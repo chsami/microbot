@@ -25,108 +25,95 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
+
+import net.runelite.api.ScriptID;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.steps.emote.QuestEmote;
 import net.runelite.client.plugins.questhelper.steps.overlay.IconOverlay;
-import java.awt.Color;
-import java.awt.Graphics2D;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import net.runelite.api.ScriptID;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.ComponentID;
-import net.runelite.api.widgets.Widget;
 
-public class EmoteStep extends DetailedQuestStep
-{
-	private boolean hasScrolled;
-	private final QuestEmote emote;
+public class EmoteStep extends DetailedQuestStep {
+    private final QuestEmote emote;
+    private boolean hasScrolled;
 
-	public EmoteStep(QuestHelper questHelper, QuestEmote emote, WorldPoint worldPoint, String text, Requirement... requirements)
-	{
-		super(questHelper, worldPoint, text, requirements);
-		this.emote = emote;
-	}
+    public EmoteStep(QuestHelper questHelper, QuestEmote emote, WorldPoint worldPoint, String text, Requirement... requirements) {
+        super(questHelper, worldPoint, text, requirements);
+        this.emote = emote;
+    }
 
-	public EmoteStep(QuestHelper questHelper, QuestEmote emote, String text, Requirement... requirements)
-	{
-		super(questHelper, text, requirements);
-		this.emote = emote;
-	}
+    public EmoteStep(QuestHelper questHelper, QuestEmote emote, String text, Requirement... requirements) {
+        super(questHelper, text, requirements);
+        this.emote = emote;
+    }
 
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
+    @Override
+    public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin) {
+        super.makeWidgetOverlayHint(graphics, plugin);
 
-		Widget emoteContainer = client.getWidget(ComponentID.EMOTES_EMOTE_CONTAINER);
+        Widget emoteContainer = client.getWidget(ComponentID.EMOTES_EMOTE_CONTAINER);
 
-		if (emoteContainer == null || emoteContainer.isHidden())
-		{
-			return;
-		}
+        if (emoteContainer == null || emoteContainer.isHidden()) {
+            return;
+        }
 
-		Widget emoteWindow = client.getWidget(ComponentID.EMOTES_WINDOW);
+        Widget emoteWindow = client.getWidget(ComponentID.EMOTES_WINDOW);
 
-		if (emoteWindow == null)
-		{
-			return;
-		}
+        if (emoteWindow == null) {
+            return;
+        }
 
-		Widget finalEmoteWidget = null;
+        Widget finalEmoteWidget = null;
 
-		for (Widget emoteWidget : emoteContainer.getDynamicChildren())
-		{
-			if (emoteWidget.getSpriteId() == emote.getSpriteId())
-			{
-				finalEmoteWidget = emoteWidget;
-				graphics.setColor(new Color(questHelper.getConfig().targetOverlayColor().getRed(),
-					questHelper.getConfig().targetOverlayColor().getGreen(),
-					questHelper.getConfig().targetOverlayColor().getBlue(), 65));
-				graphics.fill(emoteWidget.getBounds());
-				graphics.setColor(questHelper.getConfig().targetOverlayColor());
-				graphics.draw(emoteWidget.getBounds());
-			}
-		}
-		if (!hasScrolled)
-		{
-			hasScrolled = true;
-			scrollToWidget(finalEmoteWidget);
-		}
-	}
+        for (Widget emoteWidget : emoteContainer.getDynamicChildren()) {
+            if (emoteWidget.getSpriteId() == emote.getSpriteId()) {
+                finalEmoteWidget = emoteWidget;
+                graphics.setColor(new Color(questHelper.getConfig().targetOverlayColor().getRed(),
+                        questHelper.getConfig().targetOverlayColor().getGreen(),
+                        questHelper.getConfig().targetOverlayColor().getBlue(), 65));
+                graphics.fill(emoteWidget.getBounds());
+                graphics.setColor(questHelper.getConfig().targetOverlayColor());
+                graphics.draw(emoteWidget.getBounds());
+            }
+        }
+        if (!hasScrolled) {
+            hasScrolled = true;
+            scrollToWidget(finalEmoteWidget);
+        }
+    }
 
-	void scrollToWidget(Widget widget)
-	{
-		final Widget parent = client.getWidget(ComponentID.EMOTES_EMOTE_CONTAINER);
+    void scrollToWidget(Widget widget) {
+        final Widget parent = client.getWidget(ComponentID.EMOTES_EMOTE_CONTAINER);
 
-		if (widget == null || parent == null)
-		{
-			return;
-		}
+        if (widget == null || parent == null) {
+            return;
+        }
 
-		final int newScroll = Math.max(0, Math.min(parent.getScrollHeight(),
-			(widget.getRelativeY() + widget.getHeight() / 2) - parent.getHeight() / 2));
+        final int newScroll = Math.max(0, Math.min(parent.getScrollHeight(),
+                (widget.getRelativeY() + widget.getHeight() / 2) - parent.getHeight() / 2));
 
-		client.runScript(
-			ScriptID.UPDATE_SCROLLBAR,
-			ComponentID.EMOTES_EMOTE_SCROLLBAR,
-			ComponentID.EMOTES_EMOTE_CONTAINER,
-			newScroll
-		);
-	}
+        client.runScript(
+                ScriptID.UPDATE_SCROLLBAR,
+                ComponentID.EMOTES_EMOTE_SCROLLBAR,
+                ComponentID.EMOTES_EMOTE_CONTAINER,
+                newScroll
+        );
+    }
 
-	@Override
-	protected void setupIcon()
-	{
-		if (emote.getSpriteId() != -1 && icon == null)
-		{
-			BufferedImage emoteImage = spriteManager.getSprite(emote.getSpriteId(), 0);
-			if (emoteImage != null)
-			{
-				icon = IconOverlay.createIconImage(emoteImage);
-			}
-		}
-		super.setupIcon();
-	}
+    @Override
+    protected void setupIcon() {
+        if (emote.getSpriteId() != -1 && icon == null) {
+            BufferedImage emoteImage = spriteManager.getSprite(emote.getSpriteId(), 0);
+            if (emoteImage != null) {
+                icon = IconOverlay.createIconImage(emoteImage);
+            }
+        }
+        super.setupIcon();
+    }
 }

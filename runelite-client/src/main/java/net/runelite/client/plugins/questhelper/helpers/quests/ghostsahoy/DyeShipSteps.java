@@ -24,20 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.ghostsahoy;
 
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
-import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -46,265 +33,233 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.steps.*;
 
-public class DyeShipSteps extends DetailedOwnerStep
-{
-	boolean coloursKnown = false;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
-	HashMap<String, FlagColour> shapeColours = new HashMap<>();
-	HashMap<String, FlagColour> currentColours = new HashMap<>();
+public class DyeShipSteps extends DetailedOwnerStep {
+    boolean coloursKnown = false;
 
-	DetailedQuestStep searchMast, dyeTop, dyeSkull, dyeBottom, goDownToMan, talkToMan, goUpToMan, goUpToDeckForMast, goUpToMast;
+    HashMap<String, FlagColour> shapeColours = new HashMap<>();
+    HashMap<String, FlagColour> currentColours = new HashMap<>();
 
-	Requirement onTopOfShip, onDeck;
+    DetailedQuestStep searchMast, dyeTop, dyeSkull, dyeBottom, goDownToMan, talkToMan, goUpToMan, goUpToDeckForMast, goUpToMast;
 
-	Zone topOfShip, deck;
+    Requirement onTopOfShip, onDeck;
 
-	ItemRequirement modelShip;
+    Zone topOfShip, deck;
 
-	public DyeShipSteps(QuestHelper questHelper)
-	{
-		super(questHelper);
+    ItemRequirement modelShip;
 
-		topOfShip = new Zone(new WorldPoint(3616, 3541, 2), new WorldPoint(3622, 3545, 2));
-		deck = new Zone(new WorldPoint(3600, 3541, 1), new WorldPoint(3623, 3545, 1));
-		onTopOfShip = new ZoneRequirement(topOfShip);
-		onDeck = new ZoneRequirement(deck);
+    public DyeShipSteps(QuestHelper questHelper) {
+        super(questHelper);
 
-		shapeColours.put("skull", FlagColour.WHITE);
-		shapeColours.put("top", FlagColour.WHITE);
-		shapeColours.put("bottom", FlagColour.WHITE);
+        topOfShip = new Zone(new WorldPoint(3616, 3541, 2), new WorldPoint(3622, 3545, 2));
+        deck = new Zone(new WorldPoint(3600, 3541, 1), new WorldPoint(3623, 3545, 1));
+        onTopOfShip = new ZoneRequirement(topOfShip);
+        onDeck = new ZoneRequirement(deck);
 
-		currentColours.put("skull", FlagColour.WHITE);
-		currentColours.put("top", FlagColour.WHITE);
-		currentColours.put("bottom", FlagColour.WHITE);
-	}
+        shapeColours.put("skull", FlagColour.WHITE);
+        shapeColours.put("top", FlagColour.WHITE);
+        shapeColours.put("bottom", FlagColour.WHITE);
 
-	@Subscribe
-	public void onGameTick(GameTick event)
-	{
-		updateSteps();
-	}
+        currentColours.put("skull", FlagColour.WHITE);
+        currentColours.put("top", FlagColour.WHITE);
+        currentColours.put("bottom", FlagColour.WHITE);
+    }
 
-	private void updateCurrentColours()
-	{
-		Widget dyed = client.getWidget(ComponentID.DIALOG_SPRITE_TEXT);
-		if (dyed == null)
-		{
-			return;
-		}
+    private enum FlagColour {
+        RED("red.", new ItemRequirement("Red dye", ItemID.RED_DYE)),
+        BLUE("blue.", new ItemRequirement("Blue dye", ItemID.BLUE_DYE)),
+        YELLOW("yellow.", new ItemRequirement("Yellow dye", ItemID.YELLOW_DYE)),
+        GREEN("green.", new ItemRequirement("Green dye", ItemID.GREEN_DYE)),
+        PURPLE("purple.", new ItemRequirement("Purple dye", ItemID.PURPLE_DYE)),
+        ORANGE("orange.", new ItemRequirement("Orange dye", ItemID.ORANGE_DYE)),
+        WHITE("white.", new ItemRequirement("White", -1, -1));
 
-		String text = dyed.getText();
-		if (text.isEmpty())
-		{
-			return;
-		}
-		String[] splitOnNewLines = text.split("<br>");
-		if (splitOnNewLines.length > 1)
-		{
-			for (String splitOnNewLine : splitOnNewLines)
-			{
-				updateCurrentColoursFromString(splitOnNewLine);
-			}
-		}
+        private final String colourText;
+        private final ItemRequirement item;
 
-		String[] splitText = text.split("dye the ");
-		if (splitText.length < 2)
-		{
-			return;
-		}
+        FlagColour(String colourText, ItemRequirement item) {
+            this.colourText = colourText;
+            item.setHighlightInInventory(true);
+            this.item = item;
+        }
 
-		updateCurrentColoursFromString(splitText[1]);
-	}
+        public String getColourText() {
+            return colourText;
+        }
 
-	private void updateCurrentColoursFromString(String text)
-	{
-		String[] shapeAndColour = text.split(" (emblem|of the flag) ");
-		if (shapeAndColour.length < 2)
-		{
-			return;
-		}
-		String shape = shapeAndColour[0];
-		String colour = shapeAndColour[1];
-		shape = shape.replace("The ", "");
-		colour = colour.replace("is ", "");
-		currentColours.put(shape, FlagColour.findByKey(colour));
-	}
+        public ItemRequirement getItem() {
+            return item;
+        }
 
-	public void updateSteps()
-	{
-		updateCurrentColours();
-		updateColours();
-		FlagColour topColour = shapeColours.get("top");
-		FlagColour bottomColour = shapeColours.get("bottom");
-		FlagColour skullColour = shapeColours.get("skull");
-		FlagColour currentTopColour = currentColours.get("top");
-		FlagColour currentBottomColour = currentColours.get("bottom");
-		FlagColour currentSkullColour = currentColours.get("skull");
-		if (!coloursKnown &&
-			topColour != FlagColour.WHITE &&
-			skullColour != FlagColour.WHITE &&
-			bottomColour != FlagColour.WHITE)
-		{
-			coloursKnown = true;
-			dyeTop.setRequirements(Arrays.asList(topColour.getItem(), modelShip));
-			dyeTop.setText("Dye the top of the model ship's flag " + topColour.getColourText() + " If you already have, inspect the ship.");
-			dyeTop.addDialogStep("Top half");
-			dyeBottom.setRequirements(Arrays.asList(bottomColour.getItem(), modelShip));
-			dyeBottom.setText("Dye the bottom of the model ship's flag " + bottomColour.getColourText() + " If you already have, inspect the ship.");
-			dyeBottom.addDialogStep("Bottom half");
-			dyeSkull.setRequirements(Arrays.asList(skullColour.getItem(), modelShip));
-			dyeSkull.addDialogStep("Skull emblem");
-			dyeSkull.setText("Dye the skull on the model ship's flag " + skullColour.getColourText() + " If you already have, inspect the ship.");
-		}
-		if (!coloursKnown)
-		{
-			if (onDeck.check(client))
-			{
-				startUpStep(goUpToMast);
-			}
-			else if (onTopOfShip.check(client))
-			{
-				startUpStep(searchMast);
-			}
-			else
-			{
-				startUpStep(goUpToDeckForMast);
-			}
-			return;
-		}
+        public static FlagColour findByKey(String colour) {
+            FlagColour[] flagColours = FlagColour.values();
+            for (FlagColour flagColour : flagColours) {
+                if (flagColour.colourText.equals(colour)) {
+                    return flagColour;
+                }
+            }
+            return null;
+        }
+    }
 
-		if (topColour != currentTopColour)
-		{
-			startUpStep(dyeTop);
-		}
-		else if (bottomColour != currentBottomColour)
-		{
-			startUpStep(dyeBottom);
-		}
-		else if (skullColour != currentSkullColour)
-		{
-			startUpStep(dyeSkull);
-		}
-		else if (onTopOfShip.check(client))
-		{
-			startUpStep(goDownToMan);
-		}
-		else if (onDeck.check(client))
-		{
-			startUpStep(talkToMan);
-		}
-		else
-		{
-			startUpStep(goUpToMan);
-		}
-	}
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        updateSteps();
+    }
 
-	public void updateColours()
-	{
-		Widget textWidget = client.getWidget(229, 1);
-		if (textWidget != null)
-		{
-			String text = textWidget.getText();
-			if (text.isEmpty())
-			{
-				return;
-			}
-			String[] splitText = text.split("The ");
-			if (splitText.length < 2)
-			{
-				return;
-			}
-			String mainText = splitText[1];
-			if (!mainText.contains("coloured"))
-			{
-				return;
-			}
+    private void updateCurrentColours() {
+        Widget dyed = client.getWidget(ComponentID.DIALOG_SPRITE_TEXT);
+        if (dyed == null) {
+            return;
+        }
 
-			String[] shapeAndColour = mainText.split(" (emblem|half of the flag) is coloured ");
-			if (shapeAndColour.length < 2)
-			{
-				return;
-			}
-			String shape = shapeAndColour[0];
-			String colour = shapeAndColour[1];
-			shapeColours.put(shape, FlagColour.findByKey(colour));
-		}
-	}
+        String text = dyed.getText();
+        if (text.isEmpty()) {
+            return;
+        }
+        String[] splitOnNewLines = text.split("<br>");
+        if (splitOnNewLines.length > 1) {
+            for (String splitOnNewLine : splitOnNewLines) {
+                updateCurrentColoursFromString(splitOnNewLine);
+            }
+        }
 
-	@Override
-	protected void setupSteps()
-	{
-		modelShip = new ItemRequirement("Model ship", ItemID.MODEL_SHIP_4254);
-		modelShip.setHighlightInInventory(true);
+        String[] splitText = text.split("dye the ");
+        if (splitText.length < 2) {
+            return;
+        }
 
-		searchMast = new ObjectStep(getQuestHelper(), ObjectID.MAST_16640, new WorldPoint(3619, 3543, 2), "Search the Mast repeatedly until you've found out all the colours for the toy boat.");
-		dyeTop = new DetailedQuestStep(getQuestHelper(), "Dye the top of the model ship's flag to match the real ship.", modelShip);
-		dyeBottom = new DetailedQuestStep(getQuestHelper(), "Dye the bottom of the model ship's flag to match the real ship.", modelShip);
-		dyeSkull = new DetailedQuestStep(getQuestHelper(), "Dye the skull of the model ship's flag to match the real ship.", modelShip);
-		talkToMan = new NpcStep(getQuestHelper(), NpcID.OLD_MAN, new WorldPoint(3616, 3543, 1), "Talk to the Old Man with the model ship to get a key.");
-		talkToMan.addDialogStep("Is this your toy boat?");
-		goDownToMan = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16112, new WorldPoint(3615, 3541, 2), "Go to the main deck of the ship.");
-		goUpToMan = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3613, 3543, 0), "Go up the ladder in the ship west of Port Phasmatys.");
-		goDownToMan.addSubSteps(goUpToMan);
+        updateCurrentColoursFromString(splitText[1]);
+    }
 
-		goUpToDeckForMast = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3613, 3543, 0),
-			"Go up the ladder in the ship west of Port Phasmatys.");
-		goUpToMast = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3615, 3541, 1),
-			"Go up to the mast of the ship.");
-	}
+    private void updateCurrentColoursFromString(String text) {
+        String[] shapeAndColour = text.split(" (emblem|of the flag) ");
+        if (shapeAndColour.length < 2) {
+            return;
+        }
+        String shape = shapeAndColour[0];
+        String colour = shapeAndColour[1];
+        shape = shape.replace("The ", "");
+        colour = colour.replace("is ", "");
+        currentColours.put(shape, FlagColour.findByKey(colour));
+    }
 
-	@Override
-	public Collection<QuestStep> getSteps()
-	{
-		return Arrays.asList(searchMast, dyeTop, dyeBottom, dyeSkull, talkToMan, goDownToMan, goUpToMan, goUpToDeckForMast, goUpToMast);
-	}
+    public void updateSteps() {
+        updateCurrentColours();
+        updateColours();
+        FlagColour topColour = shapeColours.get("top");
+        FlagColour bottomColour = shapeColours.get("bottom");
+        FlagColour skullColour = shapeColours.get("skull");
+        FlagColour currentTopColour = currentColours.get("top");
+        FlagColour currentBottomColour = currentColours.get("bottom");
+        FlagColour currentSkullColour = currentColours.get("skull");
+        if (!coloursKnown &&
+                topColour != FlagColour.WHITE &&
+                skullColour != FlagColour.WHITE &&
+                bottomColour != FlagColour.WHITE) {
+            coloursKnown = true;
+            dyeTop.setRequirements(Arrays.asList(topColour.getItem(), modelShip));
+            dyeTop.setText("Dye the top of the model ship's flag " + topColour.getColourText() + " If you already have, inspect the ship.");
+            dyeTop.addDialogStep("Top half");
+            dyeBottom.setRequirements(Arrays.asList(bottomColour.getItem(), modelShip));
+            dyeBottom.setText("Dye the bottom of the model ship's flag " + bottomColour.getColourText() + " If you already have, inspect the ship.");
+            dyeBottom.addDialogStep("Bottom half");
+            dyeSkull.setRequirements(Arrays.asList(skullColour.getItem(), modelShip));
+            dyeSkull.addDialogStep("Skull emblem");
+            dyeSkull.setText("Dye the skull on the model ship's flag " + skullColour.getColourText() + " If you already have, inspect the ship.");
+        }
+        if (!coloursKnown) {
+            if (onDeck.check(client)) {
+                startUpStep(goUpToMast);
+            } else if (onTopOfShip.check(client)) {
+                startUpStep(searchMast);
+            } else {
+                startUpStep(goUpToDeckForMast);
+            }
+            return;
+        }
 
-	public List<QuestStep> getDisplaySteps()
-	{
-		return Arrays.asList(goUpToDeckForMast, goUpToMast, searchMast, dyeTop, dyeBottom, dyeSkull, goDownToMan,
-			talkToMan);
-	}
+        if (topColour != currentTopColour) {
+            startUpStep(dyeTop);
+        } else if (bottomColour != currentBottomColour) {
+            startUpStep(dyeBottom);
+        } else if (skullColour != currentSkullColour) {
+            startUpStep(dyeSkull);
+        } else if (onTopOfShip.check(client)) {
+            startUpStep(goDownToMan);
+        } else if (onDeck.check(client)) {
+            startUpStep(talkToMan);
+        } else {
+            startUpStep(goUpToMan);
+        }
+    }
 
-	private enum FlagColour
-	{
-		RED("red.", new ItemRequirement("Red dye", ItemID.RED_DYE)),
-		BLUE("blue.", new ItemRequirement("Blue dye", ItemID.BLUE_DYE)),
-		YELLOW("yellow.", new ItemRequirement("Yellow dye", ItemID.YELLOW_DYE)),
-		GREEN("green.", new ItemRequirement("Green dye", ItemID.GREEN_DYE)),
-		PURPLE("purple.", new ItemRequirement("Purple dye", ItemID.PURPLE_DYE)),
-		ORANGE("orange.", new ItemRequirement("Orange dye", ItemID.ORANGE_DYE)),
-		WHITE("white.", new ItemRequirement("White", -1, -1));
+    public void updateColours() {
+        Widget textWidget = client.getWidget(229, 1);
+        if (textWidget != null) {
+            String text = textWidget.getText();
+            if (text.isEmpty()) {
+                return;
+            }
+            String[] splitText = text.split("The ");
+            if (splitText.length < 2) {
+                return;
+            }
+            String mainText = splitText[1];
+            if (!mainText.contains("coloured")) {
+                return;
+            }
 
-		private final String colourText;
-		private final ItemRequirement item;
+            String[] shapeAndColour = mainText.split(" (emblem|half of the flag) is coloured ");
+            if (shapeAndColour.length < 2) {
+                return;
+            }
+            String shape = shapeAndColour[0];
+            String colour = shapeAndColour[1];
+            shapeColours.put(shape, FlagColour.findByKey(colour));
+        }
+    }
 
-		FlagColour(String colourText, ItemRequirement item)
-		{
-			this.colourText = colourText;
-			item.setHighlightInInventory(true);
-			this.item = item;
-		}
+    @Override
+    protected void setupSteps() {
+        modelShip = new ItemRequirement("Model ship", ItemID.MODEL_SHIP_4254);
+        modelShip.setHighlightInInventory(true);
 
-		public String getColourText()
-		{
-			return colourText;
-		}
+        searchMast = new ObjectStep(getQuestHelper(), ObjectID.MAST_16640, new WorldPoint(3619, 3543, 2), "Search the Mast repeatedly until you've found out all the colours for the toy boat.");
+        dyeTop = new DetailedQuestStep(getQuestHelper(), "Dye the top of the model ship's flag to match the real ship.", modelShip);
+        dyeBottom = new DetailedQuestStep(getQuestHelper(), "Dye the bottom of the model ship's flag to match the real ship.", modelShip);
+        dyeSkull = new DetailedQuestStep(getQuestHelper(), "Dye the skull of the model ship's flag to match the real ship.", modelShip);
+        talkToMan = new NpcStep(getQuestHelper(), NpcID.OLD_MAN, new WorldPoint(3616, 3543, 1), "Talk to the Old Man with the model ship to get a key.");
+        talkToMan.addDialogStep("Is this your toy boat?");
+        goDownToMan = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16112, new WorldPoint(3615, 3541, 2), "Go to the main deck of the ship.");
+        goUpToMan = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3613, 3543, 0), "Go up the ladder in the ship west of Port Phasmatys.");
+        goDownToMan.addSubSteps(goUpToMan);
 
-		public ItemRequirement getItem()
-		{
-			return item;
-		}
+        goUpToDeckForMast = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3613, 3543, 0),
+                "Go up the ladder in the ship west of Port Phasmatys.");
+        goUpToMast = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3615, 3541, 1),
+                "Go up to the mast of the ship.");
+    }
 
-		public static FlagColour findByKey(String colour) {
-			FlagColour[] flagColours = FlagColour.values();
-			for (FlagColour flagColour : flagColours) {
-				if (flagColour.colourText.equals(colour)) {
-					return flagColour;
-				}
-			}
-			return null;
-		}
-	}
+    @Override
+    public Collection<QuestStep> getSteps() {
+        return Arrays.asList(searchMast, dyeTop, dyeBottom, dyeSkull, talkToMan, goDownToMan, goUpToMan, goUpToDeckForMast, goUpToMast);
+    }
+
+    public List<QuestStep> getDisplaySteps() {
+        return Arrays.asList(goUpToDeckForMast, goUpToMast, searchMast, dyeTop, dyeBottom, dyeSkull, goDownToMan,
+                talkToMan);
+    }
 }
 

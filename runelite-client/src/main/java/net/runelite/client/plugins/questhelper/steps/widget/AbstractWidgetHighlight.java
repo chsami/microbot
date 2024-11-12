@@ -24,27 +24,26 @@
  */
 package net.runelite.client.plugins.questhelper.steps.widget;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import java.awt.Color;
-import java.awt.Graphics2D;
+
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 
-public abstract class AbstractWidgetHighlight
-{
-	public abstract void highlightChoices(Graphics2D graphics, Client client, QuestHelperPlugin questHelper);
+import java.awt.*;
 
-	protected void highlightWidget(Graphics2D graphics, QuestHelperPlugin questHelper, Widget widgetToHighlight)
-	{
-		if (widgetToHighlight == null) {
-			return;
-		}
+public abstract class AbstractWidgetHighlight {
+    public abstract void highlightChoices(Graphics2D graphics, Client client, QuestHelperPlugin questHelper);
 
-		graphics.setColor(new Color(questHelper.getConfig().targetOverlayColor().getRed(),
-			questHelper.getConfig().targetOverlayColor().getGreen(),
-			questHelper.getConfig().targetOverlayColor().getBlue(), 65));
-		graphics.fill(widgetToHighlight.getBounds());
-		graphics.setColor(questHelper.getConfig().targetOverlayColor());
-		graphics.draw(widgetToHighlight.getBounds());
-	}
+    protected void highlightWidget(Graphics2D graphics, QuestHelperPlugin questHelper, Widget widgetToHighlight) {
+        if (widgetToHighlight == null) {
+            return;
+        }
+
+        graphics.setColor(new Color(questHelper.getConfig().targetOverlayColor().getRed(),
+                questHelper.getConfig().targetOverlayColor().getGreen(),
+                questHelper.getConfig().targetOverlayColor().getBlue(), 65));
+        graphics.fill(widgetToHighlight.getBounds());
+        graphics.setColor(questHelper.getConfig().targetOverlayColor());
+        graphics.draw(widgetToHighlight.getBounds());
+    }
 }

@@ -26,161 +26,155 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.item;
 
+
+import lombok.Getter;
+import net.runelite.api.Client;
+import net.runelite.api.Item;
 import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestUtil;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
 import net.runelite.client.plugins.questhelper.util.Utils;
-import lombok.Getter;
-import lombok.Setter;
-import net.runelite.api.Client;
-import net.runelite.api.Item;
 
-public class ItemRequirements extends ItemRequirement
-{
-	@Getter
-	ArrayList<ItemRequirement> itemRequirements = new ArrayList<>();
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
 
-	@Getter
-	LogicType logicType;
+public class ItemRequirements extends ItemRequirement {
+    @Getter
+    ArrayList<ItemRequirement> itemRequirements = new ArrayList<>();
 
-	public ItemRequirements(ItemRequirement... requirements)
-	{
-		this("", requirements);
-	}
+    @Getter
+    LogicType logicType;
 
-	public ItemRequirements(String name, ItemRequirement... itemRequirements)
-	{
-		super(name, itemRequirements[0].getId(), -1);
+    public ItemRequirements(ItemRequirement... requirements) {
+        this("", requirements);
+    }
 
-		assert(Utils.varargsNotNull(itemRequirements));
+    public ItemRequirements(String name, ItemRequirement... itemRequirements) {
+        super(name, itemRequirements[0].getId(), -1);
 
-		this.itemRequirements.addAll(Arrays.asList(itemRequirements));
-		this.logicType = LogicType.AND;
-	}
+        assert (Utils.varargsNotNull(itemRequirements));
 
-	public ItemRequirements(LogicType logicType, String name, ItemRequirement... itemRequirements)
-	{
-		super(name, itemRequirements[0].getId(), -1);
+        this.itemRequirements.addAll(Arrays.asList(itemRequirements));
+        this.logicType = LogicType.AND;
+    }
 
-		assert(Utils.varargsNotNull(itemRequirements));
+    public ItemRequirements(LogicType logicType, String name, ItemRequirement... itemRequirements) {
+        super(name, itemRequirements[0].getId(), -1);
 
-		this.itemRequirements.addAll(Arrays.asList(itemRequirements));
-		this.logicType = logicType;
-	}
+        assert (Utils.varargsNotNull(itemRequirements));
 
-	public ItemRequirements(LogicType logicType, String name, List<ItemRequirement> itemRequirements)
-	{
-		super(name, itemRequirements.get(0).getId(), -1);
+        this.itemRequirements.addAll(Arrays.asList(itemRequirements));
+        this.logicType = logicType;
+    }
 
-		assert(itemRequirements.stream().noneMatch(Objects::isNull));
+    public ItemRequirements(LogicType logicType, String name, List<ItemRequirement> itemRequirements) {
+        super(name, itemRequirements.get(0).getId(), -1);
 
-		this.itemRequirements.addAll(itemRequirements);
-		this.logicType = logicType;
-	}
+        assert (itemRequirements.stream().noneMatch(Objects::isNull));
 
-	public ItemRequirements(LogicType logicType, ItemRequirement... requirements)
-	{
-		this(logicType, "", requirements);
-	}
+        this.itemRequirements.addAll(itemRequirements);
+        this.logicType = logicType;
+    }
 
-	@Override
-	public boolean isActualItem()
-	{
-		return LogicType.OR.test(getItemRequirements().stream(), item -> !item.getAllIds().contains(-1) && item.getQuantity() >= 0);
-	}
+    public ItemRequirements(LogicType logicType, ItemRequirement... requirements) {
+        this(logicType, "", requirements);
+    }
 
-	@Override
-	public boolean check(Client client)
-	{
-		return check(client, false);
-	}
+    @Override
+    public boolean isActualItem() {
+        return LogicType.OR.test(getItemRequirements().stream(), item -> !item.getAllIds().contains(-1) && item.getQuantity() >= 0);
+    }
 
-	@Override
-	public boolean check(Client client, boolean checkConsideringSlotRestrictions)
-	{
-		Predicate<ItemRequirement> predicate = r -> r.check(client, checkConsideringSlotRestrictions);
-		int successes = (int) itemRequirements.stream().filter(Objects::nonNull).filter(predicate).count();
-		hadItemLastCheck = logicType.compare(successes, itemRequirements.size());
-		return hadItemLastCheck;
-	}
+    @Override
+    public boolean check(Client client) {
+        return check(client, false);
+    }
 
-	@Override
-	public boolean check(Client client, boolean checkConsideringSlotRestrictions, List<Item> items)
-	{
-		Predicate<ItemRequirement> predicate = r -> r.check(client, checkConsideringSlotRestrictions, items);
-		int successes = (int) itemRequirements.stream().filter(Objects::nonNull).filter(predicate).count();
-		hadItemLastCheck = logicType.compare(successes, itemRequirements.size());
-		return hadItemLastCheck;
-	}
+    @Override
+    public boolean check(Client client, boolean checkConsideringSlotRestrictions) {
+        Predicate<ItemRequirement> predicate = r -> r.check(client, checkConsideringSlotRestrictions);
+        int successes = (int) itemRequirements.stream().filter(Objects::nonNull).filter(predicate).count();
+        hadItemLastCheck = logicType.compare(successes, itemRequirements.size());
+        return hadItemLastCheck;
+    }
 
-	@Override
-	public Color getColor(Client client, QuestHelperConfig config)
-	{
-		return this.check(client, true) ? config.passColour() : config.failColour();
-	}
+    @Override
+    public boolean check(Client client, boolean checkConsideringSlotRestrictions, List<Item> items) {
+        Predicate<ItemRequirement> predicate = r -> r.check(client, checkConsideringSlotRestrictions, items);
+        int successes = (int) itemRequirements.stream().filter(Objects::nonNull).filter(predicate).count();
+        hadItemLastCheck = logicType.compare(successes, itemRequirements.size());
+        return hadItemLastCheck;
+    }
 
-	@Override
-	public Color getColorConsideringBank(Client client, boolean checkConsideringSlotRestrictions,
-										 List<Item> bankItems, QuestHelperConfig config)
-	{
-		Color color = config.failColour();
-		if (!this.isActualItem() && this.getItemRequirements() == null)
-		{
-			color = Color.GRAY;
-		}
-		else if (this.check(client, checkConsideringSlotRestrictions))
-		{
-			color = config.passColour();
-		}
+    @Override
+    public Color getColor(Client client, QuestHelperConfig config) {
+        return this.check(client, true) ? config.passColour() : config.failColour();
+    }
 
-		if (color == config.failColour() && bankItems != null)
-		{
-			if (check(client, false, bankItems))
-			{
-				color = Color.WHITE;
-			}
-		}
+    @Override
+    public Color getColorConsideringBank(Client client, boolean checkConsideringSlotRestrictions,
+                                         List<Item> bankItems, QuestHelperConfig config) {
+        Color color = config.failColour();
+        if (!this.isActualItem() && this.getItemRequirements() == null) {
+            color = Color.GRAY;
+        } else if (this.check(client, checkConsideringSlotRestrictions)) {
+            color = config.passColour();
+        }
 
-		return color;
-	}
+        if (color == config.failColour() && bankItems != null) {
+            if (check(client, false, bankItems)) {
+                color = Color.WHITE;
+            }
+        }
 
-	@Override
-	public ItemRequirement copy()
-	{
-		ItemRequirements newItem = new ItemRequirements(getLogicType(), getName(), getItemRequirements());
-		newItem.addAlternates(alternateItems);
-		newItem.setDisplayItemId(getDisplayItemId());
-		newItem.setExclusiveToOneItemType(exclusiveToOneItemType);
-		newItem.setHighlightInInventory(highlightInInventory);
-		newItem.setDisplayMatchedItemName(isDisplayMatchedItemName());
-		newItem.setConditionToHide(getConditionToHide());
-		newItem.setQuestBank(getQuestBank());
-		newItem.setTooltip(getTooltip());
-		newItem.logicType = logicType;
-		newItem.additionalOptions = additionalOptions;
+        return color;
+    }
 
-		return newItem;
-	}
+    @Override
+    public ItemRequirement copy() {
+        ItemRequirements newItem = new ItemRequirements(getLogicType(), getName(), getItemRequirements());
+        newItem.addAlternates(alternateItems);
+        newItem.setDisplayItemId(getDisplayItemId());
+        newItem.setExclusiveToOneItemType(exclusiveToOneItemType);
+        newItem.setHighlightInInventory(highlightInInventory);
+        newItem.setDisplayMatchedItemName(isDisplayMatchedItemName());
+        newItem.setConditionToHide(getConditionToHide());
+        newItem.setQuestBank(getQuestBank());
+        newItem.setTooltip(getTooltip());
+        newItem.logicType = logicType;
+        newItem.additionalOptions = additionalOptions;
 
-	@Override
-	public List<Integer> getAllIds()
-	{
-		return itemRequirements.stream()
-			.map(ItemRequirement::getAllIds)
-			.flatMap(Collection::stream)
-			.collect(QuestUtil.collectToArrayList());
-	}
+        return newItem;
+    }
 
-	@Override
-	public boolean checkBank(Client client)
-	{
-		return logicType.test(getItemRequirements().stream(), item -> item.checkBank(client) || item.check(client, false));
-	}
+    @Override
+    public List<Integer> getAllIds() {
+        return itemRequirements.stream()
+                .map(ItemRequirement::getAllIds)
+                .flatMap(Collection::stream)
+                .collect(QuestUtil.collectToArrayList());
+    }
+
+    @Override
+    public ItemRequirement equipped() {
+        ItemRequirements newItem = (ItemRequirements) copy();
+
+        newItem.itemRequirements.forEach((itemRequirement -> itemRequirement.setEquip(true)));
+        equip = true;
+        return newItem;
+    }
+
+
+    @Override
+    public void setEquip(boolean shouldEquip) {
+        itemRequirements.forEach((itemRequirement -> itemRequirement.setEquip(true)));
+        equip = shouldEquip;
+    }
+
+    @Override
+    public boolean checkBank(Client client) {
+        return logicType.test(getItemRequirements().stream(), item -> item.checkBank(client) || item.check(client, false));
+    }
 }

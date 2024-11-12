@@ -26,47 +26,43 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.location;
 
-import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
-import net.runelite.client.plugins.questhelper.steps.tools.QuestPerspective;
-import javax.annotation.Nonnull;
+
 import net.runelite.api.Client;
 import net.runelite.api.Constants;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import java.util.Objects;
+import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
+import net.runelite.client.plugins.questhelper.steps.tools.QuestPerspective;
 
-public class TileIsLoadedRequirement extends AbstractRequirement
-{
-	private final WorldPoint worldPoint;
-	private final String displayText;
+import javax.annotation.Nonnull;
 
-	/**
-	 * Check if the player is either in the specified zone.
-	 *
-	 * @param worldPoint the WorldPoint to check
-	 */
-	public TileIsLoadedRequirement(WorldPoint worldPoint)
-	{
-		assert(worldPoint != null);
-		this.worldPoint = worldPoint;
-		this.displayText = "WorldPoint " + worldPoint.toString() + "is loaded locally.";
-	}
+public class TileIsLoadedRequirement extends AbstractRequirement {
+    private final WorldPoint worldPoint;
+    private final String displayText;
 
-	@Override
-	public boolean check(Client client)
-	{
-		LocalPoint lp = QuestPerspective.getInstanceLocalPointFromReal(client, worldPoint);
-		if (lp == null) return false;
-		// Final tiles of a scene do not have objects of them
-		if (lp.getSceneX() == Constants.SCENE_SIZE - 1) return false;
-		if (lp.getSceneY() == Constants.SCENE_SIZE - 1) return false;
-		return true;
-	}
+    /**
+     * Check if the player is either in the specified zone.
+     *
+     * @param worldPoint the WorldPoint to check
+     */
+    public TileIsLoadedRequirement(WorldPoint worldPoint) {
+        assert (worldPoint != null);
+        this.worldPoint = worldPoint;
+        this.displayText = "WorldPoint " + worldPoint + "is loaded locally.";
+    }
 
-	@Nonnull
-	@Override
-	public String getDisplayText()
-	{
-		return displayText == null ? "" : displayText;
-	}
+    @Override
+    public boolean check(Client client) {
+        LocalPoint lp = QuestPerspective.getInstanceLocalPointFromReal(client, worldPoint);
+        if (lp == null) return false;
+        // Final tiles of a scene do not have objects of them
+        if (lp.getSceneX() == Constants.SCENE_SIZE - 1) return false;
+        return lp.getSceneY() != Constants.SCENE_SIZE - 1;
+    }
+
+    @Nonnull
+    @Override
+    public String getDisplayText() {
+        return displayText == null ? "" : displayText;
+    }
 }

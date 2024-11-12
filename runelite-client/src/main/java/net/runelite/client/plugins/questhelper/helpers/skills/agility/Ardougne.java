@@ -24,118 +24,110 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.skills.agility;
 
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.api.ObjectID;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
+
 import java.util.Arrays;
 import java.util.Collections;
-import net.runelite.api.ObjectID;
-import net.runelite.api.coords.WorldPoint;
 
-public class Ardougne extends AgilityCourse
+public class Ardougne extends AgilityCourse {
+    QuestStep ardougneSidebar;
+    QuestStep climbWoodenBeam, jumpFirstGap, walkOnPlank, jumpSecondGap, jumpThirdGap, balanceRoof, jumpForthGap;
+    Zone firstGapZone, plankZone, secondGapZone, thirdGapZone, balanceZone, forthGapZone;
+    ZoneRequirement inFirstGapZone, inPlankZone, inSecondGapZone, inThirdGapZone, inBalanceZone, inForthGapZone;
 
-{
-	QuestStep ardougneSidebar;
-	QuestStep climbWoodenBeam, jumpFirstGap, walkOnPlank, jumpSecondGap, jumpThirdGap, balanceRoof, jumpForthGap;
-	Zone firstGapZone, plankZone, secondGapZone, thirdGapZone, balanceZone, forthGapZone;
-	ZoneRequirement inFirstGapZone, inPlankZone, inSecondGapZone, inThirdGapZone, inBalanceZone, inForthGapZone;
+    ConditionalStep ardougneStep;
+    PanelDetails ardougnePanels;
 
-	ConditionalStep ardougneStep;
-	PanelDetails ardougnePanels;
+    public Ardougne(QuestHelper questHelper) {
+        super(questHelper);
+    }
 
-	public Ardougne(QuestHelper questHelper)
-	{
-		super(questHelper);
-	}
+    @Override
+    protected ConditionalStep loadStep() {
+        setupZones();
+        setupConditions();
+        setupSteps();
+        addSteps();
 
-	@Override
-	protected ConditionalStep loadStep()
-	{
-		setupZones();
-		setupConditions();
-		setupSteps();
-		addSteps();
+        return ardougneStep;
+    }
 
-		return ardougneStep;
-	}
-
-	@Override
-	protected void setupConditions()
-	{
-		inFirstGapZone = new ZoneRequirement(firstGapZone);
-		inPlankZone = new ZoneRequirement(plankZone);
-		inSecondGapZone = new ZoneRequirement(secondGapZone);
-		inThirdGapZone = new ZoneRequirement(thirdGapZone);
-		inBalanceZone = new ZoneRequirement(balanceZone);
-		inForthGapZone = new ZoneRequirement(forthGapZone);
+    @Override
+    protected void setupConditions() {
+        inFirstGapZone = new ZoneRequirement(firstGapZone);
+        inPlankZone = new ZoneRequirement(plankZone);
+        inSecondGapZone = new ZoneRequirement(secondGapZone);
+        inThirdGapZone = new ZoneRequirement(thirdGapZone);
+        inBalanceZone = new ZoneRequirement(balanceZone);
+        inForthGapZone = new ZoneRequirement(forthGapZone);
 
 
-	}
+    }
 
-	@Override
-	protected void setupZones()
-	{
-		firstGapZone = new Zone(new WorldPoint(2671, 3299, 3), new WorldPoint(2666, 3318, 3));
-		plankZone = new Zone(new WorldPoint(2665, 3318, 3), new WorldPoint(2657, 3318, 3));
-		secondGapZone = new Zone(new WorldPoint(2656, 3318, 3), new WorldPoint(2653, 3315, 3));
-		thirdGapZone = new Zone(new WorldPoint(2653, 3314, 3), new WorldPoint(2653, 3310, 3));
-		balanceZone = new Zone(new WorldPoint(2651, 3309, 3), new WorldPoint(2655, 3298, 3));
-		forthGapZone = new Zone(new WorldPoint(2656, 3297, 3), new WorldPoint(2667, 3297, 0));
-
-
-	}
-
-	@Override
-	protected void setupSteps()
-	{
-		//Ardougne obstacles
-		climbWoodenBeam = new ObjectStep(this.questHelper, ObjectID.WOODEN_BEAMS, new WorldPoint(2729, 3489, 0),
-			"Climb up the wooden beams on the outside of the house south east of the East Ardougne Marketplace.",
-			Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
-		jumpFirstGap = new ObjectStep(this.questHelper, ObjectID.GAP_15609, new WorldPoint(2729, 3489, 0),
-			"Jump across the gap.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
-		walkOnPlank = new ObjectStep(this.questHelper, ObjectID.PLANK_26635, new WorldPoint(2729, 3489, 0),
-			"Walk across the plank.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
-		jumpSecondGap = new ObjectStep(this.questHelper, ObjectID.GAP_15610, new WorldPoint(2729, 3489, 0),
-			"Jump across the gap.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
-		jumpThirdGap = new ObjectStep(this.questHelper, ObjectID.GAP_15611, new WorldPoint(2729, 3489, 0),
-			"Jump across another gap.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
-		balanceRoof = new ObjectStep(this.questHelper, ObjectID.STEEP_ROOF, new WorldPoint(2729, 3489, 0),
-			"Balance across the steep roof.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
-		jumpForthGap = new ObjectStep(this.questHelper, ObjectID.GAP_15612, new WorldPoint(2729, 3489, 0),
-			"Balance across the final steep roof.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
+    @Override
+    protected void setupZones() {
+        firstGapZone = new Zone(new WorldPoint(2671, 3299, 3), new WorldPoint(2666, 3318, 3));
+        plankZone = new Zone(new WorldPoint(2665, 3318, 3), new WorldPoint(2657, 3318, 3));
+        secondGapZone = new Zone(new WorldPoint(2656, 3318, 3), new WorldPoint(2653, 3315, 3));
+        thirdGapZone = new Zone(new WorldPoint(2653, 3314, 3), new WorldPoint(2653, 3310, 3));
+        balanceZone = new Zone(new WorldPoint(2651, 3309, 3), new WorldPoint(2655, 3298, 3));
+        forthGapZone = new Zone(new WorldPoint(2656, 3297, 3), new WorldPoint(2667, 3297, 0));
 
 
-	}
+    }
 
-	@Override
-	protected void addSteps()
-	{
-		ardougneStep = new ConditionalStep(this.questHelper, climbWoodenBeam);
-		ardougneStep.addStep(new Conditions(inFirstGapZone), jumpFirstGap);
-		ardougneStep.addStep(new Conditions(inPlankZone), walkOnPlank);
-		ardougneStep.addStep(new Conditions(inSecondGapZone), jumpSecondGap);
-		ardougneStep.addStep(new Conditions(inThirdGapZone), jumpThirdGap);
-		ardougneStep.addStep(new Conditions(inBalanceZone), balanceRoof);
-		ardougneStep.addStep(new Conditions(inForthGapZone), jumpForthGap);
+    @Override
+    protected void setupSteps() {
+        //Ardougne obstacles
+        climbWoodenBeam = new ObjectStep(this.questHelper, ObjectID.WOODEN_BEAMS, new WorldPoint(2729, 3489, 0),
+                "Climb up the wooden beams on the outside of the house south east of the East Ardougne Marketplace.",
+                Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
+        jumpFirstGap = new ObjectStep(this.questHelper, ObjectID.GAP_15609, new WorldPoint(2729, 3489, 0),
+                "Jump across the gap.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
+        walkOnPlank = new ObjectStep(this.questHelper, ObjectID.PLANK_26635, new WorldPoint(2729, 3489, 0),
+                "Walk across the plank.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
+        jumpSecondGap = new ObjectStep(this.questHelper, ObjectID.GAP_15610, new WorldPoint(2729, 3489, 0),
+                "Jump across the gap.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
+        jumpThirdGap = new ObjectStep(this.questHelper, ObjectID.GAP_15611, new WorldPoint(2729, 3489, 0),
+                "Jump across another gap.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
+        balanceRoof = new ObjectStep(this.questHelper, ObjectID.STEEP_ROOF, new WorldPoint(2729, 3489, 0),
+                "Balance across the steep roof.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
+        jumpForthGap = new ObjectStep(this.questHelper, ObjectID.GAP_15612, new WorldPoint(2729, 3489, 0),
+                "Balance across the final steep roof.", Collections.EMPTY_LIST, Arrays.asList(recommendedItems));
 
-		ardougneSidebar = new DetailedQuestStep(this.questHelper, "Train agility at the Ardougne Rooftop Course, " +
-			"starting outside of the house south east of the East Ardougne Marketplace.");
-		ardougneSidebar.addSubSteps(climbWoodenBeam, jumpFirstGap, walkOnPlank, jumpSecondGap, jumpThirdGap, balanceRoof, jumpForthGap);
 
-	}
+    }
 
-	@Override
-	protected PanelDetails getPanelDetails()
-	{
-		ardougnePanels = new PanelDetails("90 - 99: Ardougne", Collections.singletonList(ardougneSidebar)
-		);
-		return ardougnePanels;
-	}
+    @Override
+    protected void addSteps() {
+        ardougneStep = new ConditionalStep(this.questHelper, climbWoodenBeam);
+        ardougneStep.addStep(new Conditions(inFirstGapZone), jumpFirstGap);
+        ardougneStep.addStep(new Conditions(inPlankZone), walkOnPlank);
+        ardougneStep.addStep(new Conditions(inSecondGapZone), jumpSecondGap);
+        ardougneStep.addStep(new Conditions(inThirdGapZone), jumpThirdGap);
+        ardougneStep.addStep(new Conditions(inBalanceZone), balanceRoof);
+        ardougneStep.addStep(new Conditions(inForthGapZone), jumpForthGap);
+
+        ardougneSidebar = new DetailedQuestStep(this.questHelper, "Train agility at the Ardougne Rooftop Course, " +
+                "starting outside of the house south east of the East Ardougne Marketplace.");
+        ardougneSidebar.addSubSteps(climbWoodenBeam, jumpFirstGap, walkOnPlank, jumpSecondGap, jumpThirdGap, balanceRoof, jumpForthGap);
+
+    }
+
+    @Override
+    protected PanelDetails getPanelDetails() {
+        ardougnePanels = new PanelDetails("90 - 99: Ardougne", Collections.singletonList(ardougneSidebar)
+        );
+        return ardougnePanels;
+    }
 }

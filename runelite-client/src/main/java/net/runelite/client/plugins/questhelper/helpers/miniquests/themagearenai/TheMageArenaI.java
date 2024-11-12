@@ -24,178 +24,158 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.miniquests.themagearenai;
 
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
-import net.runelite.client.plugins.questhelper.panel.PanelDetails;
-import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.rewards.ItemReward;
-import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
-import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.panel.PanelDetails;
+import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemOnTileRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+import net.runelite.client.plugins.questhelper.rewards.ItemReward;
+import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
+import net.runelite.client.plugins.questhelper.steps.*;
 
-public class TheMageArenaI extends BasicQuestHelper
-{
-	ItemRequirement runesForCasts, knife, godCape;
+import java.util.*;
 
-	Requirement inCavern, inStatuesRoom, hasCape;
+public class TheMageArenaI extends BasicQuestHelper {
+    ItemRequirement runesForCasts, knife, godCape;
 
-	QuestStep enterCavern, talkToKolodion, fightKolodion, enterCavernForPool, enterPool, prayStatue, talkToGuardian;
+    Requirement inCavern, inStatuesRoom, hasCape;
 
-	Zone cavern, statuesRoom;
+    QuestStep enterCavern, talkToKolodion, fightKolodion, enterCavernForPool, enterPool, prayStatue, talkToGuardian;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
+    Zone cavern, statuesRoom;
 
-		ConditionalStep goTalkToKolodion = new ConditionalStep(this, enterCavern);
-		goTalkToKolodion.addStep(inCavern, talkToKolodion);
-		steps.put(0, goTalkToKolodion);
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupConditions();
+        setupSteps();
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		steps.put(1, fightKolodion);
-		steps.put(2, fightKolodion);
-		steps.put(3, fightKolodion);
-		steps.put(4, fightKolodion);
-		steps.put(5, fightKolodion);
+        ConditionalStep goTalkToKolodion = new ConditionalStep(this, enterCavern);
+        goTalkToKolodion.addStep(inCavern, talkToKolodion);
+        steps.put(0, goTalkToKolodion);
 
-		ConditionalStep goGetStaff = new ConditionalStep(this, enterCavernForPool);
-		goGetStaff.addStep(new Conditions(inStatuesRoom, hasCape), talkToGuardian);
-		goGetStaff.addStep(new Conditions(inStatuesRoom), prayStatue);
-		goGetStaff.addStep(inCavern, enterPool);
-		steps.put(6, goGetStaff);
-		steps.put(7, goGetStaff);
+        steps.put(1, fightKolodion);
+        steps.put(2, fightKolodion);
+        steps.put(3, fightKolodion);
+        steps.put(4, fightKolodion);
+        steps.put(5, fightKolodion);
 
-		return steps;
-	}
+        ConditionalStep goGetStaff = new ConditionalStep(this, enterCavernForPool);
+        goGetStaff.addStep(new Conditions(inStatuesRoom, hasCape), talkToGuardian);
+        goGetStaff.addStep(new Conditions(inStatuesRoom), prayStatue);
+        goGetStaff.addStep(inCavern, enterPool);
+        steps.put(6, goGetStaff);
+        steps.put(7, goGetStaff);
 
-	@Override
-	protected void setupRequirements()
-	{
-		runesForCasts = new ItemRequirement("Runes for fighting Kolodion", -1, -1);
-		runesForCasts.setDisplayItemId(ItemID.DEATH_RUNE);
-		knife = new ItemRequirement("Knife or sharp weapon to cut through a web", ItemID.KNIFE).isNotConsumed();
-		godCape = new ItemRequirement("God cape", ItemID.ZAMORAK_CAPE).isNotConsumed();
-		godCape.addAlternates(ItemID.GUTHIX_CAPE, ItemID.SARADOMIN_CAPE);
-	}
+        return steps;
+    }
 
-	@Override
-	protected void setupZones()
-	{
-		cavern = new Zone(new WorldPoint(2529, 4709, 0), new WorldPoint(2550, 4725, 0));
-		statuesRoom = new Zone(new WorldPoint(2486, 4683, 0), new WorldPoint(2526, 4736, 0));
-	}
+    @Override
+    protected void setupRequirements() {
+        runesForCasts = new ItemRequirement("Runes for fighting Kolodion", -1, -1);
+        runesForCasts.setDisplayItemId(ItemID.DEATH_RUNE);
+        knife = new ItemRequirement("Knife or sharp weapon to cut through a web", ItemID.KNIFE).isNotConsumed();
+        godCape = new ItemRequirement("God cape", ItemID.ZAMORAK_CAPE).isNotConsumed();
+        godCape.addAlternates(ItemID.GUTHIX_CAPE, ItemID.SARADOMIN_CAPE);
+    }
 
-	public void setupConditions()
-	{
-		inCavern = new ZoneRequirement(cavern);
-		inStatuesRoom = new ZoneRequirement(statuesRoom);
+    @Override
+    protected void setupZones() {
+        cavern = new Zone(new WorldPoint(2529, 4709, 0), new WorldPoint(2550, 4725, 0));
+        statuesRoom = new Zone(new WorldPoint(2486, 4683, 0), new WorldPoint(2526, 4736, 0));
+    }
 
-		hasCape = new ItemOnTileRequirement(godCape);
-	}
+    public void setupConditions() {
+        inCavern = new ZoneRequirement(cavern);
+        inStatuesRoom = new ZoneRequirement(statuesRoom);
 
-	public void setupSteps()
-	{
-		enterCavern = new ObjectStep(this, ObjectID.LEVER_5959, new WorldPoint(3090, 3956, 0), "Pull the lever in the" +
-			" building north of the Mage Arena. This is IN THE WILDERNESS, so don't bring anything you don't want to " +
-			"lose.", knife);
-		talkToKolodion = new NpcStep(this, NpcID.KOLODION, new WorldPoint(2539, 4716, 0), "Talk to Kolodion, ready " +
-			"for fighting him in the Mage Arena.", runesForCasts);
-		talkToKolodion.addDialogSteps("Can I fight here?", "Yes indeedy.", "Okay, let's fight.");
+        hasCape = new ItemOnTileRequirement(godCape);
+    }
 
-		fightKolodion = new NpcStep(this, NpcID.KOLODION_1604, new WorldPoint(3105, 3934, 0), "Defeat Kolodion's " +
-			"various forms.");
-		((NpcStep) fightKolodion).addAlternateNpcs(NpcID.KOLODION_1605, NpcID.KOLODION_1606, NpcID.KOLODION_1607,
-			NpcID.KOLODION_1608, NpcID.KOLODION_1609);
+    public void setupSteps() {
+        enterCavern = new ObjectStep(this, ObjectID.LEVER_5959, new WorldPoint(3090, 3956, 0), "Pull the lever in the" +
+                " building north of the Mage Arena. This is IN THE WILDERNESS, so don't bring anything you don't want to " +
+                "lose.", knife);
+        talkToKolodion = new NpcStep(this, NpcID.KOLODION, new WorldPoint(2539, 4716, 0), "Talk to Kolodion, ready " +
+                "for fighting him in the Mage Arena.", runesForCasts);
+        talkToKolodion.addDialogSteps("Can I fight here?", "Yes indeedy.", "Okay, let's fight.");
 
-		enterCavernForPool = new ObjectStep(this, ObjectID.LEVER_5959, new WorldPoint(3090, 3956, 0), "Pull the lever in the" +
-			" building north of the Mage Arena. This is IN THE WILDERNESS, so don't bring anything you don't want to " +
-			"lose.", knife);
+        fightKolodion = new NpcStep(this, NpcID.KOLODION_1604, new WorldPoint(3105, 3934, 0), "Defeat Kolodion's " +
+                "various forms.");
+        ((NpcStep) fightKolodion).addAlternateNpcs(NpcID.KOLODION_1605, NpcID.KOLODION_1606, NpcID.KOLODION_1607,
+                NpcID.KOLODION_1608, NpcID.KOLODION_1609);
 
-		enterPool = new ObjectStep(this, ObjectID.SPARKLING_POOL, new WorldPoint(2542, 4720, 0), "Enter the sparkling" +
-			" pool.");
-		enterPool.addSubSteps(enterCavernForPool);
+        enterCavernForPool = new ObjectStep(this, ObjectID.LEVER_5959, new WorldPoint(3090, 3956, 0), "Pull the lever in the" +
+                " building north of the Mage Arena. This is IN THE WILDERNESS, so don't bring anything you don't want to " +
+                "lose.", knife);
 
-		prayStatue = new DetailedQuestStep(this, new WorldPoint(2507, 4720, 0), "Pray at the statue of the god who's " +
-			"cape you want. Pick up the cape which appears.");
+        enterPool = new ObjectStep(this, ObjectID.SPARKLING_POOL, new WorldPoint(2542, 4720, 0), "Enter the sparkling" +
+                " pool.");
+        enterPool.addSubSteps(enterCavernForPool);
 
-		talkToGuardian = new NpcStep(this, NpcID.CHAMBER_GUARDIAN, new WorldPoint(2508, 4695, 0), "Talk to the " +
-			"Chamber Guardian for your staff.", godCape);
-	}
+        prayStatue = new DetailedQuestStep(this, new WorldPoint(2507, 4720, 0), "Pray at the statue of the god who's " +
+                "cape you want. Pick up the cape which appears.");
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		return Arrays.asList(knife, runesForCasts);
-	}
+        talkToGuardian = new NpcStep(this, NpcID.CHAMBER_GUARDIAN, new WorldPoint(2508, 4695, 0), "Talk to the " +
+                "Chamber Guardian for your staff.", godCape);
+    }
 
-	@Override
-	public List<String> getCombatRequirements()
-	{
-		return Collections.singletonList("Kolodion in 5 forms, up to level 112");
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        return Arrays.asList(knife, runesForCasts);
+    }
 
-	@Override
-	public List<String> getNotes()
-	{
-		return Collections.singletonList("This miniquest is in deep Wilderness. Don't bring anything you're not " +
-			"willing to risk! It's recommended to turn off player attack options to avoid potentially getting " +
-			"skulled.");
-	}
+    @Override
+    public List<String> getCombatRequirements() {
+        return Collections.singletonList("Kolodion in 5 forms, up to level 112");
+    }
 
-	@Override
-	public List<Requirement> getGeneralRequirements()
-	{
-		ArrayList<Requirement> reqs = new ArrayList<>();
-		reqs.add(new SkillRequirement(Skill.MAGIC, 60));
-		return reqs;
-	}
+    @Override
+    public List<String> getNotes() {
+        return Collections.singletonList("This miniquest is in deep Wilderness. Don't bring anything you're not " +
+                "willing to risk! It's recommended to turn off player attack options to avoid potentially getting " +
+                "skulled.");
+    }
 
-	@Override
-	public List<ItemReward> getItemRewards()
-	{
-		return Arrays.asList(
-				new ItemReward("A God Staff", ItemID.ZAMORAK_STAFF, 1),
-				new ItemReward("A God Cape", ItemID.ZAMORAK_CAPE, 1));
-	}
+    @Override
+    public List<Requirement> getGeneralRequirements() {
+        ArrayList<Requirement> reqs = new ArrayList<>();
+        reqs.add(new SkillRequirement(Skill.MAGIC, 60));
+        return reqs;
+    }
 
-	@Override
-	public List<UnlockReward> getUnlockRewards()
-	{
-		return Collections.singletonList(new UnlockReward("Ability to unlock 3 new God Spells."));
-	}
+    @Override
+    public List<ItemReward> getItemRewards() {
+        return Arrays.asList(
+                new ItemReward("A God Staff", ItemID.ZAMORAK_STAFF, 1),
+                new ItemReward("A God Cape", ItemID.ZAMORAK_CAPE, 1));
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Getting to the Mage Arena", Collections.singletonList(enterCavern), knife));
-		allSteps.add(new PanelDetails("Defeating Kolodion", Arrays.asList(talkToKolodion, fightKolodion),
-			runesForCasts));
+    @Override
+    public List<UnlockReward> getUnlockRewards() {
+        return Collections.singletonList(new UnlockReward("Ability to unlock 3 new God Spells."));
+    }
 
-		allSteps.add(new PanelDetails("Getting your rewards",
-			Arrays.asList(enterPool, prayStatue, talkToGuardian)));
-		return allSteps;
-	}
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        allSteps.add(new PanelDetails("Getting to the Mage Arena", Collections.singletonList(enterCavern), knife));
+        allSteps.add(new PanelDetails("Defeating Kolodion", Arrays.asList(talkToKolodion, fightKolodion),
+                runesForCasts));
+
+        allSteps.add(new PanelDetails("Getting your rewards",
+                Arrays.asList(enterPool, prayStatue, talkToGuardian)));
+        return allSteps;
+    }
 }

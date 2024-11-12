@@ -24,97 +24,104 @@
  */
 package net.runelite.client.plugins.questhelper.steps.widget;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.steps.widget.AbstractWidgetHighlight;
+
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+
 import java.awt.*;
 
-public class WidgetHighlight extends AbstractWidgetHighlight
-{
-	@Getter
-	protected final int groupId;
+public class WidgetHighlight extends AbstractWidgetHighlight {
+    @Getter
+    protected final int groupId;
+    @Getter
+    protected final int childId;
+    @Getter
+    protected final int childChildId;
+    protected final boolean checkChildren;
+    @Getter
+    protected Integer itemIdRequirement;
+    @Getter
+    @Setter
+    protected Integer modelIdRequirement;
 
-	@Getter
-	protected final int childId;
+    public WidgetHighlight(int groupId, int childId) {
+        this.groupId = groupId;
+        this.childId = childId;
+        this.childChildId = -1;
+        this.checkChildren = false;
+    }
 
-	@Getter
-	protected final int childChildId;
+    public WidgetHighlight(int groupId, int childId, int childChildId) {
+        this.groupId = groupId;
+        this.childId = childId;
+        this.childChildId = childChildId;
+        this.checkChildren = false;
+    }
 
-	@Getter
-	protected Integer itemIdRequirement;
+    public WidgetHighlight(int groupId, int childId, boolean checkChildren) {
+        this.groupId = groupId;
+        this.childId = childId;
+        this.childChildId = -1;
+        this.checkChildren = checkChildren;
+    }
 
-	protected final boolean checkChildren;
+    public WidgetHighlight(int groupId, int childId, int itemIdRequirement, boolean checkChildren) {
+        this.groupId = groupId;
+        this.childId = childId;
+        this.childChildId = -1;
+        this.itemIdRequirement = itemIdRequirement;
+        this.checkChildren = checkChildren;
+    }
 
-	public WidgetHighlight(int groupId, int childId)
-	{
-		this.groupId = groupId;
-		this.childId = childId;
-		this.childChildId = -1;
-		this.checkChildren = false;
-	}
+    @Override
+    public void highlightChoices(Graphics2D graphics, Client client, QuestHelperPlugin questHelper) {
+        Widget widgetToHighlight = client.getWidget(groupId, childId);
+        if (widgetToHighlight == null) return;
+        if (widgetToHighlight.isHidden()) return;
 
-	public WidgetHighlight(int groupId, int childId, int childChildId)
-	{
-		this.groupId = groupId;
-		this.childId = childId;
-		this.childChildId = childChildId;
-		this.checkChildren = false;
-	}
+        highlightChoices(widgetToHighlight, graphics, questHelper);
+    }
 
-	public WidgetHighlight(int groupId, int childId, int itemIdRequirement, boolean checkChildren)
-	{
-		this.groupId = groupId;
-		this.childId = childId;
-		this.childChildId = -1;
-		this.itemIdRequirement = itemIdRequirement;
-		this.checkChildren = checkChildren;
-	}
+    private void highlightChoices(Widget parentWidget, Graphics2D graphics, QuestHelperPlugin questHelper) {
+        if (parentWidget == null) return;
 
-	@Override
-	public void highlightChoices(Graphics2D graphics, Client client, QuestHelperPlugin questHelper)
-	{
-		Widget widgetToHighlight = client.getWidget(groupId, childId);
-		if (widgetToHighlight == null) return;
-		if (widgetToHighlight.isHidden()) return;
+        Widget[] widgets = parentWidget.getChildren();
+        Widget[] staticWidgets = parentWidget.getStaticChildren();
 
-		highlightChoices(widgetToHighlight, graphics, questHelper);
-	}
+        if (childChildId != -1 && widgets != null) {
+            highlightChoices(widgets[childChildId], graphics, questHelper);
+            return;
+        }
 
-	private void highlightChoices(Widget parentWidget, Graphics2D graphics, QuestHelperPlugin questHelper)
-	{
-		if (parentWidget == null) return;
+        if (checkChildren && widgets != null) {
+            for (Widget widget : widgets) {
+                highlightChoices(widget, graphics, questHelper);
+            }
+            for (Widget widget : staticWidgets) {
+                highlightChoices(widget, graphics, questHelper);
+            }
+        }
 
-		Widget[] widgets = parentWidget.getChildren();
-		Widget[] staticWidgets = parentWidget.getStaticChildren();
+        highlightWidget(graphics, questHelper, parentWidget);
+    }
 
-		if (childChildId != -1 && widgets != null)
-		{
-			highlightChoices(widgets[childChildId], graphics, questHelper);
-			return;
-		}
+    @Override
+    protected void highlightWidget(Graphics2D graphics, QuestHelperPlugin questHelper, Widget widgetToHighlight) {
+        if (widgetToHighlight == null || !itemCheckPasses(widgetToHighlight) || !modelCheckPasses(widgetToHighlight))
+            return;
 
-		if (checkChildren && widgets != null)
-		{
-			for (Widget widget : widgets)
-			{
-				highlightChoices(widget, graphics, questHelper);
-			}
-			for (Widget widget : staticWidgets)
-			{
-				highlightChoices(widget, graphics, questHelper);
-			}
-		}
+        super.highlightWidget(graphics, questHelper, widgetToHighlight);
+    }
 
-		highlightWidget(graphics, questHelper, parentWidget);
-	}
 
-	@Override
-	protected void highlightWidget(Graphics2D graphics, QuestHelperPlugin questHelper, Widget widgetToHighlight)
-	{
-		if (widgetToHighlight == null || (itemIdRequirement != null && widgetToHighlight.getItemId() != itemIdRequirement)) return;
+    private boolean itemCheckPasses(Widget widgetToHighlight) {
+        return (itemIdRequirement == null || widgetToHighlight.getItemId() == itemIdRequirement);
+    }
 
-		super.highlightWidget(graphics, questHelper, widgetToHighlight);
-	}
+    private boolean modelCheckPasses(Widget widget) {
+        return (modelIdRequirement == null || widget.getModelId() == modelIdRequirement);
+    }
 }

@@ -24,26 +24,24 @@
  */
 package net.runelite.client.plugins.questhelper.requirements;
 
-import java.util.function.BooleanSupplier;
 import lombok.Setter;
 import net.runelite.api.Client;
 
-public class ConfigRequirement extends SimpleRequirement
-{
-	@Setter
-	boolean shouldPass;
+import java.util.function.BooleanSupplier;
 
-	BooleanSupplier booleanSupplier;
+public class ConfigRequirement extends SimpleRequirement {
+    @Setter
+    boolean shouldPass;
 
-	public ConfigRequirement(BooleanSupplier booleanSupplier)
-	{
-		this.booleanSupplier = booleanSupplier;
-	}
+    BooleanSupplier booleanSupplier;
 
-	@Override
-	public boolean check(Client client)
-	{
-		return booleanSupplier.getAsBoolean();
-	}
+    public ConfigRequirement(BooleanSupplier booleanSupplier) {
+        this.booleanSupplier = booleanSupplier;
+    }
+
+    @Override
+    public boolean check(Client client) {
+        return booleanSupplier.getAsBoolean();
+    }
 }
 

@@ -24,51 +24,50 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.songoftheelves;
 
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import java.util.Collections;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 
-public class BaxtorianPillar
-{
-	@Getter
-	private final WorldPoint wp;
+import java.util.Collections;
 
-	@Getter
-	private final String answerText;
+public class BaxtorianPillar {
+    @Getter
+    private final WorldPoint wp;
 
-	@Getter
-	@Setter
-	private DetailedQuestStep inspectStep;
+    @Getter
+    private final String answerText;
 
-	@Getter
-	@Setter
-	private DetailedQuestStep useStep;
+    @Getter
+    @Setter
+    private DetailedQuestStep inspectStep;
 
-	@Getter
-	@Setter
-	private ItemRequirement placedItem;
+    @Getter
+    @Setter
+    private DetailedQuestStep useStep;
 
-	@Getter
-	private ItemRequirement solution;
+    @Getter
+    @Setter
+    private ItemRequirement placedItem;
 
-	public BaxtorianPillar(QuestHelper questHelper, WorldPoint inspectWp, WorldPoint wp, String answerText, String name)
-	{
-		this.wp = wp;
-		this.answerText = answerText;
-		this.inspectStep = new ObjectStep(questHelper, NullObjectID.NULL_2005, inspectWp, "Inspect the marked pillar.");
-		this.useStep = new ObjectStep(questHelper, NullObjectID.NULL_2005, wp, "Place the correct item on the " + name + " pillar.");
-	}
+    @Getter
+    private ItemRequirement solution;
 
-	public void setSolution(ItemRequirement solution)
-	{
-		this.solution = solution;
-		useStep.setRequirements(Collections.singletonList(solution));
-		useStep.addIcon(solution.getId());
-	}
+    public BaxtorianPillar(QuestHelper questHelper, WorldPoint inspectWp, WorldPoint wp, String answerText, String name) {
+        this.wp = wp;
+        this.answerText = answerText;
+        this.inspectStep = new ObjectStep(questHelper, NullObjectID.NULL_2005, inspectWp, "Inspect the marked pillar.");
+        this.useStep = new ObjectStep(questHelper, NullObjectID.NULL_2005, wp, "Place the correct item on the " + name + " pillar.");
+    }
+
+    public void setSolution(ItemRequirement solution) {
+        this.solution = solution;
+        useStep.setRequirements(Collections.singletonList(solution));
+        useStep.addIcon(solution.getId());
+    }
 }

@@ -24,151 +24,124 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.mischelpers.allneededitems;
 
+
+import net.runelite.api.SpriteID;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.ComplexStateQuestHelper;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestDetails;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import net.runelite.api.SpriteID;
 
-public class AllNeededItems extends ComplexStateQuestHelper
-{
-	DetailedQuestStep step1;
+import java.util.*;
 
-	@Override
-	public QuestStep loadStep()
-	{
-		Map<Integer, ItemRequirement> reqs = new LinkedHashMap<>();;
-		questHelperPlugin.getItemRequirements().forEach((qhQuest, questReqs) -> refinedList(qhQuest.getName(), reqs, questReqs));
-		questHelperPlugin.getItemRecommended().forEach((qhQuest, questRecommended) -> refinedList(qhQuest.getName(), reqs, questRecommended));
+public class AllNeededItems extends ComplexStateQuestHelper {
+    DetailedQuestStep step1;
 
-		step1 = new DetailedQuestStep(this, "Get all items you need. You can have items being highlighted that you" +
-			" need without running this helper if you activate it in the Quest Helper settings.", new ArrayList<>(reqs.values()));
-		step1.hideRequirements = true;
-		step1.considerBankForItemHighlight = true;
-		step1.iconToUseForNeededItems = SpriteID.TAB_QUESTS;
+    @Override
+    public QuestStep loadStep() {
+        Map<Integer, ItemRequirement> reqs = new LinkedHashMap<>();
+        questHelperPlugin.getItemRequirements().forEach((qhQuest, questReqs) -> refinedList(qhQuest.getName(), reqs, questReqs));
+        questHelperPlugin.getItemRecommended().forEach((qhQuest, questRecommended) -> refinedList(qhQuest.getName(), reqs, questRecommended));
 
-		return step1;
-	}
+        step1 = new DetailedQuestStep(this, "Get all items you need. You can have items being highlighted that you" +
+                " need without running this helper if you activate it in the Quest Helper settings.", new ArrayList<>(reqs.values()));
+        step1.hideRequirements = true;
+        step1.considerBankForItemHighlight = true;
+        step1.iconToUseForNeededItems = SpriteID.TAB_QUESTS;
+        step1.setBackgroundWorldTooltipText("Highlighted due to the config setting 'Highlight missing items' in Quest Helper.");
 
-	private void refinedList(String questName, Map<Integer, ItemRequirement> compressedReqs, List<ItemRequirement> reqs)
-	{
-		// TODO: Rather than an ItemRequirement, shift to an ItemRequirements with each itemreq as an ItemRequirement in it
-		// This would allow for better mixed IDs between items
-		for (ItemRequirement req : reqs)
-		{
-			ItemRequirement newReq = req;
-			if (req.getId() == -1)
-			{
-				continue;
-			}
+        return step1;
+    }
 
-			if (req.getQuantity() == -1) newReq = req.quantity(1);
+    private void refinedList(String questName, Map<Integer, ItemRequirement> compressedReqs, List<ItemRequirement> reqs) {
+        // TODO: Rather than an ItemRequirement, shift to an ItemRequirements with each itemreq as an ItemRequirement in it
+        // This would allow for better mixed IDs between items
+        for (ItemRequirement req : reqs) {
+            ItemRequirement newReq = req;
+            if (req.getId() == -1) {
+                continue;
+            }
 
-			if (!compressedReqs.containsKey(newReq.getId()))
-			{
-				ItemRequirement freshReq = new ItemRequirement(req.getName(), newReq.getId(), newReq.getQuantity());
-				String tip = "Needed for " + questName;
-				freshReq.setTooltip(tip);
-				compressedReqs.put(newReq.getId(), freshReq);
-			}
-			else
-			{
-				ItemRequirement currentReq = compressedReqs.get(newReq.getId());
-				currentReq.appendToTooltip(questName);
-				if (newReq.isConsumedItem())
-				{
-					currentReq.setQuantity(currentReq.getQuantity() + newReq.getQuantity());
-				}
-			}
-		}
-	}
+            if (req.getQuantity() == -1) newReq = req.quantity(1);
 
-	@Override
-	protected void setupRequirements()
-	{
+            if (!compressedReqs.containsKey(newReq.getId())) {
+                ItemRequirement freshReq = new ItemRequirement(req.getName(), newReq.getId(), newReq.getQuantity());
+                String tip = "Needed for " + questName;
+                freshReq.setTooltip(tip);
+                compressedReqs.put(newReq.getId(), freshReq);
+            } else {
+                ItemRequirement currentReq = compressedReqs.get(newReq.getId());
+                currentReq.appendToTooltip(questName);
+                if (newReq.isConsumedItem()) {
+                    currentReq.setQuantity(currentReq.getQuantity() + newReq.getQuantity());
+                }
+            }
+        }
+    }
 
-	}
+    @Override
+    protected void setupRequirements() {
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		Map<Integer, ItemRequirement> reqs = new LinkedHashMap<>();
-		questHelperPlugin.getItemRequirements().forEach((qhQuest, questReqs) -> refinedList(qhQuest.getName(), reqs, questReqs));
-		return new ArrayList<>(reqs.values());
-	}
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRecommended()
-	{
-		Map<Integer, ItemRequirement> reqs = new LinkedHashMap<>();
-		questHelperPlugin.getItemRecommended().forEach((qhQuest, questRecs) -> refinedList(qhQuest.getName(), reqs, questRecs));
-		return new ArrayList<>(reqs.values());
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        Map<Integer, ItemRequirement> reqs = new LinkedHashMap<>();
+        questHelperPlugin.getItemRequirements().forEach((qhQuest, questReqs) -> refinedList(qhQuest.getName(), reqs, questReqs));
+        return new ArrayList<>(reqs.values());
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Starting off", Collections.singletonList(step1)));
-		Map<Integer, ItemRequirement> questsReq = new LinkedHashMap<>();
-		Map<Integer, ItemRequirement> miniquestsReq = new LinkedHashMap<>();
-		Map<Integer, ItemRequirement> diariesReq = new LinkedHashMap<>();
-		Map<Integer, ItemRequirement> questsRec = new LinkedHashMap<>();
-		Map<Integer, ItemRequirement> miniquestsRec = new LinkedHashMap<>();
-		Map<Integer, ItemRequirement> diariesRec = new LinkedHashMap<>();
+    @Override
+    public List<ItemRequirement> getItemRecommended() {
+        Map<Integer, ItemRequirement> reqs = new LinkedHashMap<>();
+        questHelperPlugin.getItemRecommended().forEach((qhQuest, questRecs) -> refinedList(qhQuest.getName(), reqs, questRecs));
+        return new ArrayList<>(reqs.values());
+    }
 
-		questHelperPlugin.getItemRequirements().forEach((qhQuest, reqs) -> {
-			QuestDetails.Type type = qhQuest.getQuestType();
-			if (type == QuestDetails.Type.P2P || type == QuestDetails.Type.F2P)
-			{
-				refinedList(qhQuest.getName(), questsReq, reqs);
-			}
-			else if (type == QuestDetails.Type.MINIQUEST)
-			{
-				refinedList(qhQuest.getName(), miniquestsReq, reqs);
-			}
-			else if (type == QuestDetails.Type.ACHIEVEMENT_DIARY)
-			{
-				refinedList(qhQuest.getName(), diariesReq, reqs);
-			}
-		});
-		questHelperPlugin.getItemRecommended().forEach((qhQuest, reqs) -> {
-			QuestDetails.Type type = qhQuest.getQuestType();
-			if (type == QuestDetails.Type.P2P || type == QuestDetails.Type.F2P)
-			{
-				refinedList(qhQuest.getName(), questsRec, reqs);
-			}
-			else if (type == QuestDetails.Type.MINIQUEST)
-			{
-				refinedList(qhQuest.getName(), miniquestsRec, reqs);
-			}
-			else if (type == QuestDetails.Type.ACHIEVEMENT_DIARY)
-			{
-				refinedList(qhQuest.getName(), diariesRec, reqs);
-			}
-		});
-		if (questsReq.size() > 0)
-		{
-			allSteps.add(new PanelDetails("Quests", Collections.emptyList(), new ArrayList<>(questsReq.values()), new ArrayList<>(questsRec.values())));
-		}
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        allSteps.add(new PanelDetails("Starting off", Collections.singletonList(step1)));
+        Map<Integer, ItemRequirement> questsReq = new LinkedHashMap<>();
+        Map<Integer, ItemRequirement> miniquestsReq = new LinkedHashMap<>();
+        Map<Integer, ItemRequirement> diariesReq = new LinkedHashMap<>();
+        Map<Integer, ItemRequirement> questsRec = new LinkedHashMap<>();
+        Map<Integer, ItemRequirement> miniquestsRec = new LinkedHashMap<>();
+        Map<Integer, ItemRequirement> diariesRec = new LinkedHashMap<>();
 
-		if (miniquestsReq.size() > 0)
-		{
-			allSteps.add(new PanelDetails("Miniquests", Collections.emptyList(), new ArrayList<>(miniquestsReq.values()), new ArrayList<>(miniquestsRec.values())));
-		}
+        questHelperPlugin.getItemRequirements().forEach((qhQuest, reqs) -> {
+            QuestDetails.Type type = qhQuest.getQuestType();
+            if (type == QuestDetails.Type.P2P || type == QuestDetails.Type.F2P) {
+                refinedList(qhQuest.getName(), questsReq, reqs);
+            } else if (type == QuestDetails.Type.MINIQUEST) {
+                refinedList(qhQuest.getName(), miniquestsReq, reqs);
+            } else if (type == QuestDetails.Type.ACHIEVEMENT_DIARY) {
+                refinedList(qhQuest.getName(), diariesReq, reqs);
+            }
+        });
+        questHelperPlugin.getItemRecommended().forEach((qhQuest, reqs) -> {
+            QuestDetails.Type type = qhQuest.getQuestType();
+            if (type == QuestDetails.Type.P2P || type == QuestDetails.Type.F2P) {
+                refinedList(qhQuest.getName(), questsRec, reqs);
+            } else if (type == QuestDetails.Type.MINIQUEST) {
+                refinedList(qhQuest.getName(), miniquestsRec, reqs);
+            } else if (type == QuestDetails.Type.ACHIEVEMENT_DIARY) {
+                refinedList(qhQuest.getName(), diariesRec, reqs);
+            }
+        });
+        if (questsReq.size() > 0) {
+            allSteps.add(new PanelDetails("Quests", Collections.emptyList(), new ArrayList<>(questsReq.values()), new ArrayList<>(questsRec.values())));
+        }
 
-		if (diariesReq.size() > 0)
-		{
-			allSteps.add(new PanelDetails("Achievement Diaries", Collections.emptyList(), new ArrayList<>(diariesReq.values()), new ArrayList<>(diariesRec.values())));
-		}
+        if (miniquestsReq.size() > 0) {
+            allSteps.add(new PanelDetails("Miniquests", Collections.emptyList(), new ArrayList<>(miniquestsReq.values()), new ArrayList<>(miniquestsRec.values())));
+        }
 
-		return allSteps;
-	}
+        if (diariesReq.size() > 0) {
+            allSteps.add(new PanelDetails("Achievement Diaries", Collections.emptyList(), new ArrayList<>(diariesReq.values()), new ArrayList<>(diariesRec.values())));
+        }
+
+        return allSteps;
+    }
 }

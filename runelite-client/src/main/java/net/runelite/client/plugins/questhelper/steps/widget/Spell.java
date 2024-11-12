@@ -25,7 +25,6 @@
  */
 package net.runelite.client.plugins.questhelper.steps.widget;
 
-public interface Spell
-{
-	String getSpellName();
+public interface Spell {
+    String getSpellName();
 }

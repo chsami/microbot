@@ -24,272 +24,246 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.enlightenedjourney;
 
+
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.questhelper.collections.ItemCollections;
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestPointRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.quest.QuestPointRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.widget.WidgetTextRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.QuestPointReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
-import net.runelite.client.plugins.questhelper.steps.DetailedOwnerStep;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
-import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import net.runelite.api.ItemID;
-import net.runelite.api.NpcID;
-import net.runelite.api.NullObjectID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.Skill;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.*;
 
-public class EnlightenedJourney extends BasicQuestHelper
-{
-	ItemRequirement papyrus3, ballOfWool, sackOfPotatoes, emptySack8, unlitCandle, yellowDye, redDye, silk10, bowl,
-		logs10, tinderbox, willowBranches12, papyrus, papyrus2;
+import java.util.*;
 
-	ItemRequirement draynorTeleport;
+public class EnlightenedJourney extends BasicQuestHelper {
+    ItemRequirement papyrus3, ballOfWool, sackOfPotatoes, emptySack8, unlitCandle, yellowDye, redDye, silk10, bowl,
+            logs10, tinderbox, willowBranches12, papyrus, papyrus2;
 
-	ItemRequirement balloonStructure, origamiBalloon, sandbag8;
+    ItemRequirement draynorTeleport;
 
-	Requirement onEntrana, hasSandbags, flying;
+    ItemRequirement balloonStructure, origamiBalloon, sandbag8;
 
-	Zone entrana;
+    Requirement onEntrana, hasSandbags, flying;
 
-	QuestStep travelToEntrana, talkToAuguste, usePapyrusOnWool, useCandleOnBalloon, talkToAugusteAgain,
-		talkToAugusteWithPapyrus, talkToAugusteAfterMob;
+    Zone entrana;
 
-	QuestStep fillSacks, talkToAugusteWithDye, talkToAugusteWithBranches,
-		talkToAugusteWithLogsAndTinderbox, talkToAugusteToFinish;
+    QuestStep travelToEntrana, talkToAuguste, usePapyrusOnWool, useCandleOnBalloon, talkToAugusteAgain,
+            talkToAugusteWithPapyrus, talkToAugusteAfterMob;
 
-	DetailedOwnerStep doPuzzle;
+    QuestStep fillSacks, talkToAugusteWithDye, talkToAugusteWithBranches,
+            talkToAugusteWithLogsAndTinderbox, talkToAugusteToFinish;
+
+    DetailedOwnerStep doPuzzle;
 
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupConditions();
-		setupSteps();
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupConditions();
+        setupSteps();
 
-		Map<Integer, QuestStep> steps = new HashMap<>();
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		ConditionalStep startingOff = new ConditionalStep(this, travelToEntrana);
-		startingOff.addStep(onEntrana, talkToAuguste);
-		steps.put(0, startingOff);
-		steps.put(5, startingOff);
-		steps.put(6, startingOff);
-		steps.put(10, startingOff);
+        ConditionalStep startingOff = new ConditionalStep(this, travelToEntrana);
+        startingOff.addStep(onEntrana, talkToAuguste);
+        steps.put(0, startingOff);
+        steps.put(5, startingOff);
+        steps.put(6, startingOff);
+        steps.put(10, startingOff);
 
-		ConditionalStep makingPrototype = new ConditionalStep(this, usePapyrusOnWool);
-		makingPrototype.addStep(origamiBalloon, talkToAugusteAgain);
-		makingPrototype.addStep(balloonStructure, useCandleOnBalloon);
-		steps.put(20, makingPrototype);
+        ConditionalStep makingPrototype = new ConditionalStep(this, usePapyrusOnWool);
+        makingPrototype.addStep(origamiBalloon, talkToAugusteAgain);
+        makingPrototype.addStep(balloonStructure, useCandleOnBalloon);
+        steps.put(20, makingPrototype);
 
-		steps.put(40, talkToAugusteWithPapyrus);
-		steps.put(60, talkToAugusteAfterMob);
+        steps.put(40, talkToAugusteWithPapyrus);
+        steps.put(60, talkToAugusteAfterMob);
 
-		ConditionalStep gettingFinalMaterials = new ConditionalStep(this, fillSacks);
-		gettingFinalMaterials.addStep(hasSandbags, talkToAugusteWithDye);
-		steps.put(70, gettingFinalMaterials);
+        ConditionalStep gettingFinalMaterials = new ConditionalStep(this, fillSacks);
+        gettingFinalMaterials.addStep(hasSandbags, talkToAugusteWithDye);
+        steps.put(70, gettingFinalMaterials);
 
-		steps.put(80, talkToAugusteWithBranches);
+        steps.put(80, talkToAugusteWithBranches);
 
-		ConditionalStep flight = new ConditionalStep(this, talkToAugusteWithLogsAndTinderbox);
-		flight.addStep(flying, doPuzzle);
-		steps.put(90, flight);
+        ConditionalStep flight = new ConditionalStep(this, talkToAugusteWithLogsAndTinderbox);
+        flight.addStep(flying, doPuzzle);
+        steps.put(90, flight);
 
-		steps.put(100, talkToAugusteToFinish);
+        steps.put(100, talkToAugusteToFinish);
 
-		return steps;
-	}
+        return steps;
+    }
 
-	@Override
-	protected void setupRequirements()
-	{
-		papyrus3 = new ItemRequirement("Papyrus", ItemID.PAPYRUS, 3);
-		papyrus2 = new ItemRequirement("Papyrus", ItemID.PAPYRUS, 2);
-		papyrus = new ItemRequirement("Papyrus", ItemID.PAPYRUS);
-		ballOfWool = new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL);
-		sackOfPotatoes = new ItemRequirement("Sack of potatoes (10)", ItemID.POTATOES10);
-		emptySack8 = new ItemRequirement("Empty sack", ItemID.EMPTY_SACK, 8);
-		emptySack8.addAlternates(ItemID.SANDBAG);
-		unlitCandle = new ItemRequirement("Unlit candle", ItemID.CANDLE);
-		unlitCandle.addAlternates(ItemID.BLACK_CANDLE);
-		yellowDye = new ItemRequirement("Yellow dye", ItemID.YELLOW_DYE);
-		redDye = new ItemRequirement("Red dye", ItemID.RED_DYE);
-		silk10 = new ItemRequirement("Silk", ItemID.SILK, 10);
-		bowl = new ItemRequirement("Bowl", ItemID.BOWL);
-		logs10 = new ItemRequirement("Logs", ItemID.LOGS, 10);
-		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX).isNotConsumed();
-		willowBranches12 = new ItemRequirement("Willow branches", ItemID.WILLOW_BRANCH, 12);
-		willowBranches12.setTooltip("You can get these by using secateurs on a willow tree you've grown. Auguste will" +
-			" give you a sapling to grow during the quest if you need one");
+    @Override
+    protected void setupRequirements() {
+        papyrus3 = new ItemRequirement("Papyrus", ItemID.PAPYRUS, 3);
+        papyrus2 = new ItemRequirement("Papyrus", ItemID.PAPYRUS, 2);
+        papyrus = new ItemRequirement("Papyrus", ItemID.PAPYRUS);
+        ballOfWool = new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL);
+        sackOfPotatoes = new ItemRequirement("Sack of potatoes (10)", ItemID.POTATOES10);
+        emptySack8 = new ItemRequirement("Empty sack", ItemID.EMPTY_SACK, 8);
+        emptySack8.addAlternates(ItemID.SANDBAG);
+        unlitCandle = new ItemRequirement("Unlit candle", ItemID.CANDLE);
+        unlitCandle.addAlternates(ItemID.BLACK_CANDLE);
+        yellowDye = new ItemRequirement("Yellow dye", ItemID.YELLOW_DYE);
+        redDye = new ItemRequirement("Red dye", ItemID.RED_DYE);
+        silk10 = new ItemRequirement("Silk", ItemID.SILK, 10);
+        bowl = new ItemRequirement("Bowl", ItemID.BOWL);
+        logs10 = new ItemRequirement("Logs", ItemID.LOGS, 10);
+        tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX).isNotConsumed();
+        willowBranches12 = new ItemRequirement("Willow branches", ItemID.WILLOW_BRANCH, 12);
+        willowBranches12.setTooltip("You can get these by using secateurs on a willow tree you've grown. Auguste will" +
+                " give you a sapling to grow during the quest if you need one");
 
-		draynorTeleport = new ItemRequirement("Draynor/Port Sarim teleport", ItemID.EXPLORERS_RING_3);
-		draynorTeleport.addAlternates(ItemID.EXPLORERS_RING_4, ItemID.DRAYNOR_MANOR_TELEPORT);
-		draynorTeleport.addAlternates(ItemCollections.AMULET_OF_GLORIES);
+        draynorTeleport = new ItemRequirement("Draynor/Port Sarim teleport", ItemID.EXPLORERS_RING_3);
+        draynorTeleport.addAlternates(ItemID.EXPLORERS_RING_4, ItemID.DRAYNOR_MANOR_TELEPORT);
+        draynorTeleport.addAlternates(ItemCollections.AMULET_OF_GLORIES);
 
-		balloonStructure = new ItemRequirement("Balloon structure", ItemID.BALLOON_STRUCTURE);
-		origamiBalloon = new ItemRequirement("Origami balloon", ItemID.ORIGAMI_BALLOON);
-		sandbag8 = new ItemRequirement("Sandbag", ItemID.SANDBAG, 8);
-	}
+        balloonStructure = new ItemRequirement("Balloon structure", ItemID.BALLOON_STRUCTURE);
+        origamiBalloon = new ItemRequirement("Origami balloon", ItemID.ORIGAMI_BALLOON);
+        sandbag8 = new ItemRequirement("Sandbag", ItemID.SANDBAG, 8);
+    }
 
-	@Override
-	protected void setupZones()
-	{
-		entrana = new Zone(new WorldPoint(2798, 3327,0), new WorldPoint(2878, 3394,1));
-	}
+    @Override
+    protected void setupZones() {
+        entrana = new Zone(new WorldPoint(2798, 3327, 0), new WorldPoint(2878, 3394, 1));
+    }
 
-	public void setupConditions()
-	{
-		onEntrana = new ZoneRequirement(entrana);
+    public void setupConditions() {
+        onEntrana = new ZoneRequirement(entrana);
 
-		hasSandbags = new Conditions(LogicType.OR,
-			new VarbitRequirement(2875, 1),
-			sandbag8);
+        hasSandbags = new Conditions(LogicType.OR,
+                new VarbitRequirement(2875, 1),
+                sandbag8);
 
-		flying = new WidgetTextRequirement(471, 1, "Balloon Controls");
-		// Finished flight, 2868 = 1
-	}
+        flying = new WidgetTextRequirement(471, 1, "Balloon Controls");
+        // Finished flight, 2868 = 1
+    }
 
-	public void setupSteps()
-	{
-		travelToEntrana = new NpcStep(this, NpcID.MONK_OF_ENTRANA_1167, new WorldPoint(3047, 3236, 0),
-			"Bank all weapons and armour you have, and go to Port Sarim to get a boat to Entrana.");
+    public void setupSteps() {
+        travelToEntrana = new NpcStep(this, NpcID.MONK_OF_ENTRANA_1167, new WorldPoint(3047, 3236, 0),
+                "Bank all weapons and armour you have, and go to Port Sarim to get a boat to Entrana.");
 
-		talkToAuguste = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0), "Talk to Auguste on Entrana 3" +
-			" times.", papyrus3, ballOfWool);
-		talkToAuguste.addDialogSteps("Yes! Sign me up.", "Umm, yes. What's your point?", "Yes.");
+        talkToAuguste = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0), "Talk to Auguste on Entrana 3" +
+                " times.", papyrus3, ballOfWool);
+        talkToAuguste.addDialogSteps("Yes! Sign me up.", "Umm, yes. What's your point?", "Yes.");
 
-		usePapyrusOnWool = new DetailedQuestStep(this, "Use papyrus on a ball of wool.", papyrus.highlighted(),
-			ballOfWool.highlighted());
+        usePapyrusOnWool = new DetailedQuestStep(this, "Use papyrus on a ball of wool.", papyrus.highlighted(),
+                ballOfWool.highlighted());
 
-		useCandleOnBalloon = new DetailedQuestStep(this, "Use a candle on the balloon.", unlitCandle.highlighted(),
-			balloonStructure.highlighted());
+        useCandleOnBalloon = new DetailedQuestStep(this, "Use a candle on the balloon.", unlitCandle.highlighted(),
+                balloonStructure.highlighted());
 
-		talkToAugusteAgain = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0), "Talk to Auguste again.",
-			origamiBalloon);
-		talkToAugusteAgain.addDialogSteps("Yes, I have them here.");
+        talkToAugusteAgain = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0), "Talk to Auguste again.",
+                origamiBalloon);
+        talkToAugusteAgain.addDialogSteps("Yes, I have them here.");
 
-		talkToAugusteWithPapyrus = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0),
-			"Talk to Auguste with 2 papyrus and a sack of potatoes.", papyrus2, sackOfPotatoes);
-		talkToAugusteWithPapyrus.addDialogStep("Yes, I have them here.");
+        talkToAugusteWithPapyrus = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0),
+                "Talk to Auguste with 2 papyrus and a sack of potatoes.", papyrus2, sackOfPotatoes);
+        talkToAugusteWithPapyrus.addDialogStep("Yes, I have them here.");
 
-		talkToAugusteAfterMob = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0),
-			"Talk to Auguste after the flash mob.");
+        talkToAugusteAfterMob = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0),
+                "Talk to Auguste after the flash mob.");
 
-		fillSacks = new ObjectStep(this, ObjectID.SAND_PIT, new WorldPoint(2817, 3342, 0),
-			"Fill your empty sacks on the sand pit south of Auguste.", emptySack8.highlighted());
-		fillSacks.addIcon(ItemID.EMPTY_SACK);
+        fillSacks = new ObjectStep(this, ObjectID.SAND_PIT, new WorldPoint(2817, 3342, 0),
+                "Fill your empty sacks on the sand pit south of Auguste.", emptySack8.highlighted());
+        fillSacks.addIcon(ItemID.EMPTY_SACK);
 
-		talkToAugusteWithDye = new GiveAugusteItems(this);
-		talkToAugusteWithDye.addDialogSteps("Yes, I want to give you some items.", "Dye.", "Sandbags.", "Silk.",
-			"Bowl.");
+        talkToAugusteWithDye = new GiveAugusteItems(this);
+        talkToAugusteWithDye.addDialogSteps("Yes, I want to give you some items.", "Dye.", "Sandbags.", "Silk.",
+                "Bowl.");
 
-		talkToAugusteWithBranches = new ObjectStep(this, NullObjectID.NULL_19133, new WorldPoint(2807, 3356, 0),
-			"Get 12 willow branches and use them to make the basket.", willowBranches12.highlighted());
-		talkToAugusteWithBranches.addIcon(ItemID.WILLOW_BRANCH);
+        talkToAugusteWithBranches = new ObjectStep(this, NullObjectID.NULL_19133, new WorldPoint(2807, 3356, 0),
+                "Get 12 willow branches and use them to make the basket.", willowBranches12.highlighted());
+        talkToAugusteWithBranches.addIcon(ItemID.WILLOW_BRANCH);
 
-		talkToAugusteWithLogsAndTinderbox = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0),
-			"Talk to Auguste to fly.", logs10, tinderbox);
-		talkToAugusteWithLogsAndTinderbox.addDialogSteps("Okay.");
+        talkToAugusteWithLogsAndTinderbox = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2809, 3354, 0),
+                "Talk to Auguste to fly.", logs10, tinderbox);
+        talkToAugusteWithLogsAndTinderbox.addDialogSteps("Okay.");
 
-		doPuzzle = new TaverleyBalloonFlight(this);
+        doPuzzle = new TaverleyBalloonFlight(this);
 
-		talkToAugusteToFinish = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2937, 3421, 0),
-			"Talk to Auguste in Taverley to finish the quest.");
-	}
+        talkToAugusteToFinish = new NpcStep(this, NpcID.AUGUSTE, new WorldPoint(2937, 3421, 0),
+                "Talk to Auguste in Taverley to finish the quest.");
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		return Arrays.asList(papyrus3, ballOfWool, sackOfPotatoes, emptySack8, unlitCandle, yellowDye, redDye, silk10, bowl,
-			logs10, tinderbox, willowBranches12);
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        return Arrays.asList(papyrus3, ballOfWool, sackOfPotatoes, emptySack8, unlitCandle, yellowDye, redDye, silk10, bowl,
+                logs10, tinderbox, willowBranches12);
+    }
 
-	@Override
-	public List<ItemRequirement> getItemRecommended()
-	{
-		return Collections.singletonList(draynorTeleport);
-	}
+    @Override
+    public List<ItemRequirement> getItemRecommended() {
+        return Collections.singletonList(draynorTeleport);
+    }
 
-	@Override
-	public List<Requirement> getGeneralRequirements()
-	{
-		List<Requirement> reqs = new ArrayList<>();
-		reqs.add(new QuestPointRequirement(20));
-		reqs.add(new SkillRequirement(Skill.FIREMAKING, 20));
-		reqs.add(new SkillRequirement(Skill.FARMING, 30, true));
-		reqs.add(new SkillRequirement(Skill.CRAFTING, 36, true));
-		return reqs;
-	}
+    @Override
+    public List<Requirement> getGeneralRequirements() {
+        List<Requirement> reqs = new ArrayList<>();
+        reqs.add(new QuestPointRequirement(20));
+        reqs.add(new SkillRequirement(Skill.FIREMAKING, 20));
+        reqs.add(new SkillRequirement(Skill.FARMING, 30, true));
+        reqs.add(new SkillRequirement(Skill.CRAFTING, 36, true));
+        return reqs;
+    }
 
-	@Override
-	public QuestPointReward getQuestPointReward()
-	{
-		return new QuestPointReward(1);
-	}
+    @Override
+    public QuestPointReward getQuestPointReward() {
+        return new QuestPointReward(1);
+    }
 
-	@Override
-	public List<ExperienceReward> getExperienceRewards()
-	{
-		return Arrays.asList(
-				new ExperienceReward(Skill.CRAFTING, 2000),
-				new ExperienceReward(Skill.FARMING, 3000),
-				new ExperienceReward(Skill.WOODCUTTING, 1500),
-				new ExperienceReward(Skill.FIREMAKING, 4000));
-	}
+    @Override
+    public List<ExperienceReward> getExperienceRewards() {
+        return Arrays.asList(
+                new ExperienceReward(Skill.CRAFTING, 2000),
+                new ExperienceReward(Skill.FARMING, 3000),
+                new ExperienceReward(Skill.WOODCUTTING, 1500),
+                new ExperienceReward(Skill.FIREMAKING, 4000));
+    }
 
-	@Override
-	public List<ItemReward> getItemRewards()
-	{
-		return Arrays.asList(
-				new ItemReward("Bomber Jacket", ItemID.BOMBER_JACKET, 1),
-				new ItemReward("Bomber Cap", ItemID.BOMBER_CAP, 1));
-	}
+    @Override
+    public List<ItemReward> getItemRewards() {
+        return Arrays.asList(
+                new ItemReward("Bomber Jacket", ItemID.BOMBER_JACKET, 1),
+                new ItemReward("Bomber Cap", ItemID.BOMBER_CAP, 1));
+    }
 
-	@Override
-	public List<UnlockReward> getUnlockRewards()
-	{
-		return Arrays.asList(
-				new UnlockReward("Access to the Hot Air Balloon transport system."),
-				new UnlockReward("Ability to make origami balloons."));
-	}
+    @Override
+    public List<UnlockReward> getUnlockRewards() {
+        return Arrays.asList(
+                new UnlockReward("Access to the Hot Air Balloon transport system."),
+                new UnlockReward("Ability to make origami balloons."));
+    }
 
 
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
+    @Override
+    public ArrayList<PanelDetails> getPanels() {
+        ArrayList<PanelDetails> allSteps = new ArrayList<>();
 
-		allSteps.add(new PanelDetails("Making a balloon", Arrays.asList(travelToEntrana, talkToAuguste,
-			usePapyrusOnWool,
-			useCandleOnBalloon, talkToAugusteAgain, talkToAugusteWithPapyrus, talkToAugusteAfterMob, fillSacks,
-			talkToAugusteWithDye),	papyrus3, ballOfWool, unlitCandle, sackOfPotatoes, emptySack8, yellowDye,redDye,
-			silk10, bowl));
+        allSteps.add(new PanelDetails("Making a balloon", Arrays.asList(travelToEntrana, talkToAuguste,
+                usePapyrusOnWool,
+                useCandleOnBalloon, talkToAugusteAgain, talkToAugusteWithPapyrus, talkToAugusteAfterMob, fillSacks,
+                talkToAugusteWithDye), papyrus3, ballOfWool, unlitCandle, sackOfPotatoes, emptySack8, yellowDye, redDye,
+                silk10, bowl));
 
-		allSteps.add(new PanelDetails("Flying", Arrays.asList(talkToAugusteWithBranches,
-			talkToAugusteWithLogsAndTinderbox, doPuzzle, talkToAugusteToFinish),
-			willowBranches12, logs10, tinderbox));
+        allSteps.add(new PanelDetails("Flying", Arrays.asList(talkToAugusteWithBranches,
+                talkToAugusteWithLogsAndTinderbox, doPuzzle, talkToAugusteToFinish),
+                willowBranches12, logs10, tinderbox));
 
-		return allSteps;
-	}
+        return allSteps;
+    }
 }

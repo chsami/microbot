@@ -24,6 +24,8 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
+
+import lombok.NonNull;
 import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
@@ -31,201 +33,204 @@ import net.runelite.client.plugins.questhelper.requirements.ConfigRequirement;
 import net.runelite.client.plugins.questhelper.requirements.ManualRequirement;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
-import static net.runelite.client.plugins.questhelper.requirements.util.LogicHelper.not;
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-import lombok.NonNull;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 
-public class PuzzleWrapperStep extends ConditionalStep
-{
-	final QuestHelperConfig questHelperConfig;
-	final DetailedQuestStep noSolvingStep;
-	ManualRequirement shouldHideHiddenPuzzleHintInSidebar = new ManualRequirement();
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Pattern;
 
-	public PuzzleWrapperStep(QuestHelper questHelper, QuestStep step, DetailedQuestStep hiddenStep, String text, Requirement... requirements)
-	{
-		super(questHelper, step, text, requirements);
-		this.noSolvingStep = hiddenStep;
-		this.questHelperConfig = questHelper.getConfig();
-		addStep(not(new ConfigRequirement(questHelper.getConfig()::solvePuzzles)), noSolvingStep);
-		addSubSteps(noSolvingStep, step);
-		conditionToHideInSidebar(new Conditions(shouldHideHiddenPuzzleHintInSidebar, new Conditions(LogicType.NOR, new ConfigRequirement(questHelper.getConfig()::solvePuzzles))));
-	}
+import static net.runelite.client.plugins.questhelper.requirements.util.LogicHelper.not;
 
-	public PuzzleWrapperStep(QuestHelper questHelper, QuestStep step, Requirement... requirements)
-	{
-		this(questHelper, step, new DetailedQuestStep(questHelper, "If you want help with this, enable 'Show Puzzle Solutions' in the Quest Helper configuration settings."), requirements);
-	}
+public class PuzzleWrapperStep extends ConditionalStep {
+    final QuestHelperConfig questHelperConfig;
+    final DetailedQuestStep noSolvingStep;
+    ManualRequirement shouldHideHiddenPuzzleHintInSidebar = new ManualRequirement();
 
-	public PuzzleWrapperStep(QuestHelper questHelper, QuestStep step, String text, Requirement... requirements)
-	{
-		this(questHelper, step, new DetailedQuestStep(questHelper, "If you want help with this, enable 'Show Puzzle Solutions' in the Quest Helper configuration settings."), text, requirements);
-	}
+    public PuzzleWrapperStep(QuestHelper questHelper, QuestStep step, DetailedQuestStep hiddenStep, String text, Requirement... requirements) {
+        super(questHelper, step, text, requirements);
+        this.noSolvingStep = hiddenStep;
+        this.questHelperConfig = questHelper.getConfig();
+        addStep(not(new ConfigRequirement(questHelper.getConfig()::solvePuzzles)), noSolvingStep);
+        super.addSubSteps(noSolvingStep, step);
+        conditionToHideInSidebar(new Conditions(shouldHideHiddenPuzzleHintInSidebar, new Conditions(LogicType.NOR, new ConfigRequirement(questHelper.getConfig()::solvePuzzles))));
+    }
 
-	public PuzzleWrapperStep(QuestHelper questHelper, QuestStep step, DetailedQuestStep hiddenStep, Requirement... requirements)
-	{
-		this(questHelper, step, hiddenStep, "", requirements);
-	}
+    public PuzzleWrapperStep(QuestHelper questHelper, QuestStep step, Requirement... requirements) {
+        this(questHelper, step, new DetailedQuestStep(questHelper, "If you want help with this, enable 'Show Puzzle Solutions' in the Quest Helper configuration settings."), requirements);
+    }
 
-	@Override
-	protected void updateSteps()
-	{
-		if (!questHelperConfig.solvePuzzles() && currentStep != noSolvingStep)
-		{
-			startUpStep(noSolvingStep);
-			return;
-		}
+    public PuzzleWrapperStep(QuestHelper questHelper, QuestStep step, String text, Requirement... requirements) {
+        this(questHelper, step, new DetailedQuestStep(questHelper, "If you want help with this, enable 'Show Puzzle Solutions' in the Quest Helper configuration settings."), text, requirements);
+    }
 
-		super.updateSteps();
-	}
+    public PuzzleWrapperStep(QuestHelper questHelper, QuestStep step, DetailedQuestStep hiddenStep, Requirement... requirements) {
+        this(questHelper, step, hiddenStep, "", requirements);
+    }
 
-	@Override
-	public List<String> getText()
-	{
-		if (questHelperConfig.solvePuzzles())
-		{
-			if (currentStep == null)
-			{
-				return steps.get(null).getText();
-			}
-			return currentStep.getText();
-		}
-		return super.getText();
-	}
+    @Override
+    protected void updateSteps() {
+        if (!questHelperConfig.solvePuzzles() && currentStep != noSolvingStep) {
+            startUpStep(noSolvingStep);
+            return;
+        }
 
-	public PuzzleWrapperStep withNoHelpHiddenInSidebar(boolean isHidden)
-	{
-		shouldHideHiddenPuzzleHintInSidebar.setShouldPass(isHidden);
-		return this;
-	}
+        super.updateSteps();
+    }
 
-	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
-	{
-		if (questHelperConfig.solvePuzzles())
-		{
-			currentStep.makeOverlayHint(panelComponent, plugin, additionalText, additionalRequirements);
-		}
-		else
-		{
-			super.makeOverlayHint(panelComponent, plugin, additionalText, additionalRequirements);
-		}
-	}
+    @Override
+    public List<String> getText() {
+        if (questHelperConfig.solvePuzzles()) {
+            if (currentStep == null) {
+                return steps.get(null).getText();
+            }
+            return currentStep.getText();
+        }
+        return super.getText();
+    }
 
-	@Override
-	public void addDialogStep(String choice)
-	{
-		steps.get(null).addDialogStep(choice);
-	}
+    public PuzzleWrapperStep withNoHelpHiddenInSidebar(boolean isHidden) {
+        shouldHideHiddenPuzzleHintInSidebar.setShouldPass(isHidden);
+        return this;
+    }
 
-	@Override
-	public void addDialogStep(Pattern pattern)
-	{
-		steps.get(null).addDialogStep(pattern);
-	}
+    @Override
+    public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements) {
+        if (questHelperConfig.solvePuzzles()) {
+            currentStep.makeOverlayHint(panelComponent, plugin, additionalText, additionalRequirements);
+        } else {
+            super.makeOverlayHint(panelComponent, plugin, additionalText, additionalRequirements);
+        }
+    }
 
-	@Override
-	public void resetDialogSteps()
-	{
-		steps.get(null).resetDialogSteps();
-	}
+    @Override
+    public QuestStep addDialogStep(String choice) {
+        steps.get(null).addDialogStep(choice);
+        return this;
+    }
 
-	@Override
-	public void addDialogStepWithExclusion(String choice, String exclusionString)
-	{
-		steps.get(null).addDialogStepWithExclusion(choice, exclusionString);
-	}
+    @Override
+    public QuestStep addDialogStep(Pattern pattern) {
+        steps.get(null).addDialogStep(pattern);
+        return this;
+    }
 
-	@Override
-	public void addDialogStepWithExclusions(String choice, String... exclusionString)
-	{
-		steps.get(null).addDialogStepWithExclusions(choice, exclusionString);
-	}
+    @Override
+    public void resetDialogSteps() {
+        steps.get(null).resetDialogSteps();
+    }
 
-	@Override
-	public void addDialogStep(int id, String choice)
-	{
-		steps.get(null).addDialogStep(id, choice);
-	}
+    @Override
+    public QuestStep addDialogStepWithExclusion(String choice, String exclusionString) {
+        steps.get(null).addDialogStepWithExclusion(choice, exclusionString);
+        return this;
+    }
 
-	@Override
-	public void addDialogStep(int id, Pattern pattern)
-	{
-		steps.get(null).addDialogStep(id, pattern);
-	}
+    @Override
+    public QuestStep addDialogStepWithExclusions(String choice, String... exclusionString) {
+        steps.get(null).addDialogStepWithExclusions(choice, exclusionString);
+        return this;
+    }
 
-	@Override
-	public void addDialogSteps(String... newChoices)
-	{
-		steps.get(null).addDialogSteps(newChoices);
-	}
+    @Override
+    public QuestStep addDialogStep(int id, String choice) {
+        steps.get(null).addDialogStep(id, choice);
+        return this;
+    }
 
-	@Override
-	public void addDialogConsideringLastLineCondition(String dialogString, String choiceValue)
-	{
-		steps.get(null).addDialogConsideringLastLineCondition(dialogString, choiceValue);
-	}
+    @Override
+    public QuestStep addDialogStep(int id, Pattern pattern) {
+        steps.get(null).addDialogStep(id, pattern);
+        return this;
+    }
 
-	@Override
-	public void addDialogChange(String choice, String newText)
-	{
-		steps.get(null).addDialogChange(choice, newText);
-	}
+    @Override
+    public QuestStep addDialogSteps(String... newChoices) {
+        steps.get(null).addDialogSteps(newChoices);
+        return this;
+    }
 
-	@Override
-	public void addWidgetChoice(String text, int groupID, int childID)
-	{
-		steps.get(null).addWidgetChoice(text, groupID, childID);
-	}
+    @Override
+    public QuestStep addDialogConsideringLastLineCondition(String dialogString, String choiceValue) {
+        steps.get(null).addDialogConsideringLastLineCondition(dialogString, choiceValue);
+        return this;
+    }
 
-	@Override
-	public void addWidgetChoice(String text, int groupID, int childID, int groupIDForChecking)
-	{
-		steps.get(null).addWidgetChoice(text, groupID, childID, groupIDForChecking);
+    @Override
+    public QuestStep addDialogChange(String choice, String newText) {
+        steps.get(null).addDialogChange(choice, newText);
+        return this;
+    }
 
-	}
+    @Override
+    public QuestStep addWidgetChoice(String text, int groupID, int childID) {
+        steps.get(null).addWidgetChoice(text, groupID, childID);
+        return this;
+    }
 
-	@Override
-	public void addWidgetChoice(int id, int groupID, int childID)
-	{
-		steps.get(null).addWidgetChoice(id, groupID, childID);
-	}
+    @Override
+    public QuestStep addWidgetChoice(String text, int groupID, int childID, int groupIDForChecking) {
+        steps.get(null).addWidgetChoice(text, groupID, childID, groupIDForChecking);
+        return this;
+    }
 
-	@Override
-	public void addWidgetChange(String choice, int groupID, int childID, String newText)
-	{
-		steps.get(null).addWidgetChange(choice, groupID, childID, newText);
-	}
+    @Override
+    public QuestStep addWidgetChoice(int id, int groupID, int childID) {
+        steps.get(null).addWidgetChoice(id, groupID, childID);
+        return this;
+    }
 
-	@Override
-	public void clearWidgetHighlights() {
-		steps.get(null).clearWidgetHighlights();
-	}
+    @Override
+    public QuestStep addWidgetChange(String choice, int groupID, int childID, String newText) {
+        steps.get(null).addWidgetChange(choice, groupID, childID, newText);
+        return this;
+    }
 
-	@Override
-	public void addWidgetHighlight(int groupID, int childID)
-	{
-		steps.get(null).addWidgetHighlight(groupID, childID);
-	}
+    @Override
+    public void clearWidgetHighlights() {
+        steps.get(null).clearWidgetHighlights();
+    }
 
-	@Override
-	public void addWidgetHighlight(int groupID, int childID, int childChildID)
-	{
-		steps.get(null).addWidgetHighlight(groupID, childID, childChildID);
-	}
+    @Override
+    public QuestStep addWidgetHighlight(int groupID, int childID) {
+        steps.get(null).addWidgetHighlight(groupID, childID);
+        return this;
+    }
 
-	@Override
-	protected void setupIcon()
-	{
-		steps.get(null).setupIcon();
-	}
+    @Override
+    public QuestStep addWidgetHighlight(int groupID, int childID, int childChildID) {
+        steps.get(null).addWidgetHighlight(groupID, childID, childChildID);
+        return this;
+    }
 
-	@Override
-	public void addIcon(int iconItemID)
-	{
-		steps.get(null).addIcon(iconItemID);
-	}
+    @Override
+    protected void setupIcon() {
+        steps.get(null).setupIcon();
+    }
+
+    @Override
+    public QuestStep addIcon(int iconItemID) {
+        steps.get(null).addIcon(iconItemID);
+        return this;
+    }
+
+    @Override
+    public List<QuestStep> getSubsteps() {
+        if (questHelperConfig.solvePuzzles()) {
+            return steps.get(null).getSubsteps();
+        } else {
+            return noSolvingStep.getSubsteps();
+        }
+    }
+
+    @Override
+    public void addSubSteps(QuestStep... substep) {
+        noSolvingStep.addSubSteps(Arrays.asList(substep));
+    }
+
+    @Override
+    public void addSubSteps(Collection<QuestStep> substeps) {
+        noSolvingStep.addSubSteps(substeps);
+    }
 }

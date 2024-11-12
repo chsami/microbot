@@ -24,11 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.statemanagement;
 
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
-import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
-import javax.inject.Singleton;
+
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
@@ -37,54 +33,54 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.NpcLootReceived;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
+
+import javax.inject.Singleton;
 
 @Singleton
-public class AchievementDiaryStepManager
-{
-	@Getter
-	static Zone workshop;
+public class AchievementDiaryStepManager {
+    @Getter
+    static Zone workshop;
 
-	@Getter
-	static Requirement inWorkshop;
+    @Getter
+    static Requirement inWorkshop;
 
-	@Getter
-	static RuneliteRequirement killedFire, killedEarth, killedWater, killedAir;
+    @Getter
+    static RuneliteRequirement killedFire, killedEarth, killedWater, killedAir;
 
-	public static void setup(ConfigManager configManager)
-	{
-		setupKandarin(configManager);
-	}
+    private static void setupKandarin(ConfigManager configManager) {
+        workshop = new Zone(new WorldPoint(2682, 9862, 0), new WorldPoint(2747, 9927, 0));
+        inWorkshop = new ZoneRequirement(workshop);
+        killedFire = new RuneliteRequirement(configManager, "kandarin-easy-killed-fire", "true");
+        killedEarth = new RuneliteRequirement(configManager, "kandarin-easy-killed-earth", "true");
+        killedAir = new RuneliteRequirement(configManager, "kandarin-easy-killed-air", "true");
+        killedWater = new RuneliteRequirement(configManager, "kandarin-easy-killed-water", "true");
+    }
 
-	private static void setupKandarin(ConfigManager configManager)
-	{
-		workshop = new Zone(new WorldPoint(2682, 9862, 0), new WorldPoint(2747, 9927, 0));
-		inWorkshop = new ZoneRequirement(workshop);
-		killedFire = new RuneliteRequirement(configManager, "kandarin-easy-killed-fire", "true");
-		killedEarth = new RuneliteRequirement(configManager, "kandarin-easy-killed-earth", "true");
-		killedAir = new RuneliteRequirement(configManager, "kandarin-easy-killed-air", "true");
-		killedWater = new RuneliteRequirement(configManager, "kandarin-easy-killed-water", "true");
-	}
+    public static void setup(ConfigManager configManager) {
+        setupKandarin(configManager);
+    }
 
-	public static void check(Client client)
-	{
-		if (!inWorkshop.check(client))
-		{
-			killedFire.setConfigValue("false");
-			killedEarth.setConfigValue("false");
-			killedWater.setConfigValue("false");
-			killedAir.setConfigValue("false");
-		}
-	}
+    public static void check(Client client) {
+        if (!inWorkshop.check(client)) {
+            killedFire.setConfigValue("false");
+            killedEarth.setConfigValue("false");
+            killedWater.setConfigValue("false");
+            killedAir.setConfigValue("false");
+        }
+    }
 
-	@Subscribe
-	public void onNpcLootReceived(final NpcLootReceived npcLootReceived)
-	{
-		final NPC npc = npcLootReceived.getNpc();
+    @Subscribe
+    public void onNpcLootReceived(final NpcLootReceived npcLootReceived) {
+        final NPC npc = npcLootReceived.getNpc();
 
-		final int id = npc.getId();
-		if (id == NpcID.FIRE_ELEMENTAL) killedFire.setConfigValue("true");
-		if (id == NpcID.EARTH_ELEMENTAL) killedEarth.setConfigValue("true");
-		if (id == NpcID.WATER_ELEMENTAL) killedWater.setConfigValue("true");
-		if (id == NpcID.AIR_ELEMENTAL) killedAir.setConfigValue("true");
-	}
+        final int id = npc.getId();
+        if (id == NpcID.FIRE_ELEMENTAL) killedFire.setConfigValue("true");
+        if (id == NpcID.EARTH_ELEMENTAL) killedEarth.setConfigValue("true");
+        if (id == NpcID.WATER_ELEMENTAL) killedWater.setConfigValue("true");
+        if (id == NpcID.AIR_ELEMENTAL) killedAir.setConfigValue("true");
+    }
 }

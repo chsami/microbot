@@ -13,10 +13,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.config.ConfigPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.qualityoflife.enums.WintertodtActions;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.AutoRunScript;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.CameraScript;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.NeverLogoutScript;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.SpecialAttackScript;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.*;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchOverlay;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtOverlay;
@@ -103,6 +100,8 @@ public class QoLPlugin extends Plugin {
     private PouchOverlay pouchOverlay;
     @Inject
     private WintertodtOverlay wintertodtOverlay;
+    @Inject
+    private CannonScript cannonScript;
 
     @Provides
     QoLConfig provideConfig(ConfigManager configManager) {
@@ -161,6 +160,7 @@ public class QoLPlugin extends Plugin {
         specialAttackScript.run(config);
         qoLScript.run(config);
         wintertodtScript.run(config);
+        cannonScript.run(config);
         awaitExecutionUntil(() ->Microbot.getClientThread().invokeLater(this::updateUiElements), () -> !SplashScreen.isOpen(), 600);
     }
 
@@ -169,6 +169,7 @@ public class QoLPlugin extends Plugin {
         qoLScript.shutdown();
         autoRunScript.shutdown();
         specialAttackScript.shutdown();
+        cannonScript.shutdown();
         overlayManager.remove(pouchOverlay);
         overlayManager.remove(qoLOverlay);
         overlayManager.remove(wintertodtOverlay);

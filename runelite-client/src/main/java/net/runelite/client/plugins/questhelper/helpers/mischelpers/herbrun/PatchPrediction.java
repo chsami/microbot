@@ -30,12 +30,11 @@ import net.runelite.client.plugins.timetracking.farming.CropState;
 import net.runelite.client.plugins.timetracking.farming.Produce;
 
 @Value
-class PatchPrediction
-{
-	private final Produce produce;
-	private final CropState cropState;
-	private final long doneEstimate;
-	private final int stage;
-	private final int stages;
+class PatchPrediction {
+    private final Produce produce;
+    private final CropState cropState;
+    private final long doneEstimate;
+    private final int stage;
+    private final int stages;
 }
 

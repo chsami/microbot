@@ -27,14 +27,12 @@ package net.runelite.client.plugins.questhelper.requirements;
 import lombok.Setter;
 import net.runelite.api.Client;
 
-public class ManualRequirement extends SimpleRequirement
-{
-	@Setter
-	boolean shouldPass;
+public class ManualRequirement extends SimpleRequirement {
+    @Setter
+    boolean shouldPass;
 
-	@Override
-	public boolean check(Client client)
-	{
-		return shouldPass;
-	}
+    @Override
+    public boolean check(Client client) {
+        return shouldPass;
+    }
 }

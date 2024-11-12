@@ -24,115 +24,98 @@
  */
 package net.runelite.client.plugins.questhelper.steps.playermadesteps;
 
+
+import net.runelite.api.Perspective;
+import net.runelite.api.Point;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.overlay.DirectionArrow;
 import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.ExtendedRuneliteObject;
 import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.RuneliteObjectManager;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
+import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
+import net.runelite.client.plugins.questhelper.steps.overlay.DirectionArrow;
+import net.runelite.client.ui.overlay.OverlayUtil;
+
+import javax.inject.Inject;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.inject.Inject;
-import net.runelite.api.Perspective;
-import net.runelite.api.Point;
-import net.runelite.client.ui.overlay.OverlayUtil;
 
 // TODO: Separate out NPC logic from Step logic
-public class RuneliteObjectStep extends DetailedQuestStep
-{
-	@Inject
-	private RuneliteObjectManager runeliteObjectManager;
+public class RuneliteObjectStep extends DetailedQuestStep {
+    private final ExtendedRuneliteObject extendedRuneliteObject;
+    // TODO: Maybe a list of npcs to 'delete' with this?
+    List<String> npcsGroupsToDelete = new ArrayList<>();
+    HashMap<String, ExtendedRuneliteObject> npcsToDelete = new HashMap<>();
+    @Inject
+    private RuneliteObjectManager runeliteObjectManager;
 
-	private final ExtendedRuneliteObject extendedRuneliteObject;
+    public RuneliteObjectStep(QuestHelper questHelper, ExtendedRuneliteObject extendedRuneliteObject, String text, Requirement... requirements) {
+        super(questHelper, extendedRuneliteObject.getWorldPoint(), text, requirements);
+        this.extendedRuneliteObject = extendedRuneliteObject;
+    }
 
-	// TODO: Maybe a list of npcs to 'delete' with this?
-	List<String> npcsGroupsToDelete = new ArrayList<>();
-	HashMap<String, ExtendedRuneliteObject> npcsToDelete = new HashMap<>();
+    @Override
+    public void startUp() {
+        super.startUp();
+    }
 
-	public RuneliteObjectStep(QuestHelper questHelper, ExtendedRuneliteObject extendedRuneliteObject, String text, Requirement... requirements)
-	{
-		super(questHelper, extendedRuneliteObject.getWorldPoint(), text, requirements);
-		this.extendedRuneliteObject = extendedRuneliteObject;
-	}
+    @Override
+    public void shutDown() {
+        super.shutDown();
+        // Delete all fake npcs associated
+        clientThread.invokeLater(this::removeRuneliteNpcs);
+    }
 
-	@Override
-	public void startUp()
-	{
-		super.startUp();
-	}
+    private void removeRuneliteNpcs() {
+        runeliteObjectManager.removeGroupAndSubgroups(this.toString());
+    }
 
-	@Override
-	public void shutDown()
-	{
-		super.shutDown();
-		// Delete all fake npcs associated
-		clientThread.invokeLater(this::removeRuneliteNpcs);
-	}
+    @Override
+    public void renderArrow(Graphics2D graphics) {
+        if (!extendedRuneliteObject.getWorldPoint().isInScene(client)) return;
+        if (questHelper.getConfig().showMiniMapArrow()) {
+            if (!extendedRuneliteObject.isRuneliteObjectActive()) {
+                super.renderArrow(graphics);
+            } else if (!hideWorldArrow) {
+                Point p = Perspective.localToCanvas(client, extendedRuneliteObject.getRuneliteObject().getLocation(), client.getPlane(),
+                        extendedRuneliteObject.getRuneliteObject().getModelHeight());
+                if (p != null) {
+                    DirectionArrow.drawWorldArrow(graphics, getQuestHelper().getConfig().targetOverlayColor(), p.getX(), p.getY() - ARROW_SHIFT_Y);
+                }
+            }
+        }
+    }
 
-	private void removeRuneliteNpcs()
-	{
-		runeliteObjectManager.removeGroupAndSubgroups(this.toString());
-	}
+    @Override
+    public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin) {
+        super.makeWorldOverlayHint(graphics, plugin);
 
-	@Override
-	public void renderArrow(Graphics2D graphics)
-	{
-		if (!extendedRuneliteObject.getWorldPoint().isInScene(client)) return;
-		if (questHelper.getConfig().showMiniMapArrow())
-		{
-			if (!extendedRuneliteObject.isRuneliteObjectActive())
-			{
-				super.renderArrow(graphics);
-			}
-			else if (!hideWorldArrow)
-			{
-				Point p = Perspective.localToCanvas(client, extendedRuneliteObject.getRuneliteObject().getLocation(), client.getPlane(),
-					extendedRuneliteObject.getRuneliteObject().getModelHeight());
-				if (p != null)
-				{
-					DirectionArrow.drawWorldArrow(graphics, getQuestHelper().getConfig().targetOverlayColor(), p.getX(), p.getY() - ARROW_SHIFT_Y);
-				}
-			}
-		}
-	}
+        Color configColor = getQuestHelper().getConfig().targetOverlayColor();
+        highlightNpc(configColor, graphics);
+    }
 
-	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWorldOverlayHint(graphics, plugin);
-
-		Color configColor = getQuestHelper().getConfig().targetOverlayColor();
-		highlightNpc(configColor, graphics);
-	}
-
-	private void highlightNpc(Color color, Graphics2D graphics)
-	{
-		if (!extendedRuneliteObject.getWorldPoint().isInScene(client)) return;
-		switch (questHelper.getConfig().highlightStyleNpcs())
-		{
-			case CONVEX_HULL:
-			case OUTLINE:
-				if (!extendedRuneliteObject.getRuneliteObject().isActive()) break;
-				modelOutlineRenderer.drawOutline(
-					extendedRuneliteObject.getRuneliteObject(),
-					questHelper.getConfig().outlineThickness(),
-					color,
-					questHelper.getConfig().outlineFeathering()
-				);
-				break;
-			case TILE:
-				Polygon poly = Perspective.getCanvasTilePoly(client, extendedRuneliteObject.getRuneliteObject().getLocation());
-				if (poly != null)
-				{
-					OverlayUtil.renderPolygon(graphics, poly, color);
-				}
-				break;
-			default:
-		}
-	}
+    private void highlightNpc(Color color, Graphics2D graphics) {
+        if (!extendedRuneliteObject.getWorldPoint().isInScene(client)) return;
+        switch (questHelper.getConfig().highlightStyleNpcs()) {
+            case CONVEX_HULL:
+            case OUTLINE:
+                if (!extendedRuneliteObject.getRuneliteObject().isActive()) break;
+                modelOutlineRenderer.drawOutline(
+                        extendedRuneliteObject.getRuneliteObject(),
+                        questHelper.getConfig().outlineThickness(),
+                        color,
+                        questHelper.getConfig().outlineFeathering()
+                );
+                break;
+            case TILE:
+                Polygon poly = Perspective.getCanvasTilePoly(client, extendedRuneliteObject.getRuneliteObject().getLocation());
+                if (poly != null) {
+                    OverlayUtil.renderPolygon(graphics, poly, color);
+                }
+                break;
+            default:
+        }
+    }
 }

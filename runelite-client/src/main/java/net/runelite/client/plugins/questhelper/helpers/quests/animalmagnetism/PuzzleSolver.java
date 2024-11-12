@@ -1,35 +1,34 @@
 package net.runelite.client.plugins.questhelper.helpers.quests.animalmagnetism;
 
+
 import net.runelite.client.plugins.questhelper.steps.widget.WidgetDetails;
 
+import java.util.Collections;
 import java.util.HashSet;
 
-public class PuzzleSolver
-{
+public class PuzzleSolver {
 
-	public PuzzleSolver() {}
-
-	//Controls
+    //Controls
     private static final WidgetDetails[] buttons = new WidgetDetails[]{
-		new WidgetDetails(480, 26, 0),
-		//Skip 2
-		new WidgetDetails(480, 31, 0),
-		new WidgetDetails(480, 34, 0),
-		//Skip 5
-		new WidgetDetails(480, 40, 0),
-		new WidgetDetails(480, 43, 0),
-		new WidgetDetails(480, 46, 0)
-		//Skip 9
-	};
+            new WidgetDetails(480, 26, 0),
+            //Skip 2
+            new WidgetDetails(480, 31, 0),
+            new WidgetDetails(480, 34, 0),
+            //Skip 5
+            new WidgetDetails(480, 40, 0),
+            new WidgetDetails(480, 43, 0),
+            new WidgetDetails(480, 46, 0)
+            //Skip 9
+    };
 
-	public HashSet<WidgetDetails> solver()
-	{
-		HashSet<WidgetDetails> highlights = new HashSet<>();
+    public PuzzleSolver() {
+    }
 
-		for (WidgetDetails button : buttons) {
-			highlights.add(button);
-		}
+    public HashSet<WidgetDetails> solver() {
+        HashSet<WidgetDetails> highlights = new HashSet<>();
 
-		return highlights;
-	}
+        Collections.addAll(highlights, buttons);
+
+        return highlights;
+    }
 }

@@ -24,13 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.statemanagement;
 
-import net.runelite.client.plugins.questhelper.collections.KeyringCollection;
-import net.runelite.client.plugins.questhelper.domain.AccountType;
-import net.runelite.client.plugins.questhelper.requirements.item.KeyringRequirement;
-import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.QuestCompletedWidget;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
 import lombok.Getter;
 import lombok.NonNull;
 import net.runelite.api.ChatMessageType;
@@ -42,106 +36,109 @@ import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.plugins.questhelper.collections.KeyringCollection;
+import net.runelite.client.plugins.questhelper.domain.AccountType;
+import net.runelite.client.plugins.questhelper.requirements.item.KeyringRequirement;
+import net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects.QuestCompletedWidget;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.List;
 
 @Singleton
-public class PlayerStateManager
-{
-	@Inject
-	Client client;
+public class PlayerStateManager {
+    @Inject
+    Client client;
 
-	@Inject
-	ConfigManager configManager;
+    @Inject
+    ConfigManager configManager;
 
-	@Inject
-	QuestCompletedWidget playerQuestCompleteWidget;
+    @Inject
+    EventBus eventBus;
 
-	List<KeyringRequirement> keyringKeys;
+    @Inject
+    QuestCompletedWidget playerQuestCompleteWidget;
 
-	WorldPoint lastPlayerPos = null;
+    @Inject
+    BarbarianTrainingStateTracker barbarianTrainingStateTracker;
 
-	/**
-	 * The type of the logged in account (e.g. ironman, hardcore ironman)
-	 * Quest helpers should use this value when building their requirements instead of fetching the value themselves.
-	 */
-	@Getter
-	private @NonNull AccountType accountType = AccountType.NORMAL;
+    List<KeyringRequirement> keyringKeys;
 
-	public void startUp()
-	{
-		keyringKeys = KeyringCollection.allKeyRequirements(configManager);
-		AchievementDiaryStepManager.setup(configManager);
-	}
+    WorldPoint lastPlayerPos = null;
 
-	@Subscribe
-	public void onChatMessage(ChatMessage chatMessage)
-	{
-		if (keyringKeys == null || chatMessage.getType() != ChatMessageType.GAMEMESSAGE) return;
-		if (chatMessage.getMessage().contains("to your key ring."))
-		{
-			for (KeyringRequirement keyringKey : keyringKeys)
-			{
-				if (chatMessage.getMessage().contains("You add the " + keyringKey.chatboxText()))
-				{
-					keyringKey.setConfigValue("true");
-				}
-			}
-		}
-		if (chatMessage.getMessage().contains("from your key ring."))
-		{
-			for (KeyringRequirement keyringKey : keyringKeys)
-			{
-				if (chatMessage.getMessage().contains("You remove the " + keyringKey.chatboxText()))
-				{
-					keyringKey.setConfigValue("false");
-				}
-			}
-		}
+    /**
+     * The type of the logged in account (e.g. ironman, hardcore ironman)
+     * Quest helpers should use this value when building their requirements instead of fetching the value themselves.
+     */
+    @Getter
+    private @NonNull AccountType accountType = AccountType.NORMAL;
 
-		if (chatMessage.getMessage().contains("Achievement Diary Stage Task - "))
-		{
-			AchievementDiaryStepManager.check(client);
-		}
-	}
+    public void startUp() {
+        keyringKeys = KeyringCollection.allKeyRequirements(configManager);
+        AchievementDiaryStepManager.setup(configManager);
+        barbarianTrainingStateTracker.startUp(configManager, eventBus);
+    }
 
-	@Subscribe
-	public void onGameTick(GameTick gameTick)
-	{
-		Player player = client.getLocalPlayer();
-		if (player != null)
-		{
-			WorldPoint newPos = player.getWorldLocation();
-			if (newPos != null && lastPlayerPos != null)
-			{
-				if (newPos.distanceTo(lastPlayerPos) != 0)
-				{
-					playerQuestCompleteWidget.close(client);
-				}
-			}
-			lastPlayerPos = newPos;
-		}
-	}
+    public void shutDown() {
+        barbarianTrainingStateTracker.shutDown(eventBus);
+    }
 
-	@Subscribe
-	public void onVarbitChanged(VarbitChanged event)
-	{
-		if (event.getVarbitId() == Varbits.ACCOUNT_TYPE) {
-			var newAccountType = AccountType.get(event.getValue());
-			if (newAccountType == null) {
-				// The account type value is invalid, leave previous account type as is
-				return;
-			}
+    @Subscribe
+    public void onChatMessage(ChatMessage chatMessage) {
+        if (keyringKeys == null || chatMessage.getType() != ChatMessageType.GAMEMESSAGE) return;
+        if (chatMessage.getMessage().contains("to your key ring.")) {
+            for (KeyringRequirement keyringKey : keyringKeys) {
+                if (chatMessage.getMessage().contains("You add the " + keyringKey.chatboxText())) {
+                    keyringKey.setConfigValue("true");
+                }
+            }
+        }
+        if (chatMessage.getMessage().contains("from your key ring.")) {
+            for (KeyringRequirement keyringKey : keyringKeys) {
+                if (chatMessage.getMessage().contains("You remove the " + keyringKey.chatboxText())) {
+                    keyringKey.setConfigValue("false");
+                }
+            }
+        }
 
-			accountType = newAccountType;
-		}
-	}
+        if (chatMessage.getMessage().contains("Achievement Diary Stage Task - ")) {
+            AchievementDiaryStepManager.check(client);
+        }
+    }
 
-	public String getPlayerName()
-	{
-		if (client.getLocalPlayer() == null)
-		{
-			return null;
-		}
-		return client.getLocalPlayer().getName();
-	}
+    @Subscribe
+    public void onGameTick(GameTick gameTick) {
+        Player player = client.getLocalPlayer();
+        if (player != null) {
+            WorldPoint newPos = player.getWorldLocation();
+            if (newPos != null && lastPlayerPos != null) {
+                if (newPos.distanceTo(lastPlayerPos) != 0) {
+                    playerQuestCompleteWidget.close(client);
+                }
+            }
+            lastPlayerPos = newPos;
+        }
+    }
+
+    @Subscribe
+    public void onVarbitChanged(VarbitChanged event) {
+        if (event.getVarbitId() == Varbits.ACCOUNT_TYPE) {
+            var newAccountType = AccountType.get(event.getValue());
+            if (newAccountType == null) {
+                // The account type value is invalid, leave previous account type as is
+                return;
+            }
+
+            accountType = newAccountType;
+        }
+    }
+
+    public String getPlayerName() {
+        if (client.getLocalPlayer() == null) {
+            return null;
+        }
+        return client.getLocalPlayer().getName();
+    }
 }

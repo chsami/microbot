@@ -24,61 +24,51 @@
  */
 package net.runelite.client.plugins.questhelper.panel;
 
-import net.runelite.client.plugins.questhelper.tools.Icon;
-import net.runelite.client.plugins.questhelper.rewards.Reward;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Insets;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 import lombok.Setter;
+import net.runelite.client.plugins.questhelper.rewards.Reward;
+import net.runelite.client.plugins.questhelper.tools.Icon;
 
-public class QuestRewardPanel extends JPanel
-{
-	private static final ImageIcon INFO_ICON = Icon.INFO_ICON.getIcon();
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 
-	@Getter
-	@Setter
-	private JLabel label;
+public class QuestRewardPanel extends JPanel {
+    private static final ImageIcon INFO_ICON = Icon.INFO_ICON.getIcon();
+    @Getter
+    private final Reward reward;
+    @Getter
+    @Setter
+    private JLabel label;
 
-	@Getter
-	private final Reward reward;
+    public QuestRewardPanel(Reward reward) {
+        this.reward = reward;
 
-	public QuestRewardPanel(Reward reward)
-	{
-		this.reward = reward;
+        setLayout(new BorderLayout());
+        setBorder(new EmptyBorder(0, 0, 0, 0));
 
-		setLayout(new BorderLayout());
-		setBorder(new EmptyBorder(0, 0, 0, 0));
+        String html1 = "<html><body style='padding: 0px; margin: 0px; width: 140px'>";
+        String html2 = "</body></html>";
 
-		String html1 = "<html><body style='padding: 0px; margin: 0px; width: 140px'>";
-		String html2 = "</body></html>";
+        label = new JLabel(html1 + reward.getDisplayText() + html2);
+        label.setForeground(Color.WHITE);
+        label.setSize(label.getPreferredSize());
+        setPreferredSize(label.getSize());
+        add(label, BorderLayout.WEST);
+    }
 
-		label = new JLabel(html1 + reward.getDisplayText() + html2);
-		label.setForeground(Color.WHITE);
-		label.setSize(label.getPreferredSize());
-		setPreferredSize(label.getSize());
-		add(label, BorderLayout.WEST);
-	}
-
-	private void addButtonToPanel(String tooltipText)
-	{
-		String html1 = "<html><body>";
-		String html2 = "</body></html>";
-		tooltipText = tooltipText.replaceAll("\\n", "<br>");
-		JButton b = new JButton(INFO_ICON);
-		b.setPreferredSize(new Dimension(10, 10));
-		b.setToolTipText(html1 + tooltipText + html2);
-		b.setBorderPainted(false);
-		b.setFocusPainted(false);
-		b.setBorderPainted(false);
-		b.setContentAreaFilled(false);
-		b.setMargin(new Insets(0, 0, 0, 0));
-		add(b);
-	}
+    private void addButtonToPanel(String tooltipText) {
+        String html1 = "<html><body>";
+        String html2 = "</body></html>";
+        tooltipText = tooltipText.replaceAll("\\n", "<br>");
+        JButton b = new JButton(INFO_ICON);
+        b.setPreferredSize(new Dimension(10, 10));
+        b.setToolTipText(html1 + tooltipText + html2);
+        b.setBorderPainted(false);
+        b.setFocusPainted(false);
+        b.setBorderPainted(false);
+        b.setContentAreaFilled(false);
+        b.setMargin(new Insets(0, 0, 0, 0));
+        add(b);
+    }
 }

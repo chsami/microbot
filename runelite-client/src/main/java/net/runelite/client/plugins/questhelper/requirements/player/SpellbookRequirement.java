@@ -26,30 +26,30 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.player;
 
+
+import net.runelite.api.Client;
 import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.Spellbook;
-import net.runelite.api.Client;
 
-public class SpellbookRequirement extends AbstractRequirement
-{
-	private static final int SPELLBOOK_VARBIT = 4070;
-	private final Spellbook spellBook;
+import javax.annotation.Nonnull;
 
-	public SpellbookRequirement(Spellbook spellBook)
-	{
-		assert(spellBook != null);
-		this.spellBook = spellBook;
-	}
+public class SpellbookRequirement extends AbstractRequirement {
+    private static final int SPELLBOOK_VARBIT = 4070;
+    private final Spellbook spellBook;
 
-	@Override
-	public boolean check(Client client)
-	{
-		return spellBook.check(client, SPELLBOOK_VARBIT);
-	}
+    public SpellbookRequirement(Spellbook spellBook) {
+        assert (spellBook != null);
+        this.spellBook = spellBook;
+    }
 
-	@Override
-	public String getDisplayText()
-	{
-		return "You must be on the " + spellBook.getName() + " spellbook.";
-	}
+    @Override
+    public boolean check(Client client) {
+        return spellBook.check(client, SPELLBOOK_VARBIT);
+    }
+
+    @Nonnull
+    @Override
+    public String getDisplayText() {
+        return "You must be on the " + spellBook.getName() + " spellbook.";
+    }
 }

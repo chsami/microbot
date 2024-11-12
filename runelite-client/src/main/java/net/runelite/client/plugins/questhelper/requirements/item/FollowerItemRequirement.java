@@ -26,57 +26,52 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.item;
 
-import net.runelite.client.plugins.questhelper.collections.ItemCollections;
-import java.util.List;
-import java.util.Objects;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 
-public class FollowerItemRequirement extends ItemRequirement
-{
-	private final List<Integer> followerIDs;
-	private final List<Integer> itemIDs;
+import java.util.List;
+import java.util.Objects;
 
-	public FollowerItemRequirement(String name, List<Integer> itemIDs, List<Integer> followerIDs)
-	{
-		super(name, itemIDs);
+public class FollowerItemRequirement extends ItemRequirement {
+    private final List<Integer> followerIDs;
+    private final List<Integer> itemIDs;
 
-		assert(itemIDs.stream().noneMatch(Objects::isNull));
-		assert(followerIDs.stream().noneMatch(Objects::isNull));
+    public FollowerItemRequirement(String name, List<Integer> itemIDs, List<Integer> followerIDs) {
+        super(name, itemIDs);
 
-		this.itemIDs = itemIDs;
-		this.followerIDs = followerIDs;
-	}
+        assert (itemIDs.stream().noneMatch(Objects::isNull));
+        assert (followerIDs.stream().noneMatch(Objects::isNull));
 
-	public FollowerItemRequirement(String name, ItemCollections itemIDs, List<Integer> followerIDs)
-	{
-		super(name, itemIDs);
+        this.itemIDs = itemIDs;
+        this.followerIDs = followerIDs;
+    }
 
-		assert(followerIDs.stream().noneMatch(Objects::isNull));
+    public FollowerItemRequirement(String name, ItemCollections itemIDs, List<Integer> followerIDs) {
+        super(name, itemIDs);
 
-		this.itemIDs = itemIDs.getItems();
-		this.followerIDs = followerIDs;
-	}
+        assert (followerIDs.stream().noneMatch(Objects::isNull));
 
-	@Override
-	protected FollowerItemRequirement copyOfClass()
-	{
-		return new FollowerItemRequirement(getName(), itemIDs, followerIDs);
-	}
+        this.itemIDs = itemIDs.getItems();
+        this.followerIDs = followerIDs;
+    }
 
-	@Override
-	public boolean check(Client client, boolean checkConsideringSlotRestrictions, List<Item> items)
-	{
-		boolean match = client.getNpcs().stream()
-			.filter(npc -> npc.getInteracting() != null) // we need this check because Client#getLocalPlayer is Nullable
-			.filter(npc -> npc.getInteracting() == client.getLocalPlayer())
-			.anyMatch(npc -> followerIDs.contains(npc.getId()));
+    @Override
+    protected FollowerItemRequirement copyOfClass() {
+        return new FollowerItemRequirement(getName(), itemIDs, followerIDs);
+    }
 
-		if (match)
-		{
-			return true;
-		}
+    @Override
+    public boolean check(Client client, boolean checkConsideringSlotRestrictions, List<Item> items) {
+        boolean match = client.getNpcs().stream()
+                .filter(npc -> npc.getInteracting() != null) // we need this check because Client#getLocalPlayer is Nullable
+                .filter(npc -> npc.getInteracting() == client.getLocalPlayer())
+                .anyMatch(npc -> followerIDs.contains(npc.getId()));
 
-		return super.check(client, checkConsideringSlotRestrictions, items);
-	}
+        if (match) {
+            return true;
+        }
+
+        return super.check(client, checkConsideringSlotRestrictions, items);
+    }
 }

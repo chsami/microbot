@@ -26,26 +26,24 @@
  */
 package net.runelite.client.plugins.questhelper.requirements;
 
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
-import java.awt.Color;
-import javax.annotation.Nonnull;
 import net.runelite.api.Client;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 
-public abstract class SimpleRequirement extends AbstractRequirement
-{
-	@Override
-	public abstract boolean check(Client client);
+import javax.annotation.Nonnull;
+import java.awt.*;
 
-	@Nonnull
-	@Override
-	public String getDisplayText()
-	{
-		return "";
-	}
+public abstract class SimpleRequirement extends AbstractRequirement {
+    @Override
+    public abstract boolean check(Client client);
 
-	@Override
-	public Color getColor(Client client, QuestHelperConfig config)
-	{
-		return check(client) ? config.passColour() : config.failColour();
-	}
+    @Nonnull
+    @Override
+    public String getDisplayText() {
+        return "";
+    }
+
+    @Override
+    public Color getColor(Client client, QuestHelperConfig config) {
+        return check(client) ? config.passColour() : config.failColour();
+    }
 }

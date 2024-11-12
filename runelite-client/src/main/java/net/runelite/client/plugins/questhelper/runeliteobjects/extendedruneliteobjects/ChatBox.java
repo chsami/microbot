@@ -25,283 +25,244 @@
  */
 package net.runelite.client.plugins.questhelper.runeliteobjects.extendedruneliteobjects;
 
-import net.runelite.client.plugins.questhelper.runeliteobjects.dialog.RuneliteDialogStep;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.FontID;
-import net.runelite.api.widgets.JavaScriptCallback;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetModelType;
-import net.runelite.api.widgets.WidgetPositionMode;
-import net.runelite.api.widgets.WidgetSizeMode;
-import net.runelite.api.widgets.WidgetTextAlignment;
-import net.runelite.api.widgets.WidgetType;
+import net.runelite.api.widgets.*;
 import net.runelite.client.game.chatbox.ChatboxInput;
 import net.runelite.client.game.chatbox.ChatboxPanelManager;
 import net.runelite.client.input.KeyListener;
+import net.runelite.client.plugins.questhelper.runeliteobjects.dialog.RuneliteDialogStep;
 
-public class ChatBox extends ChatboxInput implements KeyListener
-{
-	@Data
-	@AllArgsConstructor
-	private static final class Entry
-	{
-		private String text;
-		private Runnable callback;
-	}
+import javax.inject.Inject;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
-	protected final Client client;
+public class ChatBox extends ChatboxInput implements KeyListener {
+    protected final Client client;
+    protected final ChatboxPanelManager chatboxPanelManager;
+    @Getter
+    private final List<Entry> options = new ArrayList<>();
+    @Getter
+    protected RuneliteDialogStep dialog;
+    RuneliteDialogStep nextDialog;
+    ChatBox nextChatBox;
+    boolean chatProgressed = false;
+    Widget continueW;
+    @Getter
+    private Runnable onClose;
 
-	protected final ChatboxPanelManager chatboxPanelManager;
+    @Inject
+    protected ChatBox(Client client, ChatboxPanelManager chatboxPanelManager) {
+        this.client = client;
+        this.chatboxPanelManager = chatboxPanelManager;
+    }
 
-	@Getter
-	protected RuneliteDialogStep dialog;
+    @Data
+    @AllArgsConstructor
+    private static final class Entry {
+        private String text;
+        private Runnable callback;
+    }
 
-	@Getter
-	private final List<Entry> options = new ArrayList<>();
+    public ChatBox dialog(RuneliteDialogStep dialog) {
+        this.dialog = dialog;
+        return this;
+    }
 
-	@Getter
-	private Runnable onClose;
+    public ChatBox option(String text, Runnable callback) {
+        options.add(new Entry(text, callback));
+        return this;
+    }
 
-	RuneliteDialogStep nextDialog;
-	ChatBox nextChatBox;
+    public ChatBox onClose(Runnable onClose) {
+        this.onClose = onClose;
+        return this;
+    }
 
-	boolean chatProgressed = false;
+    public ChatBox build() {
+        if (dialog == null) {
+            throw new IllegalStateException("Dialog must be set");
+        }
 
-	@Inject
-	protected ChatBox(Client client, ChatboxPanelManager chatboxPanelManager)
-	{
-		this.client = client;
-		this.chatboxPanelManager = chatboxPanelManager;
-	}
+        chatboxPanelManager.openInput(this);
+        return this;
+    }
 
-	public ChatBox dialog(RuneliteDialogStep dialog)
-	{
-		this.dialog = dialog;
-		return this;
-	}
+    @Override
+    protected void open() {
+        Widget container = chatboxPanelManager.getContainerWidget();
 
+        Widget npcFaceWidget = container.createChild(0, WidgetType.RECTANGLE);
+        npcFaceWidget.setType(WidgetType.MODEL);
+        npcFaceWidget.setModelId(dialog.getFaceID());
+        npcFaceWidget.setModelType(WidgetModelType.NPC_CHATHEAD);
+        npcFaceWidget.setAnimationId(dialog.getAnimation());
+        npcFaceWidget.setRotationX(40);
+        npcFaceWidget.setRotationZ(1882);
+        npcFaceWidget.setModelZoom(796);
+        npcFaceWidget.setOriginalX(46);
+        npcFaceWidget.setOriginalY(53);
+        npcFaceWidget.setOriginalWidth(32);
+        npcFaceWidget.setOriginalHeight(32);
+        npcFaceWidget.setXPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
+        npcFaceWidget.setYPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
+        npcFaceWidget.revalidate();
 
-	public ChatBox option(String text, Runnable callback)
-	{
-		options.add(new Entry(text, callback));
-		return this;
-	}
+        setupDialog(container, 96);
+    }
 
-	public ChatBox onClose(Runnable onClose)
-	{
-		this.onClose = onClose;
-		return this;
-	}
+    public void setupDialog(Widget container, int x) {
+        int WRAPPER_HEIGHT_ADJUSTMENT = 17;
+        int WRAPPER_WIDTH_ADJUSTMENT = 12;
 
-	public ChatBox build()
-	{
-		if (dialog == null)
-		{
-			throw new IllegalStateException("Dialog must be set");
-		}
+        Widget nameWidget = container.createChild(-1, WidgetType.TEXT);
+        nameWidget.setText(dialog.getName());
+        nameWidget.setTextColor(0x800000);
+        nameWidget.setFontId(FontID.QUILL_8);
+        nameWidget.setXPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
+        nameWidget.setOriginalX(WRAPPER_WIDTH_ADJUSTMENT + x);
+        nameWidget.setYPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
+        nameWidget.setOriginalY(WRAPPER_HEIGHT_ADJUSTMENT);
+        nameWidget.setOriginalWidth(380);
+        nameWidget.setOriginalHeight(17);
+        nameWidget.setXTextAlignment(WidgetTextAlignment.CENTER);
+        nameWidget.setYTextAlignment(WidgetTextAlignment.CENTER);
+        nameWidget.setWidthMode(WidgetSizeMode.ABSOLUTE);
+        nameWidget.revalidate();
 
-		chatboxPanelManager.openInput(this);
-		return this;
-	}
+        Widget continueWidget = container.createChild(-1, WidgetType.TEXT);
+        continueWidget.setText("Click here to continue");
+        continueWidget.setTextColor(0xff);
+        continueWidget.setFontId(FontID.QUILL_8);
+        continueWidget.setXPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
+        continueWidget.setOriginalX(WRAPPER_WIDTH_ADJUSTMENT + x);
+        continueWidget.setYPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
+        continueWidget.setOriginalY(WRAPPER_HEIGHT_ADJUSTMENT + 80);
+        continueWidget.setOriginalWidth(380);
+        continueWidget.setOriginalHeight(17);
+        continueWidget.setXTextAlignment(WidgetTextAlignment.CENTER);
+        continueWidget.setYTextAlignment(WidgetTextAlignment.CENTER);
+        continueWidget.setWidthMode(WidgetSizeMode.ABSOLUTE);
+        continueWidget.setAction(0, "Continue");
+        continueWidget.setOnOpListener((JavaScriptCallback) ev -> {
+            continueWidget.setText("Please wait...");
+            continueChat();
+        });
+        continueWidget.setOnMouseOverListener((JavaScriptCallback) ev -> continueWidget.setTextColor(0xFFFFFF));
+        continueWidget.setOnMouseLeaveListener((JavaScriptCallback) ev -> continueWidget.setTextColor(0xff));
+        continueWidget.setHasListener(true);
+        continueWidget.revalidate();
 
-	Widget continueW;
+        continueW = continueWidget;
 
-	@Override
-	protected void open()
-	{
-		Widget container = chatboxPanelManager.getContainerWidget();
+        Widget dialogWidget = container.createChild(-1, WidgetType.TEXT);
+        dialogWidget.setText(dialog.getText());
+        dialogWidget.setTextColor(0x0);
+        dialogWidget.setFontId(FontID.QUILL_8);
+        dialogWidget.setXPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
+        dialogWidget.setOriginalX(WRAPPER_WIDTH_ADJUSTMENT + x);
+        dialogWidget.setYPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
+        dialogWidget.setOriginalY(WRAPPER_HEIGHT_ADJUSTMENT + 16);
+        dialogWidget.setOriginalWidth(380);
+        dialogWidget.setOriginalHeight(67);
+        dialogWidget.setXTextAlignment(WidgetTextAlignment.CENTER);
+        dialogWidget.setYTextAlignment(WidgetTextAlignment.CENTER);
+        dialogWidget.setWidthMode(WidgetSizeMode.ABSOLUTE);
+        dialogWidget.revalidate();
+    }
 
-		Widget npcFaceWidget = container.createChild(0, WidgetType.RECTANGLE);
-		npcFaceWidget.setType(WidgetType.MODEL);
-		npcFaceWidget.setModelId(dialog.getFaceID());
-		npcFaceWidget.setModelType(WidgetModelType.NPC_CHATHEAD);
-		npcFaceWidget.setAnimationId(dialog.getAnimation());
-		npcFaceWidget.setRotationX(40);
-		npcFaceWidget.setRotationZ(1882);
-		npcFaceWidget.setModelZoom(796);
-		npcFaceWidget.setOriginalX(46);
-		npcFaceWidget.setOriginalY(53);
-		npcFaceWidget.setOriginalWidth(32);
-		npcFaceWidget.setOriginalHeight(32);
-		npcFaceWidget.setXPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
-		npcFaceWidget.setYPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
-		npcFaceWidget.revalidate();
+    public void progressDialog() {
+        if (nextDialog == null) return;
 
-		setupDialog(container, 96);
-	}
+        // If already progressed, try to progress next step
+        if (nextChatBox != null) {
+            nextChatBox.progressDialog();
+            return;
+        }
 
-	public void setupDialog(Widget container, int x)
-	{
-		int WRAPPER_HEIGHT_ADJUSTMENT = 17;
-		int WRAPPER_WIDTH_ADJUSTMENT = 12;
+        if (nextDialog.isPlayer()) {
+            nextChatBox = new PlayerChatBox(client, chatboxPanelManager)
+                    .dialog(nextDialog)
+                    .build();
+            return;
+        }
+        nextChatBox = new NpcChatBox(client, chatboxPanelManager)
+                .dialog(nextDialog)
+                .build();
+    }
 
-		Widget nameWidget = container.createChild(-1, WidgetType.TEXT);
-		nameWidget.setText(dialog.getName());
-		nameWidget.setTextColor(0x800000);
-		nameWidget.setFontId(FontID.QUILL_8);
-		nameWidget.setXPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
-		nameWidget.setOriginalX(WRAPPER_WIDTH_ADJUSTMENT + x);
-		nameWidget.setYPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
-		nameWidget.setOriginalY(WRAPPER_HEIGHT_ADJUSTMENT);
-		nameWidget.setOriginalWidth(380);
-		nameWidget.setOriginalHeight(17);
-		nameWidget.setXTextAlignment(WidgetTextAlignment.CENTER);
-		nameWidget.setYTextAlignment(WidgetTextAlignment.CENTER);
-		nameWidget.setWidthMode(WidgetSizeMode.ABSOLUTE);
-		nameWidget.revalidate();
+    protected void continueChat() {
+        dialog.progressState();
 
-		Widget continueWidget = container.createChild(-1, WidgetType.TEXT);
-		continueWidget.setText("Click here to continue");
-		continueWidget.setTextColor(0xff);
-		continueWidget.setFontId(FontID.QUILL_8);
-		continueWidget.setXPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
-		continueWidget.setOriginalX(WRAPPER_WIDTH_ADJUSTMENT + x);
-		continueWidget.setYPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
-		continueWidget.setOriginalY(WRAPPER_HEIGHT_ADJUSTMENT + 80);
-		continueWidget.setOriginalWidth(380);
-		continueWidget.setOriginalHeight(17);
-		continueWidget.setXTextAlignment(WidgetTextAlignment.CENTER);
-		continueWidget.setYTextAlignment(WidgetTextAlignment.CENTER);
-		continueWidget.setWidthMode(WidgetSizeMode.ABSOLUTE);
-		continueWidget.setAction(0, "Continue");
-		continueWidget.setOnOpListener((JavaScriptCallback) ev -> {
-			continueWidget.setText("Please wait...");
-			continueChat();
-		});
-		continueWidget.setOnMouseOverListener((JavaScriptCallback) ev -> continueWidget.setTextColor(0xFFFFFF));
-		continueWidget.setOnMouseLeaveListener((JavaScriptCallback) ev -> continueWidget.setTextColor(0xff));
-		continueWidget.setHasListener(true);
-		continueWidget.revalidate();
+        // Already clicked an option
+        if (nextDialog != null) return;
 
-		continueW = continueWidget;
+        // TODO: Possible race condition once we add multiple choices, need to make sure they lock choices once one is clicked
+        nextDialog = dialog.getContinueDialog();
+        if (nextDialog == null) {
+            chatboxPanelManager.close();
+        }
+    }
 
-		Widget dialogWidget = container.createChild(-1, WidgetType.TEXT);
-		dialogWidget.setText(dialog.getText());
-		dialogWidget.setTextColor(0x0);
-		dialogWidget.setFontId(FontID.QUILL_8);
-		dialogWidget.setXPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
-		dialogWidget.setOriginalX(WRAPPER_WIDTH_ADJUSTMENT + x);
-		dialogWidget.setYPositionMode(WidgetPositionMode.ABSOLUTE_TOP);
-		dialogWidget.setOriginalY(WRAPPER_HEIGHT_ADJUSTMENT + 16);
-		dialogWidget.setOriginalWidth(380);
-		dialogWidget.setOriginalHeight(67);
-		dialogWidget.setXTextAlignment(WidgetTextAlignment.CENTER);
-		dialogWidget.setYTextAlignment(WidgetTextAlignment.CENTER);
-		dialogWidget.setWidthMode(WidgetSizeMode.ABSOLUTE);
-		dialogWidget.revalidate();
-	}
+    private void callback(Entry entry) {
+        Widget container = chatboxPanelManager.getContainerWidget();
+        container.setOnKeyListener((Object[]) null);
 
-	public void progressDialog()
-	{
-		if (nextDialog == null) return;
+        chatboxPanelManager.close();
 
-		// If already progressed, try to progress next step
-		if (nextChatBox != null)
-		{
-			nextChatBox.progressDialog();
-			return;
-		}
+        entry.callback.run();
+    }
 
-		if (nextDialog.isPlayer())
-		{
-			nextChatBox = new PlayerChatBox(client, chatboxPanelManager)
-				.dialog(nextDialog)
-				.build();
-			return;
-		}
-		nextChatBox = new NpcChatBox(client, chatboxPanelManager)
-			.dialog(nextDialog)
-			.build();
-	}
+    @Override
+    protected void close() {
+        if (onClose != null) {
+            onClose.run();
+        }
+    }
 
-	protected void continueChat()
-	{
-		dialog.progressState();
+    @Override
+    public void keyTyped(KeyEvent e) {
+        if (!chatboxPanelManager.shouldTakeInput()) {
+            return;
+        }
 
-		// Already clicked an option
-		if (nextDialog != null) return;
+        char c = e.getKeyChar();
 
-		// TODO: Possible race condition once we add multiple choices, need to make sure they lock choices once one is clicked
-		nextDialog = dialog.getContinueDialog();
-		if (nextDialog == null)
-		{
-			chatboxPanelManager.close();
-		}
-	}
+        if (c == '\033') {
+            chatboxPanelManager.close();
+            e.consume();
+            return;
+        }
 
-	private void callback(Entry entry)
-	{
-		Widget container = chatboxPanelManager.getContainerWidget();
-		container.setOnKeyListener((Object[]) null);
+        if (c == KeyEvent.VK_SPACE) {
+            if (continueW != null) continueW.setText("Please wait...");
+            continueChat();
+        }
 
-		chatboxPanelManager.close();
+        int n = c - '1';
+        if (n >= 0 && n < options.size()) {
+            callback(options.get(n));
+            e.consume();
+        }
+    }
 
-		entry.callback.run();
-	}
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (!chatboxPanelManager.shouldTakeInput()) {
+            return;
+        }
 
-	@Override
-	protected void close()
-	{
-		if (onClose != null)
-		{
-			onClose.run();
-		}
-	}
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            e.consume();
+        }
+    }
 
-	@Override
-	public void keyTyped(KeyEvent e)
-	{
-		if (!chatboxPanelManager.shouldTakeInput())
-		{
-			return;
-		}
-
-		char c = e.getKeyChar();
-
-		if (c == '\033')
-		{
-			chatboxPanelManager.close();
-			e.consume();
-			return;
-		}
-
-		if (c == KeyEvent.VK_SPACE)
-		{
-			if (continueW != null) continueW.setText("Please wait...");
-			continueChat();
-		}
-
-		int n = c - '1';
-		if (n >= 0 && n < options.size())
-		{
-			callback(options.get(n));
-			e.consume();
-		}
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e)
-	{
-		if (!chatboxPanelManager.shouldTakeInput())
-		{
-			return;
-		}
-
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
-		{
-			e.consume();
-		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e)
-	{
-	}
+    @Override
+    public void keyReleased(KeyEvent e) {
+    }
 }

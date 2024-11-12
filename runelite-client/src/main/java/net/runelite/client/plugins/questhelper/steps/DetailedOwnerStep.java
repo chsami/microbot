@@ -25,159 +25,158 @@
 package net.runelite.client.plugins.questhelper.steps;
 
 import com.google.inject.Inject;
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import lombok.NonNull;
 import net.runelite.api.Client;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.ui.overlay.components.PanelComponent;
-import org.apache.commons.lang3.ArrayUtils;
 
-public class DetailedOwnerStep extends QuestStep implements OwnerStep
-{
-	protected QuestStep currentStep;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
-	protected List<Requirement> requirements = new ArrayList<>();
+public class DetailedOwnerStep extends QuestStep implements OwnerStep {
+    protected QuestStep currentStep;
 
-	@Inject
-	protected EventBus eventBus;
+    protected List<Requirement> requirements = new ArrayList<>();
 
-	@Inject
-	protected Client client;
+    @Inject
+    protected EventBus eventBus;
 
-	public DetailedOwnerStep(QuestHelper questHelper, Requirement... requirements)
-	{
-		super(questHelper);
-		this.requirements.addAll(Arrays.asList(requirements));
-		setupSteps();
-		addSubSteps(getSteps());
-	}
+    @Inject
+    protected Client client;
 
-	public DetailedOwnerStep(QuestHelper questHelper, String text, Requirement... requirements)
-	{
-		super(questHelper, text);
-		this.requirements.addAll(Arrays.asList(requirements));
-		setupSteps();
-		addSubSteps(getSteps());
-	}
+    public DetailedOwnerStep(QuestHelper questHelper, Requirement... requirements)
+    {
+        super(questHelper);
+        this.requirements.addAll(Arrays.asList(requirements));
+        setupSteps();
+        addSubSteps(getSteps());
+    }
 
-	@Override
-	public void startUp()
-	{
-		updateSteps();
-	}
+    public DetailedOwnerStep(QuestHelper questHelper, String text, Requirement... requirements)
+    {
+        super(questHelper, text);
+        this.requirements.addAll(Arrays.asList(requirements));
+        setupSteps();
+        addSubSteps(getSteps());
+    }
 
-	@Override
-	public void shutDown()
-	{
-		shutDownStep();
-		currentStep = null;
-	}
+    @Override
+    public void startUp()
+    {
+        updateSteps();
+    }
 
-	protected void startUpStep(QuestStep step)
-	{
-		if (currentStep == null)
-		{
-			currentStep = step;
-			eventBus.register(currentStep);
-			currentStep.startUp();
-			return;
-		}
+    @Override
+    public void shutDown()
+    {
+        shutDownStep();
+        currentStep = null;
+    }
 
-		if (!step.equals(currentStep))
-		{
-			shutDownStep();
-			eventBus.register(step);
-			step.startUp();
-			currentStep = step;
-		}
-	}
+    protected void startUpStep(QuestStep step)
+    {
+        if (step.equals(currentStep)) return;
 
-	protected void shutDownStep()
-	{
-		if (currentStep != null)
-		{
-			eventBus.unregister(currentStep);
-			currentStep.shutDown();
-			currentStep = null;
-		}
-	}
+        if (currentStep != null)
+        {
+            shutDownStep();
+        }
 
-	protected void updateSteps()
-	{
-	}
+        eventBus.register(step);
+        step.startUp();
+        currentStep = step;
+    }
 
-	// This should only have been called from a parent ConditionalStep, so default the additional text to the passed in text
-	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
-	{
-		List<Requirement> allRequirements = new ArrayList<>(additionalRequirements);
-		allRequirements.addAll(requirements);
+    protected void shutDownStep()
+    {
+        if (currentStep != null)
+        {
+            eventBus.unregister(currentStep);
+            currentStep.shutDown();
+            currentStep = null;
+        }
+    }
 
-		List<String> allAdditionalText = new ArrayList<>(additionalText);
-		if (text != null) allAdditionalText.addAll(text);
+    protected void updateSteps()
+    {
+    }
 
-		if (currentStep != null)
-		{
-			currentStep.makeOverlayHint(panelComponent, plugin, allAdditionalText, allRequirements);
-		}
-	}
+    // This should only have been called from a parent ConditionalStep, so default the additional text to the passed in text
+    @Override
+    public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, @NonNull List<String> additionalText, @NonNull List<Requirement> additionalRequirements)
+    {
+        List<Requirement> allRequirements = new ArrayList<>(additionalRequirements);
+        allRequirements.addAll(requirements);
 
-	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeWorldOverlayHint(graphics, plugin);
-		}
-	}
+        List<String> allAdditionalText = new ArrayList<>(additionalText);
+        if (text != null) allAdditionalText.addAll(text);
 
-	@Override
-	public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeWorldArrowOverlayHint(graphics, plugin);
-		}
-	}
+        if (currentStep != null)
+        {
+            currentStep.makeOverlayHint(panelComponent, plugin, allAdditionalText, allRequirements);
+        }
+    }
 
-	@Override
-	public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeWorldLineOverlayHint(graphics, plugin);
-		}
-	}
+    @Override
+    public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+    {
+        if (currentStep != null)
+        {
+            currentStep.makeWorldOverlayHint(graphics, plugin);
+        }
+    }
 
-	@Override
-	public QuestStep getActiveStep()
-	{
-		if (currentStep != null)
-		{
-			return currentStep.getActiveStep();
-		}
-		else
-		{
-			return this;
-		}
-	}
+    @Override
+    public void makeWorldArrowOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+    {
+        if (currentStep != null)
+        {
+            currentStep.makeWorldArrowOverlayHint(graphics, plugin);
+        }
+    }
 
+    @Override
+    public void makeWorldLineOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+    {
+        if (currentStep != null)
+        {
+            currentStep.makeWorldLineOverlayHint(graphics, plugin);
+        }
+    }
 
-	protected void setupSteps()
-	{
-	}
+    @Override
+    public void renderQuestStepTooltip(PanelComponent panelComponent, boolean isMenuOpen, boolean isBackgroundHelper)
+    {
+        if (currentStep != null)
+        {
+            currentStep.renderQuestStepTooltip(panelComponent, isMenuOpen, isBackgroundHelper);
+        }
+    }
+    @Override
+    public QuestStep getActiveStep()
+    {
+        if (currentStep != null)
+        {
+            return currentStep.getActiveStep();
+        }
+        else
+        {
+            return this;
+        }
+    }
 
-	@Override
-	public Collection<QuestStep> getSteps()
-	{
-		return null;
-	}
+    protected void setupSteps()
+    {
+    }
+
+    @Override
+    public Collection<QuestStep> getSteps()
+    {
+        return null;
+    }
 }
 

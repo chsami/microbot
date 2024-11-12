@@ -24,14 +24,17 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thequeenofthieves;
 
-import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
 import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
@@ -41,224 +44,200 @@ import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import net.runelite.api.ItemID;
-import net.runelite.api.NpcID;
-import net.runelite.api.NullObjectID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.QuestState;
-import net.runelite.api.Skill;
-import net.runelite.api.coords.WorldPoint;
 
-public class TheQueenOfThieves extends BasicQuestHelper
-{
-	//Items Required
-	ItemRequirement stew, hughesLetter;
+import java.util.*;
 
-	QuestStep talkToLawry, talkToPoorLookingPerson, talkToOReilly, talkToDevan, exitWarrens, killConrad,
-		tellDevanAboutConrad, exitWarrens2, goToKingstown, openChest, leaveKingstown, talkToLawry2,
-		talkToShauna;
+public class TheQueenOfThieves extends BasicQuestHelper {
+    //Items Required
+    ItemRequirement stew, hughesLetter;
 
-	ObjectStep enterWarrens, enterWarrens2, enterWarrens3, enterWarrens4;
+    QuestStep talkToLawry, talkToPoorLookingPerson, talkToOReilly, talkToDevan, exitWarrens, killConrad,
+            tellDevanAboutConrad, exitWarrens2, goToKingstown, openChest, leaveKingstown, talkToLawry2,
+            talkToShauna;
 
-	NpcStep talkToQueenOfThieves;
+    ObjectStep enterWarrens, enterWarrens2, enterWarrens3, enterWarrens4;
 
-	//Zones
-	ZoneRequirement inWarrens, inUpstairsHughesHouse;
-	Zone warrens, kingstown, upstairsHughesHouse;
+    NpcStep talkToQueenOfThieves;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
+    //Zones
+    ZoneRequirement inWarrens, inUpstairsHughesHouse;
+    Zone warrens, kingstown, upstairsHughesHouse;
 
-		ConditionalStep searchHughesChest = new ConditionalStep(this, goToKingstown);
-		searchHughesChest.addStep(inWarrens, exitWarrens);
-		searchHughesChest.addStep(inUpstairsHughesHouse, openChest);
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupConditions();
+        setupSteps();
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		steps.put(0, talkToLawry);
-		steps.put(1, talkToPoorLookingPerson);
-		steps.put(2, talkToOReilly);
-		// Switches to 3 after mention of stew, but before giving it to him.
-		steps.put(3, talkToOReilly);
+        ConditionalStep searchHughesChest = new ConditionalStep(this, goToKingstown);
+        searchHughesChest.addStep(inWarrens, exitWarrens);
+        searchHughesChest.addStep(inUpstairsHughesHouse, openChest);
 
-		ConditionalStep findDevan = new ConditionalStep(this, enterWarrens);
-		findDevan.addStep(inWarrens, talkToDevan);
+        steps.put(0, talkToLawry);
+        steps.put(1, talkToPoorLookingPerson);
+        steps.put(2, talkToOReilly);
+        // Switches to 3 after mention of stew, but before giving it to him.
+        steps.put(3, talkToOReilly);
 
-		steps.put(4, findDevan);
-		// Switches to 5 when you enter the manhole.
-		steps.put(5, findDevan);
+        ConditionalStep findDevan = new ConditionalStep(this, enterWarrens);
+        findDevan.addStep(inWarrens, talkToDevan);
 
-		ConditionalStep killConradConditional = new ConditionalStep(this, killConrad);
-		killConradConditional.addStep(inWarrens, exitWarrens);
+        steps.put(4, findDevan);
+        // Switches to 5 when you enter the manhole.
+        steps.put(5, findDevan);
 
-		steps.put(6, killConradConditional);
+        ConditionalStep killConradConditional = new ConditionalStep(this, killConrad);
+        killConradConditional.addStep(inWarrens, exitWarrens);
 
-		ConditionalStep tellDevanAboutConradConditional = new ConditionalStep(this, enterWarrens2);
-		tellDevanAboutConradConditional.addStep(inWarrens, tellDevanAboutConrad);
-		steps.put(7, tellDevanAboutConradConditional);
+        steps.put(6, killConradConditional);
 
-		ConditionalStep talkToQueenOfThievesConditional = new ConditionalStep(this, enterWarrens3);
-		talkToQueenOfThievesConditional.addStep(inWarrens, talkToQueenOfThieves);
-		steps.put(8, talkToQueenOfThievesConditional);
-		steps.put(9, talkToQueenOfThievesConditional);
+        ConditionalStep tellDevanAboutConradConditional = new ConditionalStep(this, enterWarrens2);
+        tellDevanAboutConradConditional.addStep(inWarrens, tellDevanAboutConrad);
+        steps.put(7, tellDevanAboutConradConditional);
 
-		ConditionalStep exposeHughes = new ConditionalStep(this, goToKingstown);
-		exposeHughes.addStep(inWarrens, exitWarrens2);
-		exposeHughes.addStep(inUpstairsHughesHouse, openChest);
+        ConditionalStep talkToQueenOfThievesConditional = new ConditionalStep(this, enterWarrens3);
+        talkToQueenOfThievesConditional.addStep(inWarrens, talkToQueenOfThieves);
+        steps.put(8, talkToQueenOfThievesConditional);
+        steps.put(9, talkToQueenOfThievesConditional);
 
-		steps.put(10, exposeHughes);
+        ConditionalStep exposeHughes = new ConditionalStep(this, goToKingstown);
+        exposeHughes.addStep(inWarrens, exitWarrens2);
+        exposeHughes.addStep(inUpstairsHughesHouse, openChest);
 
-		ConditionalStep talkToLawry2Conditional = new ConditionalStep(this, talkToLawry2);
-		talkToLawry2Conditional.addStep(inUpstairsHughesHouse, leaveKingstown);
-		steps.put(11, talkToLawry2Conditional);
+        steps.put(10, exposeHughes);
 
-		ConditionalStep talkToShaunaConditional = new ConditionalStep(this, enterWarrens4);
-		talkToShaunaConditional.addStep(inWarrens, talkToShauna);
+        ConditionalStep talkToLawry2Conditional = new ConditionalStep(this, talkToLawry2);
+        talkToLawry2Conditional.addStep(inUpstairsHughesHouse, leaveKingstown);
+        steps.put(11, talkToLawry2Conditional);
 
-		steps.put(12, talkToShaunaConditional);
+        ConditionalStep talkToShaunaConditional = new ConditionalStep(this, enterWarrens4);
+        talkToShaunaConditional.addStep(inWarrens, talkToShauna);
 
-		return steps;
-	}
+        steps.put(12, talkToShaunaConditional);
 
-	@Override
-	protected void setupRequirements()
-	{
-		stew = new ItemRequirement("Stew", ItemID.STEW);
-		hughesLetter = new ItemRequirement("Letter", ItemID.LETTER_21774);
-		hughesLetter.setTooltip("You can get another letter by searching the chest upstairs in Hughes' house in Kingstown.");
-	}
+        return steps;
+    }
 
-	@Override
-	protected void setupZones()
-	{
-		warrens = new Zone(new WorldPoint(1728, 10115, 0), new WorldPoint(1814, 10177, 0));
-		kingstown = new Zone(new WorldPoint(1668, 3675, 1), new WorldPoint(1685, 3684, 1));
-		upstairsHughesHouse = new Zone(new WorldPoint(1668, 3675, 1), new WorldPoint(1685, 3684, 1));
-	}
+    @Override
+    protected void setupRequirements() {
+        stew = new ItemRequirement("Stew", ItemID.STEW);
+        hughesLetter = new ItemRequirement("Letter", ItemID.LETTER_21774);
+        hughesLetter.setTooltip("You can get another letter by searching the chest upstairs in Hughes' house in Kingstown.");
+    }
 
-	public void setupConditions()
-	{
-		inWarrens = new ZoneRequirement(warrens);
-		inUpstairsHughesHouse = new ZoneRequirement(upstairsHughesHouse);
-	}
+    @Override
+    protected void setupZones() {
+        warrens = new Zone(new WorldPoint(1728, 10115, 0), new WorldPoint(1814, 10177, 0));
+        kingstown = new Zone(new WorldPoint(1668, 3675, 1), new WorldPoint(1685, 3684, 1));
+        upstairsHughesHouse = new Zone(new WorldPoint(1668, 3675, 1), new WorldPoint(1685, 3684, 1));
+    }
 
-	public void setupSteps()
-	{
-		WorldPoint tomasPoint = new WorldPoint(1796, 3781, 0);
-		WorldPoint manholePoint = new WorldPoint(1813, 3745, 0);
-		WorldPoint ladderPoint = new WorldPoint(1813, 10145, 0);
-		WorldPoint devanPoint = new WorldPoint(1767, 10146, 0);
-		WorldPoint queenOfThievesPoint = new WorldPoint(1764, 10158, 0);
+    public void setupConditions() {
+        inWarrens = new ZoneRequirement(warrens);
+        inUpstairsHughesHouse = new ZoneRequirement(upstairsHughesHouse);
+    }
 
-		talkToLawry = new NpcStep(this, NpcID.TOMAS_LAWRY, tomasPoint, "Speak to Tomas Lawry in Port Piscarilius.");
-		talkToLawry.addDialogStep("I'm looking for a quest.");
-		talkToLawry.addDialogStep("What are you investigating?");
-		talkToLawry.addDialogStep("Yes.");
+    public void setupSteps() {
+        WorldPoint tomasPoint = new WorldPoint(1796, 3781, 0);
+        WorldPoint manholePoint = new WorldPoint(1813, 3745, 0);
+        WorldPoint ladderPoint = new WorldPoint(1813, 10145, 0);
+        WorldPoint devanPoint = new WorldPoint(1767, 10146, 0);
+        WorldPoint queenOfThievesPoint = new WorldPoint(1764, 10158, 0);
 
-		talkToPoorLookingPerson = new NpcStep(this, NpcID.POOR_LOOKING_WOMAN_7923, new WorldPoint(1803, 3738, 0), "Speak to the poor looking woman.");
-		talkToOReilly = new NpcStep(this, NpcID.ROBERT_OREILLY, new WorldPoint(1794, 3757, 0), "Speak to Robert O'Reilly, and give him the bowl of stew.", stew);
-		talkToOReilly.addDialogStep("Okay.");
+        talkToLawry = new NpcStep(this, NpcID.TOMAS_LAWRY, tomasPoint, "Speak to Tomas Lawry in Port Piscarilius.");
+        talkToLawry.addDialogStep("I'm looking for a quest.");
+        talkToLawry.addDialogStep("What are you investigating?");
+        talkToLawry.addDialogStep("Yes.");
 
-		enterWarrens = new ObjectStep(this, ObjectID.MANHOLE_31706, manholePoint, "Enter the Warrens.");
-		enterWarrens.addAlternateObjects(ObjectID.MANHOLE_31707);
+        talkToPoorLookingPerson = new NpcStep(this, NpcID.POOR_LOOKING_WOMAN_7923, new WorldPoint(1803, 3738, 0), "Speak to the poor looking woman.");
+        talkToOReilly = new NpcStep(this, NpcID.ROBERT_OREILLY, new WorldPoint(1794, 3757, 0), "Speak to Robert O'Reilly, and give him the bowl of stew.", stew);
+        talkToOReilly.addDialogStep("Okay.");
 
-		talkToDevan = new NpcStep(this, NpcID.DEVAN_RUTTER, devanPoint, "Speak to Devan Rutter.");
-		talkToDevan.addDialogStep("Nope, sounds good to me.");
+        enterWarrens = new ObjectStep(this, ObjectID.MANHOLE_31706, manholePoint, "Enter the Warrens.");
+        enterWarrens.addAlternateObjects(ObjectID.MANHOLE_31707);
 
-		exitWarrens = new ObjectStep(this, ObjectID.LADDER_31708, ladderPoint, "Exit the Warrens.");
+        talkToDevan = new NpcStep(this, NpcID.DEVAN_RUTTER, devanPoint, "Speak to Devan Rutter.");
+        talkToDevan.addDialogStep("Nope, sounds good to me.");
 
-		// Could potentially add a dialog step for Brutally or Softly, but seems unnecessary since either works.
-		killConrad = new NpcStep(this, NpcID.CONRAD_KING, new WorldPoint(1847, 3734, 0), "Murder Conrad King.");
+        exitWarrens = new ObjectStep(this, ObjectID.LADDER_31708, ladderPoint, "Exit the Warrens.");
 
-		// Enter the Warrens again.
-		enterWarrens2 = new ObjectStep(this, ObjectID.MANHOLE_31706, manholePoint, "Enter the Warrens.");
-		enterWarrens2.addAlternateObjects(ObjectID.MANHOLE_31707);
+        // Could potentially add a dialog step for Brutally or Softly, but seems unnecessary since either works.
+        killConrad = new NpcStep(this, NpcID.CONRAD_KING, new WorldPoint(1847, 3734, 0), "Murder Conrad King.");
 
-		tellDevanAboutConrad = new NpcStep(this, NpcID.DEVAN_RUTTER, devanPoint, "Tell Devan Rutter about the murder.");
+        // Enter the Warrens again.
+        enterWarrens2 = new ObjectStep(this, ObjectID.MANHOLE_31706, manholePoint, "Enter the Warrens.");
+        enterWarrens2.addAlternateObjects(ObjectID.MANHOLE_31707);
 
-		enterWarrens3 = new ObjectStep(this, ObjectID.MANHOLE_31706, manholePoint, "Enter the Warrens.");
-		enterWarrens3.addAlternateObjects(ObjectID.MANHOLE_31707);
+        tellDevanAboutConrad = new NpcStep(this, NpcID.DEVAN_RUTTER, devanPoint, "Tell Devan Rutter about the murder.");
 
-		talkToQueenOfThieves = new NpcStep(this, NpcID.THE_QUEEN_OF_THIEVES, queenOfThievesPoint, "Talk to the Queen of Thieves.");
-		talkToQueenOfThieves.addAlternateNpcs(NpcID.LADY_SHAUNA_PISCARILIUS);
+        enterWarrens3 = new ObjectStep(this, ObjectID.MANHOLE_31706, manholePoint, "Enter the Warrens.");
+        enterWarrens3.addAlternateObjects(ObjectID.MANHOLE_31707);
 
-		// Exit the Warrens again.
-		exitWarrens2 = new ObjectStep(this, ObjectID.LADDER_31708, ladderPoint, "Exit the Warrens.");
+        talkToQueenOfThieves = new NpcStep(this, NpcID.THE_QUEEN_OF_THIEVES, queenOfThievesPoint, "Talk to the Queen of Thieves.");
+        talkToQueenOfThieves.addAlternateNpcs(NpcID.LADY_SHAUNA_PISCARILIUS);
 
-		goToKingstown = new ObjectStep(this, ObjectID.STAIRCASE_11796, new WorldPoint(1672, 3681, 0), "Go up the stairs in Councillor Hughes' home in Kingstown.");
-		openChest = new ObjectStep(this, NullObjectID.NULL_10084, new WorldPoint(1681, 3677, 1), "Pick the locked chest.");
+        // Exit the Warrens again.
+        exitWarrens2 = new ObjectStep(this, ObjectID.LADDER_31708, ladderPoint, "Exit the Warrens.");
 
-		leaveKingstown = new ObjectStep(this, ObjectID.STAIRCASE_11799, new WorldPoint(1672, 3682, 1), "Go downstairs.");
+        goToKingstown = new ObjectStep(this, ObjectID.STAIRCASE_11796, new WorldPoint(1672, 3681, 0), "Go up the stairs in Councillor Hughes' home in Kingstown.");
+        openChest = new ObjectStep(this, NullObjectID.NULL_10084, new WorldPoint(1681, 3677, 1), "Pick the locked chest.");
 
-		// Talk to Lawry again
-		talkToLawry2 = new NpcStep(this, NpcID.TOMAS_LAWRY, tomasPoint, "Speak to Tomas Lawry in Port Piscarilius.", hughesLetter);
-		talkToLawry2.addDialogStep("Let's talk about my quest.");
+        leaveKingstown = new ObjectStep(this, ObjectID.STAIRCASE_11799, new WorldPoint(1672, 3682, 1), "Go downstairs.");
 
-		// Enter the Warrens again
-		enterWarrens4 = new ObjectStep(this, ObjectID.MANHOLE_31706, manholePoint, "Enter the Warrens.");
-		enterWarrens4.addAlternateObjects(ObjectID.MANHOLE_31707);
+        // Talk to Lawry again
+        talkToLawry2 = new NpcStep(this, NpcID.TOMAS_LAWRY, tomasPoint, "Speak to Tomas Lawry in Port Piscarilius.", hughesLetter);
+        talkToLawry2.addDialogStep("Let's talk about my quest.");
 
-		talkToShauna = new NpcStep(this, NpcID.LADY_SHAUNA_PISCARILIUS, queenOfThievesPoint, "Talk to Lady Shauna Piscarilius.");
-	}
+        // Enter the Warrens again
+        enterWarrens4 = new ObjectStep(this, ObjectID.MANHOLE_31706, manholePoint, "Enter the Warrens.");
+        enterWarrens4.addAlternateObjects(ObjectID.MANHOLE_31707);
 
-	@Override
-	public List<ItemRequirement> getItemRequirements()
-	{
-		return Collections.singletonList(stew);
-	}
+        talkToShauna = new NpcStep(this, NpcID.LADY_SHAUNA_PISCARILIUS, queenOfThievesPoint, "Talk to Lady Shauna Piscarilius.");
+    }
 
-	@Override
-	public List<Requirement> getGeneralRequirements()
-	{
-		return Arrays.asList(
-			new SkillRequirement(Skill.THIEVING, 20),
-			new QuestRequirement(QuestHelperQuest.CLIENT_OF_KOUREND, QuestState.FINISHED),
-			new QuestRequirement(QuestHelperQuest.X_MARKS_THE_SPOT, QuestState.FINISHED)
-		);
-	}
+    @Override
+    public List<ItemRequirement> getItemRequirements() {
+        return Collections.singletonList(stew);
+    }
 
-	@Override
-	public QuestPointReward getQuestPointReward()
-	{
-		return new QuestPointReward(1);
-	}
+    @Override
+    public List<Requirement> getGeneralRequirements() {
+        return Arrays.asList(
+                new SkillRequirement(Skill.THIEVING, 20),
+                new QuestRequirement(QuestHelperQuest.CLIENT_OF_KOUREND, QuestState.FINISHED),
+                new QuestRequirement(QuestHelperQuest.X_MARKS_THE_SPOT, QuestState.FINISHED)
+        );
+    }
 
-	@Override
-	public List<ExperienceReward> getExperienceRewards()
-	{
-		return Collections.singletonList(new ExperienceReward(Skill.THIEVING, 2000));
-	}
+    @Override
+    public QuestPointReward getQuestPointReward() {
+        return new QuestPointReward(1);
+    }
 
-	@Override
-	public List<ItemReward> getItemRewards()
-	{
-		return Arrays.asList(
-			new ItemReward("Coins", ItemID.COINS_995, 2000),
-			new ItemReward("A page for Kharedst's Memoirs", ItemID.KHAREDSTS_MEMOIRS, 1));
-	}
+    @Override
+    public List<ExperienceReward> getExperienceRewards() {
+        return Collections.singletonList(new ExperienceReward(Skill.THIEVING, 2000));
+    }
 
-	@Override
-	public List<UnlockReward> getUnlockRewards()
-	{
-		return Collections.singletonList(new UnlockReward("Access to The Warrens."));
-	}
+    @Override
+    public List<ItemReward> getItemRewards() {
+        return Arrays.asList(
+                new ItemReward("Coins", ItemID.COINS_995, 2000),
+                new ItemReward("A page for Kharedst's Memoirs", ItemID.KHAREDSTS_MEMOIRS, 1));
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Investigation", Arrays.asList(talkToLawry, talkToPoorLookingPerson, talkToOReilly), stew));
-		allSteps.add(new PanelDetails("Gaining Trust", Arrays.asList(enterWarrens, talkToDevan, exitWarrens, killConrad, enterWarrens2, tellDevanAboutConrad)));
-		allSteps.add(new PanelDetails("Exposing Hughes", Arrays.asList(enterWarrens3, talkToQueenOfThieves, exitWarrens2, goToKingstown, openChest, leaveKingstown, talkToLawry2, enterWarrens4, talkToShauna)));
-		return allSteps;
-	}
+    @Override
+    public List<UnlockReward> getUnlockRewards() {
+        return Collections.singletonList(new UnlockReward("Access to The Warrens."));
+    }
+
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        allSteps.add(new PanelDetails("Investigation", Arrays.asList(talkToLawry, talkToPoorLookingPerson, talkToOReilly), stew));
+        allSteps.add(new PanelDetails("Gaining Trust", Arrays.asList(enterWarrens, talkToDevan, exitWarrens, killConrad, enterWarrens2, tellDevanAboutConrad)));
+        allSteps.add(new PanelDetails("Exposing Hughes", Arrays.asList(enterWarrens3, talkToQueenOfThieves, exitWarrens2, goToKingstown, openChest, leaveKingstown, talkToLawry2, enterWarrens4, talkToShauna)));
+        return allSteps;
+    }
 }

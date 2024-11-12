@@ -24,72 +24,68 @@
  */
 package net.runelite.client.plugins.questhelper.managers;
 
-import net.runelite.client.plugins.questhelper.overlays.QuestHelperDebugOverlay;
-import net.runelite.client.plugins.questhelper.overlays.QuestHelperMinimapOverlay;
-import net.runelite.client.plugins.questhelper.overlays.QuestHelperOverlay;
-import net.runelite.client.plugins.questhelper.overlays.QuestHelperWidgetOverlay;
-import net.runelite.client.plugins.questhelper.overlays.QuestHelperWorldArrowOverlay;
-import net.runelite.client.plugins.questhelper.overlays.QuestHelperWorldLineOverlay;
-import net.runelite.client.plugins.questhelper.overlays.QuestHelperWorldOverlay;
+
+import net.runelite.client.plugins.questhelper.overlays.*;
 import net.runelite.client.ui.overlay.OverlayManager;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class QuestOverlayManager
-{
-	@Inject
-	private OverlayManager overlayManager;
+public class QuestOverlayManager {
+    @Inject
+    private OverlayManager overlayManager;
 
-	@Inject
-	private QuestHelperOverlay questHelperOverlay;
+    @Inject
+    private QuestHelperOverlay questHelperOverlay;
 
-	@Inject
-	private QuestHelperWidgetOverlay questHelperWidgetOverlay;
+    @Inject
+    private QuestHelperWidgetOverlay questHelperWidgetOverlay;
 
-	@Inject
-	private QuestHelperMinimapOverlay questHelperMinimapOverlay;
+    @Inject
+    private QuestHelperMinimapOverlay questHelperMinimapOverlay;
 
-	@Inject
-	private QuestHelperWorldOverlay questHelperWorldOverlay;
+    @Inject
+    private QuestHelperWorldOverlay questHelperWorldOverlay;
 
-	@Inject
-	private QuestHelperWorldArrowOverlay questHelperWorldArrowOverlay;
+    @Inject
+    private QuestHelperWorldArrowOverlay questHelperWorldArrowOverlay;
 
-	@Inject
-	private QuestHelperWorldLineOverlay questHelperWorldLineOverlay;
+    @Inject
+    private QuestHelperWorldLineOverlay questHelperWorldLineOverlay;
 
-	@Inject
-	private QuestHelperDebugOverlay questHelperDebugOverlay;
+    @Inject
+    private QuestHelperTooltipOverlay questHelperTooltipOverlay;
 
-	public void startUp()
-	{
-		overlayManager.add(questHelperOverlay);
-		overlayManager.add(questHelperWorldOverlay);
-		overlayManager.add(questHelperWorldArrowOverlay);
-		overlayManager.add(questHelperWorldLineOverlay);
-		overlayManager.add(questHelperWidgetOverlay);
-		overlayManager.add(questHelperMinimapOverlay);
-	}
+    @Inject
+    private QuestHelperDebugOverlay questHelperDebugOverlay;
 
-	public void shutDown()
-	{
-		overlayManager.remove(questHelperOverlay);
-		overlayManager.remove(questHelperWorldOverlay);
-		overlayManager.remove(questHelperWorldArrowOverlay);
-		overlayManager.remove(questHelperWorldLineOverlay);
-		overlayManager.remove(questHelperWidgetOverlay);
-		overlayManager.remove(questHelperDebugOverlay);
-		overlayManager.remove(questHelperMinimapOverlay);
-	}
+    public void startUp() {
+        overlayManager.add(questHelperOverlay);
+        overlayManager.add(questHelperWorldOverlay);
+        overlayManager.add(questHelperWorldArrowOverlay);
+        overlayManager.add(questHelperWorldLineOverlay);
+        overlayManager.add(questHelperWidgetOverlay);
+        overlayManager.add(questHelperMinimapOverlay);
+        overlayManager.add(questHelperTooltipOverlay);
+    }
 
-	public void addDebugOverlay()
-	{
-		overlayManager.add(questHelperDebugOverlay);
-	}
+    public void shutDown() {
+        overlayManager.remove(questHelperOverlay);
+        overlayManager.remove(questHelperWorldOverlay);
+        overlayManager.remove(questHelperWorldArrowOverlay);
+        overlayManager.remove(questHelperWorldLineOverlay);
+        overlayManager.remove(questHelperWidgetOverlay);
+        overlayManager.remove(questHelperDebugOverlay);
+        overlayManager.remove(questHelperMinimapOverlay);
+        overlayManager.remove(questHelperTooltipOverlay);
+    }
 
-	public void removeDebugOverlay()
-	{
-		overlayManager.remove(questHelperDebugOverlay);
-	}
+    public void addDebugOverlay() {
+        overlayManager.add(questHelperDebugOverlay);
+    }
+
+    public void removeDebugOverlay() {
+        overlayManager.remove(questHelperDebugOverlay);
+    }
 }

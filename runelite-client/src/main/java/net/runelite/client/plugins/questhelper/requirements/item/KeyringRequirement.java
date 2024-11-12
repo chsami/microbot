@@ -24,124 +24,109 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.item;
 
-import net.runelite.client.plugins.questhelper.collections.KeyringCollection;
-import net.runelite.client.plugins.questhelper.QuestHelperConfig;
-import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
+
 import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.ItemID;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.plugins.questhelper.QuestHelperConfig;
+import net.runelite.client.plugins.questhelper.collections.KeyringCollection;
+import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
 
-public class KeyringRequirement extends ItemRequirement
-{
-	RuneliteRequirement runeliteRequirement;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
-	KeyringCollection keyringCollection;
+public class KeyringRequirement extends ItemRequirement {
+    RuneliteRequirement runeliteRequirement;
 
-	ConfigManager configManager;
+    KeyringCollection keyringCollection;
 
-	ItemRequirement keyring;
+    ConfigManager configManager;
 
-	public KeyringRequirement(String name, ConfigManager configManager, KeyringCollection key)
-	{
-		super(name, key.getItemID());
-		keyring = new ItemRequirement("Steel key ring", ItemID.STEEL_KEY_RING);
-		runeliteRequirement = new RuneliteRequirement(configManager, key.runeliteName(),
-			"true", key.toChatText());
-		this.keyringCollection = key;
-		this.configManager = configManager;
-	}
+    ItemRequirement keyring;
 
-	public KeyringRequirement(ConfigManager configManager, KeyringCollection key)
-	{
-		super(key.toChatText(), key.getItemID());
-		keyring = new ItemRequirement("Steel key ring", ItemID.STEEL_KEY_RING);
-		runeliteRequirement = new RuneliteRequirement(configManager, key.runeliteName(),
-			"true", key.toChatText());
-		this.keyringCollection = key;
-		this.configManager = configManager;
-	}
+    public KeyringRequirement(String name, ConfigManager configManager, KeyringCollection key) {
+        super(name, key.getItemID());
+        keyring = new ItemRequirement("Steel key ring", ItemID.STEEL_KEY_RING);
+        runeliteRequirement = new RuneliteRequirement(configManager, key.runeliteName(),
+                "true", key.toChatText());
+        this.keyringCollection = key;
+        this.configManager = configManager;
+    }
 
-	public String chatboxText()
-	{
-		return keyringCollection.toChatText();
-	}
+    public KeyringRequirement(ConfigManager configManager, KeyringCollection key) {
+        super(key.toChatText(), key.getItemID());
+        keyring = new ItemRequirement("Steel key ring", ItemID.STEEL_KEY_RING);
+        runeliteRequirement = new RuneliteRequirement(configManager, key.runeliteName(),
+                "true", key.toChatText());
+        this.keyringCollection = key;
+        this.configManager = configManager;
+    }
 
-	public void setConfigValue(String value)
-	{
-		runeliteRequirement.setConfigValue(value);
-	}
+    public String chatboxText() {
+        return keyringCollection.toChatText();
+    }
 
-	@Override
-	public ItemRequirement copy()
-	{
-		KeyringRequirement newItem = new KeyringRequirement(getName(), configManager, keyringCollection);
-		newItem.addAlternates(alternateItems);
-		newItem.setDisplayItemId(getDisplayItemId());
-		newItem.setExclusiveToOneItemType(exclusiveToOneItemType);
-		newItem.setHighlightInInventory(highlightInInventory);
-		newItem.setDisplayMatchedItemName(isDisplayMatchedItemName());
-		newItem.setConditionToHide(getConditionToHide());
-		newItem.setQuestBank(getQuestBank());
-		newItem.setTooltip(getTooltip());
-		newItem.setUrlSuffix(getUrlSuffix());
+    public void setConfigValue(String value) {
+        runeliteRequirement.setConfigValue(value);
+    }
 
-		return newItem;
-	}
+    @Override
+    public ItemRequirement copy() {
+        KeyringRequirement newItem = new KeyringRequirement(getName(), configManager, keyringCollection);
+        newItem.addAlternates(alternateItems);
+        newItem.setDisplayItemId(getDisplayItemId());
+        newItem.setExclusiveToOneItemType(exclusiveToOneItemType);
+        newItem.setHighlightInInventory(highlightInInventory);
+        newItem.setDisplayMatchedItemName(isDisplayMatchedItemName());
+        newItem.setConditionToHide(getConditionToHide());
+        newItem.setQuestBank(getQuestBank());
+        newItem.setTooltip(getTooltip());
+        newItem.setUrlSuffix(getUrlSuffix());
 
-	@Override
-	public boolean check(Client client, boolean checkConsideringSlotRestrictions, List<Item> items)
-	{
-		boolean match = runeliteRequirement.check(client);
+        return newItem;
+    }
 
-		if (match && keyring.check(client))
-		{
-			return true;
-		}
+    @Override
+    public boolean check(Client client, boolean checkConsideringSlotRestrictions, List<Item> items) {
+        boolean match = runeliteRequirement.check(client);
 
-		return super.check(client, checkConsideringSlotRestrictions, items);
-	}
+        if (match && keyring.check(client)) {
+            return true;
+        }
 
-	@Override
-	public Color getColorConsideringBank(Client client, boolean checkConsideringSlotRestrictions,
-										 List<Item> bankItems, QuestHelperConfig config)
-	{
-		Color color = config.failColour();
-		if (!this.isActualItem())
-		{
-			color = Color.GRAY;
-		}
-		else if (super.check(client, checkConsideringSlotRestrictions, new ArrayList<>()))
-		{
-			color = config.passColour();
-		}
+        return super.check(client, checkConsideringSlotRestrictions, items);
+    }
 
-		if (color == config.failColour() && bankItems != null)
-		{
-			if (super.check(client, false, bankItems))
-			{
-				color = Color.WHITE;
-			}
-		}
+    @Override
+    public Color getColorConsideringBank(Client client, boolean checkConsideringSlotRestrictions,
+                                         List<Item> bankItems, QuestHelperConfig config) {
+        Color color = config.failColour();
+        if (!this.isActualItem()) {
+            color = Color.GRAY;
+        } else if (super.check(client, checkConsideringSlotRestrictions, new ArrayList<>())) {
+            color = config.passColour();
+        }
 
-		if (color == config.failColour())
-		{
-			boolean match = runeliteRequirement.check(client);
+        if (color == config.failColour() && bankItems != null) {
+            if (super.check(client, false, bankItems)) {
+                color = Color.WHITE;
+            }
+        }
 
-			if (match)
-			{
-				color = Color.ORANGE;
-			}
-		}
-		return color;
-	}
+        if (color == config.failColour()) {
+            boolean match = runeliteRequirement.check(client);
 
-	@Override
-	protected KeyringRequirement copyOfClass()
-	{
-		return new KeyringRequirement(getName(), configManager, keyringCollection);
-	}
+            if (match) {
+                color = Color.ORANGE;
+            }
+        }
+        return color;
+    }
+
+    @Override
+    protected KeyringRequirement copyOfClass() {
+        return new KeyringRequirement(getName(), configManager, keyringCollection);
+    }
 }

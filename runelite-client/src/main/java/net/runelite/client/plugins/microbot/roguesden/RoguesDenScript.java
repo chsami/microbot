@@ -68,7 +68,7 @@ public class RoguesDenScript extends Script {
 
                 if (!init) {
                     if (!Rs2Player.getSkillRequirement(Skill.THIEVING, 80)) {
-                        Microbot.log("This script requires atleast 80 thieving...shutting down.");
+                        Microbot.log("RoguesDen script requires atleast 80 thieving...shutting down.");
                         shutdown();
                         return;
                     }

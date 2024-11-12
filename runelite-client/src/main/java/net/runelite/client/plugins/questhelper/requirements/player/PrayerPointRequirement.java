@@ -1,27 +1,28 @@
 package net.runelite.client.plugins.questhelper.requirements.player;
 
-import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
+
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
+import net.runelite.client.plugins.questhelper.requirements.AbstractRequirement;
 
-public class PrayerPointRequirement extends AbstractRequirement
-{
-	private final int level;
-	public PrayerPointRequirement(int level)
-	{
-		this.level = level;
-	}
+import javax.annotation.Nonnull;
+
+public class PrayerPointRequirement extends AbstractRequirement {
+    private final int level;
+
+    public PrayerPointRequirement(int level) {
+        this.level = level;
+    }
 
 
-	@Override
-	public boolean check(Client client)
-	{
-		return client.getBoostedSkillLevel(Skill.PRAYER) >= level;
-	}
+    @Override
+    public boolean check(Client client) {
+        return client.getBoostedSkillLevel(Skill.PRAYER) >= level;
+    }
 
-	@Override
-	public String getDisplayText()
-	{
-		return level + " prayer points";
-	}
+    @Nonnull
+    @Override
+    public String getDisplayText() {
+        return level + " prayer points";
+    }
 }

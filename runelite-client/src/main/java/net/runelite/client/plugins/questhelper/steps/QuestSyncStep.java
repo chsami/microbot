@@ -24,86 +24,77 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
-import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.tools.QuestWidgets;
-import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
-import java.awt.Color;
-import java.awt.Graphics2D;
+
 import net.runelite.api.ScriptID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.tools.QuestWidgets;
 import net.runelite.client.util.ColorUtil;
 
-public class QuestSyncStep extends QuestStep
-{
-	private boolean hasScrolled;
-	private final QuestHelperQuest quest;
+import java.awt.*;
 
-	public QuestSyncStep(QuestHelper questHelper, QuestHelperQuest quest, String text)
-	{
-		super(questHelper, text);
-		this.quest = quest;
-	}
+public class QuestSyncStep extends QuestStep {
+    private final QuestHelperQuest quest;
+    private boolean hasScrolled;
 
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
+    public QuestSyncStep(QuestHelper questHelper, QuestHelperQuest quest, String text) {
+        super(questHelper, text);
+        this.quest = quest;
+    }
 
-		Widget questContainer = client.getWidget(QuestWidgets.QUESTLIST_CONTAINER.getPackedId());
-		if (questContainer == null || questContainer.isHidden())
-		{
-			return;
-		}
+    @Override
+    public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin) {
+        super.makeWidgetOverlayHint(graphics, plugin);
 
-		Widget questsContainer = client.getWidget(QuestWidgets.QUEST_CONTAINER.getPackedId());
+        Widget questContainer = client.getWidget(QuestWidgets.QUESTLIST_CONTAINER.getPackedId());
+        if (questContainer == null || questContainer.isHidden()) {
+            return;
+        }
 
-		Widget finalEmoteWidget = null;
+        Widget questsContainer = client.getWidget(QuestWidgets.QUEST_CONTAINER.getPackedId());
 
-		Color overlayColor = questHelper.getConfig().targetOverlayColor();
+        Widget finalEmoteWidget = null;
+
+        Color overlayColor = questHelper.getConfig().targetOverlayColor();
 
 
-		for (Widget questWidget : questsContainer.getDynamicChildren())
-		{
-			if (questWidget.getText().equals(quest.getName()))
-			{
-				finalEmoteWidget = questWidget;
-				if (questWidget.getCanvasLocation().getY() > questContainer.getCanvasLocation().getY() &&
-					questWidget.getCanvasLocation().getY() < questContainer.getCanvasLocation().getY() + questContainer.getHeight())
-				{
-					graphics.setColor(ColorUtil.colorWithAlpha(overlayColor, 65));
-					graphics.fill(questWidget.getBounds());
-					graphics.setColor(questHelper.getConfig().targetOverlayColor());
-					graphics.draw(questWidget.getBounds());
-					break;
-				}
-			}
-		}
+        for (Widget questWidget : questsContainer.getDynamicChildren()) {
+            if (questWidget.getText().equals(quest.getName())) {
+                finalEmoteWidget = questWidget;
+                if (questWidget.getCanvasLocation().getY() > questContainer.getCanvasLocation().getY() &&
+                        questWidget.getCanvasLocation().getY() < questContainer.getCanvasLocation().getY() + questContainer.getHeight()) {
+                    graphics.setColor(ColorUtil.colorWithAlpha(overlayColor, 65));
+                    graphics.fill(questWidget.getBounds());
+                    graphics.setColor(questHelper.getConfig().targetOverlayColor());
+                    graphics.draw(questWidget.getBounds());
+                    break;
+                }
+            }
+        }
 
-		if (!hasScrolled)
-		{
-			hasScrolled = true;
-			scrollToWidget(finalEmoteWidget);
-		}
-	}
+        if (!hasScrolled) {
+            hasScrolled = true;
+            scrollToWidget(finalEmoteWidget);
+        }
+    }
 
-	void scrollToWidget(Widget widget)
-	{
-		final Widget parent = client.getWidget(QuestWidgets.QUESTLIST_CONTAINER.getPackedId());
+    void scrollToWidget(Widget widget) {
+        final Widget parent = client.getWidget(QuestWidgets.QUESTLIST_CONTAINER.getPackedId());
 
-		if (widget == null || parent == null)
-		{
-			return;
-		}
+        if (widget == null || parent == null) {
+            return;
+        }
 
-		final int newScroll = Math.max(0, Math.min(parent.getScrollHeight(),
-			(widget.getRelativeY() / 2 + (widget.getHeight()) / 2) - parent.getHeight() / 2));
+        final int newScroll = Math.max(0, Math.min(parent.getScrollHeight(),
+                (widget.getRelativeY() / 2 + (widget.getHeight()) / 2) - parent.getHeight() / 2));
 
-		client.runScript(
-			ScriptID.UPDATE_SCROLLBAR,
-			QuestWidgets.QUESTLIST_SCROLLBAR.getId(),
-			QuestWidgets.QUESTLIST_CONTAINER.getId(),
-			newScroll
-		);
-	}
+        client.runScript(
+                ScriptID.UPDATE_SCROLLBAR,
+                QuestWidgets.QUESTLIST_SCROLLBAR.getId(),
+                QuestWidgets.QUESTLIST_CONTAINER.getId(),
+                newScroll
+        );
+    }
 }

@@ -24,107 +24,93 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.miniquests.hisfaithfulservants;
 
+
+import net.runelite.api.Client;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import net.runelite.api.Client;
-import net.runelite.api.coords.WorldPoint;
 
-public class BarrowsRouteCalculator
-{
-	private static int lastStartRoom = -1;
-	static final BarrowsRooms GOAL_ROOM = BarrowsRooms.C;
-	public static List<WorldPoint> startDelving(Client client)
-	{
-		WorldPoint currentPos = client.getLocalPlayer().getWorldLocation();
-		BarrowsRooms startRoom = null;
-		for (BarrowsRooms room : BarrowsRooms.values())
-		{
-			for (Zone zone : room.getArea())
-			{
-				if (zone.contains(currentPos))
-				{
-					startRoom = room;
-					break;
-				}
-			}
-		}
+public class BarrowsRouteCalculator {
+    static final BarrowsRooms GOAL_ROOM = BarrowsRooms.C;
+    private static int lastStartRoom = -1;
 
-		if(startRoom == null)
-		{
-			return null;
-		}
-		if (startRoom == GOAL_ROOM) return new ArrayList<>();
+    public static List<WorldPoint> startDelving(Client client) {
+        WorldPoint currentPos = client.getLocalPlayer().getWorldLocation();
+        BarrowsRooms startRoom = null;
+        for (BarrowsRooms room : BarrowsRooms.values()) {
+            for (Zone zone : room.getArea()) {
+                if (zone.contains(currentPos)) {
+                    startRoom = room;
+                    break;
+                }
+            }
+        }
 
-		if (lastStartRoom == startRoom.getId()) return null;
-		lastStartRoom = startRoom.getId();
+        if (startRoom == null) {
+            return null;
+        }
+        if (startRoom == GOAL_ROOM) return new ArrayList<>();
 
-		ArrayList<BarrowsDoors> route = createRoute(client, startRoom, new ArrayList<>(), new ArrayList<>(), 0);
+        if (lastStartRoom == startRoom.getId()) return null;
+        lastStartRoom = startRoom.getId();
 
-		ArrayList<WorldPoint> points = new ArrayList<>();
-		BarrowsRooms currentRoomInLoop = startRoom;
-		if (route == null || route.size() == 0) return null;
-		for (BarrowsDoors barrowsDoors : route)
-		{
-			if (barrowsDoors.getStartRoom() == currentRoomInLoop.getId())
-			{
-				points.addAll(barrowsDoors.getPath());
-				currentRoomInLoop = BarrowsRooms.getRoomById(barrowsDoors.getEndRoom());
-			}
-			else
-			{
-				ArrayList<WorldPoint> newPath = new ArrayList<>(barrowsDoors.getPath());
-				Collections.reverse(newPath);
-				points.addAll(newPath);
-				currentRoomInLoop = BarrowsRooms.getRoomById(barrowsDoors.getStartRoom());
-			}
-		}
-		return points;
-	}
-	public static ArrayList<BarrowsDoors> createRoute(Client client, BarrowsRooms currentRoom, List<Integer> previousRooms, ArrayList<BarrowsDoors> pastRoute, int depth)
-	{
-		ArrayList<BarrowsDoors> bestRoute = new ArrayList<>();
-		int MAX_DEPTH = 8;
-		if (depth > MAX_DEPTH) return null;
+        ArrayList<BarrowsDoors> route = createRoute(client, startRoom, new ArrayList<>(), new ArrayList<>(), 0);
 
-		for (BarrowsDoors path : currentRoom.getPaths())
-		{
-			BarrowsRooms nextRoom;
-			if (path.getEndRoom() == currentRoom.getId())
-			{
-				nextRoom = BarrowsRooms.getRoomById(path.getStartRoom());
-			}
-			else
-			{
-				nextRoom = BarrowsRooms.getRoomById(path.getEndRoom());
-			}
+        ArrayList<WorldPoint> points = new ArrayList<>();
+        BarrowsRooms currentRoomInLoop = startRoom;
+        if (route == null || route.size() == 0) return null;
+        for (BarrowsDoors barrowsDoors : route) {
+            if (barrowsDoors.getStartRoom() == currentRoomInLoop.getId()) {
+                points.addAll(barrowsDoors.getPath());
+                currentRoomInLoop = BarrowsRooms.getRoomById(barrowsDoors.getEndRoom());
+            } else {
+                ArrayList<WorldPoint> newPath = new ArrayList<>(barrowsDoors.getPath());
+                Collections.reverse(newPath);
+                points.addAll(newPath);
+                currentRoomInLoop = BarrowsRooms.getRoomById(barrowsDoors.getStartRoom());
+            }
+        }
+        return points;
+    }
 
-			// If blocked path, continue
-			if (client.getVarbitValue(path.getVarbit()) != 0) continue;
-			if (previousRooms.contains(nextRoom.getId()))
-			{
-				continue;
-			}
+    public static ArrayList<BarrowsDoors> createRoute(Client client, BarrowsRooms currentRoom, List<Integer> previousRooms, ArrayList<BarrowsDoors> pastRoute, int depth) {
+        ArrayList<BarrowsDoors> bestRoute = new ArrayList<>();
+        int MAX_DEPTH = 8;
+        if (depth > MAX_DEPTH) return null;
 
-			if (nextRoom == GOAL_ROOM)
-			{
-				pastRoute.add(path);
-				return pastRoute;
-			}
+        for (BarrowsDoors path : currentRoom.getPaths()) {
+            BarrowsRooms nextRoom;
+            if (path.getEndRoom() == currentRoom.getId()) {
+                nextRoom = BarrowsRooms.getRoomById(path.getStartRoom());
+            } else {
+                nextRoom = BarrowsRooms.getRoomById(path.getEndRoom());
+            }
 
-			ArrayList<Integer> newPreviousRooms = new ArrayList<>(previousRooms);
-			newPreviousRooms.add(currentRoom.getId());
-			ArrayList<BarrowsDoors> nextPath = new ArrayList<>(pastRoute);
-			nextPath.add(path);
-			ArrayList<BarrowsDoors> fullRoute = createRoute(client, nextRoom, newPreviousRooms, nextPath, depth + 1);
+            // If blocked path, continue
+            if (client.getVarbitValue(path.getVarbit()) != 0) continue;
+            if (previousRooms.contains(nextRoom.getId())) {
+                continue;
+            }
+
+            if (nextRoom == GOAL_ROOM) {
+                pastRoute.add(path);
+                return pastRoute;
+            }
+
+            ArrayList<Integer> newPreviousRooms = new ArrayList<>(previousRooms);
+            newPreviousRooms.add(currentRoom.getId());
+            ArrayList<BarrowsDoors> nextPath = new ArrayList<>(pastRoute);
+            nextPath.add(path);
+            ArrayList<BarrowsDoors> fullRoute = createRoute(client, nextRoom, newPreviousRooms, nextPath, depth + 1);
 
 
-			if (fullRoute != null && fullRoute.size() > 0 && fullRoute.size() < bestRoute.size() || bestRoute.size() == 0)
-			{
-				bestRoute = fullRoute;
-			}
-		}
-		return bestRoute;
-	}
+            if (fullRoute != null && fullRoute.size() > 0 && fullRoute.size() < bestRoute.size() || bestRoute.size() == 0) {
+                bestRoute = fullRoute;
+            }
+        }
+        return bestRoute;
+    }
 }

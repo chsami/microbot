@@ -24,155 +24,131 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.miniquests.lairoftarnrazorlor;
 
-import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
-import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.questhelper.bank.banktab.BankSlotIcons;
 import net.runelite.client.plugins.questhelper.panel.PanelDetails;
 import net.runelite.client.plugins.questhelper.questhelpers.BasicQuestHelper;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
-import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
-import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.SkillRequirement;
+import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.requirements.util.Operation;
+import net.runelite.client.plugins.questhelper.requirements.var.VarbitRequirement;
+import net.runelite.client.plugins.questhelper.requirements.zone.Zone;
+import net.runelite.client.plugins.questhelper.requirements.zone.ZoneRequirement;
 import net.runelite.client.plugins.questhelper.rewards.ExperienceReward;
 import net.runelite.client.plugins.questhelper.rewards.ItemReward;
 import net.runelite.client.plugins.questhelper.rewards.UnlockReward;
-import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
-import net.runelite.client.plugins.questhelper.steps.ItemStep;
-import net.runelite.client.plugins.questhelper.steps.NpcStep;
-import net.runelite.client.plugins.questhelper.steps.ObjectStep;
-import net.runelite.client.plugins.questhelper.steps.QuestStep;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import net.runelite.api.ItemID;
-import net.runelite.api.NpcID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.QuestState;
-import net.runelite.api.Skill;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.*;
 
-public class LairOfTarnRazorlor extends BasicQuestHelper
-{
-	//Requirements
-	ItemRequirement combatGear, diary;
+import java.util.*;
 
-	Requirement inBossRoom, killedTarn, inFinalRoom;
+public class LairOfTarnRazorlor extends BasicQuestHelper {
+    //Requirements
+    ItemRequirement combatGear, diary;
 
-	DetailedQuestStep enterFinalRoom, pickUpDiary;
+    Requirement inBossRoom, killedTarn, inFinalRoom;
 
-	NpcStep killTarn;
+    DetailedQuestStep enterFinalRoom, pickUpDiary;
 
-	TarnRoute tarnRoute;
+    NpcStep killTarn;
 
-	//Zones
-	Zone bossRoom, finalRoom;
+    TarnRoute tarnRoute;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		initializeRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
+    //Zones
+    Zone bossRoom, finalRoom;
 
-		ConditionalStep fullQuest = new ConditionalStep(this, tarnRoute);
-		fullQuest.addStep(inFinalRoom, pickUpDiary);
-		fullQuest.addStep(new Conditions(inBossRoom, killedTarn), enterFinalRoom);
-		fullQuest.addStep(inBossRoom, killTarn);
+    @Override
+    public Map<Integer, QuestStep> loadSteps() {
+        initializeRequirements();
+        setupConditions();
+        setupSteps();
+        Map<Integer, QuestStep> steps = new HashMap<>();
 
-		steps.put(0, fullQuest);
-		steps.put(1, fullQuest);
-		steps.put(2, fullQuest);
-		return steps;
-	}
+        ConditionalStep fullQuest = new ConditionalStep(this, tarnRoute);
+        fullQuest.addStep(inFinalRoom, pickUpDiary);
+        fullQuest.addStep(new Conditions(inBossRoom, killedTarn), enterFinalRoom);
+        fullQuest.addStep(inBossRoom, killTarn);
 
-	@Override
-	protected void setupRequirements()
-	{
-		combatGear = new ItemRequirement("Combat gear", -1, -1).isNotConsumed();
-		combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
-		diary = new ItemRequirement("Tarn's diary", ItemID.TARNS_DIARY);
-		diary.setHighlightInInventory(true);
-	}
+        steps.put(0, fullQuest);
+        steps.put(1, fullQuest);
+        steps.put(2, fullQuest);
+        return steps;
+    }
 
-	@Override
-	protected void setupZones()
-	{
-		bossRoom = new Zone(new WorldPoint(3176, 4611, 0), new WorldPoint(3196, 4626, 0));
-		finalRoom = new Zone(new WorldPoint(3181, 4632, 0), new WorldPoint(3191, 4637, 0));
-	}
+    @Override
+    protected void setupRequirements() {
+        combatGear = new ItemRequirement("Combat gear", -1, -1).isNotConsumed();
+        combatGear.setDisplayItemId(BankSlotIcons.getCombatGear());
+        diary = new ItemRequirement("Tarn's diary", ItemID.TARNS_DIARY);
+        diary.setHighlightInInventory(true);
+    }
 
-	public void setupConditions()
-	{
-		inBossRoom = new ZoneRequirement(bossRoom);
-		inFinalRoom = new ZoneRequirement(finalRoom);
+    @Override
+    protected void setupZones() {
+        bossRoom = new Zone(new WorldPoint(3176, 4611, 0), new WorldPoint(3196, 4626, 0));
+        finalRoom = new Zone(new WorldPoint(3181, 4632, 0), new WorldPoint(3191, 4637, 0));
+    }
 
-		killedTarn = new VarbitRequirement(3290, 2, Operation.GREATER_EQUAL);
-	}
+    public void setupConditions() {
+        inBossRoom = new ZoneRequirement(bossRoom);
+        inFinalRoom = new ZoneRequirement(finalRoom);
 
-	public void setupSteps()
-	{
-		tarnRoute = new TarnRoute(this);
-		killTarn = new NpcStep(this, NpcID.MUTANT_TARN, new WorldPoint(3186, 4619, 0), "Kill Mutant and Ghost Tarn.");
-		killTarn.addAlternateNpcs(NpcID.TARN, NpcID.TARN_6476);
+        killedTarn = new VarbitRequirement(3290, 2, Operation.GREATER_EQUAL);
+    }
 
-		enterFinalRoom = new ObjectStep(this, ObjectID.PASSAGEWAY_15774, new WorldPoint(3186, 4627, 0), "Go into the north passageway. If you would like to complete a task for the Morytania Diary, you should kill a Terror Dog now.");
-		pickUpDiary = new ItemStep(this, "Pick up Tarn's diary. Quest complete!", diary);
-	}
+    public void setupSteps() {
+        tarnRoute = new TarnRoute(this);
+        killTarn = new NpcStep(this, NpcID.MUTANT_TARN, new WorldPoint(3186, 4619, 0), "Kill Mutant and Ghost Tarn.");
+        killTarn.addAlternateNpcs(NpcID.TARN, NpcID.TARN_6476);
 
-	@Override
-	public List<ItemRequirement> getItemRecommended()
-	{
-		return Collections.singletonList(combatGear);
-	}
+        enterFinalRoom = new ObjectStep(this, ObjectID.PASSAGEWAY_15774, new WorldPoint(3186, 4627, 0), "Go into the north passageway. If you would like to complete a task for the Morytania Diary, you should kill a Terror Dog now.");
+        pickUpDiary = new ItemStep(this, "Pick up Tarn's diary. Quest complete!", diary);
+    }
 
-	@Override
-	public List<String> getCombatRequirements()
-	{
-		return Collections.singletonList("Tarn (level 69) twice");
-	}
+    @Override
+    public List<ItemRequirement> getItemRecommended() {
+        return Collections.singletonList(combatGear);
+    }
 
-	@Override
-	public List<Requirement> getGeneralRequirements()
-	{
-		ArrayList<Requirement> req = new ArrayList<>();
-		req.add(new QuestRequirement(QuestHelperQuest.HAUNTED_MINE, QuestState.FINISHED));
-		req.add(new SkillRequirement(Skill.SLAYER, 40));
-		return req;
-	}
+    @Override
+    public List<String> getCombatRequirements() {
+        return Collections.singletonList("Tarn (level 69) twice");
+    }
 
-	@Override
-	public List<ExperienceReward> getExperienceRewards()
-	{
-		return Collections.singletonList(new ExperienceReward(Skill.SLAYER, 5000));
-	}
+    @Override
+    public List<Requirement> getGeneralRequirements() {
+        ArrayList<Requirement> req = new ArrayList<>();
+        req.add(new QuestRequirement(QuestHelperQuest.HAUNTED_MINE, QuestState.FINISHED));
+        req.add(new SkillRequirement(Skill.SLAYER, 40));
+        return req;
+    }
 
-	@Override
-	public List<ItemReward> getItemRewards()
-	{
-		return Collections.singletonList(new ItemReward("Tarn's Diary", ItemID.TARNS_DIARY, 1));
-	}
+    @Override
+    public List<ExperienceReward> getExperienceRewards() {
+        return Collections.singletonList(new ExperienceReward(Skill.SLAYER, 5000));
+    }
 
-	@Override
-	public List<UnlockReward> getUnlockRewards()
-	{
-		return Collections.singletonList(new UnlockReward("The ability to enchant Salve Amulets."));
-	}
+    @Override
+    public List<ItemReward> getItemRewards() {
+        return Collections.singletonList(new ItemReward("Tarn's Diary", ItemID.TARNS_DIARY, 1));
+    }
 
-	@Override
-	public List<PanelDetails> getPanels()
-	{
-		List<PanelDetails> allSteps = new ArrayList<>();
-		PanelDetails fullQuestPanel = new PanelDetails("Traversing the dungeon", tarnRoute.getDisplaySteps(), combatGear);
-		fullQuestPanel.addSteps(killTarn, enterFinalRoom, pickUpDiary);
-		allSteps.add(fullQuestPanel);
-		return allSteps;
-	}
+    @Override
+    public List<UnlockReward> getUnlockRewards() {
+        return Collections.singletonList(new UnlockReward("The ability to enchant Salve Amulets."));
+    }
+
+    @Override
+    public List<PanelDetails> getPanels() {
+        List<PanelDetails> allSteps = new ArrayList<>();
+        PanelDetails fullQuestPanel = new PanelDetails("Traversing the dungeon", tarnRoute.getDisplaySteps(), combatGear);
+        fullQuestPanel.addSteps(killTarn, enterFinalRoom, pickUpDiary);
+        allSteps.add(fullQuestPanel);
+        return allSteps;
+    }
 }

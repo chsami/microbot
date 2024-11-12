@@ -24,24 +24,22 @@
  */
 package net.runelite.client.plugins.questhelper.helpers.quests.thepathofglouphrie;
 
+
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.steps.ItemStep;
-import net.runelite.api.widgets.Widget;
 
 /**
  * DiscInsertionStep is a custom ItemStep that allows highlighting items in the disc insertion widget that overlays the inventory
  */
-public class DiscInsertionStep extends ItemStep
-{
-	public DiscInsertionStep(QuestHelper questHelper, String text, Requirement... requirements)
-	{
-		super(questHelper, text, requirements);
-	}
+public class DiscInsertionStep extends ItemStep {
+    public DiscInsertionStep(QuestHelper questHelper, String text, Requirement... requirements) {
+        super(questHelper, text, requirements);
+    }
 
-	@Override
-	protected Widget getInventoryWidget()
-	{
-		return client.getWidget(852, 0);
-	}
+    @Override
+    protected Widget getInventoryWidget() {
+        return client.getWidget(852, 0);
+    }
 }

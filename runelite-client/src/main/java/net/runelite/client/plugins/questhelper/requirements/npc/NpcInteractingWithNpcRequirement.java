@@ -26,31 +26,27 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.npc;
 
-import net.runelite.client.plugins.questhelper.requirements.SimpleRequirement;
-import net.runelite.client.plugins.questhelper.requirements.conditional.ConditionForStep;
-import java.util.Arrays;
-import java.util.List;
+
 import net.runelite.api.Client;
-import net.runelite.api.NPC;
+import net.runelite.client.plugins.questhelper.requirements.SimpleRequirement;
 
-public class NpcInteractingWithNpcRequirement extends SimpleRequirement
-{
-	final Integer npcID;
-	final String npcName2;
+import java.util.List;
 
-	public NpcInteractingWithNpcRequirement(Integer npcID, String npcName2)
-	{
-		assert(npcID != null);
-		this.npcID = npcID;
-		this.npcName2 = npcName2;
-	}
+public class NpcInteractingWithNpcRequirement extends SimpleRequirement {
+    final Integer npcID;
+    final List<String> npcNames;
 
-	@Override
-	public boolean check(Client client)
-	{
-		return client.getNpcs().stream()
-			.filter(npc -> npc.getInteracting() != null)
-			.filter(npc -> npc.getInteracting().getName().equals(npcName2))
-			.anyMatch(npc -> npc.getInteracting().getInteracting() == npc);
-	}
+    public NpcInteractingWithNpcRequirement(Integer npcID, String... npcNames) {
+        assert (npcID != null);
+        this.npcID = npcID;
+        this.npcNames = List.of(npcNames);
+    }
+
+    @Override
+    public boolean check(Client client) {
+        return client.getNpcs().stream()
+                .filter(npc -> npc.getInteracting() != null)
+                .filter(npc -> npcNames.contains(npc.getInteracting().getName()))
+                .anyMatch(npc -> npc.getInteracting().getInteracting() == npc);
+    }
 }

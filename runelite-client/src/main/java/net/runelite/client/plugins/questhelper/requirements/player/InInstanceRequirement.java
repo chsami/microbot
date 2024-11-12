@@ -27,14 +27,13 @@
 
 package net.runelite.client.plugins.questhelper.requirements.player;
 
-import net.runelite.client.plugins.questhelper.requirements.SimpleRequirement;
-import net.runelite.api.Client;
 
-public class InInstanceRequirement extends SimpleRequirement
-{
-	@Override
-	public boolean check(Client client)
-	{
-		return client.isInInstancedRegion();
-	}
+import net.runelite.api.Client;
+import net.runelite.client.plugins.questhelper.requirements.SimpleRequirement;
+
+public class InInstanceRequirement extends SimpleRequirement {
+    @Override
+    public boolean check(Client client) {
+        return client.isInInstancedRegion();
+    }
 }

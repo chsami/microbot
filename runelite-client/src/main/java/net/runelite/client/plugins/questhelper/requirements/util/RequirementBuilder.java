@@ -26,87 +26,81 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.util;
 
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
+
 import net.runelite.api.Client;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+
+import javax.annotation.Nonnull;
+import java.util.function.Predicate;
 
 /**
  * Builder for building non-standard simple {@link Requirement}s.<br>
  * For complex requirements, use {@link ComplexRequirementBuilder},
- * {@link net.runelite.client.plugins.questhelper.requirements.ComplexRequirement}, or
+ * {@link com.questhelper.requirements.ComplexRequirement}, or
  * implement your own {@link Requirement}.
  */
-public final class RequirementBuilder
-{
-	private String displayText = "";
-	private Predicate<Client> requirementPredicate = client -> true;
+public final class RequirementBuilder {
+    private String displayText = "";
+    private Predicate<Client> requirementPredicate = client -> true;
 
 
-	private RequirementBuilder(@Nonnull String displayText)
-	{
-		this.displayText = displayText;
-	}
+    private RequirementBuilder(@Nonnull String displayText) {
+        this.displayText = displayText;
+    }
 
-	/**
-	 * Convenience method to create a simple ComplexRequirement with the default {@link LogicType#AND} and no
-	 * display text (not null).
-	 * @return a new {@link ComplexRequirementBuilder} with a default {@link LogicType#AND} and no display text
-	 */
-	public static ComplexRequirementBuilder complex()
-	{
-		return new ComplexRequirementBuilder(LogicType.AND, "");
-	}
+    /**
+     * Convenience method to create a simple ComplexRequirement with the default {@link LogicType#AND} and no
+     * display text (not null).
+     *
+     * @return a new {@link ComplexRequirementBuilder} with a default {@link LogicType#AND} and no display text
+     */
+    public static ComplexRequirementBuilder complex() {
+        return new ComplexRequirementBuilder(LogicType.AND, "");
+    }
 
-	/**
-	 * Create a new instance of {@link RequirementBuilder} with the given display text
-	 *
-	 * @param displayText display text
-	 * @return new instance of {@link RequirementBuilder}
-	 */
-	public static RequirementBuilder builder(@Nonnull String displayText)
-	{
-		return new RequirementBuilder(displayText);
-	}
+    /**
+     * Create a new instance of {@link RequirementBuilder} with the given display text
+     *
+     * @param displayText display text
+     * @return new instance of {@link RequirementBuilder}
+     */
+    public static RequirementBuilder builder(@Nonnull String displayText) {
+        return new RequirementBuilder(displayText);
+    }
 
-	/**
-	 * @return new instance of {@link RequirementBuilder} with no display text
-	 */
-	public static RequirementBuilder builder()
-	{
-		return builder("");
-	}
+    /**
+     * @return new instance of {@link RequirementBuilder} with no display text
+     */
+    public static RequirementBuilder builder() {
+        return builder("");
+    }
 
-	/**
-	 * Define a new check predicate that is used in {@link Requirement#check(Client)}
-	 *
-	 * @param requirementPredicate predicate to use
-	 * @return this
-	 */
-	public RequirementBuilder check(@Nonnull Predicate<Client> requirementPredicate)
-	{
-		this.requirementPredicate = requirementPredicate;
-		return this;
-	}
+    /**
+     * Define a new check predicate that is used in {@link Requirement#check(Client)}
+     *
+     * @param requirementPredicate predicate to use
+     * @return this
+     */
+    public RequirementBuilder check(@Nonnull Predicate<Client> requirementPredicate) {
+        this.requirementPredicate = requirementPredicate;
+        return this;
+    }
 
-	/**
-	 * @return new instance of {@link Requirement} using the supplied display text and predicate
-	 */
-	public Requirement build()
-	{
-		return new Requirement()
-		{
-			@Override
-			public boolean check(Client client)
-			{
-				return requirementPredicate.test(client);
-			}
+    /**
+     * @return new instance of {@link Requirement} using the supplied display text and predicate
+     */
+    public Requirement build() {
+        return new Requirement() {
+            @Override
+            public boolean check(Client client) {
+                return requirementPredicate.test(client);
+            }
 
-			@Override
-			public String getDisplayText()
-			{
-				return displayText;
-			}
-		};
-	}
+            @Nonnull
+            @Override
+            public String getDisplayText() {
+                return displayText;
+            }
+        };
+    }
 }

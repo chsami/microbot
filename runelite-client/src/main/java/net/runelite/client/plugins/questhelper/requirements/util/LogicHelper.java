@@ -24,33 +24,28 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.util;
 
+
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.conditional.Conditions;
 
-public class LogicHelper
-{
-	public static Requirement nor(Requirement... condition)
-	{
-		return new Conditions(LogicType.NOR, condition);
-	}
+public class LogicHelper {
+    public static Conditions nor(Requirement... condition) {
+        return new Conditions(LogicType.NOR, condition);
+    }
 
-	public static Requirement not(Requirement condition)
-	{
-		return new Conditions(LogicType.NOR, condition);
-	}
+    public static Conditions not(Requirement condition) {
+        return new Conditions(LogicType.NOR, condition);
+    }
 
-	public static Requirement nand(Requirement... condition)
-	{
-		return new Conditions(LogicType.NAND, condition);
-	}
+    public static Conditions nand(Requirement... condition) {
+        return new Conditions(LogicType.NAND, condition);
+    }
 
-	public static Requirement or(Requirement... condition)
-	{
-		return new Conditions(LogicType.OR, condition);
-	}
+    public static Conditions or(Requirement... condition) {
+        return new Conditions(LogicType.OR, condition);
+    }
 
-	public static Requirement and(Requirement... condition)
-	{
-		return new Conditions(LogicType.AND, condition);
-	}
+    public static Conditions and(Requirement... condition) {
+        return new Conditions(LogicType.AND, condition);
+    }
 }

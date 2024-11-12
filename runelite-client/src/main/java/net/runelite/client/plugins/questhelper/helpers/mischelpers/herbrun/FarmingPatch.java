@@ -26,51 +26,45 @@ package net.runelite.client.plugins.questhelper.helpers.mischelpers.herbrun;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import net.runelite.api.annotations.Varbit;
 
 @Getter
 @ToString(onlyExplicitlyIncluded = true)
-class FarmingPatch
-{
-	@Setter(AccessLevel.PACKAGE)
-	@ToString.Include
-	private FarmingRegion region;
-	@ToString.Include
-	private final String name;
-	@Getter(onMethod_ = {@Varbit})
-	private final int varbit;
-	@ToString.Include
-	private final PatchImplementation implementation;
-	private int farmer = -1;
-	private final int patchNumber;
+class FarmingPatch {
+    @ToString.Include
+    private final String name;
+    @Getter(onMethod_ = {@Varbit})
+    private final int varbit;
+    @ToString.Include
+    private final PatchImplementation implementation;
+    private final int patchNumber;
+    @Setter(AccessLevel.PACKAGE)
+    @ToString.Include
+    private FarmingRegion region;
+    private int farmer = -1;
 
-	FarmingPatch(String name, @Varbit int varbit, PatchImplementation implementation)
-	{
-		this(name, varbit, implementation, -1);
-	}
+    FarmingPatch(String name, @Varbit int varbit, PatchImplementation implementation) {
+        this(name, varbit, implementation, -1);
+    }
 
 
-	FarmingPatch(String name, @Varbit int varbit, PatchImplementation implementation, int farmer)
-	{
-		this(name, varbit, implementation, farmer, -1);
-	}
+    FarmingPatch(String name, @Varbit int varbit, PatchImplementation implementation, int farmer) {
+        this(name, varbit, implementation, farmer, -1);
+    }
 
 
-	FarmingPatch(String name, @Varbit int varbit, PatchImplementation implementation, int farmer, int patchNumber)
-	{
-		this.name = name;
-		this.varbit = varbit;
-		this.implementation = implementation;
-		this.farmer = farmer;
-		this.patchNumber = patchNumber;
-	}
+    FarmingPatch(String name, @Varbit int varbit, PatchImplementation implementation, int farmer, int patchNumber) {
+        this.name = name;
+        this.varbit = varbit;
+        this.implementation = implementation;
+        this.farmer = farmer;
+        this.patchNumber = patchNumber;
+    }
 
-	String configKey()
-	{
-		return region.getRegionID() + "." + varbit;
-	}
+    String configKey() {
+        return region.getRegionID() + "." + varbit;
+    }
 }
 

@@ -29,32 +29,31 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public enum Boosts
-{
-	AGILITY("Agility",5),
-	ATTACK("Attack",21),
-	CONSTRUCTION("Construction",6),
-	COOKING("Cooking",6),
-	CRAFTING("Crafting",4),
-	DEFENCE("Defence",21),
-	FARMING("Farming",3),
-	FIREMAKING("Firemaking",0),
-	FISHING("Fishing",5),
-	FLETCHING("Fletching",4),
-	HERBLORE("Herblore",4),
-	HITPOINTS("Hitpoints",22),
-	HUNTER("Hunter",3),
-	MAGIC("Magic",19),
-	MINING("Mining",3),
-	PRAYER("Prayer",0),
-	RANGED("Ranged",19),
-	RUNECRAFT("Runecraft",0),
-	SLAYER("Slayer",5),
-	SMITHING("Smithing",4),
-	STRENGTH("Strength",19),
-	THIEVING("Thieving",3),
-	WOODCUTTING("Woodcutting",3);
+public enum Boosts {
+    AGILITY("Agility", 5),
+    ATTACK("Attack", 21),
+    CONSTRUCTION("Construction", 6),
+    COOKING("Cooking", 6),
+    CRAFTING("Crafting", 4),
+    DEFENCE("Defence", 21),
+    FARMING("Farming", 3),
+    FIREMAKING("Firemaking", 1),
+    FISHING("Fishing", 5),
+    FLETCHING("Fletching", 4),
+    HERBLORE("Herblore", 4),
+    HITPOINTS("Hitpoints", 22),
+    HUNTER("Hunter", 3),
+    MAGIC("Magic", 19),
+    MINING("Mining", 3),
+    PRAYER("Prayer", 0),
+    RANGED("Ranged", 19),
+    RUNECRAFT("Runecraft", 1),
+    SLAYER("Slayer", 5),
+    SMITHING("Smithing", 4),
+    STRENGTH("Strength", 19),
+    THIEVING("Thieving", 3),
+    WOODCUTTING("Woodcutting", 3);
 
-	private final String name;
-	private final int highestBoost;
+    private final String name;
+    private final int highestBoost;
 }

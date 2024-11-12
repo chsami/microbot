@@ -24,248 +24,208 @@
  */
 package net.runelite.client.plugins.questhelper.steps.overlay;
 
-import net.runelite.client.plugins.questhelper.tools.QuestHelperWorldMapPoint;
-import net.runelite.client.plugins.questhelper.steps.tools.QuestPerspective;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
+
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.Player;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.questhelper.steps.tools.QuestPerspective;
+import net.runelite.client.plugins.questhelper.tools.QuestHelperWorldMapPoint;
 
-public class DirectionArrow
-{
-	/**
-	 * @param client the {@link Client}
-	 * @return the rough number of tiles distance the minimap can draw
-	 */
-	public static int getMaxMinimapDrawDistance(Client client)
-	{
-		var minimapZoom = client.getMinimapZoom();
-		if (minimapZoom > 0.0)
-		{
-			return (int) (64.0 / client.getMinimapZoom());
-		}
-		return 16;
-	}
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 
-	public static void renderMinimapArrow(Graphics2D graphics, Client client, WorldPoint worldPoint, Color color)
-	{
-		var maxMinimapDrawDistance = getMaxMinimapDrawDistance(client);
-		Player player = client.getLocalPlayer();
-		if (player == null)
-		{
-			return;
-		}
+public class DirectionArrow {
+    /**
+     * @param client the {@link Client}
+     * @return the rough number of tiles distance the minimap can draw
+     */
+    public static int getMaxMinimapDrawDistance(Client client) {
+        var minimapZoom = client.getMinimapZoom();
+        if (minimapZoom > 0.0) {
+            return (int) (64.0 / client.getMinimapZoom());
+        }
+        return 16;
+    }
 
-		WorldPoint playerRealLocation = WorldPoint.fromLocalInstance(client, player.getLocalLocation());
-		if (playerRealLocation == null) return;
+    public static void renderMinimapArrow(Graphics2D graphics, Client client, WorldPoint worldPoint, Color color) {
+        var maxMinimapDrawDistance = getMaxMinimapDrawDistance(client);
+        Player player = client.getLocalPlayer();
+        if (player == null) {
+            return;
+        }
 
-		if (worldPoint == null)
-		{
-			return;
-		}
+        WorldPoint playerRealLocation = WorldPoint.fromLocalInstance(client, player.getLocalLocation());
+        if (playerRealLocation == null) return;
 
-		if (worldPoint.distanceTo(playerRealLocation) >= maxMinimapDrawDistance)
-		{
-			createMinimapDirectionArrow(graphics, client, playerRealLocation, worldPoint, color);
-			return;
-		}
+        if (worldPoint == null) {
+            return;
+        }
 
-		WorldPoint fakeDestinationWp = QuestPerspective.getInstanceWorldPointFromReal(client, worldPoint);
+        if (worldPoint.distanceTo(playerRealLocation) >= maxMinimapDrawDistance) {
+            createMinimapDirectionArrow(graphics, client, playerRealLocation, worldPoint, color);
+            return;
+        }
 
-		if (fakeDestinationWp == null) return;
+        WorldPoint fakeDestinationWp = QuestPerspective.getInstanceWorldPointFromReal(client, worldPoint);
 
-		LocalPoint lp = LocalPoint.fromWorld(client, fakeDestinationWp);
+        if (fakeDestinationWp == null) return;
 
-		if (lp == null)
-		{
-			return;
-		}
+        LocalPoint lp = LocalPoint.fromWorld(client, fakeDestinationWp);
 
-		Point posOnMinimap = Perspective.localToMinimap(client, lp);
-		if (posOnMinimap == null)
-		{
-			return;
-		}
+        if (lp == null) {
+            return;
+        }
 
-		Line2D.Double line = new Line2D.Double(posOnMinimap.getX(), posOnMinimap.getY() - 18, posOnMinimap.getX(),
-			posOnMinimap.getY() - 8);
+        Point posOnMinimap = Perspective.localToMinimap(client, lp);
+        if (posOnMinimap == null) {
+            return;
+        }
 
-		drawMinimapArrow(graphics, line, color);
-	}
+        Line2D.Double line = new Line2D.Double(posOnMinimap.getX(), posOnMinimap.getY() - 18, posOnMinimap.getX(),
+                posOnMinimap.getY() - 8);
 
-	protected static void createMinimapDirectionArrow(Graphics2D graphics, Client client, WorldPoint playerRealWp, WorldPoint wp, Color color)
-	{
-		Player player = client.getLocalPlayer();
+        drawMinimapArrow(graphics, line, color);
+    }
 
-		if (player == null)
-		{
-			return;
-		}
+    protected static void createMinimapDirectionArrow(Graphics2D graphics, Client client, WorldPoint playerRealWp, WorldPoint wp, Color color) {
+        Player player = client.getLocalPlayer();
 
-		if (wp == null)
-		{
-			return;
-		}
+        if (player == null) {
+            return;
+        }
 
-		Point playerPosOnMinimap = player.getMinimapLocation();
+        if (wp == null) {
+            return;
+        }
 
-		Point destinationPosOnMinimap = QuestPerspective.getMinimapPoint(client, playerRealWp, wp);
+        Point playerPosOnMinimap = player.getMinimapLocation();
 
-		if (playerPosOnMinimap == null || destinationPosOnMinimap == null)
-		{
-			return;
-		}
+        Point destinationPosOnMinimap = QuestPerspective.getMinimapPoint(client, playerRealWp, wp);
 
-		double xDiff = playerPosOnMinimap.getX() - destinationPosOnMinimap.getX();
-		double yDiff = destinationPosOnMinimap.getY() - playerPosOnMinimap.getY();
-		double angle = Math.atan2(yDiff, xDiff);
+        if (playerPosOnMinimap == null || destinationPosOnMinimap == null) {
+            return;
+        }
 
-		int startX = (int) (playerPosOnMinimap.getX() - (Math.cos(angle) * 55));
-		int startY = (int) (playerPosOnMinimap.getY() + (Math.sin(angle) * 55));
+        double xDiff = playerPosOnMinimap.getX() - destinationPosOnMinimap.getX();
+        double yDiff = destinationPosOnMinimap.getY() - playerPosOnMinimap.getY();
+        double angle = Math.atan2(yDiff, xDiff);
 
-		int endX = (int) (playerPosOnMinimap.getX() - (Math.cos(angle) * 65));
-		int endY = (int) (playerPosOnMinimap.getY() + (Math.sin(angle) * 65));
+        int startX = (int) (playerPosOnMinimap.getX() - (Math.cos(angle) * 55));
+        int startY = (int) (playerPosOnMinimap.getY() + (Math.sin(angle) * 55));
 
-		Line2D.Double line = new Line2D.Double(startX, startY, endX, endY);
+        int endX = (int) (playerPosOnMinimap.getX() - (Math.cos(angle) * 65));
+        int endY = (int) (playerPosOnMinimap.getY() + (Math.sin(angle) * 65));
 
-		drawMinimapArrow(graphics, line, color);
-	}
+        Line2D.Double line = new Line2D.Double(startX, startY, endX, endY);
 
-	public static void drawWorldArrow(Graphics2D graphics, Color color, int startX, int startY)
-	{
-		Line2D.Double line = new Line2D.Double(startX, startY - 13, startX, startY);
+        drawMinimapArrow(graphics, line, color);
+    }
 
-		int headWidth = 5;
-		int headHeight = 4;
-		int lineWidth = 9;
+    public static void drawWorldArrow(Graphics2D graphics, Color color, int startX, int startY) {
+        Line2D.Double line = new Line2D.Double(startX, startY - 13, startX, startY);
 
-		drawArrow(graphics, line, color, lineWidth, headHeight, headWidth);
-	}
+        int headWidth = 5;
+        int headHeight = 4;
+        int lineWidth = 9;
 
-	public static void drawMinimapArrow(Graphics2D graphics, Line2D.Double line, Color color)
-	{
-		drawArrow(graphics, line, color, 6, 2, 2);
-	}
+        drawArrow(graphics, line, color, lineWidth, headHeight, headWidth);
+    }
 
-	public static void drawArrow(Graphics2D graphics, Line2D.Double line, Color color, int width, int tipHeight,
-								 int tipWidth)
-	{
-		graphics.setColor(Color.BLACK);
-		graphics.setStroke(new BasicStroke(width));
-		graphics.draw(line);
-		drawWorldArrowHead(graphics, line, tipHeight, tipWidth);
+    public static void drawMinimapArrow(Graphics2D graphics, Line2D.Double line, Color color) {
+        drawArrow(graphics, line, color, 6, 2, 2);
+    }
 
-		graphics.setColor(color);
-		graphics.setStroke(new BasicStroke(width - 3));
-		graphics.draw(line);
-		drawWorldArrowHead(graphics, line, tipHeight - 2, tipWidth - 2);
-		graphics.setStroke(new BasicStroke(1));
-	}
+    public static void drawArrow(Graphics2D graphics, Line2D.Double line, Color color, int width, int tipHeight,
+                                 int tipWidth) {
+        graphics.setColor(Color.BLACK);
+        graphics.setStroke(new BasicStroke(width));
+        graphics.draw(line);
+        drawWorldArrowHead(graphics, line, tipHeight, tipWidth);
+
+        graphics.setColor(color);
+        graphics.setStroke(new BasicStroke(width - 3));
+        graphics.draw(line);
+        drawWorldArrowHead(graphics, line, tipHeight - 2, tipWidth - 2);
+        graphics.setStroke(new BasicStroke(1));
+    }
 
 
-	public static void drawWorldArrowHead(Graphics2D g2d, Line2D.Double line, int extraSizeHeight, int extraSizeWidth)
-	{
-		AffineTransform tx = new AffineTransform();
+    public static void drawWorldArrowHead(Graphics2D g2d, Line2D.Double line, int extraSizeHeight, int extraSizeWidth) {
+        AffineTransform tx = new AffineTransform();
 
-		Polygon arrowHead = new Polygon();
-		arrowHead.addPoint(0, 6 + extraSizeHeight);
-		arrowHead.addPoint(-6 - extraSizeWidth, -1 - extraSizeHeight);
-		arrowHead.addPoint(6 + extraSizeWidth, -1 - extraSizeHeight);
+        Polygon arrowHead = new Polygon();
+        arrowHead.addPoint(0, 6 + extraSizeHeight);
+        arrowHead.addPoint(-6 - extraSizeWidth, -1 - extraSizeHeight);
+        arrowHead.addPoint(6 + extraSizeWidth, -1 - extraSizeHeight);
 
-		tx.setToIdentity();
-		double angle = Math.atan2(line.y2 - line.y1, line.x2 - line.x1);
-		tx.translate(line.x2, line.y2);
-		tx.rotate((angle - Math.PI / 2d));
+        tx.setToIdentity();
+        double angle = Math.atan2(line.y2 - line.y1, line.x2 - line.x1);
+        tx.translate(line.x2, line.y2);
+        tx.rotate((angle - Math.PI / 2d));
 
-		Graphics2D g = (Graphics2D) g2d.create();
-		g.setTransform(tx);
-		g.fill(arrowHead);
-		g.dispose();
-	}
+        Graphics2D g = (Graphics2D) g2d.create();
+        g.setTransform(tx);
+        g.fill(arrowHead);
+        g.dispose();
+    }
 
-	public static void drawLineArrowHead(Graphics2D g2d, Line2D.Double line) {
-		AffineTransform tx = new AffineTransform();
+    public static void drawLineArrowHead(Graphics2D g2d, Line2D.Double line) {
+        AffineTransform tx = new AffineTransform();
 
-		Polygon arrowHead = new Polygon();
-		arrowHead.addPoint( 0,0);
-		arrowHead.addPoint( -3, -6);
-		arrowHead.addPoint( 3,-6);
+        Polygon arrowHead = new Polygon();
+        arrowHead.addPoint(0, 0);
+        arrowHead.addPoint(-3, -6);
+        arrowHead.addPoint(3, -6);
 
-		tx.setToIdentity();
-		double angle = Math.atan2(line.y2-line.y1, line.x2-line.x1);
-		tx.translate(line.x2, line.y2);
-		tx.rotate((angle-Math.PI/2d));
+        tx.setToIdentity();
+        double angle = Math.atan2(line.y2 - line.y1, line.x2 - line.x1);
+        tx.translate(line.x2, line.y2);
+        tx.rotate((angle - Math.PI / 2d));
 
-		Graphics2D g = (Graphics2D) g2d.create();
-		g.setTransform(tx);
-		g.fill(arrowHead);
-		g.dispose();
-	}
+        Graphics2D g = (Graphics2D) g2d.create();
+        g.setTransform(tx);
+        g.fill(arrowHead);
+        g.dispose();
+    }
 
-	public static void drawLine(Graphics2D graphics, Line2D.Double line, Color color, Rectangle clippingRegion)
-	{
-		graphics.setStroke(new BasicStroke(1));
-		graphics.setClip(clippingRegion);
-		graphics.setColor(color);
-		graphics.draw(line);
+    public static void drawLine(Graphics2D graphics, Line2D.Double line, Color color, Rectangle clippingRegion) {
+        graphics.setStroke(new BasicStroke(1));
+        graphics.setClip(clippingRegion);
+        graphics.setColor(color);
+        graphics.draw(line);
 
-		drawLineArrowHead(graphics, line);
-	}
+        drawLineArrowHead(graphics, line);
+    }
 
-	public static void renderWorldMapArrow(Rectangle mapViewArea, Point drawPoint, QuestHelperWorldMapPoint mapPoint)
-	{
-		if (mapViewArea != null &&  drawPoint != null && !mapViewArea.contains(drawPoint.getX(), drawPoint.getY()))
-		{
-			if (drawPoint.getX() < mapViewArea.getMinX())
-			{
-				if (drawPoint.getY() < mapViewArea.getMinY())
-				{
-					mapPoint.rotateArrow(225);
-				}
-				else if (drawPoint.getY() > mapViewArea.getMaxY())
-				{
-					mapPoint.rotateArrow(135);
-				}
-				else
-				{
-					mapPoint.rotateArrow(180);
-				}
-			}
-			else if (drawPoint.getX() > mapViewArea.getMaxX())
-			{
-				if (drawPoint.getY() < mapViewArea.getMinY())
-				{
-					mapPoint.rotateArrow(315);
-				}
-				else if (drawPoint.getY() > mapViewArea.getMaxY())
-				{
-					mapPoint.rotateArrow(45);
-				}
-				else
-				{
-					mapPoint.rotateArrow(0);
-				}
-			}
-			else
-			{
-				if (drawPoint.getY() < mapViewArea.getMinY())
-				{
-					mapPoint.rotateArrow(270);
-				}
-				else if (drawPoint.getY() > mapViewArea.getMaxY())
-				{
-					mapPoint.rotateArrow(90);
-				}
-			}
-		}
-	}
+    public static void renderWorldMapArrow(Rectangle mapViewArea, Point drawPoint, QuestHelperWorldMapPoint mapPoint) {
+        if (mapViewArea != null && drawPoint != null && !mapViewArea.contains(drawPoint.getX(), drawPoint.getY())) {
+            if (drawPoint.getX() < mapViewArea.getMinX()) {
+                if (drawPoint.getY() < mapViewArea.getMinY()) {
+                    mapPoint.rotateArrow(225);
+                } else if (drawPoint.getY() > mapViewArea.getMaxY()) {
+                    mapPoint.rotateArrow(135);
+                } else {
+                    mapPoint.rotateArrow(180);
+                }
+            } else if (drawPoint.getX() > mapViewArea.getMaxX()) {
+                if (drawPoint.getY() < mapViewArea.getMinY()) {
+                    mapPoint.rotateArrow(315);
+                } else if (drawPoint.getY() > mapViewArea.getMaxY()) {
+                    mapPoint.rotateArrow(45);
+                } else {
+                    mapPoint.rotateArrow(0);
+                }
+            } else {
+                if (drawPoint.getY() < mapViewArea.getMinY()) {
+                    mapPoint.rotateArrow(270);
+                } else if (drawPoint.getY() > mapViewArea.getMaxY()) {
+                    mapPoint.rotateArrow(90);
+                }
+            }
+        }
+    }
 }

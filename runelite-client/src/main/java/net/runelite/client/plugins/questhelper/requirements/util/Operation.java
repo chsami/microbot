@@ -26,27 +26,28 @@
  */
 package net.runelite.client.plugins.questhelper.requirements.util;
 
-import java.util.function.BiFunction;
 import lombok.Getter;
 
-public enum Operation
-{
-	GREATER(">", (x,y) -> x > y),
-	LESS("<", (x,y) -> x < y),
-	LESS_EQUAL("<=", (x,y) -> x <= y),
-	EQUAL("==", Integer::equals),
-	GREATER_EQUAL(">=", (x,y) -> x >= y),
-	NOT_EQUAL("=/=", (x,y) -> !x.equals(y));
+import java.util.function.BiFunction;
 
-	private final BiFunction<Integer, Integer, Boolean> operation;
-	@Getter
-	private String displayText;
-	Operation(String displayText, BiFunction<Integer, Integer, Boolean> operation) {
-		this.displayText = displayText;
-		this.operation = operation;
-	}
+public enum Operation {
+    GREATER(">", (x, y) -> x > y),
+    LESS("<", (x, y) -> x < y),
+    LESS_EQUAL("<=", (x, y) -> x <= y),
+    EQUAL("==", Integer::equals),
+    GREATER_EQUAL(">=", (x, y) -> x >= y),
+    NOT_EQUAL("=/=", (x, y) -> !x.equals(y));
 
-	public boolean check(int numberToCheck, int numberToCheckAgainst) {
-		return operation.apply(numberToCheck, numberToCheckAgainst);
-	}
+    private final BiFunction<Integer, Integer, Boolean> operation;
+    @Getter
+    private final String displayText;
+
+    Operation(String displayText, BiFunction<Integer, Integer, Boolean> operation) {
+        this.displayText = displayText;
+        this.operation = operation;
+    }
+
+    public boolean check(int numberToCheck, int numberToCheckAgainst) {
+        return operation.apply(numberToCheck, numberToCheckAgainst);
+    }
 }

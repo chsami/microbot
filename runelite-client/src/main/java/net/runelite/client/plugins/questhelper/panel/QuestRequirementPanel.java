@@ -24,12 +24,17 @@
  */
 package net.runelite.client.plugins.questhelper.panel;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.runelite.client.plugins.questhelper.managers.QuestManager;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
+import net.runelite.client.plugins.questhelper.requirements.Requirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.tools.Icon;
-import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.Requirement;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -37,138 +42,107 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import lombok.Getter;
-import lombok.Setter;
 
-public class QuestRequirementPanel extends JPanel
-{
-	private static final ImageIcon INFO_ICON = Icon.INFO_ICON.getIcon();
+public class QuestRequirementPanel extends JPanel {
+    private static final ImageIcon INFO_ICON = Icon.INFO_ICON.getIcon();
+    @Getter
+    private final Requirement requirement;
+    @Getter
+    @Setter
+    private JLabel label;
 
-	@Getter
-	@Setter
-	private JLabel label;
+    public QuestRequirementPanel(Requirement requirement, QuestManager questManager) {
+        this.requirement = requirement;
 
-	@Getter
-	private final Requirement requirement;
+        setLayout(new BorderLayout());
+        setBorder(new EmptyBorder(0, 0, 0, 0));
 
-	public QuestRequirementPanel(Requirement requirement, QuestManager questManager)
-	{
-		this.requirement = requirement;
+        // TODO: Create generic getSidebarText which handles generating sidebar text for all requirement types
+        StringBuilder text = new StringBuilder();
+        if (requirement instanceof ItemRequirement) {
+            ItemRequirement itemRequirement = (ItemRequirement) requirement;
+            if (itemRequirement.showQuantity()) {
+                text.append(itemRequirement.getQuantity()).append(" x ");
+            }
+        }
 
-		setLayout(new BorderLayout());
-		setBorder(new EmptyBorder(0, 0, 0, 0));
+        text.append(requirement.getDisplayText());
+        String html1 = "<html><body style='padding: 0px; margin: 0px; width: 140px'>";
+        String html2 = "</body></html>";
+        String html1Underline = "<html><body style='padding: 0px; margin: 0px; width: 140px; text-decoration:underline'>";
 
-		// TODO: Create generic getSidebarText which handles generating sidebar text for all requirement types
-		StringBuilder text = new StringBuilder();
-		if (requirement instanceof ItemRequirement)
-		{
-			ItemRequirement itemRequirement = (ItemRequirement) requirement;
-			if (itemRequirement.showQuantity())
-			{
-				text.append(itemRequirement.getQuantity()).append(" x ");
-			}
-		}
+        label = new JLabel(html1 + text + html2);
+        label.setForeground(Color.GRAY);
+        label.setSize(label.getPreferredSize());
+        setPreferredSize(label.getSize());
+        add(label, BorderLayout.WEST);
 
-		text.append(requirement.getDisplayText());
-		String html1 = "<html><body style='padding: 0px; margin: 0px; width: 140px'>";
-		String html2 = "</body></html>";
-		String html1Underline = "<html><body style='padding: 0px; margin: 0px; width: 140px; text-decoration:underline'>";
+        if (requirement instanceof ItemRequirement) {
+            JPopupMenu menu = new JPopupMenu("Menu");
+            int id = ((ItemRequirement) requirement).getId();
+            JMenuItem wikiLink = new JMenuItem(new AbstractAction("Go to wiki..") {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        if (requirement.getUrlSuffix() == null) {
+                            Desktop.getDesktop().browse(new URI("https://oldschool.runescape.wiki/w/Special:Lookup?type=item&id=" + id));
+                        } else {
+                            Desktop.getDesktop().browse(new URI("https://oldschool.runescape.wiki/w/" + requirement.getUrlSuffix()));
+                        }
+                    } catch (IOException | URISyntaxException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            });
 
-		label = new JLabel(html1 + text + html2);
-		label.setForeground(Color.GRAY);
-		label.setSize(label.getPreferredSize());
-		setPreferredSize(label.getSize());
-		add(label, BorderLayout.WEST);
+            menu.add(wikiLink);
 
-		if (requirement instanceof ItemRequirement)
-		{
-			JPopupMenu menu = new JPopupMenu("Menu");
-			int id = ((ItemRequirement) requirement).getId();
-			JMenuItem wikiLink = new JMenuItem(new AbstractAction("Go to wiki..")
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					try
-					{
-						if (requirement.getUrlSuffix() == null)
-						{
-							Desktop.getDesktop().browse(new URI("https://oldschool.runescape.wiki/w/Special:Lookup?type=item&id=" + id));
-						}
-						else
-						{
-							Desktop.getDesktop().browse(new URI("https://oldschool.runescape.wiki/w/" + requirement.getUrlSuffix()));
-						}
-					}
-					catch (IOException | URISyntaxException e1)
-					{
-						e1.printStackTrace();
-					}
-				}
-			});
+            label.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    ItemRequirement iReq = ((ItemRequirement) requirement);
+                    //right mouse click event
+                    if (iReq.getId() != -1 || (iReq.getId() != -1 && iReq.getUrlSuffix() != null)
+                            || (iReq.getId() == -1 && iReq.getUrlSuffix() != null)) {
+                        if (SwingUtilities.isRightMouseButton(e) && e.getClickCount() == 1) {
+                            menu.show(label, e.getX(), e.getY());
+                        }
+                    }
+                }
+            });
+        } else if (questManager != null && requirement instanceof QuestRequirement) {
+            QuestHelper quest = ((QuestRequirement) requirement).getQuest().getQuestHelper();
+            label.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent event) {
+                    questManager.setSidebarSelectedQuest(quest);
+                }
 
-			menu.add(wikiLink);
+                public void mouseEntered(MouseEvent evt) {
+                    label.setText(html1Underline + text + html2);
+                }
 
-			label.addMouseListener(new MouseAdapter()
-			{
-				public void mouseClicked(MouseEvent e)
-				{
-					ItemRequirement iReq = ((ItemRequirement) requirement);
-					//right mouse click event
-					if (iReq.getId() != -1 || (iReq.getId() != -1 && iReq.getUrlSuffix() != null)
-						|| (iReq.getId() == -1 && iReq.getUrlSuffix() != null))
-					{
-						if (SwingUtilities.isRightMouseButton(e) && e.getClickCount() == 1)
-						{
-							menu.show(label, e.getX(), e.getY());
-						}
-					}
-				}
-			});
-		}
-		else if (questManager != null && requirement instanceof QuestRequirement)
-		{
-			QuestHelper quest = ((QuestRequirement) requirement).getQuest().getQuestHelper();
-			label.addMouseListener(new MouseAdapter()
-			{
-				public void mouseClicked(MouseEvent event)
-				{
-					questManager.setSidebarSelectedQuest(quest);
-				}
+                public void mouseExited(MouseEvent evt) {
+                    label.setText(html1 + text + html2);
+                }
+            });
+        }
 
-				public void mouseEntered(MouseEvent evt)
-				{
-					label.setText(html1Underline + text + html2);
-				}
+        if (requirement.getTooltip() != null) {
+            addButtonToPanel(requirement.getTooltip());
+        }
+    }
 
-				public void mouseExited(MouseEvent evt)
-				{
-					label.setText(html1 + text + html2);
-				}
-			});
-		}
-
-		if (requirement.getTooltip() != null)
-		{
-			addButtonToPanel(requirement.getTooltip());
-		}
-	}
-
-	private void addButtonToPanel(String tooltipText)
-	{
-		String html1 = "<html><body>";
-		String html2 = "</body></html>";
-		tooltipText = tooltipText.replaceAll("\\n", "<br>");
-		JButton b = new JButton(INFO_ICON);
-		b.setPreferredSize(new Dimension(10, 10));
-		b.setToolTipText(html1 + tooltipText + html2);
-		b.setBorderPainted(false);
-		b.setFocusPainted(false);
-		b.setBorderPainted(false);
-		b.setContentAreaFilled(false);
-		b.setMargin(new Insets(0, 0, 0, 0));
-		add(b);
-	}
+    private void addButtonToPanel(String tooltipText) {
+        String html1 = "<html><body>";
+        String html2 = "</body></html>";
+        tooltipText = tooltipText.replaceAll("\\n", "<br>");
+        JButton b = new JButton(INFO_ICON);
+        b.setPreferredSize(new Dimension(10, 10));
+        b.setToolTipText(html1 + tooltipText + html2);
+        b.setBorderPainted(false);
+        b.setFocusPainted(false);
+        b.setBorderPainted(false);
+        b.setContentAreaFilled(false);
+        b.setMargin(new Insets(0, 0, 0, 0));
+        add(b);
+    }
 }
 

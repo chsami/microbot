@@ -24,83 +24,72 @@
  */
 package net.runelite.client.plugins.questhelper.runeliteobjects.dialog;
 
-import java.util.ArrayList;
-import net.runelite.client.plugins.questhelper.runeliteobjects.RuneliteConfigSetter;
+
 import lombok.Getter;
+import net.runelite.client.plugins.questhelper.runeliteobjects.RuneliteConfigSetter;
 
-public class RuneliteDialogStep
-{
-	@Getter
-	protected final String name;
+import java.util.ArrayList;
 
-	@Getter
-	protected final String text;
+public class RuneliteDialogStep {
+    @Getter
+    protected final String name;
 
-	// Only used for NPCs
-	@Getter
-	protected final int faceID;
+    @Getter
+    protected final String text;
 
-	@Getter
-	protected final int animation;
+    // Only used for NPCs
+    @Getter
+    protected final int faceID;
 
-	@Getter
-	private RuneliteDialogStep continueDialog;
+    @Getter
+    protected final int animation;
+    @Getter
+    private final ArrayList<RuneliteDialogStep> dialogChoices = new ArrayList<>();
+    @Getter
+    private RuneliteDialogStep continueDialog;
+    @Getter
+    private RuneliteConfigSetter stateProgression;
 
-	@Getter
-	private RuneliteConfigSetter stateProgression;
+    public RuneliteDialogStep(String name, String text, int faceID, int animation) {
+        this.name = name;
+        this.text = text;
+        this.animation = animation;
+        this.faceID = faceID;
+    }
 
-	@Getter
-	private final ArrayList<RuneliteDialogStep> dialogChoices = new ArrayList<>();
+    public RuneliteDialogStep(String name, String text, int faceID, int animation, RuneliteConfigSetter setter) {
+        this.name = name;
+        this.text = text;
+        this.animation = animation;
+        this.faceID = faceID;
+        this.setStateProgression(setter);
+    }
 
-	public RuneliteDialogStep(String name, String text, int faceID, int animation)
-	{
-		this.name = name;
-		this.text = text;
-		this.animation = animation;
-		this.faceID = faceID;
-	}
+    public RuneliteDialogStep setStateProgression(RuneliteConfigSetter stateProgression) {
+        this.stateProgression = stateProgression;
+        return this;
+    }
 
-	public RuneliteDialogStep(String name, String text, int faceID, int animation, RuneliteConfigSetter setter)
-	{
-		this.name = name;
-		this.text = text;
-		this.animation = animation;
-		this.faceID = faceID;
-		this.setStateProgression(setter);
-	}
+    public void addNewDialogChoice(RuneliteDialogStep step) {
+        dialogChoices.add(step);
+    }
 
-	public RuneliteDialogStep setStateProgression(RuneliteConfigSetter stateProgression)
-	{
-		this.stateProgression = stateProgression;
-		return this;
-	}
+    public boolean isPlayer() {
+        return false;
+    }
 
-	public void addNewDialogChoice(RuneliteDialogStep step)
-	{
-		dialogChoices.add(step);
-	}
+    public boolean isStateChanger() {
+        return stateProgression != null;
+    }
 
-	public boolean isPlayer()
-	{
-		return false;
-	}
+    public void progressState() {
+        if (isStateChanger()) {
+            stateProgression.setConfigValue();
+        }
+    }
 
-	public boolean isStateChanger()
-	{
-		return stateProgression != null;
-	}
-
-	public void progressState()
-	{
-		if (isStateChanger())
-		{
-			stateProgression.setConfigValue();
-		}
-	}
-
-	public RuneliteDialogStep addContinueDialog(RuneliteDialogStep continueDialog)
-	{
-		this.continueDialog = continueDialog;
-		return continueDialog;
-	}
+    public RuneliteDialogStep addContinueDialog(RuneliteDialogStep continueDialog) {
+        this.continueDialog = continueDialog;
+        return continueDialog;
+    }
 }

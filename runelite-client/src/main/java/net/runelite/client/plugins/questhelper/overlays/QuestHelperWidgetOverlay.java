@@ -28,41 +28,36 @@ package net.runelite.client.plugins.questhelper.overlays;
  */
 
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import javax.inject.Inject;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayPriority;
 
-public class QuestHelperWidgetOverlay extends Overlay
-{
-	private final QuestHelperPlugin plugin;
+import javax.inject.Inject;
+import java.awt.*;
 
-	@Inject
-	public QuestHelperWidgetOverlay(QuestHelperPlugin plugin)
-	{
-		setPosition(OverlayPosition.DYNAMIC);
-		setLayer(OverlayLayer.ALWAYS_ON_TOP);
-		setPriority(OverlayPriority.HIGH);
-		this.plugin = plugin;
-	}
+public class QuestHelperWidgetOverlay extends Overlay {
+    private final QuestHelperPlugin plugin;
 
-	@Override
-	public Dimension render(Graphics2D graphics)
-	{
-		QuestHelper quest = plugin.getSelectedQuest();
+    @Inject
+    public QuestHelperWidgetOverlay(QuestHelperPlugin plugin) {
+        setPosition(OverlayPosition.DYNAMIC);
+        setLayer(OverlayLayer.ALWAYS_ON_TOP);
+        setPriority(OverlayPriority.HIGH);
+        this.plugin = plugin;
+    }
 
-		if (quest != null && quest.getCurrentStep() != null && quest.getCurrentStep().getActiveStep() != null)
-		{
-			if (plugin.getConfig().showWidgetHints())
-			{
-				quest.getCurrentStep().getActiveStep().makeWidgetOverlayHint(graphics, plugin);
-			}
-		}
-		plugin.getRuneliteObjectManager().makeWidgetOverlayHint(graphics);
-		return null;
-	}
+    @Override
+    public Dimension render(Graphics2D graphics) {
+        QuestHelper quest = plugin.getSelectedQuest();
+
+        if (quest != null && quest.getCurrentStep() != null && quest.getCurrentStep().getActiveStep() != null) {
+            if (plugin.getConfig().showWidgetHints()) {
+                quest.getCurrentStep().getActiveStep().makeWidgetOverlayHint(graphics, plugin);
+            }
+        }
+        plugin.getRuneliteObjectManager().makeWidgetOverlayHint(graphics);
+        return null;
+    }
 }
