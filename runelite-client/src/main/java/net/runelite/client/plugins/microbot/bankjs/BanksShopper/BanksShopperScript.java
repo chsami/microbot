@@ -12,7 +12,6 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 
-import javax.inject.Inject;
 import java.util.concurrent.TimeUnit;
 
 public class BanksShopperScript extends Script {
@@ -21,7 +20,6 @@ public class BanksShopperScript extends Script {
     
     private final BanksShopperPlugin plugin;
     
-    @Inject
     public BanksShopperScript(final BanksShopperPlugin plugin) {
         this.plugin = plugin;
     }

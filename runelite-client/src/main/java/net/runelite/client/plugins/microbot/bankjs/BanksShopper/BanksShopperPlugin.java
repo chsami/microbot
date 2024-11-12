@@ -43,7 +43,6 @@ public class BanksShopperPlugin extends Plugin {
     @Inject
     private BanksShopperOverlay banksShopperOverlay;
 
-    @Inject
     private BanksShopperScript banksShopperScript;
     
     @Getter
