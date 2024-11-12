@@ -25,7 +25,6 @@
 
 package net.runelite.client.plugins.microbot.ui;
 
-import net.runelite.client.plugins.config.ConfigPanel;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.SwingUtil;
 
@@ -41,7 +40,7 @@ class MicrobotPluginToggleButton extends JToggleButton
 
 	static
 	{
-		BufferedImage onSwitcher = ImageUtil.loadImageResource(ConfigPanel.class, "switcher_on.png");
+		BufferedImage onSwitcher = ImageUtil.loadImageResource(MicrobotConfigPanel.class, "switcher_on.png");
 		ON_SWITCHER = new ImageIcon(onSwitcher);
 		OFF_SWITCHER = new ImageIcon(ImageUtil.flipImage(
 			ImageUtil.luminanceScale(

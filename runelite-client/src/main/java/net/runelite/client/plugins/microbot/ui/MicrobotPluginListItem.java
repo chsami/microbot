@@ -26,7 +26,6 @@ package net.runelite.client.plugins.microbot.ui;
 
 import lombok.Getter;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.config.ConfigPanel;
 import net.runelite.client.plugins.config.SearchablePlugin;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
@@ -61,7 +60,7 @@ class MicrobotPluginListItem extends JPanel implements SearchablePlugin
 
 	static
 	{
-		BufferedImage onStar = ImageUtil.loadImageResource(ConfigPanel.class, "star_on.png");
+		BufferedImage onStar = ImageUtil.loadImageResource(MicrobotConfigPanel.class, "star_on.png");
 		ON_STAR = new ImageIcon(onStar);
 
 		BufferedImage offStar = ImageUtil.luminanceScale(
@@ -121,7 +120,7 @@ class MicrobotPluginListItem extends JPanel implements SearchablePlugin
 		JMenuItem configMenuItem = null;
 		if (pluginConfig.getConfigDescriptor() != null)
 		{
-			JButton configButton = new JButton(ConfigPanel.CONFIG_ICON);
+			JButton configButton = new JButton(MicrobotConfigPanel.CONFIG_ICON);
 			SwingUtil.removeButtonDecorations(configButton);
 			configButton.setPreferredSize(new Dimension(25, 0));
 			configButton.setVisible(false);
@@ -129,7 +128,7 @@ class MicrobotPluginListItem extends JPanel implements SearchablePlugin
 
 			configButton.addActionListener(e ->
 			{
-				configButton.setIcon(ConfigPanel.CONFIG_ICON);
+				configButton.setIcon(MicrobotConfigPanel.CONFIG_ICON);
 				openGroupConfigPanel();
 			});
 

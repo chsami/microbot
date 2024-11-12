@@ -188,6 +188,7 @@ class MicrobotPluginListPanel extends PluginPanel
 				.map(plugin ->
 				{
 					PluginDescriptor descriptor = plugin.getClass().getAnnotation(PluginDescriptor.class);
+					System.out.println(descriptor);
 					Config config = pluginManager.getPluginConfigProxy(plugin);
 					ConfigDescriptor configDescriptor = config == null ? null : configManager.getConfigDescriptor(config);
 					List<String> conflicts = pluginManager.conflictsForPlugin(plugin).stream()
