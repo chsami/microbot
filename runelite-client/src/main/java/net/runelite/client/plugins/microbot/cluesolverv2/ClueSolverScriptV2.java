@@ -8,11 +8,12 @@ import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.tasks.EmoteClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
+import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,7 +43,6 @@ public class ClueSolverScriptV2 extends Script {
     @Inject
     private Provider<EmoteClueTask> emoteClueTaskProvider; // Injected Provider
 
-
     public void start(ClueSolverConfig config) {
         this.config = config;
         executor = Executors.newScheduledThreadPool(10);
@@ -64,6 +64,8 @@ public class ClueSolverScriptV2 extends Script {
     }
 
     private void runTaskFlow() {
+        Microbot.enableAutoRunOn = false;
+        loadNpcData();
         try {
             if (currentTask == null) {
                 ClueScroll activeClue = clueScrollPlugin.getClue();
@@ -92,18 +94,25 @@ public class ClueSolverScriptV2 extends Script {
     private ClueTask createTask(ClueScroll clue) {
         log.info("Defining task for clue type: {}", clue.getClass().getSimpleName());
 
-        List<ItemRequirement> requiredItems = clueHelper.determineRequiredItems(clue);
-
         if (clue instanceof EmoteClue) {
             EmoteClueTask task = emoteClueTaskProvider.get();
-            task.initialize(client, (EmoteClue) clue, clueHelper, requiredItems, eventBus);
+            task.setClue((EmoteClue) clue);
             return task;
         }
-        // Additional clue types can be added here with else-if blocks as needed
 
+        // Additional clue types can be handled here with else-if blocks as needed
         log.warn("No matching task found for clue type: {}", clue.getClass().getSimpleName());
         return null;
     }
+
+    private void loadNpcData() {
+        try {
+            Rs2NpcManager.loadJson();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load NPC data", e);
+        }
+    }
+
 
     public void updateConfig(ClueSolverConfig config) {
         this.config = config;

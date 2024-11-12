@@ -2,32 +2,42 @@ package net.runelite.client.plugins.microbot.cluesolverv2.tasks;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.InventoryID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.api.InventoryID;
-import net.runelite.client.eventbus.Subscribe;
 
+import javax.inject.Inject;
 import java.util.List;
 
 @Slf4j
 public class EmoteClueTask implements ClueTask {
+    @Inject
+    private  Client client;
 
-    private EmoteClue clue;
-    private ClueHelperV2 clueHelper;
-    private Client client;
-    private List<ItemRequirement> requiredItems;
-    private EventBus eventBus;
+    @Inject
+    private  ClueHelperV2 clueHelper;
+
+    @Inject
+    private  EventBus eventBus;
+
+    private  EmoteClue clue;
+
+    private  List<ItemRequirement> requiredItems;
+
     private State state;
 
-    private static final int URI_ID = 7206; // NPC ID for Uri
+    private static final int URI_ID = 7206; // NPC ID for Uri (if needed)
 
+    // Define the states for the task
     private enum State {
         CHECKING_ITEMS,
         RETRIEVING_ITEMS,
@@ -36,70 +46,66 @@ public class EmoteClueTask implements ClueTask {
         COMPLETED
     }
 
+    /**
+     * Default constructor for EmoteClueTask.
+     * Dependencies are injected via fields.
+     */
     public EmoteClueTask() {
-        this.state = State.CHECKING_ITEMS;  // Initial state is checking items
+        this.state = State.CHECKING_ITEMS;
     }
 
     /**
-     * Initializes the EmoteClueTask with necessary dependencies and data.
+     * Sets the EmoteClue and initializes required items.
      *
-     * @param client        RuneLite client instance.
-     * @param clue          The EmoteClue instance to solve.
-     * @param clueHelper    Helper class for clue-related operations.
-     * @param requiredItems List of required items for the clue.
-     * @param eventBus      EventBus instance.
-     * @return The initialized EmoteClueTask instance.
+     * @param clue The EmoteClue instance to solve.
      */
-    public EmoteClueTask initialize(Client client, EmoteClue clue, ClueHelperV2 clueHelper, List<ItemRequirement> requiredItems, EventBus eventBus) {
-        this.client = client;
+    public void setClue(EmoteClue clue) {
         this.clue = clue;
-        this.clueHelper = clueHelper;
-        this.requiredItems = requiredItems;
-        this.eventBus = eventBus;
-        this.state = State.CHECKING_ITEMS;
+        this.requiredItems = clueHelper.determineRequiredItems(clue);
 
-        log.info("EmoteClueTask initialized with {} required items.", requiredItems.size());
-        for (ItemRequirement req : requiredItems) {
-            try {
-                String name = req.getCollectiveName(client);
-                log.info("Initialized with Required Item: {}", name);
-            } catch (Exception e) {
-                log.error("Error retrieving name for ItemRequirement: {}", req.getClass().getSimpleName(), e);
-                log.info("Initialized with Required Item: Unknown Item");
-            }
-        }
-        return this;
+        log.info("EmoteClueTask initialized for clue: {}", clue.getClass().getSimpleName());
+        log.info("Number of required items: {}", requiredItems.size());
     }
+
+
 
     @Override
     public void start() {
+        if (clue == null) {
+            log.error("EmoteClue instance is null. Cannot start task.");
+            state = State.COMPLETED;
+            return;
+        }
         log.info("Starting EmoteClueTask for {}", clue.getClass().getSimpleName());
         eventBus.register(this);
     }
 
     @Override
     public boolean execute() {
-        log.info("Executing EmoteClueTask in state: {}", state);
+        log.debug("Executing EmoteClueTask in state: {}", state);
         switch (state) {
             case CHECKING_ITEMS:
                 return checkAndHandleMissingItems();
 
             case RETRIEVING_ITEMS:
                 retrieveRequiredItems();
-                return false; // Wait for next execution to verify
+                return false; // Wait for inventory change event to verify
 
             case VERIFYING_WITHDRAWAL:
                 return verifyItemsPresence();
 
             case NAVIGATING_TO_LOCATION:
-                if (navigateToLocation()) {
-                    log.info("Task completed.");
-                    state = State.COMPLETED;
-                }
-                break;
+                return navigateToLocation();
+
+            case COMPLETED:
+                log.info("EmoteClueTask completed.");
+                return true;
+
+            default:
+                log.error("Unknown state encountered: {}", state);
+                state = State.COMPLETED;
+                return true;
         }
-        log.info("Current state after execution: {}", state);
-        return state == State.COMPLETED;
     }
 
     @Override
@@ -122,13 +128,13 @@ public class EmoteClueTask implements ClueTask {
     private boolean checkAndHandleMissingItems() {
         log.info("Checking for missing items...");
         List<ItemRequirement> missingItems = clueHelper.getMissingItems(requiredItems);
+        log.info("Missing items: {}", missingItems);
 
         if (missingItems.isEmpty()) {
-            log.info("All required items are already present. Proceeding to navigation.");
+            log.info("All required items are present. Proceeding to navigation.");
             state = State.NAVIGATING_TO_LOCATION;
             return true; // Proceed to navigation
         } else {
-            log.info("Missing items detected: {}", clueHelper.getItemNames(missingItems));
             state = State.RETRIEVING_ITEMS; // Transition to retrieve items
             return false;
         }
@@ -140,17 +146,23 @@ public class EmoteClueTask implements ClueTask {
      */
     private void retrieveRequiredItems() {
         log.info("Attempting to retrieve required items from the bank.");
+
         if (!Rs2Bank.openBank()) {
-            log.warn("Failed to open bank. Will retry in the next cycle.");
+            log.warn("Failed to open the bank. Will retry in the next cycle.");
             return;
         }
 
         List<ItemRequirement> missingItems = clueHelper.getMissingItems(requiredItems);
-        List<String> missingItemNames = clueHelper.getItemNames(missingItems);
 
-        for (String itemName : missingItemNames) {
+        for (ItemRequirement item : missingItems) {
+            String itemName = item.getCollectiveName(client);
             log.info("Attempting to withdraw item: {}", itemName);
-            Rs2Bank.withdrawItem(itemName); // Withdraw the item without expecting a boolean
+            Rs2Bank.withdrawItem(itemName);
+            if (Rs2Inventory.contains(itemName)) {
+                log.info("Withdrawal initiated for item: {}", itemName);
+            } else {
+                log.warn("Failed to initiate withdrawal for item: {}", itemName);
+            }
         }
 
         Rs2Bank.closeBank();
@@ -172,7 +184,7 @@ public class EmoteClueTask implements ClueTask {
             state = State.NAVIGATING_TO_LOCATION;
             return true;
         } else {
-            log.warn("Some items are still missing: {}", clueHelper.getItemNames(missingItems));
+            log.warn("Some items are still missing: {}", clueHelper.getMissingItems(requiredItems));
             // Optionally, you can decide to retry withdrawal for missing items
             return false;
         }
@@ -185,16 +197,26 @@ public class EmoteClueTask implements ClueTask {
      */
     private boolean navigateToLocation() {
         WorldPoint location = clueHelper.getClueLocation(clue);
-        if (location != null && !client.getLocalPlayer().getWorldLocation().equals(location)) {
-            log.info("Navigating to location: {}", location);
-            boolean navigationStarted = Rs2Walker.walkTo(location); // Ensure this method returns a boolean
-            if (!navigationStarted) {
-                log.warn("Failed to initiate navigation to location: {}", location);
-                return false;
-            }
-            return false; // Indicate that navigation is ongoing
+        if (location == null) {
+            log.error("Clue location is null. Cannot navigate.");
+            state = State.COMPLETED;
+            return true;
         }
+
+        WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
+        if (!playerLocation.equals(location)) {
+            log.info("Navigating to location: {}", location);
+            boolean navigationStarted = Rs2Walker.walkTo(location);
+            if (navigationStarted) {
+                log.info("Navigation to {} started.", location);
+            } else {
+                log.warn("Failed to initiate navigation to location: {}", location);
+            }
+            return false; // Wait for navigation to complete
+        }
+
         log.info("Player has arrived at the clue location.");
+        state = State.COMPLETED;
         return true;
     }
 
@@ -205,14 +227,16 @@ public class EmoteClueTask implements ClueTask {
      */
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
-        if (event.getContainerId() == InventoryID.INVENTORY.getId()) {
-            if (state == State.VERIFYING_WITHDRAWAL) {
-                log.info("Inventory updated. Verifying items...");
-                boolean allItemsPresent = verifyItemsPresence();
-                if (allItemsPresent) {
-                    // Proceed to navigation
-                    // This is already handled in verifyItemsPresence()
-                }
+        if (event.getContainerId() != InventoryID.INVENTORY.getId()) {
+            return;
+        }
+
+        if (state == State.VERIFYING_WITHDRAWAL) {
+            log.info("Inventory updated. Verifying items...");
+            boolean allItemsPresent = verifyItemsPresence();
+            if (allItemsPresent) {
+                // Proceed to navigation
+                // This is already handled in verifyItemsPresence()
             }
         }
     }
