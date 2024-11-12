@@ -9,7 +9,6 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.microbot.qualityoflife.QoLConfig;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -18,7 +17,8 @@ import java.util.HashMap;
 @PluginDescriptor(
         name = "Rogues' Den",
         description = "Mark tiles and clickboxes to help traverse the maze",
-        tags = {"agility", "maze", "minigame", "overlay", "thieving", "microbot"}
+        tags = {"agility", "maze", "minigame", "overlay", "thieving", "microbot"},
+        enabledByDefault = false
 )
 public class RoguesDenPlugin extends Plugin {
     private final HashMap<TileObject, Tile> obstaclesHull = new HashMap();
