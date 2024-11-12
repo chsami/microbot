@@ -2126,10 +2126,14 @@ public class Rs2Inventory {
 
     private static Widget getInventory() {
         final int BANK_PIN_INVENTORY_ITEM_CONTAINER = 17563648;
+        final int SHOP_INVENTORY_ITEM_CONTAINER = 19726336;
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget inventoryWidget = Microbot.getClient().getWidget(ComponentID.INVENTORY_CONTAINER);
             Widget bankInventoryWidget = Microbot.getClient().getWidget(ComponentID.BANK_INVENTORY_ITEM_CONTAINER);
             Widget bankPinInventoryWidget = Microbot.getClient().getWidget(BANK_PIN_INVENTORY_ITEM_CONTAINER);
+            Widget shopInventoryWidget = Microbot.getClient().getWidget(SHOP_INVENTORY_ITEM_CONTAINER);
+            Widget grandExchangeWidget = Microbot.getClient().getWidget(ComponentID.GRAND_EXCHANGE_INVENTORY_INVENTORY_ITEM_CONTAINER);
+            Widget depositBoxWidget = Microbot.getClient().getWidget(ComponentID.DEPOSIT_BOX_INVENTORY_ITEM_CONTAINER);
             if (inventoryWidget != null && inventoryWidget.getDynamicChildren() != null && !inventoryWidget.isHidden()) {
                 return inventoryWidget;
             }
@@ -2138,6 +2142,15 @@ public class Rs2Inventory {
             }
             if (bankPinInventoryWidget != null && bankPinInventoryWidget.getDynamicChildren() != null && !bankPinInventoryWidget.isHidden()) {
                 return bankPinInventoryWidget;
+            }
+            if (shopInventoryWidget != null && shopInventoryWidget.getDynamicChildren() != null && !shopInventoryWidget.isHidden()) {
+                return shopInventoryWidget;
+            }
+            if (grandExchangeWidget != null && grandExchangeWidget.getDynamicChildren() != null && !grandExchangeWidget.isHidden()) {
+                return grandExchangeWidget;
+            }
+            if (depositBoxWidget != null && depositBoxWidget.getDynamicChildren() != null && !depositBoxWidget.isHidden()) {
+                return depositBoxWidget;
             }
             return null;
         });
