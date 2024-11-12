@@ -386,15 +386,23 @@ public class HerbrunScript extends Script {
         Rs2Bank.withdrawOne(ItemID.SEED_DIBBER);
         Rs2Bank.withdrawOne(ItemID.SPADE);
         if (config.enableMorytania()) {
-            Rs2Bank.withdrawOne(ItemID.ECTOPHIAL);
+            if (config.USE_ECTOPHIAL()) {
+                Rs2Bank.withdrawOne(ItemID.ECTOPHIAL);
+            } else {
+                Rs2Bank.withdrawOne(ItemID.FENKENSTRAINS_CASTLE_TELEPORT);
+            }
         }
         if (config.enableVarlamore()) {
-            if (Rs2Bank.hasItem(ItemID.PERFECTED_QUETZAL_WHISTLE)) {
-                Rs2Bank.withdrawOne(ItemID.PERFECTED_QUETZAL_WHISTLE);
-            } else if (Rs2Bank.hasItem(ItemID.ENHANCED_QUETZAL_WHISTLE)) {
-                Rs2Bank.withdrawOne(ItemID.ENHANCED_QUETZAL_WHISTLE);
-            } else if (Rs2Bank.hasItem(ItemID.BASIC_QUETZAL_WHISTLE)) {
-                Rs2Bank.withdrawOne(ItemID.BASIC_QUETZAL_WHISTLE);
+            if (config.USE_QUETZAL_WHISTLE()) {
+                if (Rs2Bank.hasItem(ItemID.PERFECTED_QUETZAL_WHISTLE)) {
+                    Rs2Bank.withdrawOne(ItemID.PERFECTED_QUETZAL_WHISTLE);
+                } else if (Rs2Bank.hasItem(ItemID.ENHANCED_QUETZAL_WHISTLE)) {
+                    Rs2Bank.withdrawOne(ItemID.ENHANCED_QUETZAL_WHISTLE);
+                } else if (Rs2Bank.hasItem(ItemID.BASIC_QUETZAL_WHISTLE)) {
+                    Rs2Bank.withdrawOne(ItemID.BASIC_QUETZAL_WHISTLE);
+                }
+            } else {
+                Rs2Bank.withdrawOne(ItemID.CIVITAS_ILLA_FORTIS_TELEPORT);
             }
         }
         if (config.enableHosidius()) {
