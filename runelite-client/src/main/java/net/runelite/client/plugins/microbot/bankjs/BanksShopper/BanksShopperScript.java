@@ -52,7 +52,7 @@ public class BanksShopperScript extends Script {
                     return;
                 }
 
-                if (Rs2Inventory.isFull() || (config.useBank() && Rs2Player.distanceTo(initialPlayerLocation) > 6)) {
+                if ((plugin.getSelectedAction() == Actions.BUY && plugin.isUseBank()) && (Rs2Inventory.isFull() || Rs2Player.distanceTo(initialPlayerLocation) > 6)) {
                     if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(plugin.getItemNames(), initialPlayerLocation))
                         return;
                 }
