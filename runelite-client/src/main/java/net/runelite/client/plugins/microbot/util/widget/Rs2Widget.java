@@ -7,12 +7,11 @@ import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
@@ -27,26 +26,11 @@ public class Rs2Widget {
         return sleepUntilTrue(() -> !hasWidgetText(text, widgetId, childId, exact), 300, sleep);
     }
 
-
-    public static boolean hasWidgetText(String text, int widgetId, int childId, boolean exact) {
-        return Microbot.getClientThread().runOnClientThread(() -> {
-            Widget rootWidget = getWidget(widgetId, childId);
-            Widget widget = null;
-            if (rootWidget == null) return false;
-            if (rootWidget.getChildren() != null)
-                widget = findWidget(text, Arrays.stream(rootWidget.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
-            if (widget == null && rootWidget.getNestedChildren().length > 0)
-                widget =  findWidget(text, Arrays.stream(rootWidget.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
-            if (widget == null && rootWidget.getDynamicChildren().length > 0)
-                widget = findWidget(text, Arrays.stream(rootWidget.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
-            if (widget == null && rootWidget.getStaticChildren().length > 0)
-                widget = findWidget(text, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
-
-            return widget != null;
-        });
+    public static boolean sleepUntilHasWidget(String text) {
+        sleepUntil(() -> findWidget(text, null, false) != null);
+        return findWidget(text, null, false) != null;
     }
-
-
+    
     public static boolean clickWidget(String text, Optional<Integer> widgetId, int childId, boolean exact) {
         return Microbot.getClientThread().runOnClientThread(() -> {
 
@@ -153,40 +137,14 @@ public class Rs2Widget {
         return findWidget(text, children, false);
     }
 
-    public static Widget findWidget(String text, List<Widget> children, boolean exact) {
+    public static boolean hasWidgetText(String text, int widgetId, int childId, boolean exact) {
         return Microbot.getClientThread().runOnClientThread(() -> {
-            Widget foundWidget = null;
-            if (children == null) {
-                List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-                for (Widget rootWidget : rootWidgets) {
-                    if (rootWidget == null) continue;
-                    if (exact) {
-                        String cleanText = rootWidget.getText() != null ? rootWidget.getText().replaceAll("<col=[^>]+>|</col>", "") : "";
-                        String cleanName = rootWidget.getName() != null ? rootWidget.getName().replaceAll("<col=[^>]+>|</col>", "") : "";
-                        if (cleanText.equalsIgnoreCase(text) || cleanName.equalsIgnoreCase(text)) {
-                            return rootWidget;
-                        }
-                    } else {
-                        if (rootWidget.getText().toLowerCase().contains(text.toLowerCase()) || rootWidget.getName().toLowerCase().contains(text.toLowerCase())) {
-                            return rootWidget;
-                        }
-                    }
-                    if (rootWidget.getChildren() != null)
-                        return findWidget(text, Arrays.stream(rootWidget.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
-                    if (rootWidget.getNestedChildren().length > 0)
-                        return findWidget(text, Arrays.stream(rootWidget.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
-                    if (rootWidget.getDynamicChildren().length > 0)
-                        return findWidget(text, Arrays.stream(rootWidget.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
-                    if (rootWidget.getStaticChildren().length > 0)
-                        return findWidget(text, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()), exact);
-                }
-            } else if (children.size() > 0) {
-                for (Widget child : children) {
-                    foundWidget = searchChildren(text, child, exact);
-                    if (foundWidget != null) break;
-                }
-            }
-            return foundWidget;
+            Widget rootWidget = getWidget(widgetId, childId);
+            if (rootWidget == null) return false;
+
+            // Use findWidget to perform the search on all child types
+            Widget foundWidget = findWidget(text, List.of(rootWidget), exact);
+            return foundWidget != null;
         });
     }
 
@@ -202,74 +160,124 @@ public class Rs2Widget {
         return findWidget(text, null, false) != null;
     }
 
-    public static boolean sleepUntilHasWidget(String text) {
-        sleepUntil(() -> findWidget(text, null, false) != null);
-        return findWidget(text, null, false) != null;
-    }
-
-
-    public static Widget searchChildren(String text, Widget child, boolean exact) {
-        return Microbot.getClientThread().runOnClientThread(() -> {
-            Widget found = null;
-            if (child == null) return null;
-            if (exact) {
-                String cleanText = child.getText() != null ? child.getText().replaceAll("<col=[^>]+>|</col>", "") : "";
-                String cleanName = child.getName() != null ? child.getName().replaceAll("<col=[^>]+>|</col>", "") : "";
-                if (cleanText.equalsIgnoreCase(text) || cleanName.equalsIgnoreCase(text)) {
-                    return child;
-                }
-            } else {
-                if (child.getText().toLowerCase().contains(text.toLowerCase()) || child.getName().toLowerCase().contains(text.toLowerCase())) {
-                    return child;
-                }
-            }
-
-            if (child.getChildren() != null) {
-                List<Widget> visibleChildWidgets = Arrays.stream(child.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-                if (visibleChildWidgets.size() > 0)
-                    found = findWidget(text, visibleChildWidgets, exact);
-            }
-            if (found != null) return found;
-            if (child.getNestedChildren().length > 0) {
-                List<Widget> visibleChildWidgets = Arrays.stream(child.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-                if (visibleChildWidgets.size() > 0)
-                    found = findWidget(text, visibleChildWidgets, exact);
-            }
-            if (found != null) return found;
-            if (child.getDynamicChildren().length > 0) {
-                List<Widget> visibleChildWidgets = Arrays.stream(child.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-                if (visibleChildWidgets.size() > 0)
-                    found = findWidget(text, visibleChildWidgets, exact);
-            }
-            if (found != null) return found;
-            if (child.getStaticChildren().length > 0) {
-                List<Widget> visibleChildWidgets = Arrays.stream(child.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-                if (visibleChildWidgets.size() > 0)
-                    found = findWidget(text, visibleChildWidgets, exact);
-            }
-            return found;
-        });
-    }
-
-    public static Widget findWidget(int spriteId, List<Widget> children) {
+    /**
+     * Searches for a widget with text that matches the specified criteria, either in the provided child widgets
+     * or across all root widgets if children are not specified.
+     *
+     * @param text The text to search for within the widgets.
+     * @param children A list of child widgets to search within. If null, searches through all root widgets.
+     * @param exact Whether the search should match the text exactly or allow partial matches.
+     * @return The widget containing the specified text, or null if no match is found.
+     */
+    public static Widget findWidget(String text, List<Widget> children, boolean exact) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             Widget foundWidget = null;
             if (children == null) {
-                List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
+                // Search through root widgets if no specific children are provided
+                List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots())
+                        .filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
                 for (Widget rootWidget : rootWidgets) {
-                    if (rootWidget.getSpriteId() == spriteId) {
+                    if (rootWidget == null) continue;
+                    if (matchesText(rootWidget, text, exact)) {
                         return rootWidget;
                     }
-                    if (rootWidget.getChildren() != null)
-                        return findWidget(spriteId, Arrays.stream(rootWidget.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()));
-                    if (rootWidget.getNestedChildren().length > 0)
-                        return findWidget(spriteId, Arrays.stream(rootWidget.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()));
-                    if (rootWidget.getDynamicChildren().length > 0)
-                        return findWidget(spriteId, Arrays.stream(rootWidget.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()));
-                    if (rootWidget.getStaticChildren().length > 0)
-                        return findWidget(spriteId, Arrays.stream(rootWidget.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList()));
+                    foundWidget = searchChildren(text, rootWidget, exact);
+                    if (foundWidget != null) return foundWidget;
                 }
-            } else if (children.size() > 0) {
+            } else {
+                // Search within provided child widgets
+                for (Widget child : children) {
+                    foundWidget = searchChildren(text, child, exact);
+                    if (foundWidget != null) break;
+                }
+            }
+            return foundWidget;
+        });
+    }
+
+    /**
+     * Recursively searches through all child widgets of the specified widget for a match with the given text.
+     *
+     * @param text The text to search for within the widget and its children.
+     * @param child The widget to search within.
+     * @param exact Whether the search should match the text exactly or allow partial matches.
+     * @return The widget containing the specified text, or null if no match is found.
+     */
+    public static Widget searchChildren(String text, Widget child, boolean exact) {
+        if (matchesText(child, text, exact)) return child;
+
+        List<Widget[]> childGroups = Stream.of(child.getChildren(), child.getNestedChildren(), child.getDynamicChildren(), child.getStaticChildren())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        for (Widget[] childGroup : childGroups) {
+            if (childGroup != null) {
+                for (Widget nestedChild : Arrays.stream(childGroup).filter(w -> w != null && !w.isHidden()).collect(Collectors.toList())) {
+                    Widget found = searchChildren(text, nestedChild, exact);
+                    if (found != null) return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the text or any action in the widget matches the search criteria.
+     *
+     * @param widget The widget to check for the specified text or action.
+     * @param text The text to match within the widget’s content.
+     * @param exact Whether the match should be exact or allow partial matches.
+     * @return True if the widget's text or any action matches the search criteria, false otherwise.
+     */
+    private static boolean matchesText(Widget widget, String text, boolean exact) {
+        String cleanText = Rs2UiHelper.stripColTags(widget.getText());
+        String cleanName = Rs2UiHelper.stripColTags(widget.getName());
+
+        if (exact) {
+            if (cleanText.equalsIgnoreCase(text) || cleanName.equalsIgnoreCase(text)) return true;
+        } else {
+            if (cleanText.toLowerCase().contains(text.toLowerCase()) || cleanName.toLowerCase().contains(text.toLowerCase())) return true;
+        }
+
+        if (widget.getActions() != null) {
+            for (String action : widget.getActions()) {
+                if (action != null) {
+                    String cleanAction = Rs2UiHelper.stripColTags(action);
+                    if (exact ? cleanAction.equalsIgnoreCase(text) : cleanAction.toLowerCase().contains(text.toLowerCase())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Searches for a widget with the specified sprite ID among root widgets or the specified child widgets.
+     *
+     * @param spriteId The sprite ID to search for.
+     * @param children A list of child widgets to search within. If null, searches root widgets.
+     * @return The widget with the specified sprite ID, or null if not found.
+     */
+    public static Widget findWidget(int spriteId, List<Widget> children) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            Widget foundWidget = null;
+
+            if (children == null) {
+                // Search through root widgets if no specific children are provided
+                List<Widget> rootWidgets = Arrays.stream(Microbot.getClient().getWidgetRoots())
+                        .filter(widget -> widget != null && !widget.isHidden())
+                        .collect(Collectors.toList());
+                for (Widget rootWidget : rootWidgets) {
+                    if (rootWidget == null) continue;
+                    if (matchesSpriteId(rootWidget, spriteId)) {
+                        return rootWidget;
+                    }
+                    foundWidget = searchChildren(spriteId, rootWidget);
+                    if (foundWidget != null) return foundWidget;
+                }
+            } else {
+                // Search within provided child widgets
                 for (Widget child : children) {
                     foundWidget = searchChildren(spriteId, child);
                     if (foundWidget != null) break;
@@ -279,37 +287,40 @@ public class Rs2Widget {
         });
     }
 
+    /**
+     * Recursively searches through the child widgets of the given widget for a match with the specified sprite ID.
+     *
+     * @param spriteId The sprite ID to search for.
+     * @param child The widget to search within.
+     * @return The widget with the specified sprite ID, or null if not found.
+     */
     public static Widget searchChildren(int spriteId, Widget child) {
-        return Microbot.getClientThread().runOnClientThread(() -> {
-            Widget found = null;
-            if (child.getSpriteId() == spriteId) {
-                return child;
+        if (matchesSpriteId(child, spriteId)) return child;
+
+        List<Widget[]> childGroups = Stream.of(child.getChildren(), child.getNestedChildren(), child.getDynamicChildren(), child.getStaticChildren())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        for (Widget[] childGroup : childGroups) {
+            if (childGroup != null){
+                for (Widget nestedChild : Arrays.stream(childGroup).filter(w -> w != null && !w.isHidden()).collect(Collectors.toList())) {
+                    Widget found = searchChildren(spriteId, nestedChild);
+                    if (found != null) return found;
+                }
             }
-            if (child.getChildren() != null) {
-                List<Widget> visibleChildWidgets = Arrays.stream(child.getChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-                if (visibleChildWidgets.size() > 0)
-                    found = findWidget(spriteId, visibleChildWidgets);
-            }
-            if (found != null) return found;
-            if (child.getNestedChildren().length > 0) {
-                List<Widget> visibleChildWidgets = Arrays.stream(child.getNestedChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-                if (visibleChildWidgets.size() > 0)
-                    found = findWidget(spriteId, visibleChildWidgets);
-            }
-            if (found != null) return found;
-            if (child.getDynamicChildren().length > 0) {
-                List<Widget> visibleChildWidgets = Arrays.stream(child.getDynamicChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-                if (visibleChildWidgets.size() > 0)
-                    found = findWidget(spriteId, visibleChildWidgets);
-            }
-            if (found != null) return found;
-            if (child.getStaticChildren().length > 0) {
-                List<Widget> visibleChildWidgets = Arrays.stream(child.getStaticChildren()).filter(x -> x != null && !x.isHidden()).collect(Collectors.toList());
-                if (visibleChildWidgets.size() > 0)
-                    found = findWidget(spriteId, visibleChildWidgets);
-            }
-            return found;
-        });
+        }
+        return null;
+    }
+
+    /**
+     * Checks if a widget's sprite ID matches the specified sprite ID.
+     *
+     * @param widget The widget to check.
+     * @param spriteId The sprite ID to match.
+     * @return True if the widget's sprite ID matches the specified sprite ID, false otherwise.
+     */
+    private static boolean matchesSpriteId(Widget widget, int spriteId) {
+        return widget != null && widget.getSpriteId() == spriteId;
     }
 
     public static void clickWidgetFast(int packetId, int identifier) {
@@ -324,8 +335,6 @@ public class Rs2Widget {
         MenuAction menuAction = MenuAction.CC_OP;
         Microbot.doInvoke(new NewMenuEntry(param0 != -1 ? param0 : widget.getType(), param1, menuAction.getId(), identifier, widget.getItemId(), target), widget.getBounds());
     }
-
-
 
     public static void clickWidgetFast(Widget widget, int param0) {
         clickWidgetFast(widget, param0, 1);

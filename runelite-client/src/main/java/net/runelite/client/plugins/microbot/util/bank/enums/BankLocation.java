@@ -72,6 +72,7 @@ public enum BankLocation {
     PEST_CONTROL(new WorldPoint(2667, 2653, 0)),
     PISCARILIUS(new WorldPoint(1803, 3790, 0)),
     PORT_KHAZARD(new WorldPoint(2664, 3161, 0)),
+    PORT_PHASMATYS(new WorldPoint(3688, 3467, 0)),
     PRIFDDINAS(new WorldPoint(3257, 6106, 0)),
     ROGUES_DEN_EMERALD_BENEDICT(new WorldPoint(3043, 4973, 1)),
     ROGUES_DEN_CHEST(new WorldPoint(3040, 4969, 1)),
@@ -157,6 +158,9 @@ public enum BankLocation {
             case MAGE_TRAINING_ARENA:
                 if (hasLineOfSight && isMember()) return true;
                 return isMember();
+            case PORT_PHASMATYS:
+                if (hasLineOfSight && isMember()) return true;
+                return isMember() && Rs2Player.getQuestState(Quest.GHOSTS_AHOY) == QuestState.FINISHED;
             default:
                 return true;
         }
