@@ -12,6 +12,8 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.ui.overlay.OverlayManager;
 
+
+
 @Slf4j
 @PluginDescriptor(
         name = "Clue Solver V2",
@@ -24,9 +26,6 @@ public class ClueSolverPlugin extends Plugin {
     private ClueSolverConfig config;
 
     @Inject
-    private ClueScrollPlugin clueScrollPlugin;
-
-    @Inject
     private ClueSolverScriptV2 clueSolverScriptV2;
 
     @Inject
@@ -35,21 +34,20 @@ public class ClueSolverPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
 
+
     @Override
-    protected void startUp() {
-
+    public void startUp() {
         overlayManager.add(overlay);
-
         if (config.toggleAll()) {
-            clueSolverScriptV2.start(config);
+            clueSolverScriptV2.run();
         }
+
         log.info("Clue Solver V2 started.");
     }
 
     @Override
-    protected void shutDown() {
-
-        clueSolverScriptV2.stop();
+    public void shutDown() {
+        clueSolverScriptV2.shutdown();
         overlayManager.remove(overlay);
         log.info("Clue Solver V2 stopped.");
     }
@@ -63,11 +61,28 @@ public class ClueSolverPlugin extends Plugin {
     public void onConfigChanged(ConfigChanged event) {
         if ("cluesolverv2".equals(event.getGroup())) {
             clueSolverScriptV2.updateConfig(config);
+
+            // Toggle script based on config setting
             if (config.toggleAll()) {
-                clueSolverScriptV2.start(config);
+                // If the script is not already running, start it
+                if (!clueSolverScriptV2.isRunning()) {
+                    clueSolverScriptV2.run(config);
+                }
             } else {
-                clueSolverScriptV2.stop();
+                // Shutdown if the toggle is turned off
+                clueSolverScriptV2.shutdown();
             }
+
+            // If task interval or cooldown between tasks changed, restart script with new settings
+            if ("taskInterval".equals(event.getKey()) || "cooldownBetweenTasks".equals(event.getKey())) {
+                if (clueSolverScriptV2.isRunning()) {
+                    clueSolverScriptV2.shutdown();
+                    clueSolverScriptV2.run(config);
+                }
+            }
+
+            log.info("ClueSolverConfig changed: {}", event.getKey());
         }
     }
+
 }

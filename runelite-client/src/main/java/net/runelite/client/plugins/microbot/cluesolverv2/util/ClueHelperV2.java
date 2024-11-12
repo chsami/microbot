@@ -36,7 +36,7 @@ public class ClueHelperV2 {
     );
 
 
-    private Map<Integer, String> requiredItemsMap = new HashMap<>();
+    private final Map<Integer, String> requiredItemsMap = new HashMap<>();
 
 
     @Inject
@@ -190,7 +190,7 @@ public class ClueHelperV2 {
             itemIdField.setAccessible(true);
             int itemId = itemIdField.getInt(singleReq);
 
-            log.info("Successfully accessed itemId. SingleItemRequirement - Item ID: {} Item Name: {}", itemId, singleReq.getCollectiveName(client));
+            log.info("Successfully accessed itemId. SingleItemRequirement - Item ID: {}", itemId);
         } catch (NoSuchFieldException e) {
             log.error("No such field 'itemId' found in SingleItemRequirement. Check for typos or incorrect field name.", e);
         } catch (IllegalAccessException e) {

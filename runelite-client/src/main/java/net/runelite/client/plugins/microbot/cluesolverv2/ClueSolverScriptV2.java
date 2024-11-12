@@ -15,16 +15,14 @@ import net.runelite.client.plugins.microbot.cluesolverv2.tasks.EmoteClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 
-import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class ClueSolverScriptV2 extends Script {
 
-    private ScheduledExecutorService executor;
     private ClueSolverConfig config;
+    private ClueTask currentTask;
+    private boolean isRunning = false;
 
     @Inject
     private Client client;
@@ -38,61 +36,93 @@ public class ClueSolverScriptV2 extends Script {
     @Inject
     private EventBus eventBus;
 
-    private ClueTask currentTask;
-
     @Inject
-    private Provider<EmoteClueTask> emoteClueTaskProvider; // Injected Provider
+    private Provider<EmoteClueTask> emoteClueTaskProvider;
 
-    public void start(ClueSolverConfig config) {
+    public boolean run(ClueSolverConfig config) {
+        // Only start if not already running
+        if (isRunning) {
+            log.warn("Clue Solver Script V2 is already running.");
+            return false;
+        }
+
+        log.info("Starting Clue Solver Script V2...");
         this.config = config;
-        executor = Executors.newScheduledThreadPool(10);
-        executor.scheduleWithFixedDelay(this::runTaskFlow, 50, config.taskInterval(), TimeUnit.MILLISECONDS);
+        isRunning = true;
+        loadNpcData();
         eventBus.register(this);
-        log.info("Clue Solver Script V2 started with task interval: {} ms", config.taskInterval());
+
+        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+            try {
+                if (!Microbot.isLoggedIn() || !super.run()) return;
+                log.info("Executing Clue Solver Script V2...");
+                processClueTask();
+            } catch (Exception e) {
+                log.error("Error in ClueSolverScriptV2 execution", e);
+            }
+        }, 200, config.taskInterval(), TimeUnit.MILLISECONDS);
+
+        log.info("Clue Solver Script V2 initialized with task interval: {} ms", config.taskInterval());
+        return true;
     }
 
-    public void stop() {
+    public void shutdown() {
+        // Only stop if the script is running
+        if (!isRunning) {
+            log.warn("Clue Solver Script V2 is already stopped.");
+            return;
+        }
+
+        log.info("Stopping Clue Solver Script V2...");
+        super.shutdown();
+
+        // Cancel the scheduled task if it’s running
+        if (mainScheduledFuture != null && !mainScheduledFuture.isCancelled()) {
+            mainScheduledFuture.cancel(true);
+        }
+
         if (currentTask != null) {
             currentTask.stop();
             currentTask = null;
         }
-        if (executor != null && !executor.isShutdown()) {
-            executor.shutdownNow();
-        }
+
         eventBus.unregister(this);
-        log.info("Clue Solver Script V2 stopped.");
+        isRunning = false;
+        log.info("Clue Solver Script V2 successfully stopped.");
     }
 
-    private void runTaskFlow() {
-        Microbot.enableAutoRunOn = false;
-        loadNpcData();
-        try {
-            if (currentTask == null) {
-                ClueScroll activeClue = clueScrollPlugin.getClue();
-                if (activeClue != null && config.toggleAll()) {
-                    log.info("New clue received: {}", activeClue);
-                    currentTask = createTask(activeClue);
-                    if (currentTask != null) {
-                        currentTask.start();
-                    }
-                }
-            } else {
-                log.info("Executing current task: {}", currentTask.getTaskDescription());
-                boolean isComplete = currentTask.execute();
-                if (isComplete) {
-                    log.info("Current clue task completed.");
-                    currentTask.stop();
-                    currentTask = null;
+    private void processClueTask() {
+        if (currentTask == null) {
+            ClueScroll activeClue = clueScrollPlugin.getClue();
+            if (activeClue != null && config.toggleAll()) {
+                log.info("New clue detected: {}", activeClue);
+                currentTask = createTask(activeClue);
+                if (currentTask != null) {
+                    currentTask.start();
                 }
             }
-        } catch (Exception e) {
-            log.error("Error in ClueSolverScriptV2", e);
-            currentTask = null;
+        } else {
+            log.info("Executing current task: {}", currentTask.getTaskDescription());
+            if (currentTask.execute()) {
+                log.info("Current task completed.");
+                currentTask.stop();
+                currentTask = null;
+                // Apply cooldown if specified
+                if (config.cooldownBetweenTasks() > 0) {
+                    log.info("Applying cooldown of {} ms between tasks", config.cooldownBetweenTasks());
+                    try {
+                        Thread.sleep(config.cooldownBetweenTasks());
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        log.error("Interrupted during cooldown", e);
+                    }
+                }
+            }
         }
     }
 
     private ClueTask createTask(ClueScroll clue) {
-        log.info("Defining task for clue type: {}", clue.getClass().getSimpleName());
+        log.info("Creating task for clue type: {}", clue.getClass().getSimpleName());
 
         if (clue instanceof EmoteClue) {
             EmoteClueTask task = emoteClueTaskProvider.get();
@@ -100,8 +130,7 @@ public class ClueSolverScriptV2 extends Script {
             return task;
         }
 
-        // Additional clue types can be handled here with else-if blocks as needed
-        log.warn("No matching task found for clue type: {}", clue.getClass().getSimpleName());
+        log.warn("No task found for clue type: {}", clue.getClass().getSimpleName());
         return null;
     }
 
@@ -113,8 +142,8 @@ public class ClueSolverScriptV2 extends Script {
         }
     }
 
-
     public void updateConfig(ClueSolverConfig config) {
         this.config = config;
+        log.info("Updated ClueSolverScriptV2 configuration.");
     }
 }

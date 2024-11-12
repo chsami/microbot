@@ -4,21 +4,23 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.MicrobotOverlay;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import net.runelite.api.events.ItemContainerChanged;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 @Slf4j
 public class EmoteClueTask implements ClueTask {
@@ -34,6 +36,9 @@ public class EmoteClueTask implements ClueTask {
     private EmoteClue clue;
 
     private List<ItemRequirement> requiredItems;
+
+    List<ItemRequirement> missingItems;
+
 
     private Map<Integer, String> requiredItemsMap;
 
@@ -71,7 +76,6 @@ public class EmoteClueTask implements ClueTask {
 
         log.info("EmoteClueTask initialized for clue: {}", clue.getClass().getSimpleName());
         log.info("Number of required items: {}", requiredItems.size());
-        log.info("Cached items: {}", requiredItemsMap);
     }
 
 
@@ -126,24 +130,33 @@ public class EmoteClueTask implements ClueTask {
         return "Performing Emote Clue Task";
     }
 
-    /**
-     * Step 1: Check for missing items. If missing items are found, initiate retrieval from the bank.
-     *
-     * @return true if all items are present and task can proceed to navigation; false otherwise.
-     */
     private boolean checkAndHandleMissingItems() {
-        log.info("Checking for missing items...");
+        CountDownLatch latch = new CountDownLatch(1);
 
-        if (!requiredItemsMap.isEmpty()) {
+        Microbot.getClientThread().invoke(() -> {
+            this.missingItems = clueHelper.getMissingItems(requiredItems);
+            log.info("Number of missing items: {}", missingItems.size());
+            latch.countDown();
+        });
+
+        try {
+            latch.await(); // Wait for the invoke method to complete
+        } catch (InterruptedException e) {
+            log.error("Interrupted while waiting for missing items check", e);
+            Thread.currentThread().interrupt();
+            return false;
+        }
+
+        if (missingItems.isEmpty()) {
             log.info("All required items are present. Proceeding to navigation.");
             state = State.NAVIGATING_TO_LOCATION;
             return true; // Proceed to navigation
         } else {
-            state = State.RETRIEVING_ITEMS; // Transition to retrieve items
-            return false;
+            log.warn("Some items are missing. Initiating retrieval.");
+            state = State.RETRIEVING_ITEMS;
+            return false; // Transition to retrieve items
         }
     }
-
     /**
      * Step 2: Retrieve required items from the bank if any are missing.
      * Initiates withdrawal attempts for missing items.
@@ -188,7 +201,7 @@ public class EmoteClueTask implements ClueTask {
                 log.info("All required items have been successfully withdrawn.");
                 state = State.NAVIGATING_TO_LOCATION;
             } else {
-                log.warn("Some items are still missing: {}", clueHelper.getMissingItems(requiredItems));
+                log.warn("Some items are still missing");
                 // Optionally, you can decide to retry withdrawal for missing items
             }
         });
