@@ -354,11 +354,12 @@ public class GotrScript extends Script {
     }
 
     private boolean isOutOfFragments() {
-        if (!Rs2Inventory.hasItem(GUARDIAN_FRAGMENTS) && !Rs2Inventory.isFull()) {
+        if (!Rs2Inventory.hasItem(GUARDIAN_FRAGMENTS) && !Rs2Inventory.isFull() && shouldMineGuardianRemains == false) {
             shouldMineGuardianRemains = true;
             log("Memorize that we no longer have guardian fragments...");
             return true;
         }
+        shouldMineGuardianRemains = false;
         return false;
     }
 
