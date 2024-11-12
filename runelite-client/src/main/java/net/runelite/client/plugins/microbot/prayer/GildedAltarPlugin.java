@@ -11,10 +11,7 @@ import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.ObjectID;
-import net.runelite.api.TileObject;
+import net.runelite.api.*;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
@@ -27,9 +24,12 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.overlay.OverlayManager;
+
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 @PluginDescriptor(
         name = PluginDescriptor.Mocrosoft + "Gilded Altar",
@@ -225,7 +225,9 @@ public class GildedAltarPlugin extends Plugin {
         }
         if (altar != null) {
             Rs2Inventory.useUnNotedItemOnObject("bones", altar);
+//            sleepUntil(() -> !Rs2Inventory.hasItem("bones"), 25000);
             setSkipTicks(1);
+
         }
     }
 }

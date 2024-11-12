@@ -125,7 +125,7 @@ public class Login {
     }
 
     public static int getRandomWorld(boolean isMembers) {
-        return getRandomWorld(isMembers, null);
+        return 352; // if 368 is your homeworld
     }
 
     public void setWorld(int worldNumber) {

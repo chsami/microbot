@@ -102,22 +102,44 @@ public interface HerbrunConfig extends Config {
     @ConfigItem(
             keyName = "ardougne_teleport",
             name = "Use Ardougne cloak?",
-            description = "Does your adougne cloak still have charges for today? If not the script will use Ardy tab",
+            description = "Does your adougne cloak still have charges for today? If not an Ardy tab will be used.",
             position = 4,
             section = settingsSection
     )
-    default boolean ARDOUGNE_TELEPORT_OPTION() {
+    default boolean USE_ARDOUGNE_CLOAK() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "morytanita_teleport",
+            name = "Use Ectophial?",
+            description = "Do you have an ectophial? If not Fenkenstrain tab will be used.",
+            position = 4,
+            section = settingsSection
+    )
+    default boolean USE_ECTOPHIAL() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "varlamore_teleport",
+            name = "Use Quetzal Whistle??",
+            description = "Use Quetzal Whistle? If not Civitas tab will be used.",
+            position = 4,
+            section = settingsSection
+    )
+    default boolean USE_QUETZAL_WHISTLE() {
         return true;
     }
 
     @ConfigItem(
             keyName = "falador_teleport",
             name = "Use Explorer's ring?",
-            description = "Does your ring still have charges for today? If not the script will use falador tab",
+            description = "Does your ring still have charges for today? If not a falador tab will be used",
             position = 4,
             section = settingsSection
     )
-    default boolean FALADOR_TELEPORT_OPTION() {
+    default boolean USE_EXPLORERS_RING() {
         return true;
     }
 
@@ -245,9 +267,9 @@ public interface HerbrunConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "enableArdouge",
-            name = "Enable Ardouge Patch",
-            description = "Enable Ardouge patch in herb run",
+            keyName = "enableArdougne",
+            name = "Enable Ardougne Patch",
+            description = "Enable Ardougne patch in herb run",
             position = 6,
             section = locationSection
     )

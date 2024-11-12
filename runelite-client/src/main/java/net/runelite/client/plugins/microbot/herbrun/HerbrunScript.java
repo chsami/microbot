@@ -153,7 +153,7 @@ public class HerbrunScript extends Script {
                     case MORYTANIA_TELEPORT:
                         if (config.enableMorytania()) {
                             handleTeleportToMorytania();
-                            sleep(600,1200);
+                            sleep(600, 1200);
                         } else {
                             botStatus = states.VARLAMORE_TELEPORT;
                         }
@@ -230,6 +230,7 @@ public class HerbrunScript extends Script {
                         } else {
                             handleTeleportToArdougne(config);
                         }
+                        break;
                     case ARDOUGNE_WALKING_TO_PATCH:
                         if (!Rs2Player.isMoving() &&
                                 !Rs2Player.isAnimating() &&
@@ -386,22 +387,30 @@ public class HerbrunScript extends Script {
         Rs2Bank.withdrawOne(ItemID.SEED_DIBBER);
         Rs2Bank.withdrawOne(ItemID.SPADE);
         if (config.enableMorytania()) {
-            Rs2Bank.withdrawOne(ItemID.ECTOPHIAL);
+            if (config.USE_ECTOPHIAL()) {
+                Rs2Bank.withdrawOne(ItemID.ECTOPHIAL);
+            } else {
+                Rs2Bank.withdrawOne(ItemID.FENKENSTRAINS_CASTLE_TELEPORT);
+            }
         }
         if (config.enableVarlamore()) {
-            if (Rs2Bank.hasItem(ItemID.PERFECTED_QUETZAL_WHISTLE)) {
-                Rs2Bank.withdrawOne(ItemID.PERFECTED_QUETZAL_WHISTLE);
-            } else if (Rs2Bank.hasItem(ItemID.ENHANCED_QUETZAL_WHISTLE)) {
-                Rs2Bank.withdrawOne(ItemID.ENHANCED_QUETZAL_WHISTLE);
-            } else if (Rs2Bank.hasItem(ItemID.BASIC_QUETZAL_WHISTLE)) {
-                Rs2Bank.withdrawOne(ItemID.BASIC_QUETZAL_WHISTLE);
+            if (config.USE_QUETZAL_WHISTLE()) {
+                if (Rs2Bank.hasItem(ItemID.PERFECTED_QUETZAL_WHISTLE)) {
+                    Rs2Bank.withdrawOne(ItemID.PERFECTED_QUETZAL_WHISTLE);
+                } else if (Rs2Bank.hasItem(ItemID.ENHANCED_QUETZAL_WHISTLE)) {
+                    Rs2Bank.withdrawOne(ItemID.ENHANCED_QUETZAL_WHISTLE);
+                } else if (Rs2Bank.hasItem(ItemID.BASIC_QUETZAL_WHISTLE)) {
+                    Rs2Bank.withdrawOne(ItemID.BASIC_QUETZAL_WHISTLE);
+                }
+            } else {
+                Rs2Bank.withdrawOne(ItemID.CIVITAS_ILLA_FORTIS_TELEPORT);
             }
         }
         if (config.enableHosidius()) {
             Rs2Bank.withdrawOne(ItemID.XERICS_TALISMAN);
         }
         if (config.enableArdougne()) {
-            if (config.ARDOUGNE_TELEPORT_OPTION()) {
+            if (config.USE_ARDOUGNE_CLOAK()) {
                 Rs2Bank.withdrawOne(config.CLOAK().getItemId());
             } else {
                 Rs2Bank.withdrawOne(ItemID.ARDOUGNE_TELEPORT);
@@ -424,14 +433,14 @@ public class HerbrunScript extends Script {
                 }
             } else {
                 if (Rs2Bank.hasItem(ItemID.FARMING_CAPE)) {
-                Rs2Bank.withdrawOne(ItemID.FARMING_CAPE);
+                    Rs2Bank.withdrawOne(ItemID.FARMING_CAPE);
                 } else if (Rs2Bank.hasItem(ItemID.FARMING_CAPET)) {
                     Rs2Bank.withdrawOne(ItemID.FARMING_CAPET);
                 }
             }
         }
         if (config.enableFalador()) {
-            if (config.FALADOR_TELEPORT_OPTION()) {
+            if (config.USE_EXPLORERS_RING()) {
                 Rs2Bank.withdrawOne(config.RING().getItemId());
             } else {
                 Rs2Bank.withdrawOne(ItemID.FALADOR_TELEPORT);
@@ -621,7 +630,7 @@ public class HerbrunScript extends Script {
 
         if (!Rs2Player.isAnimating() && !Rs2Player.isMoving() && !Rs2Player.isInteracting()) {
             System.out.println("Teleporting to Ardougne farm patch");
-            if (config.ARDOUGNE_TELEPORT_OPTION()) {
+            if (config.USE_ARDOUGNE_CLOAK()) {
                 boolean success = Rs2Inventory.interact(config.CLOAK().getItemId(), "Farm Teleport");
             } else if (Rs2Inventory.contains(ItemID.SKILLS_NECKLACE1)) {
                 Rs2Inventory.interact(ItemID.SKILLS_NECKLACE1, "rub");
@@ -839,7 +848,7 @@ public class HerbrunScript extends Script {
         if (Rs2Inventory.isFull()) {
             System.out.println("Noting herbs with tool leprechaun...");
             Rs2Inventory.useItemOnNpc(config.SEED().getHerbId(), leprechaunID); // Note the herbs with tool leprechaun
-            Rs2Player.waitForAnimation();
+            Rs2Player.waitForWalking();
         }
         int timesToLoop = 2 + (int) (Math.random() * 6);
 
@@ -965,7 +974,7 @@ public class HerbrunScript extends Script {
 
             // Wait until interaction is complete
             sleepUntil(Rs2Player::isInteracting);
-            if (Rs2Inventory.contains(ItemID.EMPTY_BUCKET)) Rs2Inventory.drop(ItemID.EMPTY_BUCKET);
+            if (Rs2Inventory.contains(ItemID.BUCKET)) Rs2Inventory.drop(ItemID.BUCKET);
 
             // Update the bot status
             botStatus = state;
