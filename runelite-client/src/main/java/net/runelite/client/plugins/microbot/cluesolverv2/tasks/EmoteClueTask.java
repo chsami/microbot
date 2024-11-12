@@ -8,6 +8,7 @@ import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -17,21 +18,25 @@ import net.runelite.api.events.ItemContainerChanged;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class EmoteClueTask implements ClueTask {
     @Inject
-    private  Client client;
+    private Client client;
 
     @Inject
-    private  ClueHelperV2 clueHelper;
+    private ClueHelperV2 clueHelper;
 
     @Inject
-    private  EventBus eventBus;
+    private EventBus eventBus;
 
-    private  EmoteClue clue;
+    private EmoteClue clue;
 
-    private  List<ItemRequirement> requiredItems;
+    private List<ItemRequirement> requiredItems;
+
+    private Map<Integer, String> requiredItemsMap;
+
 
     private State state;
 
@@ -62,11 +67,12 @@ public class EmoteClueTask implements ClueTask {
     public void setClue(EmoteClue clue) {
         this.clue = clue;
         this.requiredItems = clueHelper.determineRequiredItems(clue);
+        this.requiredItemsMap = clueHelper.getRequiredItemsMap();
 
         log.info("EmoteClueTask initialized for clue: {}", clue.getClass().getSimpleName());
         log.info("Number of required items: {}", requiredItems.size());
+        log.info("Cached items: {}", requiredItemsMap);
     }
-
 
 
     @Override
@@ -127,10 +133,8 @@ public class EmoteClueTask implements ClueTask {
      */
     private boolean checkAndHandleMissingItems() {
         log.info("Checking for missing items...");
-        List<ItemRequirement> missingItems = clueHelper.getMissingItems(requiredItems);
-        log.info("Missing items: {}", missingItems);
 
-        if (missingItems.isEmpty()) {
+        if (!requiredItemsMap.isEmpty()) {
             log.info("All required items are present. Proceeding to navigation.");
             state = State.NAVIGATING_TO_LOCATION;
             return true; // Proceed to navigation
@@ -152,16 +156,16 @@ public class EmoteClueTask implements ClueTask {
             return;
         }
 
-        List<ItemRequirement> missingItems = clueHelper.getMissingItems(requiredItems);
-
-        for (ItemRequirement item : missingItems) {
-            String itemName = item.getCollectiveName(client);
-            log.info("Attempting to withdraw item: {}", itemName);
+        // Iterate the required items map and withdraw the items
+        for (Map.Entry<Integer, String> entry : requiredItemsMap.entrySet()) {
+            Integer itemId = entry.getKey();
+            String itemName = entry.getValue();
+            log.info("Attempting to withdraw item: {} With ID: {}", itemName, itemId);
             Rs2Bank.withdrawItem(itemName);
             if (Rs2Inventory.contains(itemName)) {
-                log.info("Withdrawal initiated for item: {}", itemName);
+                log.info("Withdrawal initiated for item: {} With ID: {}", itemName, itemId);
             } else {
-                log.warn("Failed to initiate withdrawal for item: {}", itemName);
+                log.warn("Failed to initiate withdrawal for item: {} With ID: {}", itemName, itemId);
             }
         }
 
@@ -176,19 +180,22 @@ public class EmoteClueTask implements ClueTask {
      * @return true if all items are present; false otherwise.
      */
     private boolean verifyItemsPresence() {
-        log.info("Verifying presence of withdrawn items in inventory.");
-        List<ItemRequirement> missingItems = clueHelper.getMissingItems(requiredItems);
+        Microbot.getClientThread().invoke(() -> {
+            log.info("Verifying presence of withdrawn items in inventory.");
+            List<ItemRequirement> missingItems = clueHelper.getMissingItems(requiredItems);
 
-        if (missingItems.isEmpty()) {
-            log.info("All required items have been successfully withdrawn.");
-            state = State.NAVIGATING_TO_LOCATION;
-            return true;
-        } else {
-            log.warn("Some items are still missing: {}", clueHelper.getMissingItems(requiredItems));
-            // Optionally, you can decide to retry withdrawal for missing items
-            return false;
-        }
+            if (missingItems.isEmpty()) {
+                log.info("All required items have been successfully withdrawn.");
+                state = State.NAVIGATING_TO_LOCATION;
+            } else {
+                log.warn("Some items are still missing: {}", clueHelper.getMissingItems(requiredItems));
+                // Optionally, you can decide to retry withdrawal for missing items
+            }
+        });
+
+        return false;
     }
+
 
     /**
      * Step 4: Navigate to the specified location.

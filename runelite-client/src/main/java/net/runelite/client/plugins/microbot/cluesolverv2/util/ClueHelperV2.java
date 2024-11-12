@@ -35,6 +35,10 @@ public class ClueHelperV2 {
             new SingleItemRequirement(ItemID.BULLSEYE_LANTERN_4550)
     );
 
+
+    private Map<Integer, String> requiredItemsMap = new HashMap<>();
+
+
     @Inject
     public ClueHelperV2(Client client) {
         this.client = client;
@@ -70,6 +74,8 @@ public class ClueHelperV2 {
     public List<ItemRequirement> determineRequiredItems(ClueScroll clue) {
         List<ItemRequirement> requiredItems = new ArrayList<>();
 
+        requiredItemsMap.clear();
+
         if (clue.isRequiresSpade()) {
             log.info("Adding spade requirement.");
             requiredItems.add(HAS_SPADE);
@@ -93,7 +99,6 @@ public class ClueHelperV2 {
                     for (ItemRequirement req : clueItemRequirements) {
                         if (req != null) {
                             requiredItems.add(req);
-                            log.info("Item requirement (toString): {}", req);
                             handleItemRequirement(req);
                         } else {
                             log.warn("Encountered a null item requirement in itemRequirements array.");
@@ -114,7 +119,13 @@ public class ClueHelperV2 {
                     try {
                         Microbot.getClientThread().invoke(() -> {
                             String collectiveName = requirement.getCollectiveName(client);
-                            log.info("Final Required item: {}", collectiveName);
+                            Integer itemId = getItemIdFromRequirement(requirement);
+                            if (itemId != null) {
+                                requiredItemsMap.put(itemId, collectiveName);
+                                log.info("Cached item - ID: {}, Name: {}", itemId, collectiveName);
+                            } else {
+                                log.warn("Item ID could not be retrieved for requirement: {}", requirement);
+                            }
                         });
                     } catch (Throwable t) {
                         log.error("Error getting collective name for requirement: {}", requirement, t);
@@ -126,8 +137,31 @@ public class ClueHelperV2 {
         } catch (Throwable t) {
             log.error("Error determining required items", t);
         }
-
         return requiredItems;
+    }
+
+
+    /**
+     * Extracts the item ID from an ItemRequirement using reflection.
+     *
+     * @param req The ItemRequirement instance.
+     * @return The item ID if accessible; null otherwise.
+     */
+    private Integer getItemIdFromRequirement(ItemRequirement req) {
+        try {
+            if (req instanceof SingleItemRequirement) {
+                Field itemIdField = SingleItemRequirement.class.getDeclaredField("itemId");
+                itemIdField.setAccessible(true);
+                return itemIdField.getInt(req);
+            } else if (req instanceof AnyRequirementCollection) {
+                // Handle accordingly if needed
+                return null;
+            }
+            // Add more conditions for other ItemRequirement types if necessary
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            log.error("Unable to access itemId field in requirement: {}", req, e);
+        }
+        return null;
     }
 
 
@@ -156,7 +190,7 @@ public class ClueHelperV2 {
             itemIdField.setAccessible(true);
             int itemId = itemIdField.getInt(singleReq);
 
-            log.info("Successfully accessed itemId. SingleItemRequirement - Item ID: {}", itemId);
+            log.info("Successfully accessed itemId. SingleItemRequirement - Item ID: {} Item Name: {}", itemId, singleReq.getCollectiveName(client));
         } catch (NoSuchFieldException e) {
             log.error("No such field 'itemId' found in SingleItemRequirement. Check for typos or incorrect field name.", e);
         } catch (IllegalAccessException e) {
@@ -273,12 +307,15 @@ public class ClueHelperV2 {
     public List<ItemRequirement> getMissingItems(List<ItemRequirement> requirements) {
         log.info("Checking for missing items.");
 
-        Item[] inventoryItemsArray = client.getItemContainer(InventoryID.INVENTORY) != null
-                ? Objects.requireNonNull(client.getItemContainer(InventoryID.INVENTORY)).getItems()
-                : new Item[0];
-        Item[] equippedItemsArray = client.getItemContainer(InventoryID.EQUIPMENT) != null
-                ? Objects.requireNonNull(client.getItemContainer(InventoryID.EQUIPMENT)).getItems()
-                : new Item[0];
+        ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
+        ItemContainer equipmentContainer = client.getItemContainer(InventoryID.EQUIPMENT);
+
+        Item[] inventoryItemsArray = inventoryContainer != null ? inventoryContainer.getItems() : new Item[0];
+        Item[] equippedItemsArray = equipmentContainer != null ? equipmentContainer.getItems() : new Item[0];
+
+        // Log current inventory and equipment for debugging
+        log.debug("Current Inventory Items: {}", Arrays.toString(inventoryItemsArray));
+        log.debug("Current Equipped Items: {}", Arrays.toString(equippedItemsArray));
 
         List<Item> allItems = new ArrayList<>();
         Collections.addAll(allItems, inventoryItemsArray);
@@ -355,5 +392,16 @@ public class ClueHelperV2 {
         }
         log.warn("Field '{}' not found in class hierarchy of '{}'", fieldName, clazz.getSimpleName());
         return null;
+    }
+
+
+
+    /**
+     * Getter for the requiredItemsMap.
+     *
+     * @return An unmodifiable view of the requiredItemsMap.
+     */
+    public Map<Integer, String> getRequiredItemsMap() {
+        return Collections.unmodifiableMap(requiredItemsMap);
     }
 }
