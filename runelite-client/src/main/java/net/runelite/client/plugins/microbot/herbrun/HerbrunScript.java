@@ -150,7 +150,7 @@ public class HerbrunScript extends Script {
                         break;
                     case MORYTANIA_TELEPORT:
                         if (config.enableMorytania()) {
-                            handleTeleportToMorytania();
+                            handleTeleportToMorytania(config);
                             sleep(600, 1200);
                         } else {
                             botStatus = states.VARLAMORE_TELEPORT;
@@ -542,13 +542,13 @@ public class HerbrunScript extends Script {
         if (!Rs2Player.isAnimating()) {
             System.out.println("Teleporting to Morytania");
             if (config.USE_ECTOPHIAL()) {
-                boolean success = Rs2Inventory.interact(ItemID.ECTOPHIAL, "empty");
+                Rs2Inventory.interact(ItemID.ECTOPHIAL, "empty");
             } else {
-                boolean success = Rs2Inventory.interact(ItemID.FENKENSTRAINS_CASTLE_TELEPORT, "break");
+                Rs2Inventory.interact(ItemID.FENKENSTRAINS_CASTLE_TELEPORT, "break");
             }
             Rs2Player.waitForAnimation();
             sleepUntil(() -> !Rs2Player.isAnimating());
-            return success;
+            return true;
         }
         return false;
     }
