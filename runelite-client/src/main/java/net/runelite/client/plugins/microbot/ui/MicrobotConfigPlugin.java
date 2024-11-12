@@ -44,88 +44,82 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 
 @PluginDescriptor(
-	name = "Configuration",
-	loadWhenOutdated = true,
-	hidden = true // prevent users from disabling
+        name = "MicrobotConfiguration",
+        loadWhenOutdated = true,
+        hidden = true // prevent users from disabling
 )
-public class MicrobotConfigPlugin extends Plugin
-{
-	@Inject
-	private ClientToolbar clientToolbar;
+public class MicrobotConfigPlugin extends Plugin {
+    @Inject
+    private ClientToolbar clientToolbar;
 
-	@Inject
-	private Provider<MicrobotPluginListPanel> pluginListPanelProvider;
+    @Inject
+    private Provider<MicrobotPluginListPanel> pluginListPanelProvider;
 
-	@Inject
-	private Provider<MicrobotTopLevelConfigPanel> topLevelConfigPanelProvider;
+    @Inject
+    private Provider<MicrobotTopLevelConfigPanel> topLevelConfigPanelProvider;
 
-	@Inject
-	private ConfigManager configManager;
+    @Inject
+    private ConfigManager configManager;
 
-	@Inject
-	private RuneLiteConfig runeLiteConfig;
+    @Inject
+    private RuneLiteConfig runeLiteConfig;
 
-	@Inject
-	private ChatColorConfig chatColorConfig;
+    @Inject
+    private ChatColorConfig chatColorConfig;
 
-	private MicrobotTopLevelConfigPanel topLevelConfigPanel;
+    private MicrobotTopLevelConfigPanel topLevelConfigPanel;
 
-	private NavigationButton navButton;
+    private NavigationButton navButton;
 
-	@Override
-	protected void startUp() throws Exception
-	{
-		MicrobotPluginListPanel pluginListPanel = pluginListPanelProvider.get();
-		pluginListPanel.addFakePlugin(new MicrobotPluginConfigurationDescriptor(
-				"Microbot", "Microbot client settings",
-				new String[]{"client", "notification", "size", "position", "window", "chrome", "focus", "font", "overlay", "tooltip", "infobox"},
-				runeLiteConfig, configManager.getConfigDescriptor(runeLiteConfig)
-			),
-			new MicrobotPluginConfigurationDescriptor(
-				"Chat Color", "Recolor chat text", new String[]{"colour", "messages"},
-				chatColorConfig, configManager.getConfigDescriptor(chatColorConfig)
-			));
-		pluginListPanel.rebuildPluginList();
+    @Override
+    protected void startUp() throws Exception {
+        MicrobotPluginListPanel pluginListPanel = pluginListPanelProvider.get();
+        pluginListPanel.addFakePlugin(new MicrobotPluginConfigurationDescriptor(
+                        "Microbot", "Microbot client settings",
+                        new String[]{"client", "notification", "size", "position", "window", "chrome", "focus", "font", "overlay", "tooltip", "infobox"},
+                        runeLiteConfig, configManager.getConfigDescriptor(runeLiteConfig)
+                ),
+                new MicrobotPluginConfigurationDescriptor(
+                        "Chat Color", "Recolor chat text", new String[]{"colour", "messages"},
+                        chatColorConfig, configManager.getConfigDescriptor(chatColorConfig)
+                ));
+        pluginListPanel.rebuildPluginList();
 
-		topLevelConfigPanel = topLevelConfigPanelProvider.get();
+        topLevelConfigPanel = topLevelConfigPanelProvider.get();
 
-		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "config_icon.png");
+        final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "mdi_alert.png");
 
-		navButton = NavigationButton.builder()
-			.tooltip("Configuration")
-			.icon(icon)
-			.priority(0)
-			.panel(topLevelConfigPanel)
-			.build();
+        navButton = NavigationButton.builder()
+                .tooltip("Configuration")
+                .icon(icon)
+                .priority(12)
+                .panel(topLevelConfigPanel)
+                .build();
 
-		clientToolbar.addNavigation(navButton);
-	}
+        clientToolbar.addNavigation(navButton);
+    }
 
-	@Override
-	protected void shutDown() throws Exception
-	{
-		clientToolbar.removeNavigation(navButton);
-	}
+    @Override
+    protected void shutDown() throws Exception {
+        clientToolbar.removeNavigation(navButton);
+    }
 
-	@Subscribe
-	public void onOverlayMenuClicked(OverlayMenuClicked overlayMenuClicked)
-	{
-		OverlayMenuEntry overlayMenuEntry = overlayMenuClicked.getEntry();
-		if (overlayMenuEntry.getMenuAction() == MenuAction.RUNELITE_OVERLAY_CONFIG)
-		{
-			Overlay overlay = overlayMenuClicked.getOverlay();
-			Plugin plugin = overlay.getPlugin();
-			if (plugin == null)
-			{
-				return;
-			}
+    @Subscribe
+    public void onOverlayMenuClicked(OverlayMenuClicked overlayMenuClicked) {
+        OverlayMenuEntry overlayMenuEntry = overlayMenuClicked.getEntry();
+        if (overlayMenuEntry.getMenuAction() == MenuAction.RUNELITE_OVERLAY_CONFIG) {
+            Overlay overlay = overlayMenuClicked.getOverlay();
+            Plugin plugin = overlay.getPlugin();
+            if (plugin == null) {
+                return;
+            }
 
-			// Expand config panel for plugin
-			SwingUtilities.invokeLater(() ->
-			{
-				clientToolbar.openPanel(navButton);
-				topLevelConfigPanel.openConfigurationPanel(plugin.getName());
-			});
-		}
-	}
+            // Expand config panel for plugin
+            SwingUtilities.invokeLater(() ->
+            {
+                clientToolbar.openPanel(navButton);
+                topLevelConfigPanel.openConfigurationPanel(plugin.getName());
+            });
+        }
+    }
 }
