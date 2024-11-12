@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.util.dialogues;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
@@ -106,6 +107,21 @@ public class Rs2Dialogue {
         boolean isWidgetVisible = Rs2Widget.isWidgetVisible(InterfaceID.DIALOG_OPTION, 1);
         if (!isWidgetVisible) return false;
         return Rs2Widget.getWidget(InterfaceID.DIALOG_OPTION, 1).getDynamicChildren() != null;
+    }
+
+    /**
+     * Retrieves the question text from the dialogue, which is usually the first widget in the dialogue options.
+     *
+     * @return the text of the question widget, or null if no question is present.
+     */
+    public static String getQuestion() {
+        if (!hasSelectAnOption()) return null;
+
+        Widget[] dynamicWidgetOptions = Rs2Widget.getWidget(InterfaceID.DIALOG_OPTION, 1).getDynamicChildren();
+        if (dynamicWidgetOptions != null && dynamicWidgetOptions.length > 0) {
+            return dynamicWidgetOptions[0].getText();
+        }
+        return null;
     }
 
     /**
@@ -289,5 +305,130 @@ public class Rs2Dialogue {
      */
     public static boolean sleepUntilHasContinue() {
         return sleepUntilTrue(Rs2Dialogue::hasContinue);
+    }
+    
+    /**
+     * Checks if the combination dialogue widget is currently visible.
+     *
+     * @return true if the combination dialogue widget is visible, false otherwise.
+     */
+    public static boolean hasCombinationDialogue() {
+        return Rs2Widget.isWidgetVisible(270, 1);
+    }
+
+    /**
+     * Retrieves a list of widgets representing the options in the combination dialogue.
+     *
+     * <p>This method checks if the combination dialogue widget is visible and, if so, collects
+     * the child widgets from the specified interface section. If no combination dialogue is visible,
+     * an empty list is returned.
+     *
+     * @return a list of widgets representing the combination dialogue options, or an empty list if no options are found.
+     */
+    public static List<Widget> getCombinationOptions() {
+        if (!hasCombinationDialogue()) return Collections.emptyList();
+
+        List<Widget> options = new ArrayList<>();
+        if (Rs2Widget.isWidgetVisible(270, 13)) {
+            for (Widget widget : Rs2Widget.getWidget(270, 13).getStaticChildren()) {
+                if (widget != null && widget.getActions() != null && widget.getActions().length > 0) {
+                    options.add(widget);
+                }
+            }
+        }
+        return options;
+    }
+
+    /**
+     * Finds a specific combination dialogue option widget that matches the provided text.
+     *
+     * @param text  the text to search for within the combination dialogue options.
+     * @param exact if true, the search will look for an exact text match; if false, partial matches are allowed.
+     * @return the widget matching the specified text, or null if no match is found.
+     */
+    public static Widget getCombinationOption(String text, boolean exact) {
+        if (!hasCombinationDialogue() || getCombinationOptions().isEmpty()) return null;
+
+        return getCombinationOptions().stream()
+                .filter(widget -> {
+                    String widgetName = Rs2UiHelper.stripColTags(widget.getName());
+                    return exact ? widgetName.equalsIgnoreCase(text) : widgetName.toLowerCase().contains(text.toLowerCase());
+                })
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Finds a specific combination dialogue option widget that partially matches the provided text.
+     *
+     * @param text the text to search for within the combination dialogue options.
+     * @return the widget matching the specified text, or null if no match is found.
+     */
+    public static Widget getCombinationOption(String text) {
+        return getCombinationOption(text, false);
+    }
+
+    /**
+     * Clicks on a combination dialogue option matching the specified text.
+     *
+     * @param text  the text of the option to click on.
+     * @param exact if true, the text must match exactly; if false, partial matches are allowed.
+     * @return true if the option was successfully clicked, false if no matching option was found.
+     */
+    public static boolean clickCombinationOption(String text, boolean exact) {
+        if (!hasCombinationDialogue()) return false;
+
+        Widget option = getCombinationOption(text, exact);
+        
+        if (option == null) return false;
+        
+        return Rs2Widget.clickWidget(option);
+        
+    }
+
+    /**
+     * Clicks on a combination dialogue option that partially matches the specified text.
+     *
+     * @param text the text of the option to click on.
+     * @return true if the option was successfully clicked, false if no matching option was found.
+     */
+    public static boolean clickCombinationOption(String text) {
+        return clickCombinationOption(text, false);
+    }
+
+    /**
+     * Pauses the current thread until the combination dialogue becomes visible.
+     *
+     * @return true if the combination dialogue appears within the timeout period, otherwise false.
+     */
+    public static boolean sleepUntilHasCombinationDialogue() {
+        return sleepUntilTrue(Rs2Dialogue::hasCombinationDialogue);
+    }
+
+    /**
+     * Pauses the current thread until a specific combination dialogue option becomes available.
+     *
+     * <p>This method continuously checks for a combination dialogue option that matches the specified
+     * text. If an exact match is required, it will search for an option that exactly matches the text; 
+     * otherwise, it will look for an option containing the text.
+     *
+     * @param text  the text to search for within the combination dialogue options.
+     * @param exact if true, requires an exact match; if false, allows partial matches.
+     * @return true if the combination dialogue option appears within the timeout period, otherwise false.
+     */
+    public static boolean sleepUntilHasCombinationOption(String text, boolean exact) {
+        return sleepUntilTrue(() -> getCombinationOption(text, exact) != null);
+    }
+
+    /**
+     * Pauses the current thread until a specific combination dialogue option containing the specified text becomes available.
+     *
+     * <p>This method checks for a combination dialogue option that partially matches the specified text.
+     *
+     * @param text the text to search for within the combination dialogue options.
+     * @return true if a combination dialogue option containing the text appears within the timeout period, otherwise false.
+     */
+    public static boolean sleepUntilHasCombinationOption(String text) {
+        return sleepUntilHasCombinationOption(text, false);
     }
 }
