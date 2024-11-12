@@ -100,11 +100,10 @@ public class VarrockAnvilScript extends Script {
                         return;
                     }
 
-                    TileObject anvilTile = Rs2GameObject.findObjectById(AnvilIDs.get(0));
+//                TileObject anvilTile = Rs2GameObject.findObjectById(AnvilIDs.get(0));
 
-                    if (Rs2GameObject.interact(anvilTile, true)) {
+                    if (Rs2GameObject.interact(2097)) {
                         debug("Using anvil");
-                        sleep(5000, 6000);
 
                         // Wait until anvil screen is open
                         sleepUntil(() -> Rs2Widget.getWidget(AnvilContainerWidgetID, 1) != null, 5000);
