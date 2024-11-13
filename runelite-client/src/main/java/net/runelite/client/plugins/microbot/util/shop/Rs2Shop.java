@@ -59,7 +59,7 @@ public class Rs2Shop {
             if (npc == null) return false;
             Rs2Npc.interact(npc, "Trade");
             sleepUntil(Rs2Shop::isOpen, 5000);
-            return false;
+            return true;
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }

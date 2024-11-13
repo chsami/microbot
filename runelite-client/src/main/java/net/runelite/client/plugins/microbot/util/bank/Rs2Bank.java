@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.inventory.RunePouchType;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -556,7 +557,7 @@ public class Rs2Bank {
      */
     public static boolean depositAllExcept(boolean exact, String... names) {
         if (!exact)
-            return depositAll(x -> Arrays.stream(names).noneMatch(name -> x.name.contains(name.toLowerCase())));
+            return depositAll(x -> Arrays.stream(names).noneMatch(name -> x.name.toLowerCase().contains(name.toLowerCase())));
         else
             return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
     }
@@ -629,6 +630,50 @@ public class Rs2Bank {
     public static void withdrawOne(String name, int sleepTime) {
         withdrawOne(name, false);
         sleep(sleepTime);
+    }
+
+    /**
+     * withdraw one item identified by its id.
+     *
+     * @param id the item id
+     */
+    public static void withdrawAllButOne(int id) {
+        withdrawAllButOne(findBankItem(id));
+    }
+
+    /**
+     * withdraw one item identified by its name
+     *
+     * @param name the item name
+     */
+    public static void withdrawAllButOne(String name) {
+        withdrawAllButOne(name, false);
+    }
+
+
+    /**
+     * withdraw one item identified by its name.
+     * set exact to true if you want to identify by the exact name.
+     *
+     * @param name  the item name
+     * @param exact boolean
+     */
+    public static void withdrawAllButOne(String name, boolean exact) {
+        withdrawAllButOne(findBankItem(name, exact));
+    }
+
+    /**
+     * withdraw all but one of an item identified by its ItemWidget.
+     *
+     * @param rs2Item item to withdraw
+     */
+    private static void withdrawAllButOne(Rs2Item rs2Item) {
+        if (!isOpen()) return;
+        if (rs2Item == null) return;
+        if (Rs2Inventory.isFull()) return;
+        container = BANK_ITEM_CONTAINER;
+        
+        invokeMenu(8, rs2Item);
     }
 
     /**
@@ -1337,6 +1382,48 @@ public class Rs2Bank {
         Rs2Widget.clickWidget(786456);
         sleep(600);
         return hasWithdrawAsItem();
+    }
+
+    /**
+     * Withdraws the player's rune pouch if it's available in the bank.
+     *
+     * @return true if the rune pouch was withdrawn, false otherwise.
+     */
+    public static boolean withdrawRunePouch() {
+        return Arrays.stream(RunePouchType.values())
+                .filter(pouch -> Rs2Bank.hasItem(pouch.getItemId()))
+                .findFirst()
+                .map(pouch -> {
+                    withdrawOne(pouch.getItemId());
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    /**
+     * Deposits the player's rune pouch if it's in the inventory.
+     *
+     * @return true if the rune pouch was deposited, false otherwise.
+     */
+    public static boolean depositRunePouch() {
+        return Arrays.stream(RunePouchType.values())
+                .filter(pouch -> Rs2Inventory.hasItem(pouch.getItemId()))
+                .findFirst()
+                .map(pouch -> {
+                    depositOne(pouch.getItemId());
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    /**
+     * Checks if the player has any type of rune pouch in the bank.
+     *
+     * @return true if a rune pouch is found in the bank, false otherwise.
+     */
+    public static boolean hasRunePouch() {
+        return Arrays.stream(RunePouchType.values())
+                .anyMatch(pouch -> Rs2Bank.hasItem(pouch.getItemId()));
     }
 
     /**

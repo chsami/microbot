@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.microbot.roguesden;
 
-
 import com.google.inject.Provides;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -15,9 +14,9 @@ import javax.inject.Inject;
 import java.util.HashMap;
 
 @PluginDescriptor(
-        name = "Rogues' Den",
+        name = PluginDescriptor.Mocrosoft + "Rogues' Den",
         description = "Mark tiles and clickboxes to help traverse the maze",
-        tags = {"agility", "maze", "minigame", "overlay", "thieving", "microbot"},
+        tags = {"agility", "maze", "minigame", "overlay", "thieving", "microbot", "rogue", "den"},
         enabledByDefault = false
 )
 public class RoguesDenPlugin extends Plugin {
@@ -40,9 +39,6 @@ public class RoguesDenPlugin extends Plugin {
     }
     @Inject
     RoguesDenScript roguesDenScript;
-
-    public RoguesDenPlugin() {
-    }
 
     protected void startUp() {
         this.overlayManager.add(this.overlay);

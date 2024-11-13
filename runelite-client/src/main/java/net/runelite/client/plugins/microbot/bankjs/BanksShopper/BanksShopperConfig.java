@@ -2,8 +2,17 @@ package net.runelite.client.plugins.microbot.bankjs.BanksShopper;
 
 import net.runelite.client.config.*;
 
-@ConfigGroup("example")
+@ConfigGroup(BanksShopperConfig.configGroup)
 public interface BanksShopperConfig extends Config {
+    
+    String configGroup = "banks-shopper";
+    String npcName = "npcName";
+    String itemNames = "itemNames";
+    String minStock = "minStock";
+    String action = "action";
+    String quantity = "quantity";
+    String useBank = "useBank";
+    String logout = "logout";
 
     @ConfigSection(
             name = "Shop Settings",
@@ -39,7 +48,7 @@ public interface BanksShopperConfig extends Config {
 
     // Object or NPC to trade with
     @ConfigItem(
-            keyName = "NPC Name",
+            keyName = npcName,
             name = "NPC Name",
             description = "Sets NPC to trade with",
             position = 0,
@@ -52,7 +61,7 @@ public interface BanksShopperConfig extends Config {
 
 
     @ConfigItem(
-            keyName = "Item Name(s)",
+            keyName = itemNames,
             name = "Item Name(s)",
             description = "Sets Item to Buy or Sell. Supports comma seperated values (item1, item2)",
             position = 0,
@@ -64,7 +73,7 @@ public interface BanksShopperConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "Minimum Stock",
+            keyName = minStock,
             name = "Minimum Stock",
             description = "Sets Minimum Stock level, Will not buy anymore stock past this value.",
             position = 1,
@@ -77,7 +86,7 @@ public interface BanksShopperConfig extends Config {
 
     @ConfigItem(
             position = 1,
-            keyName = "Action",
+            keyName = action,
             name = "Action",
             description = "Set Buy/Sell Mode",
             section = actionSection
@@ -88,7 +97,7 @@ public interface BanksShopperConfig extends Config {
 
     @ConfigItem(
             position = 2,
-            keyName = "Quantity",
+            keyName = quantity,
             name = "Quantity",
             description = "Set Buy/Sell Quantity",
             section = actionSection
@@ -99,7 +108,7 @@ public interface BanksShopperConfig extends Config {
 
     @ConfigItem(
             position = 1,
-            keyName = "UseBank",
+            keyName = useBank,
             name = "Use Bank",
             description = "Use bank if your inventory is full",
             section = bankSection
@@ -110,7 +119,7 @@ public interface BanksShopperConfig extends Config {
 
     @ConfigItem(
             position = 3,
-            keyName = "logout",
+            keyName = logout,
             name = "Logout when out of supply",
             description = "Logout",
             section = actionSection
