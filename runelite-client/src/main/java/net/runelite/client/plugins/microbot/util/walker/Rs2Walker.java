@@ -869,7 +869,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                                 }
                                 sleepUntil(() -> !Rs2Player.isAnimating());
                                 sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 10);
-                                sleep(600 * 2);
+                                sleep(600 * 4);
                             } else {
                                 Rs2Walker.walkFastCanvas(path.get(i));
                                 sleep(1200, 1600);
@@ -1385,7 +1385,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
             rotateSlotToDesiredRotation(SLOT_THREE, Rs2Widget.getWidget(SLOT_THREE).getRotationY(), getDesiredRotation(fairyRingCode.charAt(2)), SLOT_THREE_ACW_ROTATION, SLOT_THREE_CW_ROTATION);
             Rs2Widget.clickWidget(TELEPORT_BUTTON);
             
-            Rs2Player.waitForAnimation(Random.random(3800, 4200)); // Required due to long animation time
+            Rs2Player.waitForAnimation(Random.random(4200, 4800)); // Required due to long animation time
             
             // Re-equip the starting weapon if it was unequipped
             if (startingWeapon != null & !Rs2Equipment.isWearing(startingWeaponId)) {

@@ -56,15 +56,14 @@ public class BanksShopperScript extends Script {
                 }
 
                 Rs2Shop.openShop(plugin.getNpcName());
+                Rs2Random.waitEx(1800, 300); // this wait is required ensure that Rs2Shop.shopItems has been updated before we proceed.
 
                 boolean allOutOfStock = true;
                 boolean successfullAction = false;
 
                 if (Rs2Shop.isOpen()) {
-
                     for (String itemName : plugin.getItemNames()) {
-                        if (!isRunning()) break;
-                        if (Microbot.pauseAllScripts) break;
+                        if (!isRunning() || Microbot.pauseAllScripts) break;
 
                         switch (plugin.getSelectedAction()) {
                             case BUY:
@@ -72,6 +71,7 @@ public class BanksShopperScript extends Script {
                                 successfullAction = processBuyAction(itemName, plugin.getSelectedQuantity().toString());
                                 break;
                             case SELL:
+                                if (Rs2Shop.isFull()) continue;
                                 if (Rs2Shop.hasMinimumStock(itemName, plugin.getMinStock())) continue;
                                 successfullAction = processSellAction(itemName, plugin.getSelectedQuantity().toString());
                                 break;
@@ -79,12 +79,13 @@ public class BanksShopperScript extends Script {
                                 System.out.println("Invalid action specified in config.");
                         }
 
-                        if (!successfullAction) continue;
-
-                        allOutOfStock = false;
-                        Rs2Random.waitEx(900, 300);
+                        if (successfullAction) {
+                            allOutOfStock = false;
+                            Rs2Random.waitEx(900, 300);
+                        }
                     }
 
+                    // If no successful actions occurred, trigger a world hop
                     if (allOutOfStock) {
                         hopWorld();
                     }

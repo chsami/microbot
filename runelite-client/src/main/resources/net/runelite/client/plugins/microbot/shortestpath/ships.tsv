@@ -37,12 +37,12 @@
 2138 3899 2	2222 3796 2	Travel Captain Bentley 6650				12
 
 # Port Sarim, Port Piscarilius, Land's End
-3055 3245 0	1824 3691 0	Port Piscarilius Veos 8630				6	Port Piscarilius
-3055 3245 0	1504 3399 0	Land's End Veos 8630				6	Land's End
-1824 3691 0	3055 3245 0	Port Sarim Veos 10726				6	Port Sarim
-1824 3691 0	1504 3399 0	Land's End Veos 10726				6	Land's End
-1504 3399 0	3055 3245 0	Port Sarim Captain Magoro 7471				6	Port Sarim
-1504 3399 0	1824 3691 0	Port Piscarilius Captain Magoro 7471				6	Port Piscarilius
+3055 3245 0	1824 3695 1	Port-Piscarilius    Veos 10724				6	Port Piscarilius
+3055 3245 0	1504 3395 1	Land's-End  Veos 10724				6	Land's End
+1824 3691 0	3055 3242 1	Port-Sarim  Veos 10724				6	Port Sarim
+1824 3691 0	1504 3395 1	Land's-End  Veos 10724				6	Land's End
+1504 3399 0	3055 3242 1	Port-Sarim  Captain Magoro 7471				6	Port Sarim
+1504 3399 0	1824 3695 1	Port-Piscarilius    Captain Magoro 7471				6	Port Piscarilius
 							
 # Port Sarim, Entrana							
 3048 3234 0	2834 3331 1	Travel-boat Monk of Entrana 1165				15	
