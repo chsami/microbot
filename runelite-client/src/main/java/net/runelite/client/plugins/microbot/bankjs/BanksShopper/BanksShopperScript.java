@@ -56,6 +56,7 @@ public class BanksShopperScript extends Script {
                 }
 
                 Rs2Shop.openShop(plugin.getNpcName());
+                Rs2Random.waitEx(1800, 300); // this wait is required ensure that Rs2Shop.shopItems has been updated before we proceed.
 
                 boolean allOutOfStock = true;
                 boolean successfullAction = false;
