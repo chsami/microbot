@@ -61,7 +61,7 @@ public class GotrScript extends Script {
 
     boolean initCheck = false;
 
-    static boolean useNpcContact = false;
+    static boolean useNpcContact = true;
     private final List<Integer> runeIds = ImmutableList.of(
             ItemID.NATURE_RUNE,
             ItemID.LAW_RUNE,
@@ -138,7 +138,7 @@ public class GotrScript extends Script {
                 }
                 //Repair colossal pouch asap to avoid disintegrate completely
                 if (Rs2Inventory.hasItem("colossal pouch") && Rs2Inventory.hasDegradedPouch()) {
-                    if (repairPouches()) {
+                    if (!repairPouches()) {
                         return;
                     }
                 }
@@ -362,7 +362,7 @@ public class GotrScript extends Script {
     }
 
     private boolean isOutOfFragments() {
-        if (!Rs2Inventory.hasItem(GUARDIAN_FRAGMENTS) && !Rs2Inventory.isFull() && shouldMineGuardianRemains == false) {
+        if (!Rs2Inventory.hasItem(GUARDIAN_FRAGMENTS) && !Rs2Inventory.isFull()) {
             shouldMineGuardianRemains = true;
             log("Memorize that we no longer have guardian fragments...");
             return true;
@@ -481,7 +481,7 @@ public class GotrScript extends Script {
                     if (sleepUntil(Rs2Player::isAnimating)) {
                         sleepUntil(this::isInLargeMine);
                         if (isInLargeMine()) {
-                            sleep(randomGaussian(Random.random(2500, 3000), Random.random(100, 300)));
+                            sleep(randomGaussian(Random.random(1200, 1400), Random.random(100, 300)));
                             log("Interacting with large guardian remains...");
                             Rs2GameObject.interact(ObjectID.LARGE_GUARDIAN_REMAINS);
                             sleepGaussian(1200, 150);
