@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.microbot.cluesolverv2;
 
-import com.google.inject.Provides;
 import com.google.inject.Inject;
+import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -16,9 +16,12 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
 @PluginDescriptor(
-        name = "Clue Solver V2",
+
+        name = PluginDescriptor.Budbomber + "Clue Solver V2",
         description = "Automates clue-solving tasks alongside ClueScrollPlugin",
-        tags = {"clue", "solver", "automation"}
+        tags = {"clue", "solver", "automation"},
+        enabledByDefault = false
+
 )
 @PluginDependency(ClueScrollPlugin.class)
 public class ClueSolverPlugin extends Plugin {
