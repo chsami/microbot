@@ -99,7 +99,7 @@ public class Rs2Shop {
      * @return
      */
     public static boolean isFull() {
-        return shopItems.size() >= 40 && shopItems.stream().noneMatch(item -> item.getName() == null);
+        return shopItems.size() >= 40 && shopItems.stream().noneMatch(item -> item.getId() == -1);
     }
 
     /**
