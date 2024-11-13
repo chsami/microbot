@@ -93,6 +93,14 @@ public class Rs2Shop {
         return true;
     }
 
+    /**
+     * Checks if the shop is completely full
+     * 
+     * @return
+     */
+    public static boolean isFull() {
+        return shopItems.size() >= 40;
+    }
 
     /**
      * Checks if the specified item is in stock in the shop. **Note** if the item has stock 0 this will still return true.
@@ -123,6 +131,7 @@ public class Rs2Shop {
      * @return true if the item is in stock with quantity >= minimumQuantity, false otherwise.
      */
     public static boolean hasMinimumStock(String itemName, int minimumQuantity) {
+        
         // Iterate through the shop items to find the specified item
         for (Rs2Item item : shopItems) {
             // Check if the item name matches the specified item name and quantity is >= minimumQuantity
