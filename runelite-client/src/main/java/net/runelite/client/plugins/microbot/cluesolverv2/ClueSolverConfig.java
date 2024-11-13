@@ -2,9 +2,23 @@ package net.runelite.client.plugins.microbot.cluesolverv2;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigInformation;
 import net.runelite.client.config.ConfigItem;
 
 @ConfigGroup("cluesolverv2")
+@ConfigInformation("- Enable the official RuneLite plugin 'Clue Scroll'<br />" +
+        "  <br />" +
+        "1. Configure the delay between task completions<br />" +
+        "- This is a WIP and  WILL not fully automate the clue scrolls without issues.<br />" +
+        "  <br />" +
+        "2. If you have any issues or suggestions, please inform me on discord. <br />" +
+        "- Currently you need to open the bank and input bankpin<br />" +
+        "- You need to have the clue in your inventory and click on it with both plugins active.<br />" +
+        "- It will not buy items for you, however it will attempt to bank and check for the items.<br />" +
+        "  <br />" +
+        "- I would also suggest that you keep an eye on it at all times. <br />" +
+        "  <br />" +
+        "- 'More features to come'")
 public interface ClueSolverConfig extends Config {
 
     // General Toggle

@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.cluesolverv2;
 
 import com.google.inject.Inject;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -40,11 +41,20 @@ public class ClueSolverOverlay extends Overlay {
                 .color(Color.GREEN)
                 .build());
 
+        panelComponent.getChildren().add(LineComponent.builder().build());
 
+        if (!Microbot.getPluginManager().isActive(clueScrollPlugin)) {
         panelComponent.getChildren().add(LineComponent.builder()
-                .left("Hint:")
-                .right("No active clue")
+                .left("Make sure to enable the 'Clue Scroll' plugin!")
+                .leftColor(Color.RED)
                 .build());
+        } else {
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Clue Scrolls Plugin is Active")
+                    .leftColor(Color.GREEN)
+                    .build());
+
+        }
 
 
         return panelComponent.render(graphics);
