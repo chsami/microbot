@@ -164,7 +164,11 @@ public class ClueHelperV2 {
         return null;
     }
 
-
+    /**
+     * Handles the different types of ItemRequirements by logging their contents.
+     *
+     * @param req The ItemRequirement instance.
+     */
     private void handleItemRequirement(ItemRequirement req) {
         if (req instanceof SingleItemRequirement) {
             handleSingleItemRequirement((SingleItemRequirement) req);
@@ -183,6 +187,11 @@ public class ClueHelperV2 {
         }
     }
 
+    /**
+     * Handles the SingleItemRequirement by logging the item ID.
+     *
+     * @param singleReq The SingleItemRequirement instance.
+     */
     private void handleSingleItemRequirement(SingleItemRequirement singleReq) {
         try {
             log.info("Attempting to access itemId field for SingleItemRequirement.");
@@ -198,9 +207,12 @@ public class ClueHelperV2 {
         }
     }
 
+    /**
+     * Handles the AnyRequirementCollection by logging the contained requirements.
+     *
+     * @param anyReq The AnyRequirementCollection instance.
+     */
     private void handleAnyRequirementCollection(AnyRequirementCollection anyReq) {
-        log.info("AnyRequirementCollection - Name: {}", anyReq.getCollectiveName(client));
-
         try {
             Field requirementsField = AnyRequirementCollection.class.getDeclaredField("requirements");
             requirementsField.setAccessible(true);
@@ -223,6 +235,11 @@ public class ClueHelperV2 {
         }
     }
 
+    /**
+     * Handles the MultipleOfItemRequirement by logging the item ID and required quantity.
+     *
+     * @param multipleReq The MultipleOfItemRequirement instance.
+     */
     private void handleMultipleOfItemRequirement(MultipleOfItemRequirement multipleReq) {
         try {
             log.info("Attempting to access fields in MultipleOfItemRequirement.");
@@ -242,6 +259,11 @@ public class ClueHelperV2 {
         }
     }
 
+    /**
+     * Handles the RangeItemRequirement by logging the start and end item IDs.
+     *
+     * @param rangeReq The RangeItemRequirement instance.
+     */
     private void handleRangeItemRequirement(RangeItemRequirement rangeReq) {
         try {
             Field startItemIdField = RangeItemRequirement.class.getDeclaredField("startItemId");
@@ -259,8 +281,12 @@ public class ClueHelperV2 {
         }
     }
 
+    /**
+     * Handles the AllRequirementsCollection by logging the contained requirements.
+     *
+     * @param allReq The AllRequirementsCollection instance.
+     */
     private void handleAllRequirementsCollection(AllRequirementsCollection allReq) {
-        log.info("AllRequirementsCollection - Name: {}", allReq.getCollectiveName(client));
         try {
             Field requirementsField = AllRequirementsCollection.class.getDeclaredField("requirements");
             requirementsField.setAccessible(true);
@@ -281,8 +307,12 @@ public class ClueHelperV2 {
         }
     }
 
+    /**
+     * Handles the SlotLimitationRequirement by logging the required equipment slots.
+     *
+     * @param slotReq The SlotLimitationRequirement instance.
+     */
     private void handleSlotLimitationRequirement(SlotLimitationRequirement slotReq) {
-        log.info("SlotLimitationRequirement - Description: {}", slotReq.getCollectiveName(client));
         try {
             Field slotsField = SlotLimitationRequirement.class.getDeclaredField("slots");
             slotsField.setAccessible(true);

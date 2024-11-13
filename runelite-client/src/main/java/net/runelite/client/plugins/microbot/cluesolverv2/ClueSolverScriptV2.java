@@ -7,15 +7,18 @@ import net.runelite.api.Client;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
+import net.runelite.client.plugins.cluescrolls.clues.CoordinateClue;
 import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
+import net.runelite.client.plugins.microbot.cluesolverv2.tasks.CoordinateClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.tasks.EmoteClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 public class ClueSolverScriptV2 extends Script {
@@ -23,6 +26,7 @@ public class ClueSolverScriptV2 extends Script {
     private ClueSolverConfig config;
     private ClueTask currentTask;
     private boolean isRunning = false;
+    private final ReentrantLock taskLock = new ReentrantLock();
 
     @Inject
     private Client client;
@@ -39,6 +43,16 @@ public class ClueSolverScriptV2 extends Script {
     @Inject
     private Provider<EmoteClueTask> emoteClueTaskProvider;
 
+    @Inject
+    private Provider<CoordinateClueTask> coordinateClueTaskProvider;
+
+
+    /**
+     * Starts the Clue Solver Script V2.
+     *
+     * @param config Configuration settings for the clue solver.
+     * @return True if the script starts successfully; false otherwise.
+     */
     public boolean run(ClueSolverConfig config) {
         // Only start if not already running
         if (isRunning) {
@@ -55,7 +69,7 @@ public class ClueSolverScriptV2 extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn() || !super.run()) return;
-                log.info("Executing Clue Solver Script V2...");
+                log.debug("Executing Clue Solver Script V2...");
                 processClueTask();
             } catch (Exception e) {
                 log.error("Error in ClueSolverScriptV2 execution", e);
@@ -66,6 +80,9 @@ public class ClueSolverScriptV2 extends Script {
         return true;
     }
 
+    /**
+     * Shuts down the Clue Solver Script V2 gracefully.
+     */
     public void shutdown() {
         // Only stop if the script is running
         if (!isRunning) {
@@ -81,9 +98,15 @@ public class ClueSolverScriptV2 extends Script {
             mainScheduledFuture.cancel(true);
         }
 
-        if (currentTask != null) {
-            currentTask.stop();
-            currentTask = null;
+        // Safely stop the current task
+        taskLock.lock();
+        try {
+            if (currentTask != null) {
+                currentTask.stop();
+                currentTask = null;
+            }
+        } finally {
+            taskLock.unlock();
         }
 
         eventBus.unregister(this);
@@ -91,36 +114,57 @@ public class ClueSolverScriptV2 extends Script {
         log.info("Clue Solver Script V2 successfully stopped.");
     }
 
+    /**
+     * Processes the current clue task.
+     * Ensures that only one task is active at a time.
+     */
     private void processClueTask() {
-        if (currentTask == null) {
-            ClueScroll activeClue = clueScrollPlugin.getClue();
-            if (activeClue != null && config.toggleAll()) {
-                log.info("New clue detected: {}", activeClue);
-                currentTask = createTask(activeClue);
-                if (currentTask != null) {
-                    currentTask.start();
-                }
-            }
-        } else {
-            log.info("Executing current task: {}", currentTask.getTaskDescription());
-            if (currentTask.execute()) {
-                log.info("Current task completed.");
-                currentTask.stop();
-                currentTask = null;
-                // Apply cooldown if specified
-                if (config.cooldownBetweenTasks() > 0) {
-                    log.info("Applying cooldown of {} ms between tasks", config.cooldownBetweenTasks());
-                    try {
-                        Thread.sleep(config.cooldownBetweenTasks());
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        log.error("Interrupted during cooldown", e);
+        if (taskLock.tryLock()) {
+            try {
+                if (currentTask == null) {
+                    ClueScroll activeClue = clueScrollPlugin.getClue();
+                    if (activeClue != null && config.toggleAll()) {
+                        log.info("New clue detected: {}", activeClue);
+                        currentTask = createTask(activeClue);
+                        if (currentTask != null) {
+                            currentTask.start();
+                            log.info("Started task: {}", currentTask.getTaskDescription());
+                        }
+                    }
+                } else {
+                    log.debug("Executing current task: {}", currentTask.getTaskDescription());
+                    boolean taskCompleted = currentTask.execute();
+                    if (taskCompleted) {
+                        log.info("Current task completed: {}", currentTask.getTaskDescription());
+                        currentTask.stop();
+                        currentTask = null;
+
+                        // Apply cooldown if specified
+                        if (config.cooldownBetweenTasks() > 0) {
+                            log.info("Applying cooldown of {} ms between tasks", config.cooldownBetweenTasks());
+                            try {
+                                Thread.sleep(config.cooldownBetweenTasks());
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                                log.error("Interrupted during cooldown", e);
+                            }
+                        }
                     }
                 }
+            } finally {
+                taskLock.unlock();
             }
+        } else {
+            log.debug("A task is already being processed. Skipping this cycle.");
         }
     }
 
+    /**
+     * Creates a task based on the type of clue.
+     *
+     * @param clue Clue to create task for.
+     * @return Task for the clue.
+     */
     private ClueTask createTask(ClueScroll clue) {
         log.info("Creating task for clue type: {}", clue.getClass().getSimpleName());
 
@@ -128,20 +172,35 @@ public class ClueSolverScriptV2 extends Script {
             EmoteClueTask task = emoteClueTaskProvider.get();
             task.setClue((EmoteClue) clue);
             return task;
+        } else if (clue instanceof CoordinateClue) {
+            CoordinateClueTask task = coordinateClueTaskProvider.get();
+            task.setClue((CoordinateClue) clue);
+            return task;
         }
 
         log.warn("No task found for clue type: {}", clue.getClass().getSimpleName());
         return null;
     }
 
+
+    /**
+     * Loads NPC data required for clue solving.
+     */
     private void loadNpcData() {
         try {
             Rs2NpcManager.loadJson();
+            log.info("NPC data loaded successfully.");
         } catch (Exception e) {
+            log.error("Failed to load NPC data", e);
             throw new RuntimeException("Failed to load NPC data", e);
         }
     }
 
+    /**
+     * Updates the configuration of the Clue Solver Script V2.
+     *
+     * @param config New configuration settings.
+     */
     public void updateConfig(ClueSolverConfig config) {
         this.config = config;
         log.info("Updated ClueSolverScriptV2 configuration.");
