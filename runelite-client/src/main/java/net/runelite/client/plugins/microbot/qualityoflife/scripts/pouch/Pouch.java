@@ -16,7 +16,11 @@ public enum Pouch
 	GIANT(new int[] {ItemID.GIANT_POUCH, ItemID.GIANT_POUCH_5515}, 12, 9, 75),
 	// degradedBaseHoldAmount for colossal pouch is dynamic, it starts at 35 and lowers
 	// each time you use the degraded pouch. We'll see it to 25 to be safe
-	COLOSSAL(new int[] {ItemID.COLOSSAL_POUCH, ItemID.COLOSSAL_POUCH_26786}, 40, 25, 85);
+	COLOSSAL_LOW(new int[] {ItemID.COLOSSAL_POUCH, ItemID.COLOSSAL_POUCH_26786}, 8, 8, 25),
+	COLOSSAL_MID(new int[] {ItemID.COLOSSAL_POUCH, ItemID.COLOSSAL_POUCH_26786}, 16, 8, 50),
+	COLOSSAL_HIGH(new int[] {ItemID.COLOSSAL_POUCH, ItemID.COLOSSAL_POUCH_26786}, 27, 8, 75),
+
+	COLOSSAL_MAX(new int[] {ItemID.COLOSSAL_POUCH, ItemID.COLOSSAL_POUCH_26786}, 40, 8, 85);
 
 
 	private final int baseHoldAmount;
@@ -66,6 +70,7 @@ public enum Pouch
 		{
 			holding = 0;
 		}
+		System.out.println(delta + " " + holding + " " + holdAmount);
 		if (holding > holdAmount)
 		{
 			holding = holdAmount;
@@ -100,7 +105,7 @@ public enum Pouch
 			case ItemID.COLOSSAL_POUCH:
 			case ItemID.COLOSSAL_POUCH_26786:
 			case ItemID.COLOSSAL_POUCH_26906:
-				return COLOSSAL;
+				return COLOSSAL_HIGH;
 			default:
 				return null;
 		}

@@ -19,6 +19,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginInstantiationException;
 import net.runelite.client.plugins.PluginManager;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchOverlay;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -87,6 +88,8 @@ public class MicrobotPlugin extends Plugin {
     private NaturalMouse naturalMouse;
     @Inject
     private PouchScript pouchScript;
+    @Inject
+    private PouchOverlay pouchOverlay;
 
     @Override
     protected void startUp() throws AWTException {
@@ -112,6 +115,8 @@ public class MicrobotPlugin extends Plugin {
 
         Microbot.setPouchScript(pouchScript);
         pouchScript.startUp();
+        overlayManager.add(pouchOverlay);
+
 
         new InputSelector(clientToolbar);
     }
@@ -146,10 +151,6 @@ public class MicrobotPlugin extends Plugin {
             if (Rs2Bank.bankItems != null)
                 Rs2Bank.bankItems.clear();
         }
-    }
-
-    @Subscribe
-    public void onMenuOpened(MenuOpened event) {
     }
 
     @Subscribe
