@@ -283,7 +283,7 @@ public class GotrScript extends Script {
     }
 
     private boolean lootChisel() {
-        if (!isInHugeMine()) return false;
+        if (isInHugeMine()) return false;
         if (!Rs2Inventory.isFull() && !Rs2Inventory.hasItem("Chisel")) {
             Rs2GameObject.interact("chisel", "take");
             Rs2Player.waitForWalking();
