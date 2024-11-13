@@ -15,6 +15,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -40,6 +41,9 @@ public class CoordinateClueTask implements ClueTask {
 
     @Inject
     private ClueHelperV2 clueHelper;
+
+
+    private static  Map<String, List<Integer>> REQUIREMENTS_MAP = new HashMap<>();
 
 
     private CoordinateClue clue;
@@ -184,6 +188,13 @@ public class CoordinateClueTask implements ClueTask {
     private void retrieveRequiredItems() {
         log.info("Attempting to retrieve required items from the bank.");
 
+        boolean success = Rs2Bank.walkToBankAndUseBank();
+
+        if (!success) {
+            log.warn("Failed to walk to the bank. Will retry in the next cycle.");
+            return;
+        }
+
         if (!Rs2Bank.openBank()) {
             log.warn("Failed to open the bank. Will retry in the next cycle.");
             return;
@@ -195,9 +206,9 @@ public class CoordinateClueTask implements ClueTask {
             String itemName = entry.getValue();
             log.info("Attempting to withdraw item: {} With ID: {}", itemName, itemId);
             Rs2Bank.withdrawItem(itemName);
-            sleep(300);
+            sleep(600);
             if (Rs2Inventory.contains(itemName)) {
-                sleep(300);
+                sleep(600);
             } else {
                 log.warn("Failed to initiate withdrawal for item: {} With ID: {}", itemName, itemId);
             }

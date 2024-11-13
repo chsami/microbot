@@ -4,15 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.NPC;
-import net.runelite.api.ScriptID;
+import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
-import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
-import net.runelite.client.plugins.cluescrolls.clues.emote.STASHUnit;
+import net.runelite.client.plugins.cluescrolls.clues.AnagramClue;
 import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
@@ -20,11 +19,12 @@ import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
-import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -34,7 +34,7 @@ import java.util.concurrent.CountDownLatch;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 @Slf4j
-public class EmoteClueTask implements ClueTask {
+public class AnagramClueTask implements ClueTask {
     @Inject
     private Client client;
 
@@ -44,26 +44,15 @@ public class EmoteClueTask implements ClueTask {
     @Inject
     private EventBus eventBus;
 
-    @Inject
-    private ClueScrollPlugin clueScrollPlugin;
-
-
-    private EmoteClue clue;
+    private AnagramClue clue;
 
     private List<ItemRequirement> requiredItems;
 
     List<ItemRequirement> missingItems;
 
-
     private Map<Integer, String> requiredItemsMap;
 
-
     private State state;
-
-    private static final int URI_ID = 7206; // NPC ID for Uri (if needed)
-
-    private boolean stashUnitBuilt = false;
-
 
     // Define the states for the task
     private enum State {
@@ -72,49 +61,49 @@ public class EmoteClueTask implements ClueTask {
         VERIFYING_WITHDRAWAL,
         EQUIPPING_ITEMS,
         NAVIGATING_TO_LOCATION,
-        COMPLETED,
-        PERFORMING_EMOTES,
         INTERACTING_WITH_NPC,
+        INTERACTING_WITH_OBJECT,
+        ANSWERING_QUESTIONS,
+        COMPLETED,
         FAILED
     }
 
     /**
-     * Default constructor for EmoteClueTask.
+     * Default constructor for AnagramClueTask.
      * Dependencies are injected via fields.
      */
-    public EmoteClueTask() {
+    public AnagramClueTask() {
         this.state = State.CHECKING_ITEMS;
     }
 
     /**
-     * Sets the EmoteClue and initializes required items.
+     * Sets the AnagramClue and initializes required items.
      *
-     * @param clue The EmoteClue instance to solve.
+     * @param clue The AnagramClue instance to solve.
      */
-    public void setClue(EmoteClue clue) {
+    public void setClue(AnagramClue clue) {
         this.clue = clue;
         this.requiredItems = clueHelper.determineRequiredItems(clue);
         this.requiredItemsMap = clueHelper.getRequiredItemsMap();
 
-        log.info("EmoteClueTask initialized for clue: {}", clue.getClass().getSimpleName());
+        log.info("AnagramClueTask initialized for clue: {}", clue.getClass().getSimpleName());
         log.info("Number of required items: {}", requiredItems.size());
     }
-
 
     @Override
     public void start() {
         if (clue == null) {
-            log.error("EmoteClue instance is null. Cannot start task.");
+            log.error("AnagramClue instance is null. Cannot start task.");
             state = State.FAILED;
             return;
         }
-        log.info("Starting EmoteClueTask for {}", clue.getClass().getSimpleName());
+        log.info("Starting AnagramClueTask for {}", clue.getClass().getSimpleName());
         eventBus.register(this);
     }
 
     @Override
     public boolean execute() {
-        log.debug("Executing EmoteClueTask in state: {}", state);
+        log.debug("Executing AnagramClueTask in state: {}", state);
         switch (state) {
             case CHECKING_ITEMS:
                 return checkAndHandleMissingItems();
@@ -132,19 +121,22 @@ public class EmoteClueTask implements ClueTask {
             case NAVIGATING_TO_LOCATION:
                 return navigateToLocation();
 
-            case PERFORMING_EMOTES:
-                return performEmotes();
-
             case INTERACTING_WITH_NPC:
                 return interactWithNPC();
 
+            case INTERACTING_WITH_OBJECT:
+                return interactWithObject();
+
+            case ANSWERING_QUESTIONS:
+                return answerQuestions();
+
             case COMPLETED:
-                log.info("EmoteClueTask completed.");
+                log.info("AnagramClueTask completed.");
                 eventBus.unregister(this);
                 return true;
 
             case FAILED:
-                log.error("EmoteClueTask failed.");
+                log.error("AnagramClueTask failed.");
                 eventBus.unregister(this);
                 return true;
 
@@ -158,30 +150,29 @@ public class EmoteClueTask implements ClueTask {
 
     @Override
     public void stop() {
-        log.info("Stopping EmoteClueTask.");
+        log.info("Stopping AnagramClueTask.");
         state = State.FAILED;
         eventBus.unregister(this);
     }
 
     @Override
     public String getTaskDescription() {
-        return "Performing Emote Clue Task";
+        return "Performing Anagram Clue Task";
     }
 
     private boolean checkAndHandleMissingItems() {
-        log.info("Checking for missing items & Stash Unit");
+        log.info("Checking for missing items.");
         CountDownLatch latch = new CountDownLatch(1);
         Microbot.getClientThread().invoke(() -> {
             try {
-            this.missingItems = clueHelper.getMissingItems(requiredItems);
-            log.info("Number of missing items: {}", missingItems.size());
-            stashUnitBuilt = checkStashUnit();
-        } catch (Exception e) {
-            log.error("Error during missing items check", e);
-            state = State.FAILED;
-        } finally {
-            latch.countDown();
-        }
+                this.missingItems = clueHelper.getMissingItems(requiredItems);
+                log.info("Number of missing items: {}", missingItems.size());
+            } catch (Exception e) {
+                log.error("Error during missing items check", e);
+                state = State.FAILED;
+            } finally {
+                latch.countDown();
+            }
         });
 
         try {
@@ -258,7 +249,7 @@ public class EmoteClueTask implements ClueTask {
 
             if (missingItems.isEmpty()) {
                 log.info("All required items have been successfully withdrawn.");
-                transitionToNaviState();
+                transitionToEquipState();
             } else {
                 log.warn("Some items are still missing");
                 state = State.RETRIEVING_ITEMS;
@@ -276,7 +267,7 @@ public class EmoteClueTask implements ClueTask {
     private boolean equipItems() {
         boolean allItemsEquipped = true;
 
-        // Iterate the required items map and withdraw the items
+        // Iterate the required items map and equip the items
         for (Map.Entry<Integer, String> entry : requiredItemsMap.entrySet()) {
             Integer itemId = entry.getKey();
             String itemName = entry.getValue();
@@ -295,9 +286,9 @@ public class EmoteClueTask implements ClueTask {
     }
 
     /**
-     * Helper method to transition to navigation state if all items are equipped.
+     * Helper method to transition to equip state if all items are present.
      */
-    private void transitionToNaviState() {
+    private void transitionToEquipState() {
         if (equipItems()) {
             log.info("All items equipped successfully. Transitioning to navigation state...");
             state = State.NAVIGATING_TO_LOCATION;
@@ -315,81 +306,140 @@ public class EmoteClueTask implements ClueTask {
         WorldPoint location = clueHelper.getClueLocation(clue);
         if (location == null) {
             log.error("Clue location is null. Cannot navigate.");
-            state = State.COMPLETED;
+            state = State.FAILED;
             return true;
         }
 
         WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
-        if (!playerLocation.equals(location)) {
+        int distance = location.distanceTo2D(playerLocation);
+
+        // Navigate to the location if outside a 10x10 tile range
+        if (distance > 10) {
             log.info("Navigating to location: {}", location);
-            boolean navigationStarted = Rs2Walker.walkTo(location, 1);
+            boolean navigationStarted = Rs2Walker.walkTo(location, 5);  // Start walking within 2 tiles of the target
+
             if (navigationStarted) {
                 log.info("Navigation to {} started.", location);
             } else {
                 log.warn("Failed to initiate navigation to location: {}", location);
             }
-            return false; // Wait for navigation to complete
+            return false;  // Wait for navigation to complete
+        }
+        // Use walkFastCanvas for precise adjustment within a 10-tile range but outside 2 tiles
+        else if (distance > 5) {
+            log.info("Fine-tuning position with walkFastCanvas to {}", location);
+            Rs2Walker.walkFastCanvas(location);
+            return false;  // Allow time for the final adjustment
         }
 
         log.info("Player has arrived at the clue location.");
-        state = State.PERFORMING_EMOTES;
+
+        // Determine the next state based on the clue requirements
+        if (clue.getNpc() != null && !clue.getNpc().isEmpty()) {
+            state = State.INTERACTING_WITH_NPC;
+        }
+        if (clue.getObjectId() != -1) {
+            state = State.INTERACTING_WITH_OBJECT;
+        }
+        if ((clue.getNpc() == null || clue.getNpc().isEmpty()) && clue.getObjectId() == -1) {
+            // No NPC or Object to interact with; mark as completed
+            state = State.COMPLETED;
+            return true;
+        }
         return false;
     }
 
-    /**
-     * Step 6: Perform the required emotes for the clue.
-     *
-     * @return true if emotes are performed successfully; false otherwise.
-     */
-    private boolean performEmotes() {
-        log.info("Performing required emotes for the clue.");
-
-        boolean firstEmoteDone = performFirstEmote();
-        if (!firstEmoteDone) {
-            log.warn("Failed to perform the first emote.");
-            return false;
-        }
-
-        boolean secondEmoteDone = performSecondEmote();
-        if (!secondEmoteDone) {
-            log.warn("Failed to perform the second emote.");
-            return false;
-        }
-
-        log.info("All required emotes performed successfully.");
-        state = State.INTERACTING_WITH_NPC;
-        return true;
-    }
-
 
     /**
-     * Step 7: Interact with the NPC to complete the clue.
+     * Step 6: Interact with the NPC to complete the clue.
      *
      * @return true if interaction is successful and task is completed; false otherwise.
      */
     private boolean interactWithNPC() {
         log.info("Interacting with the NPC to complete the clue.");
-        Rs2Npc target = (Rs2Npc) Rs2Npc.getNpc(URI_ID);
-        // Find the NPC
-        boolean interactionInitiated = Rs2Npc.interact((NPC) target, "Talk-to");
+        NPC target = Rs2Npc.getNpc(clue.getNpc());
+
+        if (target == null) {
+            log.warn("NPC {} not found in the vicinity.", clue.getNpc());
+            return false;
+        }
+
+        boolean interactionInitiated = Rs2Npc.interact(target, "Talk-to");
         if (interactionInitiated) {
             log.info("NPC interaction initiated.");
             sleep(1000);
-            if (Rs2Dialogue.isInDialogue()) {
-                if (Rs2Dialogue.hasContinue()) {
-                    Rs2Dialogue.clickContinue();
-                    sleep(1000);
-                }
-            }
-            // Optionally, handle dialogue or further interactions
-            state = State.COMPLETED;
-            return true;
+            state = State.ANSWERING_QUESTIONS;
+            return false; // Proceed to answer questions if any
         } else {
             log.warn("Failed to interact with the NPC.");
             return false;
         }
     }
 
+    /**
+     * Step 7: Interact with the Game Object to complete the clue.
+     *
+     * @return true if interaction is successful; false otherwise.
+     */
+    private boolean interactWithObject() {
+        log.info("Interacting with the Game Object to complete the clue.");
+        Rs2GameObject targetObject = (Rs2GameObject) Rs2GameObject.getGameObjects(clue.getObjectId(), Rs2Player.getWorldLocation()).stream().findFirst().orElse(null);
+
+        if (targetObject == null) {
+            log.warn("Game Object with ID {} not found in the vicinity.", clue.getObjectId());
+            return false;
+        }
+
+        boolean interactionInitiated = Rs2GameObject.interact((TileObject) targetObject, "Use");
+        if (interactionInitiated) {
+            log.info("Game Object interaction initiated.");
+            sleep(1000);
+            state = State.COMPLETED;
+            return true;
+        } else {
+            log.warn("Failed to interact with the Game Object.");
+            return false;
+        }
+    }
+
+
+    /**
+     * Step 8: Answer any questions posed by the NPC.
+     *
+     * @return true if questions are answered successfully; false otherwise.
+     */
+    private boolean answerQuestions() {
+        if (clue.getQuestion() != null && clue.getAnswer() != null) {
+            log.info("Answering NPC question: {}", clue.getQuestion());
+            if (Rs2Dialogue.isInDialogue()) {
+                if (Rs2Dialogue.hasCombinationDialogue()) {
+                    Rs2Keyboard.typeString(clue.getAnswer());
+                    sleep(500);
+                }
+                if (Rs2Dialogue.hasContinue()) {
+                    Rs2Dialogue.clickContinue();
+                    sleep(500);
+                }
+                // Verify if the answer was correct
+                if (!Rs2Dialogue.isInDialogue()) {
+                    log.info("Answered the question successfully.");
+                    state = (clue.getObjectId() != -1) ? State.INTERACTING_WITH_OBJECT : State.COMPLETED;
+                    return true;
+                } else {
+                    log.warn("Dialogue still active. Possible incorrect answer or additional steps required.");
+                    return false;
+                }
+            } else {
+                log.warn("Not currently in dialogue. Unable to answer question.");
+                return false;
+            }
+        } else {
+            // No question to answer; mark as completed
+            log.info("No questions to answer. Marking task as completed.");
+            state = (clue.getObjectId() != -1) ? State.INTERACTING_WITH_OBJECT : State.COMPLETED;
+            return true;
+        }
+    }
 
     /**
      * Event listener for inventory changes to verify item withdrawals.
@@ -406,94 +456,45 @@ public class EmoteClueTask implements ClueTask {
             log.info("Inventory updated. Verifying items...");
             boolean allItemsPresent = verifyItemsPresence();
             if (allItemsPresent) {
-                // Proceed to navigation
+                // Proceed to equip
                 // This is already handled in verifyItemsPresence()
             }
         }
     }
 
     /**
-     * Perform the first emote required for the clue.
+     * Event listener for NPC spawns to handle interactions when NPC is spawned.
      *
-     * @return true if the first emote was performed successfully; false otherwise.
+     * @param npcSpawned The NpcSpawned event.
      */
-    public boolean performFirstEmote() {
-        log.info("Performing first emote...");
-        String firstEmote = clue.getFirstEmote().getName();
-        //open emotes tab if not open
-        if (Rs2Tab.switchToEmotesTab()) {
-            sleep(1200);
-            log.info("Switched to Emotes tab.");
-            if (Rs2Widget.clickWidget(firstEmote)) {
-                log.info("Clicked on first emote: {}", firstEmote);
-                sleep(1000);
-                return true;
-            } else {
-                log.warn("Failed to click on first emote: {}", firstEmote);
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Perform the second emote required for the clue.
-     *
-     * @return true if the second emote was performed successfully; false otherwise.
-     */
-    public boolean performSecondEmote() {
-        log.info("Performing second emote...");
-        String secondEmote = clue.getSecondEmote().getName();
-        //open emotes tab if not open
-        if (Rs2Tab.switchToEmotesTab()) {
-            sleep(1200);
-            log.info("Switched to Emotes tab.");
-            if (Rs2Widget.clickWidget(secondEmote)) {
-                log.info("Clicked on second emote: {}", secondEmote);
-                sleep(1000);
-                return true;
-            } else {
-                log.warn("Failed to click on second emote: {}", secondEmote);
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check if the STASH unit is built in the player's POH.
-     *
-     * @return true if the STASH unit is built; false otherwise.
-     */
-    private boolean checkStashUnit() {
-        STASHUnit stashUnit = clue.getStashUnit();
-        if (stashUnit != null) {
-            log.info("Checking for STASH unit availability...");
-
-            Microbot.getClientThread().invoke(() -> {
-                Client client = Microbot.getClient();
-                client.runScript(ScriptID.WATSON_STASH_UNIT_CHECK, stashUnit.getObjectId(), 0, 0, 0);
-
-                int[] intStack = client.getIntStack();
-                stashUnitBuilt = intStack[0] == 1;
-                log.info("STASH unit built: {}", stashUnitBuilt);
-            });
-
-        }
-        return stashUnitBuilt;
-    }
-
     @Subscribe
     public void onNpcSpawned(NpcSpawned npcSpawned) {
-        if (state == State.INTERACTING_WITH_NPC) {
+        if (state == State.INTERACTING_WITH_NPC || state == State.ANSWERING_QUESTIONS) {
             NPC npc = npcSpawned.getNpc();
-            if (npc.getId() == URI_ID) {
+            if (npc.getName().equalsIgnoreCase(clue.getNpc())) {
                 log.info("NPC spawned: {}", npc.getName());
-                interactWithNPC();
-                state = State.COMPLETED;
+                if (state == State.INTERACTING_WITH_NPC) {
+                    interactWithNPC();
+                } else if (state == State.ANSWERING_QUESTIONS) {
+                    answerQuestions();
+                }
             }
         }
     }
 
+    /**
+     * Event listener for Game Object spawns to handle interactions when the object is spawned.
+     *
+     * @param gameObjectSpawned The GameObjectSpawned event.
+     */
+    @Subscribe
+    public void onGameObjectSpawned(GameObjectSpawned gameObjectSpawned) {
+        if (state == State.INTERACTING_WITH_OBJECT) {
+            net.runelite.api.GameObject gameObject = gameObjectSpawned.getGameObject();
+            if (gameObject.getId() == clue.getObjectId()) {
+                log.info("Game Object spawned: ID {}", gameObject.getId());
+                interactWithObject();
+            }
+        }
+    }
 }
-

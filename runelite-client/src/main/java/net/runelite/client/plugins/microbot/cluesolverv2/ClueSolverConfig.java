@@ -14,7 +14,7 @@ public interface ClueSolverConfig extends Config {
             description = "Enable or disable all clue-solving tasks"
     )
     default boolean toggleAll() {
-        return true;
+        return false;
     }
 
     // Task Interval Setting
@@ -27,24 +27,24 @@ public interface ClueSolverConfig extends Config {
         return 1000;
     }
 
-    // Additional Settings
-    @ConfigItem(
-            keyName = "enableHints",
-            name = "Enable Clue Hints",
-            description = "Show hints or directions for clues"
-    )
-    default boolean enableHints() {
-        return true;
-    }
+//    // Additional Settings
+//    @ConfigItem(
+//            keyName = "enableHints",
+//            name = "Enable Clue Hints",
+//            description = "Placeholder"
+//    )
+//    default boolean enableHints() {
+//        return false;
+//    }
 
-    @ConfigItem(
-            keyName = "enableHintArrows",
-            name = "Enable Hint Arrows",
-            description = "Display hint arrows pointing to target locations or NPCs"
-    )
-    default boolean enableHintArrows() {
-        return true;
-    }
+//    @ConfigItem(
+//            keyName = "enableHintArrows",
+//            name = "Enable Hint Arrows",
+//            description = "Display hint arrows pointing to target locations or NPCs"
+//    )
+//    default boolean enableHintArrows() {
+//        return true;
+//    }
 
     // Cooldown Control Between Tasks
     @ConfigItem(

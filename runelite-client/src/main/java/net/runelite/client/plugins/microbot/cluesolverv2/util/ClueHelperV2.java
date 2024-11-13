@@ -7,6 +7,9 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
 import net.runelite.client.plugins.cluescrolls.clues.item.*;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -19,21 +22,22 @@ public class ClueHelperV2 {
     private final Client client;
     private final ConcurrentHashMap<Class<?>, Field> fieldCache = new ConcurrentHashMap<>();
 
-    // Predefined Item Requirements
-    private static final ItemRequirement HAS_SPADE = new AnyRequirementCollection(
-            "Spade",
-            new SingleItemRequirement(ItemID.SPADE),
-            new SingleItemRequirement(ItemID.EASTFLOOR_SPADE)
-    );
+    private static final Map<String, List<Integer>> REQUIREMENTS_MAP = new HashMap<>();
 
-    private static final ItemRequirement HAS_LIGHT = new AnyRequirementCollection(
-            "Light Source",
-            new SingleItemRequirement(ItemID.LIT_TORCH),
-            new SingleItemRequirement(ItemID.LIT_CANDLE),
-            new SingleItemRequirement(ItemID.CANDLE_LANTERN_4531),
-            new SingleItemRequirement(ItemID.OIL_LAMP_4524),
-            new SingleItemRequirement(ItemID.BULLSEYE_LANTERN_4550)
-    );
+    static {
+        REQUIREMENTS_MAP.put("Spade", Arrays.asList(
+                ItemID.SPADE,
+                ItemID.EASTFLOOR_SPADE
+        ));
+
+        REQUIREMENTS_MAP.put("Light Source", Arrays.asList(
+                ItemID.LIT_TORCH,
+                ItemID.LIT_CANDLE,
+                ItemID.CANDLE_LANTERN_4531,
+                ItemID.OIL_LAMP_4524,
+                ItemID.BULLSEYE_LANTERN_4550
+        ));
+    }
 
 
     private final Map<Integer, String> requiredItemsMap = new HashMap<>();
@@ -47,6 +51,78 @@ public class ClueHelperV2 {
         } else {
             log.debug("Client instance successfully injected.");
         }
+    }
+
+    /**
+     * Checks if the inventory contains any valid Light Source.
+     *
+     * @return true if a Light Source is present; false otherwise.
+     */
+    public boolean hasLightSource() {
+        List<Integer> lightSourceIds = REQUIREMENTS_MAP.get("Light Source");
+        if (lightSourceIds == null || lightSourceIds.isEmpty()) {
+            log.warn("No Light Source items defined in REQUIREMENTS_MAP.");
+            return false;
+        }
+
+        for (Integer itemId : lightSourceIds) {
+            if (Rs2Inventory.contains(itemId)) {
+                log.info("Found Light Source with ID: {}", itemId);
+                return true;
+            }
+        }
+
+        log.warn("No Light Source found in inventory.");
+        return false;
+    }
+
+    /**
+     * Retrieves the list of item IDs for a given requirement.
+     *
+     * @param requirement The name of the requirement (e.g., "Spade", "Light Source").
+     * @return An unmodifiable list of item IDs; empty list if none found.
+     */
+    public List<Integer> getItemIdsForRequirement(String requirement) {
+        return REQUIREMENTS_MAP.getOrDefault(requirement, Collections.emptyList());
+    }
+
+
+    /**
+     * Attempts to withdraw the first available item that satisfies the given requirement.
+     *
+     * @param requirement The name of the requirement (e.g., "Spade", "Light Source").
+     */
+    public void withdrawFirstAvailableItem(String requirement) {
+        List<Integer> itemIds = REQUIREMENTS_MAP.get(requirement);
+        if (itemIds == null || itemIds.isEmpty()) {
+            log.warn("No items defined for requirement: {}", requirement);
+            return;
+        }
+
+        for (Integer itemId : itemIds) {
+            log.info("Attempting to withdraw item: {} with ID: {}", requirement, itemId);
+            Rs2Bank.withdrawItem(itemId); // Rs2Bank.withdrawItem is assumed to be a void method
+
+            // After attempting to withdraw, verify if the item is now in the inventory
+            if (isItemInInventory(itemId)) {
+                log.info("Successfully withdrew item: {} with ID: {}", requirement, itemId);
+                break; // Exit after successfully withdrawing one item
+            } else {
+                log.warn("Failed to withdraw item: {} with ID: {}", requirement, itemId);
+            }
+        }
+    }
+
+    private boolean isItemInInventory(int itemId) {
+        // Check inventory
+        if (Rs2Inventory.items() != null) {
+            for (Rs2Item item : Rs2Inventory.items()) {
+                if (item != null && item.getId() == itemId) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -76,16 +152,6 @@ public class ClueHelperV2 {
 
         requiredItemsMap.clear();
 
-        if (clue.isRequiresSpade()) {
-            log.info("Adding spade requirement.");
-            requiredItems.add(HAS_SPADE);
-        }
-
-        if (clue.isRequiresLight()) {
-            log.info("Adding light source requirement.");
-            requiredItems.add(HAS_LIGHT);
-        }
-
         try {
             Field itemRequirementsField = getFieldFromClassHierarchy(clue.getClass(), "itemRequirements");
 
@@ -98,6 +164,7 @@ public class ClueHelperV2 {
 
                     for (ItemRequirement req : clueItemRequirements) {
                         if (req != null) {
+                            log.info("Adding item requirement: {}", req.getCollectiveName(client));
                             requiredItems.add(req);
                             handleItemRequirement(req);
                         } else {
@@ -111,7 +178,6 @@ public class ClueHelperV2 {
                 log.info("The clue does not have an 'itemRequirements' field.");
             }
 
-            log.info("About to process required items.");
             requiredItems.forEach(requirement -> {
                 if (client == null) {
                     log.error("Client is null when getting collective name for requirement: {}", requirement);
@@ -132,8 +198,6 @@ public class ClueHelperV2 {
                     }
                 }
             });
-            log.info("Finished processing required items.");
-
         } catch (Throwable t) {
             log.error("Error determining required items", t);
         }
@@ -154,7 +218,7 @@ public class ClueHelperV2 {
                 itemIdField.setAccessible(true);
                 return itemIdField.getInt(req);
             } else if (req instanceof AnyRequirementCollection) {
-                // Handle accordingly if needed
+                //TODO Assign anyreqs to list, get ID's from list
                 return null;
             }
             // Add more conditions for other ItemRequirement types if necessary
@@ -194,7 +258,6 @@ public class ClueHelperV2 {
      */
     private void handleSingleItemRequirement(SingleItemRequirement singleReq) {
         try {
-            log.info("Attempting to access itemId field for SingleItemRequirement.");
             Field itemIdField = SingleItemRequirement.class.getDeclaredField("itemId");
             itemIdField.setAccessible(true);
             int itemId = itemIdField.getInt(singleReq);
@@ -242,7 +305,6 @@ public class ClueHelperV2 {
      */
     private void handleMultipleOfItemRequirement(MultipleOfItemRequirement multipleReq) {
         try {
-            log.info("Attempting to access fields in MultipleOfItemRequirement.");
             Field itemIdField = MultipleOfItemRequirement.class.getDeclaredField("itemId");
             itemIdField.setAccessible(true);
             int itemId = itemIdField.getInt(multipleReq);
@@ -335,17 +397,12 @@ public class ClueHelperV2 {
      * @return A list of ItemRequirements that are missing from the player's inventory and equipment.
      */
     public List<ItemRequirement> getMissingItems(List<ItemRequirement> requirements) {
-        log.info("Checking for missing items.");
 
         ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
         ItemContainer equipmentContainer = client.getItemContainer(InventoryID.EQUIPMENT);
 
         Item[] inventoryItemsArray = inventoryContainer != null ? inventoryContainer.getItems() : new Item[0];
         Item[] equippedItemsArray = equipmentContainer != null ? equipmentContainer.getItems() : new Item[0];
-
-        // Log current inventory and equipment for debugging
-        log.debug("Current Inventory Items: {}", Arrays.toString(inventoryItemsArray));
-        log.debug("Current Equipped Items: {}", Arrays.toString(equippedItemsArray));
 
         List<Item> allItems = new ArrayList<>();
         Collections.addAll(allItems, inventoryItemsArray);
@@ -420,10 +477,9 @@ public class ClueHelperV2 {
                 currentClass = currentClass.getSuperclass();
             }
         }
-        log.warn("Field '{}' not found in class hierarchy of '{}'", fieldName, clazz.getSimpleName());
+        log.warn("Field '{}' not found in class hierarchy of '{}'", fieldName, Objects.requireNonNull(clazz).getSimpleName());
         return null;
     }
-
 
 
     /**

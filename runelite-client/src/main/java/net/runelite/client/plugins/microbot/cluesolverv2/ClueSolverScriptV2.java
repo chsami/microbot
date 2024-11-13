@@ -6,13 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
-import net.runelite.client.plugins.cluescrolls.clues.ClueScroll;
-import net.runelite.client.plugins.cluescrolls.clues.CoordinateClue;
-import net.runelite.client.plugins.cluescrolls.clues.EmoteClue;
+import net.runelite.client.plugins.cluescrolls.clues.*;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
+import net.runelite.client.plugins.microbot.cluesolverv2.tasks.AnagramClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.tasks.CoordinateClueTask;
+import net.runelite.client.plugins.microbot.cluesolverv2.tasks.CrypticClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.tasks.EmoteClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
@@ -45,6 +45,12 @@ public class ClueSolverScriptV2 extends Script {
 
     @Inject
     private Provider<CoordinateClueTask> coordinateClueTaskProvider;
+
+    @Inject
+    private Provider<AnagramClueTask> anagramClueTaskProvider;
+
+    @Inject
+    private Provider<CrypticClueTask> crypticClueTaskProvider;
 
 
     /**
@@ -175,6 +181,14 @@ public class ClueSolverScriptV2 extends Script {
         } else if (clue instanceof CoordinateClue) {
             CoordinateClueTask task = coordinateClueTaskProvider.get();
             task.setClue((CoordinateClue) clue);
+            return task;
+        } else if (clue instanceof AnagramClue) {
+            AnagramClueTask task = anagramClueTaskProvider.get();
+            task.setClue((AnagramClue) clue);
+            return task;
+        } else if (clue instanceof CrypticClue) {
+            CrypticClueTask task = crypticClueTaskProvider.get();
+            task.setClue((CrypticClue) clue);
             return task;
         }
 
