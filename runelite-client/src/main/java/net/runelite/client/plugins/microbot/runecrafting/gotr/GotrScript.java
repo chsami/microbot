@@ -297,6 +297,7 @@ public class GotrScript extends Script {
         if (!isInHugeMine() && Microbot.getClient().hasHintArrow() && Rs2Inventory.size() < config.maxAmountEssence()) {
             if (leaveLargeMine()) return true;
             Rs2Walker.walkFastCanvas(Microbot.getClient().getHintArrowPoint());
+            sleepUntil(Rs2Player::isWalking);
             Rs2GameObject.interact(Microbot.getClient().getHintArrowPoint());
             log("Found a portal spawn...interacting with it...");
             Rs2Player.waitForWalking();
@@ -474,7 +475,7 @@ public class GotrScript extends Script {
             return;
         }
         if (Rs2Player.getSkillRequirement(Skill.AGILITY, 56)) {
-            if (!isInLargeMine() && (!Rs2Inventory.hasItem(GUARDIAN_FRAGMENTS) || getStartTimer() == -1)) {
+            if (!isInLargeMine() && !isInHugeMine() && (!Rs2Inventory.hasItem(GUARDIAN_FRAGMENTS) || getStartTimer() == -1)) {
                 if (Rs2Walker.walkTo(new WorldPoint(3632, 9503, 0), 20)) {
                     log("Traveling to large mine...");
                     Rs2GameObject.interact(ObjectID.RUBBLE_43724);
@@ -552,7 +553,7 @@ public class GotrScript extends Script {
     }
 
     public boolean isInHugeMine() {
-        int hugeMineX = 3593;
+        int hugeMineX = 3594;
         return Rs2Player.getWorldLocation().getRegionID() == 14484
                 && Microbot.getClient().getLocalPlayer().getWorldLocation().getX() <= hugeMineX;
     }
