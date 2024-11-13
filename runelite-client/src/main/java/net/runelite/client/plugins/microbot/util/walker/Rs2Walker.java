@@ -1424,8 +1424,9 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
             // Interact with fairy ring after equipping the staff
             Microbot.log("Interacting with the fairy ring using a staff.");
             var fairyRing = Rs2GameObject.findObjectByLocation(origin);
-            Rs2GameObject.interact(fairyRing, "Configure");
-            Rs2Player.waitForWalking();
+            if (Rs2GameObject.interact(fairyRing, "Configure")) {
+                Rs2Player.waitForWalking();
+            }
         }
     }
 
