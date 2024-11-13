@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AutoSmeltingScript extends Script {
 
-    public static String version = "1.0.1";
+    public static String version = "1.0.2";
     private boolean expectingXPDrop = false;
 
     public boolean run(AutoSmeltingConfig config) {
@@ -53,13 +53,11 @@ public class AutoSmeltingScript extends Script {
                     withdrawRightAmountOfMaterials(config);
                     return;
                 }
-
                 if (expectingXPDrop && Rs2Inventory.waitForInventoryChanges(4500)) {
                     Rs2Antiban.actionCooldown();
                     Rs2Antiban.takeMicroBreakByChance();
                     return;
                 }
-
                 // walk to the initial position (near furnace)
                 if (initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) > 4) {
                     Rs2Walker.walkTo(initialPlayerLocation, 4);
@@ -68,7 +66,7 @@ public class AutoSmeltingScript extends Script {
 
                 // interact with the furnace until the smelting dialogue opens in chat, click the selected bar icon
                 // then wait for animation to finish
-                GameObject furnace = Rs2GameObject.findObject("furnace", true, 10, true, initialPlayerLocation);
+                GameObject furnace = Rs2GameObject.findObject("furnace", true, 10, false, initialPlayerLocation);
                 if (furnace != null) {
                     Rs2GameObject.interact(furnace, "smelt");
                     sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694733) != null);
@@ -107,7 +105,6 @@ public class AutoSmeltingScript extends Script {
             }
             Rs2Bank.withdrawX(name, totalAmount);
             sleepUntil(() -> Rs2Inventory.hasItemAmount(name, totalAmount), 3500);
-
             // Exit if we did not end up finding it.
             if (!Rs2Inventory.hasItemAmount(name, totalAmount)) {
                 Microbot.showMessage("Could not find item in bank.");

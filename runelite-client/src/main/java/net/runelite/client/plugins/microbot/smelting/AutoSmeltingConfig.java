@@ -16,7 +16,7 @@ public interface AutoSmeltingConfig extends Config {
             section = generalSection
     )
     default String GUIDE() {
-        return "Select the type of bar you want to smelt and stand near any furnace.\n" +
+        return "Select the type of bar you want to smelt and stand in line of sight of a nearby furnace.\n" +
                 "You need enough ore in your bank to fill your inventory, e.g. 14 tin and 14 copper or 9 iron and 18 coal.\n";
     }
 
