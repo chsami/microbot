@@ -14,7 +14,7 @@ import net.runelite.client.config.ConfigItem;
         "2. If you have any issues or suggestions, please inform me on discord. <br />" +
         "- Currently you need to open the bank and input bankpin<br />" +
         "- You need to have the clue in your inventory and click on it with both plugins active.<br />" +
-        "- It will not buy items for you, however it will attempt to bank and check for the items.<br />" +
+        "- It will not buy items for you, however it will attempt to bank and check for the items and proceed to withdraw.<br />" +
         "  <br />" +
         "- I would also suggest that you keep an eye on it at all times. <br />" +
         "  <br />" +
