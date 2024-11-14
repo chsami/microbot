@@ -14,16 +14,22 @@ import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 
 import java.util.concurrent.TimeUnit;
 
+enum ShopperState {
+    SHOPPING,
+    BANKING,
+}
+
 public class BanksShopperScript extends Script {
 
     public static String version = "1.3.0";
-    
+
     private final BanksShopperPlugin plugin;
-    
+    private ShopperState state = ShopperState.SHOPPING;
+
     public BanksShopperScript(final BanksShopperPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     public boolean run(BanksShopperConfig config) {
         Microbot.pauseAllScripts = false;
         Microbot.enableAutoRunOn = false;
@@ -41,56 +47,66 @@ public class BanksShopperScript extends Script {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
                 }
 
-                boolean missingAllRequiredItems = plugin.getItemNames().stream().noneMatch(Rs2Inventory::hasItem);
+                if (hasStateChanged()) {
+                    state = updateState();
+                }
 
-                if (missingAllRequiredItems && plugin.getSelectedAction() == Actions.SELL) {
-                    Microbot.status = "[Shutting down] - Reason: Not enough supplies.";
-                    Microbot.showMessage(Microbot.status);
+                if (state == null) {
+                    Microbot.showMessage("Unable to determine state!");
                     shutdown();
                     return;
                 }
 
-                if ((plugin.getSelectedAction() == Actions.BUY && plugin.isUseBank()) && (Rs2Inventory.isFull() || Rs2Player.distanceTo(initialPlayerLocation) > 6)) {
-                    if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(plugin.getItemNames(), initialPlayerLocation))
-                        return;
-                }
+                switch (state) {
+                    case SHOPPING:
+                        boolean missingAllRequiredItems = plugin.getItemNames().stream().noneMatch(Rs2Inventory::hasItem);
 
-                Rs2Shop.openShop(plugin.getNpcName());
-                Rs2Random.waitEx(1800, 300); // this wait is required ensure that Rs2Shop.shopItems has been updated before we proceed.
-
-                boolean allOutOfStock = true;
-                boolean successfullAction = false;
-
-                if (Rs2Shop.isOpen()) {
-                    for (String itemName : plugin.getItemNames()) {
-                        if (!isRunning() || Microbot.pauseAllScripts) break;
-
-                        switch (plugin.getSelectedAction()) {
-                            case BUY:
-                                if (!Rs2Shop.hasMinimumStock(itemName, plugin.getMinStock())) continue;
-                                successfullAction = processBuyAction(itemName, plugin.getSelectedQuantity().toString());
-                                break;
-                            case SELL:
-                                if (Rs2Shop.isFull()) continue;
-                                if (Rs2Shop.hasMinimumStock(itemName, plugin.getMinStock())) continue;
-                                successfullAction = processSellAction(itemName, plugin.getSelectedQuantity().toString());
-                                break;
-                            default:
-                                System.out.println("Invalid action specified in config.");
+                        if (missingAllRequiredItems && plugin.getSelectedAction() == Actions.SELL) {
+                            Microbot.status = "[Shutting down] - Reason: Not enough supplies.";
+                            Microbot.showMessage(Microbot.status);
+                            shutdown();
+                            return;
                         }
 
-                        if (successfullAction) {
-                            allOutOfStock = false;
-                            Rs2Random.waitEx(900, 300);
-                        }
-                    }
+                        Rs2Shop.openShop(plugin.getNpcName());
+                        Rs2Random.waitEx(1800, 300); // this wait is required ensure that Rs2Shop.shopItems has been updated before we proceed.
 
-                    // If no successful actions occurred, trigger a world hop
-                    if (allOutOfStock) {
-                        hopWorld();
-                    }
-                } else {
-                    System.out.println("Shop is not open");
+                        boolean allOutOfStock = true;
+                        boolean successfullAction = false;
+
+                        if (Rs2Shop.isOpen()) {
+                            for (String itemName : plugin.getItemNames()) {
+                                if (!isRunning() || Microbot.pauseAllScripts) break;
+
+                                switch (plugin.getSelectedAction()) {
+                                    case BUY:
+                                        if (!Rs2Shop.hasMinimumStock(itemName, plugin.getMinStock())) continue;
+                                        successfullAction = processBuyAction(itemName, plugin.getSelectedQuantity().toString());
+                                        break;
+                                    case SELL:
+                                        if (Rs2Shop.isFull()) continue;
+                                        if (Rs2Shop.hasMinimumStock(itemName, plugin.getMinStock())) continue;
+                                        successfullAction = processSellAction(itemName, plugin.getSelectedQuantity().toString());
+                                        break;
+                                    default:
+                                        System.out.println("Invalid action specified in config.");
+                                }
+
+                                if (successfullAction) {
+                                    allOutOfStock = false;
+                                    Rs2Random.waitEx(900, 300);
+                                }
+                            }
+
+                            // If no successful actions occurred, trigger a world hop
+                            if (allOutOfStock) {
+                                hopWorld();
+                            }
+                        }
+                    case BANKING:
+                        if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(plugin.getItemNames(), initialPlayerLocation))
+                            return;
+                        break;
                 }
             } catch (Exception ex) {
                 System.out.println("Error: " + ex.getMessage());
@@ -113,6 +129,21 @@ public class BanksShopperScript extends Script {
         super.shutdown();
     }
 
+
+    private boolean hasStateChanged() {
+        if (state == ShopperState.SHOPPING && plugin.getSelectedAction() == Actions.BUY && Rs2Inventory.isFull())
+            return true;
+        return state == ShopperState.BANKING && plugin.getSelectedAction() == Actions.BUY && Rs2Player.distanceTo(initialPlayerLocation) < 6;
+    }
+
+    private ShopperState updateState() {
+        if (state == ShopperState.SHOPPING && plugin.getSelectedAction() == Actions.BUY && Rs2Inventory.isFull())
+            return ShopperState.BANKING;
+        if (state == ShopperState.BANKING && plugin.getSelectedAction() == Actions.BUY && (Rs2Player.distanceTo(initialPlayerLocation) < 6))
+            return ShopperState.SHOPPING;
+        return null;
+    }
+
     /**
      * Hops to a new world
      */
@@ -122,7 +153,7 @@ public class BanksShopperScript extends Script {
         Rs2Shop.closeShop();
         Rs2Random.waitEx(3200, 800); // this sleep is required to avoid the message: please finish what you're doing before using the world switcher.
         // This is where we need to hop worlds.
-        int world = Login.getRandomWorld(true, null);
+        int world = plugin.isUseNextWorld() ? Login.getNextWorld(Rs2Player.isMember()) : Login.getRandomWorld(Rs2Player.isMember());
         boolean isHopped = Microbot.hopToWorld(world);
         if (!isHopped) return;
         sleepUntil(() -> Microbot.getClient().getGameState() == GameState.HOPPING);
