@@ -23,11 +23,14 @@ If you enjoy my open source work and would like to support me, consider buying m
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-donate-yellow)](https://www.paypal.com/paypalme/MicrobotBE?country.x=BE)
 
-Donate Bitcoin
 
-bc1q4c63nc5jt9wem87cy7llsk2ur5psjnqhltt2kf
+![image](https://github.com/user-attachments/assets/4413ee64-8d64-401b-bc01-ad0ed57c361c)
 
-![Untitled 1](https://github.com/user-attachments/assets/6ebb017e-80c6-4f8a-93dd-88fa828c378b)
+
+Address: bc1q4c63nc5jt9wem87cy7llsk2ur5psjnqhltt2kf
+
+![image](https://github.com/user-attachments/assets/f19be9cd-d43d-4102-89bc-bdce03dda923)
+
 
 Thank you for your support! 😊
 
