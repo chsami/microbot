@@ -37,7 +37,6 @@ import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -59,9 +58,6 @@ public class Microbot {
     @Getter
     private static final SpecialAttackConfigs specialAttackConfigs = new SpecialAttackConfigs();
     public static MenuEntry targetMenu;
-    @Inject
-    @Named("microbot.storage")
-    public static String storageUrl;
     public static boolean debug = false;
     public static boolean isGainingExp = false;
     public static boolean pauseAllScripts = false;
