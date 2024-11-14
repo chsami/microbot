@@ -161,7 +161,6 @@ public class DevToolsPlugin extends Plugin
 	private MicrobotMouseOverlay microbotMouseOverlay;
 	private DevToolsButton players;
 	private DevToolsButton npcs;
-	private DevToolsButton inventory;
 	private DevToolsButton groundItems;
 	private DevToolsButton groundObjects;
 	private DevToolsButton gameObjects;
@@ -195,6 +194,10 @@ public class DevToolsPlugin extends Plugin
 	private DevToolsButton mouseMovement;
 	private NavigationButton navButton;
 
+	//custom devtools from microbot
+	private DevToolsButton inventory;
+	private DevToolsButton memoryInspector;
+
 	@Provides
 	DevToolsConfig provideConfig(ConfigManager configManager)
 	{
@@ -207,7 +210,7 @@ public class DevToolsPlugin extends Plugin
 		players = new DevToolsButton("Players");
 		npcs = new DevToolsButton("NPCs");
 		inventory = new DevToolsButton("Inventory");
-
+		memoryInspector = new DevToolsButton("Memory");
 		groundItems = new DevToolsButton("Ground Items");
 		groundObjects = new DevToolsButton("Ground Objects");
 		gameObjects = new DevToolsButton("Game Objects");
