@@ -23,6 +23,12 @@ If you enjoy my open source work and would like to support me, consider buying m
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-donate-yellow)](https://www.paypal.com/paypalme/MicrobotBE?country.x=BE)
 
+Donate Bitcoin
+
+bc1q4c63nc5jt9wem87cy7llsk2ur5psjnqhltt2kf
+
+![Untitled 1](https://github.com/user-attachments/assets/6ebb017e-80c6-4f8a-93dd-88fa828c378b)
+
 Thank you for your support! 😊
 
 # I Want To Play
