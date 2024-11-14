@@ -456,7 +456,9 @@ public class GotrScript extends Script {
                 } else {
                     Rs2Inventory.fillPouches();
                     sleep(randomGaussian(Random.random(1000, 1500), Random.random(100, 300)));
-                    Rs2GameObject.interact(ObjectID.HUGE_GUARDIAN_REMAINS);
+                    if (!Rs2Inventory.isFull()) {
+                        Rs2GameObject.interact(ObjectID.HUGE_GUARDIAN_REMAINS);
+                    }
                 }
             }
             return true;

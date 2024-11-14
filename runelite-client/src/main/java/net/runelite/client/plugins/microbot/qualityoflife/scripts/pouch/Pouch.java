@@ -163,15 +163,16 @@ public enum Pouch {
     }
 
     public int getColossalHoldAmountIndex() {
-        switch (Rs2Player.getBoostedSkillLevel(Skill.RUNECRAFT)) {
-            case 50:
-                return 1;
-            case 75:
-                return 2;
-            case 85:
-                return 3;
-            default:
-                return 0;
+        int runecraftLevel = Rs2Player.getBoostedSkillLevel(Skill.RUNECRAFT);
+
+        if (runecraftLevel >= 85) {
+            return 3;
+        } else if (runecraftLevel >= 75) {
+            return 2;
+        } else if (runecraftLevel >= 50) {
+            return 1;
+        } else {
+            return 0;
         }
     }
 }
