@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2021 Abex
+ * Copyright (c) 2016-2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,50 +23,51 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.devtools;
+package net.runelite.client.plugins.microbot;
 
-import java.util.concurrent.ScheduledExecutorService;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.client.RuneLite;
-import net.runelite.client.callback.ClientThread;
-import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.jshell.ShellPanel;
+import lombok.Getter;
 
-@Singleton
-class ShellFrame extends DevToolsFrame
+import java.util.HashMap;
+import java.util.Map;
+
+@Getter
+public class MicrobotRSConfig
 {
-	private final ShellPanel shellPanel;
+	private final Map<String, String> appletProperties = new HashMap<>();
+	private final Map<String, String> classLoaderProperties = new HashMap<>();
 
-	@Inject
-	ShellFrame(ClientThread clientThread, ScheduledExecutorService executor)
+	String getCodeBase()
 	{
-		this.shellPanel = new ShellPanel(executor)
-		{
-			@Override
-			protected void invokeOnClientThread(Runnable r)
-			{
-				clientThread.invoke(r);
-			}
-		};
-		setContentPane(shellPanel);
-
-		setTitle("RuneLite Shell");
-
-		pack();
+		return classLoaderProperties.get("codebase");
 	}
 
-	@Override
-	public void open()
+	void setCodebase(String codebase)
 	{
-		shellPanel.switchContext(Microbot.getInjector());
-		super.open();
+		classLoaderProperties.put("codebase", codebase);
 	}
 
-	@Override
-	public void close()
+	String getInitialJar()
 	{
-		super.close();
-		shellPanel.freeContext();
+		return classLoaderProperties.get("initial_jar");
+	}
+
+	String getInitialClass()
+	{
+		return classLoaderProperties.get("initial_class").replace(".class", "");
+	}
+
+	boolean isFallback()
+	{
+		return getRuneLiteGamepack() != null;
+	}
+
+	String getRuneLiteGamepack()
+	{
+		return classLoaderProperties.get("runelite.gamepack");
+	}
+
+	String getRuneLiteWorldParam()
+	{
+		return classLoaderProperties.get("runelite.worldparam");
 	}
 }
