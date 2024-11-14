@@ -232,17 +232,6 @@ public interface QoLConfig extends Config {
         return false;
     }
 
-    @ConfigItem(
-            keyName = "displayPouchCounter",
-            name = "Display pouch counter",
-            description = "Displays a counter above your runecrafting pouches",
-            position = 4,
-            section = upkeepSection
-    )
-    default boolean displayPouchCounter() {
-        return false;
-    }
-
     // boolean to use custom spec weapon
     @ConfigItem(
             keyName = "useSpecWeapon",
