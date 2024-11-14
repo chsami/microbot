@@ -262,7 +262,10 @@ public class MotherloadMineScript extends Script {
 
     private WallObject findClosestVein() {
         return Rs2GameObject.getWallObjects().stream()
-                .filter(this::isVein).filter(this::isWithinMiningArea).min((a, b) -> Integer.compare(distanceToPlayer(a), distanceToPlayer(b))).orElse(null);
+                .filter(x -> this.isVein(x)
+                        && this.isWithinMiningArea(x)
+                        && Rs2Tile.areSurroundingTilesWalkable(x.getWorldLocation(), 1, 1))
+                .min((a, b) -> Integer.compare(distanceToPlayer(a), distanceToPlayer(b))).orElse(null);
     }
 
     private boolean isVein(WallObject wallObject) {
