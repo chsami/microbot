@@ -68,7 +68,7 @@ public class AutoSmeltingScript extends Script {
 
                 // interact with the furnace until the smelting dialogue opens in chat, click the selected bar icon
                 // then wait for animation to finish
-                GameObject furnace = Rs2GameObject.findObject("furnace", true, 10, true, initialPlayerLocation);
+                GameObject furnace = Rs2GameObject.findObject("furnace", true, 10, false, initialPlayerLocation);
                 if (furnace != null) {
                     Rs2GameObject.interact(furnace, "smelt");
                     sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694733) != null);
