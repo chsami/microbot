@@ -91,7 +91,7 @@ public interface BanksShopperConfig extends Config {
             section = actionSection
     )
     default boolean useNextWorld() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
