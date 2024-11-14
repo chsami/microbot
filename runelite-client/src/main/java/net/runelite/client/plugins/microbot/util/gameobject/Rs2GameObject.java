@@ -1220,7 +1220,7 @@ public static GameObject findReachableObject(String objectName, boolean exact, i
             int index = 0;
             if (action != null) {
                 String[] actions;
-                if (objComp.getImpostorIds() != null) {
+                if (objComp.getImpostorIds() != null && objComp.getImpostor() != null) {
                     actions = objComp.getImpostor().getActions();
                 } else {
                     actions = objComp.getActions();

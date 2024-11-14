@@ -193,7 +193,7 @@ public class Transport {
 
             //EXCEPTIONS THAT ARE NOT HANDLED BY THE REGEX
             //Shillo village cart action is: climb over without a dash
-            if (objectId == 2216) {
+            if (action != null && action.contains("-")) {
                 action = action.replace("-", " ");
             }
         }
