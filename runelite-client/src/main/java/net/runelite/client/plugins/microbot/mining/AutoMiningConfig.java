@@ -12,7 +12,9 @@ import net.runelite.client.plugins.microbot.mining.enums.Rocks;
         "<p></p>"+
         "<p>3. <strong>Banking Option:</strong> Enable or disable the use of a bank. If enabled, the bot will walk back to the original location after banking. The default setting is <em>disabled</em>.</p>" +
         "<p></p>"+
-        "<p>4. <strong>Items to Bank:</strong> Specify the items to be banked, separated by commas. The default value is <em>'ore'</em>.</p>")
+        "<p>4. <strong>Items to Bank:</strong> Specify the items to be banked, separated by commas. The default value is <em>'ore'</em>.</p>"+
+        "<p></p>"+
+        "<p>5. <strong>Basalt:</strong> If mining basalt, ensure UseBank is checked and it will automatically note at Snowflake</em>.</p>")
 
 public interface AutoMiningConfig extends Config {
     @ConfigSection(
