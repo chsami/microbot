@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot;
 
+import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Point;
@@ -7,6 +8,9 @@ import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.Notifier;
+import net.runelite.client.RuneLite;
+import net.runelite.client.RuneLiteDebug;
+import net.runelite.client.RuneLiteProperties;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ProfileManager;
@@ -37,15 +41,19 @@ import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -55,13 +63,14 @@ import java.util.stream.Collectors;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Microbot {
+    //Version path used to load the client faster when developing by checking version number
+    //If the version is the same as the current version we do not download the latest .jar
+    //Resulting in a faster startup
+    private static final String VERSION_FILE_PATH = "debug_temp_version.txt";
     private static final ScheduledExecutorService xpSchedulor = Executors.newSingleThreadScheduledExecutor();
     @Getter
     private static final SpecialAttackConfigs specialAttackConfigs = new SpecialAttackConfigs();
     public static MenuEntry targetMenu;
-    @Inject
-    @Named("microbot.storage")
-    public static String storageUrl;
     public static boolean debug = false;
     public static boolean isGainingExp = false;
     public static boolean pauseAllScripts = false;
@@ -135,6 +144,11 @@ public class Microbot {
     public static boolean cantHopWorld = false;
 
     public static int cantReachTargetRetries = 0;
+
+    public static boolean isDebug() {
+        return java.lang.management.ManagementFactory.getRuntimeMXBean().
+                getInputArguments().toString().contains("-agentlib:jdwp");
+    }
 
     @Deprecated(since = "Use isMoving", forRemoval = true)
     public static boolean isWalking() {
@@ -396,5 +410,54 @@ public class Microbot {
     public static QuestState getQuestState(Quest quest) {
         return getClientThread().runOnClientThread(() -> quest.getState(client));
     }
+
+    public static void writeVersionToFile(String version) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(VERSION_FILE_PATH))) {
+            writer.write(version);
+        }
+    }
+
+    public static boolean isFirstRun() {
+        File file = new File(VERSION_FILE_PATH);
+        // Check if the version file exists
+        return !file.exists();
+    }
+
+    public static String readVersionFromFile() throws IOException {
+        try (Scanner scanner = new Scanner(new File(VERSION_FILE_PATH))) {
+            return scanner.hasNextLine() ? scanner.nextLine() : "";
+        }
+    }
+
+     public static boolean shouldSkipVanillaClientDownload() {
+         if (isDebug()) {
+             try {
+                 String currentVersion = RuneLiteProperties.getVersion();
+                 if (Microbot.isFirstRun()) {
+                     Microbot.writeVersionToFile(currentVersion);
+                     System.out.println("First run in debug mode. Version written to file.");
+                 } else {
+                     String storedVersion = Microbot.readVersionFromFile();
+                     if (currentVersion.equals(storedVersion)) {
+                         System.out.println("Running in debug mode. Version matches stored version.");
+                         return true;
+                     } else {
+                         System.out.println("Version mismatch detected...updating client.");
+                     }
+                 }
+             } catch(Exception ex) {
+                 ex.printStackTrace();
+                 System.out.println(ex.getMessage());
+             }
+         }
+         return false;
+     }
+
+     public static Injector getInjector() {
+        if (RuneLiteDebug.getInjector() != null) {
+            return RuneLiteDebug.getInjector();
+        }
+        return RuneLite.getInjector();
+     }
 }
 

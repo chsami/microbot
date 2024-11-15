@@ -112,7 +112,7 @@ public class Rs2Camera {
         if (Microbot.isPluginEnabled(CameraPlugin.class)) {
             String configGroup = "zoom";
             String configKey = "cameraSpeed";
-            defaultCameraSpeed = RuneLite.getInjector().getInstance(ConfigManager.class).getConfiguration(configGroup, configKey, double.class);
+            defaultCameraSpeed = Microbot.getInjector().getInstance(ConfigManager.class).getConfiguration(configGroup, configKey, double.class);
         }
         // Set the camera speed to 3 to make the camera move faster
         Microbot.getClient().setCameraSpeed(3f);

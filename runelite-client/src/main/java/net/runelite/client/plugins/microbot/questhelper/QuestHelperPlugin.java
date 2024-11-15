@@ -47,6 +47,7 @@ import net.runelite.client.game.SkillIconManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.bank.BankSearch;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.questhelper.bank.banktab.BankTabItems;
 import net.runelite.client.plugins.microbot.questhelper.managers.*;
 import net.runelite.client.plugins.microbot.questhelper.panel.QuestHelperPanel;
@@ -422,7 +423,7 @@ public class QuestHelperPlugin extends Plugin {
             binder.bind(QuestHelper.class).toInstance(questHelper);
             binder.install(questHelper);
         };
-        Injector questInjector = RuneLite.getInjector().createChildInjector(questModule);
+        Injector questInjector = Microbot.getInjector().createChildInjector(questModule);
         injector.injectMembers(questHelper);
         questHelper.setInjector(questInjector);
         questHelper.setQuest(quest);

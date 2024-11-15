@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.example;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +20,7 @@ public class ExampleScript extends Script {
 
                 test = false;
 
+                System.out.println(Rs2Inventory.anyPouchUnknown());
 
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;

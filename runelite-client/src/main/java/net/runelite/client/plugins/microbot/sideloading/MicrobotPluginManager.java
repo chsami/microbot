@@ -13,6 +13,8 @@ import com.google.inject.Module;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.RuneLite;
 import net.runelite.client.plugins.*;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.ui.SplashScreen;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -162,7 +164,7 @@ public class MicrobotPluginManager {
             Plugin plugin;
             try {
                 plugin = instantiate(pluginManager.getPlugins(), (Class<Plugin>) pluginClazz);
-                log.info("Microbot plugin sideloaded " + plugin.getName());
+                log.info("Microbot pluginManager loaded " + plugin.getName());
                 newPlugins.add(plugin);
                 pluginManager.addPlugin(plugin);
             } catch (PluginInstantiationException ex) {
@@ -199,7 +201,7 @@ public class MicrobotPluginManager {
         }
 
         try {
-            Injector parent = RuneLite.getInjector();
+            Injector parent = Microbot.getInjector();
 
             if (deps.size() > 1) {
                 List<Module> modules = new ArrayList<>(deps.size());
@@ -235,5 +237,19 @@ public class MicrobotPluginManager {
 
         log.debug("Loaded plugin {}", clazz.getSimpleName());
         return plugin;
+    }
+
+    public void loadCorePlugins(List<String> packages) throws IOException, PluginInstantiationException
+    {
+        SplashScreen.stage(.59, null, "Loading plugins");
+        ClassPath classPath = ClassPath.from(getClass().getClassLoader());
+
+        List<Class<?>> plugins = packages.stream()
+                .flatMap(packageName -> classPath.getTopLevelClassesRecursive(packageName).stream())
+                .map(ClassPath.ClassInfo::load)
+                .collect(Collectors.toList());
+
+        loadPlugins(plugins, (loaded, total) ->
+                SplashScreen.stage(.60, .70, null, "Loading plugins", loaded, total, false));
     }
 }
