@@ -107,3 +107,23 @@
 3661 3278 0	3671 3542 0	Travel Row boat 32602		10000 Coins			5
 3661 3278 0	3671 3542 0	Travel Row boat 32602		10000 Coins			5
 3661 3278 0	3671 3542 0	Travel Row boat 32602		10000 Coins			5
+
+# Burgh de Rott, Meiyerditch, Icyene Graveyard, Slepe
+3525 3170 0	3605 3161 1	Board Boat 38089				7255=42	13	1: Meiyerditch.
+3525 3170 0	3684 3176 0	Board Boat 38089				7255=42	13	2: Icyene Graveyard.
+3525 3170 0	3663 3277 0	Board Boat 38089				7255=88	13	3: Slepe.
+3605 3161 1	3525 3170 0	Board Boat 38089				7255=42	13	1: Burgh de Rott.
+3605 3161 1	3684 3176 0	Board Boat 38089				7255=42	13	2: Icyene Graveyard.
+3605 3161 1	3663 3277 0	Board Boat 38089				7255=88	13	3: Slepe.
+3684 3176 0	3525 3170 0	Board Boat 38089				7255=42	13	1: Burgh de Rott.
+3684 3176 0	3605 3161 1	Board Boat 38089				7255=42	13	2: Meiyerditch.
+3684 3176 0	3663 3277 0	Board Boat 38089				7255=88	13	3: Slepe.
+3684 3175 0	3525 3170 0	Board Boat 38089				7255=42	13	1: Burgh de Rott.
+3684 3175 0	3605 3161 1	Board Boat 38089				7255=42	13	2: Meiyerditch.
+3684 3175 0	3663 3277 0	Board Boat 38089				7255=88	13	3: Slepe.
+3684 3174 0	3525 3170 0	Board Boat 38089				7255=42	13	1: Burgh de Rott.
+3684 3174 0	3605 3161 1	Board Boat 38089				7255=42	13	2: Meiyerditch.
+3684 3174 0	3663 3277 0	Board Boat 38089				7255=88	13	3: Slepe.
+3663 3277 0	3525 3170 0	Board Boat 38089				7255=88	13	1: Burgh de Rott.
+3663 3277 0	3605 3161 1	Board Boat 38089				7255=88	13	2: Meiyerditch.
+3663 3277 0	3684 3176 0	Board Boat 38089				7255=88	13	3: Icyene Graveyard.
