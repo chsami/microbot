@@ -23,7 +23,7 @@ public class BanksBankStanderOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-            panelComponent.setPreferredSize(new Dimension(200, 300));
+            panelComponent.setPreferredSize(new Dimension(400, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
                     .text("Bank's BankStander V" + BanksBankStanderScript.version)
                     .color(Color.GREEN)
