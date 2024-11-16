@@ -155,8 +155,9 @@ public class BanksBankStanderScript extends Script {
         } else {
             // User has inputted the item identifier for both items.
             System.out.println("Checking for items by identifier...");
-            return Rs2Inventory.hasItem(firstItemIdentifier) &&
-                    Rs2Inventory.hasItem(secondItemIdentifier);
+            return !firstItemIdentifier.isEmpty() &&
+                    Rs2Inventory.hasItem(firstItemIdentifier) &&
+                    (secondItemIdentifier.isEmpty() || Rs2Inventory.hasItem(secondItemIdentifier));
         }
     }
 
@@ -434,14 +435,14 @@ public class BanksBankStanderScript extends Script {
             return false;
         }
         //System.out.println("Attempting to check second item");
-        if (config.secondItemQuantity() > 0) {
+        if (config.secondItemQuantity() > 0 && !config.secondItemIdentifier().isEmpty()) {
             if (secondItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == secondItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(secondItemId))) < config.secondItemQuantity()) {
                 return false;
             } else if (secondItemId == null && (Rs2Bank.count(secondItemIdentifier) + Rs2Inventory.count(secondItemIdentifier)) < config.secondItemQuantity()) {
                 return false;
             }
         }
-        if (config.thirdItemQuantity() > 0) {
+        if (config.thirdItemQuantity() > 0 && !config.thirdItemIdentifier().isEmpty()) {
             //System.out.println("Attempting to check third item");
             if (thirdItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == thirdItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(thirdItemId))) < config.thirdItemQuantity()) {
                 return false;
@@ -449,7 +450,7 @@ public class BanksBankStanderScript extends Script {
                 return false;
             }
         }
-        if (config.fourthItemQuantity() > 0) {
+        if (config.fourthItemQuantity() > 0 && !config.fourthItemIdentifier().isEmpty()) {
             //System.out.println("Attempting to check fourth item");
             if (fourthItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == fourthItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(fourthItemId))) < config.fourthItemQuantity()) {
                 return false;
