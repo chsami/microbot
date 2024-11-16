@@ -301,7 +301,7 @@ public class GotrScript extends Script {
             Rs2GameObject.interact(Microbot.getClient().getHintArrowPoint());
             log("Found a portal spawn...interacting with it...");
             Rs2Player.waitForWalking();
-            sleep(randomGaussian(Random.random(1000, 2000), Random.random(100, 300)));
+            sleepUntil(this::isInHugeMine);
             return true;
         }
         return false;
@@ -456,7 +456,9 @@ public class GotrScript extends Script {
                 } else {
                     Rs2Inventory.fillPouches();
                     sleep(randomGaussian(Random.random(1000, 1500), Random.random(100, 300)));
-                    Rs2GameObject.interact(ObjectID.HUGE_GUARDIAN_REMAINS);
+                    if (!Rs2Inventory.isFull()) {
+                        Rs2GameObject.interact(ObjectID.HUGE_GUARDIAN_REMAINS);
+                    }
                 }
             }
             return true;
@@ -465,6 +467,8 @@ public class GotrScript extends Script {
     }
 
     private void mineGuardianRemains() {
+        if (Microbot.getClient().hasHintArrow())
+            return;
         if (Rs2Inventory.isFull()) {
             shouldMineGuardianRemains = false;
             return;

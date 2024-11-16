@@ -28,7 +28,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 @Slf4j
 public class MotherloadMineScript extends Script {
-    public static final String version = "1.6.7";
+    public static final String version = "1.6.8";
     private static final WorldArea WEST_UPPER_AREA = new WorldArea(3748, 5676, 7, 9, 0);
     private static final WorldArea EAST_UPPER_AREA = new WorldArea(3755, 5668, 8, 8, 0);
     private static final WorldPoint HOPPER_DEPOSIT_DOWN = new WorldPoint(3748, 5672, 0);
@@ -262,7 +262,10 @@ public class MotherloadMineScript extends Script {
 
     private WallObject findClosestVein() {
         return Rs2GameObject.getWallObjects().stream()
-                .filter(this::isVein).filter(this::isWithinMiningArea).min((a, b) -> Integer.compare(distanceToPlayer(a), distanceToPlayer(b))).orElse(null);
+                .filter(x -> this.isVein(x)
+                        && this.isWithinMiningArea(x)
+                        && Rs2Tile.areSurroundingTilesWalkable(x.getWorldLocation(), 1, 1))
+                .min((a, b) -> Integer.compare(distanceToPlayer(a), distanceToPlayer(b))).orElse(null);
     }
 
     private boolean isVein(WallObject wallObject) {

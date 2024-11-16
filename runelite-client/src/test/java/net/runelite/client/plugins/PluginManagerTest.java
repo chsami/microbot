@@ -54,6 +54,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.plugins.microbot.Microbot;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import static org.junit.Assert.assertEquals;
@@ -187,7 +188,7 @@ public class PluginManagerTest
 		{
 			graphvizGrapher.setOut(out);
 			graphvizGrapher.setRankdir("TB");
-			graphvizGrapher.graph(RuneLite.getInjector());
+			graphvizGrapher.graph(Microbot.getInjector());
 		}
 
 		for (Plugin p : pluginManager.getPlugins())

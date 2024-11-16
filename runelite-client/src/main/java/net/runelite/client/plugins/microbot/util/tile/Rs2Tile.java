@@ -270,7 +270,7 @@ public abstract class Rs2Tile implements Tile{
     }
 
     /**
-     * Checks if any of the tiles immediately surrounding the given object are walkable.
+     * Checks if any of the tiles immediately surrounding the given object are walkable & reachable.
      * The object is defined by its position (worldPoint) and its size (sizeX x sizeY).
      *
      * @param worldPoint The central point of the object.

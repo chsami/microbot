@@ -58,6 +58,8 @@ public class BanksShopperPlugin extends Plugin {
     @Getter
     private boolean useBank;
     @Getter
+    private boolean useNextWorld;
+    @Getter
     private boolean useLogout;
 
     @Override
@@ -68,6 +70,7 @@ public class BanksShopperPlugin extends Plugin {
         selectedQuantity = config.quantity();
         useBank = config.useBank();
         useLogout = config.logout();
+        useNextWorld = config.useNextWorld();
         updateItemList(config.itemNames());
         
         if (overlayManager != null) {
@@ -121,6 +124,10 @@ public class BanksShopperPlugin extends Plugin {
         if (event.getKey().equals(BanksShopperConfig.logout)) {
             useLogout = config.logout();
         }
+
+        if (event.getKey().equals(BanksShopperConfig.useNextWorld)) {
+            useNextWorld = config.useNextWorld();
+        }
         
         if (event.getKey().equals(BanksShopperConfig.itemNames)) {
             updateItemList(config.itemNames());
@@ -136,7 +143,7 @@ public class BanksShopperPlugin extends Plugin {
                     .map(String::toLowerCase)
                     .collect(Collectors.toList());
         } else {
-            itemNames = Collections.singletonList(items);
+            itemNames = Collections.singletonList(items.trim().toLowerCase());
         }
     }
 }

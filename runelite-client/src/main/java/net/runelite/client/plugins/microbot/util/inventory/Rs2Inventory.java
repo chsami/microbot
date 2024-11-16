@@ -2307,11 +2307,11 @@ public class Rs2Inventory {
     }
 
     public static boolean allPouchesFull() {
-        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).allMatch(x -> (x.hasRequiredRunecraftingLevel() && x.getRemaining() == 0) || !x.hasRequiredRunecraftingLevel());
+        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).allMatch(x -> (x.hasRequiredRunecraftingLevel() && x.getRemaining() <= 0) || !x.hasRequiredRunecraftingLevel());
     }
 
     public static boolean allPouchesEmpty() {
-        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).allMatch(x -> (x.hasRequiredRunecraftingLevel() && x.getHoldAmount() == 0) || !x.hasRequiredRunecraftingLevel());
+        return Arrays.stream(Pouch.values()).filter(Pouch::hasPouchInInventory).allMatch(x -> (x.hasRequiredRunecraftingLevel() && x.getHoldAmount() <= 0) || !x.hasRequiredRunecraftingLevel());
     }
 
     public static boolean hasDegradedPouch() {

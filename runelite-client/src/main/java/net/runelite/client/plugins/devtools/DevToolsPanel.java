@@ -102,6 +102,7 @@ class DevToolsPanel extends PluginPanel
 		container.add(plugin.getPlayers());
 		container.add(plugin.getNpcs());
 		container.add(plugin.getInventory());
+		container.add(plugin.getMemoryInspector());
 
 		container.add(plugin.getGroundItems());
 		container.add(plugin.getGroundObjects());
