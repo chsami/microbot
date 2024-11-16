@@ -4520,3 +4520,7 @@
 # Necropolis
 3347 2759 0	3349 2759 0	Climb-over Rubble 44003				4
 3349 2759 0	3347 2759 0	Climb-over Rubble 44003				4
+
+# Villa entry aldarin
+1425 2933 0	1427 2933 0	Pass-through Entryway 54707				4
+1427 2933 0	1425 2933 0	Pass-through Entryway 54707				4
