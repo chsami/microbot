@@ -22,7 +22,7 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 public class BanksBankStanderScript extends Script {
     @Inject
     private BanksBankStanderConfig config;
-    public static double version = 1.5;
+    public static double version = 1.6;
 
     int MAX_TRIES = 4;
     public static long previousItemChange;
@@ -129,7 +129,8 @@ public class BanksBankStanderScript extends Script {
                 combineItems();
 
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                ex.printStackTrace();
+                Microbot.log(ex.getMessage());
             }
         }, 0, 10, TimeUnit.MILLISECONDS);
         return true;
@@ -299,7 +300,7 @@ public class BanksBankStanderScript extends Script {
                 }
                 long bankCloseTime = System.currentTimeMillis();
                 while (this.isRunning() && Rs2Bank.isOpen() && (System.currentTimeMillis() - bankCloseTime < 32000)) {
-                    closeBank();
+                    Rs2Bank.closeBank();
                     sleep = sleepUntilTrue(() -> !Rs2Bank.isOpen(), random(60, 97), 5000);
                     sleep(calculateSleepDuration() - 10);
                 }
