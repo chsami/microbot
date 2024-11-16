@@ -667,7 +667,11 @@ class MicrobotConfigPanel extends PluginPanel
 		JCheckBox checkbox = new JCheckBox();
 		{
 			Notification notif = configManager.getConfiguration(cd.getGroup().value(), cid.getItem().keyName(), Notification.class);
-			checkbox.setSelected(notif.isEnabled());
+			if (notif == null) {
+				checkbox.setSelected(false);
+			} else {
+				checkbox.setSelected(notif.isEnabled());
+			}
 		}
 		checkbox.addActionListener(ae ->
 		{
