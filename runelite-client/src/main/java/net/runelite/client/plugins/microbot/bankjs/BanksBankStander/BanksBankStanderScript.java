@@ -179,7 +179,7 @@ public class BanksBankStanderScript extends Script {
             if (!Rs2Bank.isOpen()) {
                 Rs2Bank.openBank();
             }
-            sleep = sleepUntilTrue(() -> Rs2Bank.isOpen(), random(67, 97), 18000);
+            sleep = sleepUntilTrue(Rs2Bank::isOpen, random(67, 97), 18000);
             sleep(calculateSleepDuration());
             if (firstItemId != null && secondItemId != null && thirdItemId != null && fourthItemId != null) {
                 Rs2Bank.depositAllExcept(firstItemId, secondItemId, thirdItemId, fourthItemId);
