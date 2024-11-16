@@ -23,8 +23,10 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -554,73 +556,12 @@ public class Rs2Inventory {
      *
      * @return True if all matching items were successfully dropped, false otherwise.
      */
-    public static boolean dropAll(Predicate<Rs2Item> predicate, DropOrder dropOrder) {
+    public static boolean dropAll(Predicate<Rs2Item> predicate, InteractOrder dropOrder) {
         List<Rs2Item> itemsToDrop = items().stream()
                 .filter(predicate)
                 .collect(Collectors.toList());
 
-        switch (dropOrder) {
-            case STANDARD:
-                break;
-
-            case EFFICIENT_ROW:
-                itemsToDrop.sort((item1, item2) -> {
-                    int index1 = item1.getSlot();
-                    int index2 = item2.getSlot();
-                    int row1 = index1 / COLUMNS;
-                    int row2 = index2 / COLUMNS;
-                    if (row1 != row2) {
-                        return Integer.compare(row1, row2);
-                    } else {
-                        int col1 = index1 % COLUMNS;
-                        int col2 = index2 % COLUMNS;
-                        if (row1 % 2 == 0) {
-                            // For even rows, sort columns normally (left to right)
-                            return Integer.compare(col1, col2);
-                        } else {
-                            // For odd rows, sort columns in reverse (right to left)
-                            return Integer.compare(col2, col1);
-                        }
-                    }
-                });
-                break;
-
-            case COLUMN:
-                itemsToDrop.sort((item1, item2) -> {
-                    int index1 = item1.getSlot();
-                    int index2 = item2.getSlot();
-                    int col1 = index1 % COLUMNS;
-                    int col2 = index2 % COLUMNS;
-                    if (col1 != col2) {
-                        return Integer.compare(col1, col2);
-                    } else {
-                        return Integer.compare(index1 / COLUMNS, index2 / COLUMNS);
-                    }
-                });
-                break;
-
-            case EFFICIENT_COLUMN:
-                itemsToDrop.sort((item1, item2) -> {
-                    int index1 = item1.getSlot();
-                    int index2 = item2.getSlot();
-                    int col1 = index1 % COLUMNS;
-                    int col2 = index2 % COLUMNS;
-                    if (col1 != col2) {
-                        return Integer.compare(col1, col2);
-                    } else {
-                        int row1 = index1 / COLUMNS;
-                        int row2 = index2 / COLUMNS;
-                        if (col1 % 2 == 0) {
-                            // For even columns, sort rows normally (top to bottom)
-                            return Integer.compare(row1, row2);
-                        } else {
-                            // For odd columns, sort rows in reverse (bottom to top)
-                            return Integer.compare(row2, row1);
-                        }
-                    }
-                });
-                break;
-        }
+       itemsToDrop = calculateInteractOrder(itemsToDrop, dropOrder);
 
         for (Rs2Item item : itemsToDrop) {
             if (item == null) continue;
@@ -650,7 +591,7 @@ public class Rs2Inventory {
      * @return True if all non-matching items were successfully dropped, false otherwise.
      */
     public static boolean dropAllExcept(String... names) {
-        return dropAllExcept(false, DropOrder.STANDARD, names);
+        return dropAllExcept(false, InteractOrder.STANDARD, names);
     }
 
     /**
@@ -668,7 +609,7 @@ public class Rs2Inventory {
      *
      * @return True if all non-matching items were successfully dropped, false otherwise.
      */
-    public static boolean dropAllExcept(boolean exact, DropOrder dropOrder, String... names) {
+    public static boolean dropAllExcept(boolean exact, InteractOrder dropOrder, String... names) {
         if (exact)
             return dropAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)), dropOrder);
         else
@@ -2316,5 +2257,96 @@ public class Rs2Inventory {
 
     public static boolean hasDegradedPouch() {
         return Arrays.stream(Pouch.values()).anyMatch(Pouch::isDegraded);
+    }
+
+    /**
+     * clean herb in random order
+     * @return
+     */
+    public static void cleanHerbs(InteractOrder interactOrder) {
+        if (!Rs2Inventory.hasItem("grimy")) return;
+
+        List<Rs2Item> inventorySlots = calculateInteractOrder(items()
+                .stream()
+                .filter(x -> x.getName().toLowerCase().contains("grimy"))
+                .collect(Collectors.toList()), interactOrder);
+
+        // Shuffle the list to randomize the order
+
+        // Interact with each slot in the random order
+        for (Rs2Item rs2Item : inventorySlots) {
+            if (!Rs2Inventory.hasItem("grimy")) break;
+            if (rs2Item != null && !rs2Item.getName().toLowerCase().contains("grimy")) continue;
+            interact(rs2Item, "clean");
+        }
+    }
+
+    public static List<Rs2Item> calculateInteractOrder(List<Rs2Item> rs2Items, InteractOrder interactOrder) {
+        switch (interactOrder) {
+
+            case EFFICIENT_ROW:
+                rs2Items.sort((item1, item2) -> {
+                    int index1 = item1.getSlot();
+                    int index2 = item2.getSlot();
+                    int row1 = index1 / COLUMNS;
+                    int row2 = index2 / COLUMNS;
+                    if (row1 != row2) {
+                        return Integer.compare(row1, row2);
+                    } else {
+                        int col1 = index1 % COLUMNS;
+                        int col2 = index2 % COLUMNS;
+                        if (row1 % 2 == 0) {
+                            // For even rows, sort columns normally (left to right)
+                            return Integer.compare(col1, col2);
+                        } else {
+                            // For odd rows, sort columns in reverse (right to left)
+                            return Integer.compare(col2, col1);
+                        }
+                    }
+                });
+                return rs2Items;
+
+            case COLUMN:
+                rs2Items.sort((item1, item2) -> {
+                    int index1 = item1.getSlot();
+                    int index2 = item2.getSlot();
+                    int col1 = index1 % COLUMNS;
+                    int col2 = index2 % COLUMNS;
+                    if (col1 != col2) {
+                        return Integer.compare(col1, col2);
+                    } else {
+                        return Integer.compare(index1 / COLUMNS, index2 / COLUMNS);
+                    }
+                });
+                return rs2Items;
+
+            case EFFICIENT_COLUMN:
+                rs2Items.sort((item1, item2) -> {
+                    int index1 = item1.getSlot();
+                    int index2 = item2.getSlot();
+                    int col1 = index1 % COLUMNS;
+                    int col2 = index2 % COLUMNS;
+                    if (col1 != col2) {
+                        return Integer.compare(col1, col2);
+                    } else {
+                        int row1 = index1 / COLUMNS;
+                        int row2 = index2 / COLUMNS;
+                        if (col1 % 2 == 0) {
+                            // For even columns, sort rows normally (top to bottom)
+                            return Integer.compare(row1, row2);
+                        } else {
+                            // For odd columns, sort rows in reverse (bottom to top)
+                            return Integer.compare(row2, row1);
+                        }
+                    }
+                });
+                return rs2Items;
+
+            case STANDARD:
+                return rs2Items;
+
+            default:
+                return rs2Items;
+        }
     }
 }
