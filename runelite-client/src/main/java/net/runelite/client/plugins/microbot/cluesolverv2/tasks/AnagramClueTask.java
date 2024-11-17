@@ -37,6 +37,7 @@ public class AnagramClueTask implements ClueTask {
     /**
      * Constructor for the task.
      */
+    //TODO: Implement better overall logic for the task
     public AnagramClueTask() {
         this.state = State.NAVIGATING_TO_LOCATION;
     }

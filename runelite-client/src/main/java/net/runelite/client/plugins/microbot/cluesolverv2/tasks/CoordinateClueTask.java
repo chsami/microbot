@@ -34,6 +34,7 @@ public class CoordinateClueTask implements ClueTask {
         log.info("CoordinateClueTask initialized for clue at location: {}", clue.getLocation(null));
     }
 
+
     @Override
     public void start() {
         if (clue == null) {
