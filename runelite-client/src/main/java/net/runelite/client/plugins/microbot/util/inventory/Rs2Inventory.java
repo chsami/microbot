@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util.inventory;
 
+import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.ComponentID;
@@ -15,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Potion;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
@@ -23,8 +25,10 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1201,12 +1205,19 @@ public class Rs2Inventory {
      * @return A random item that matches the item IDs, or null if no matching items are found.
      */
     public static Rs2Item getRandom(int... itemIDs) {
-        return items().stream()
+        List<Rs2Item> matchingItems = items().stream()
                 .filter(x -> Arrays.stream(itemIDs)
                         .anyMatch(i -> i == x.id))
-                .findAny()
-                .orElse(null);
+                .collect(Collectors.toList());
+
+        if (matchingItems.isEmpty()) {
+            return null;
+        }
+
+        java.util.Random random = new java.util.Random();
+        return matchingItems.get(random.nextInt(matchingItems.size()));
     }
+
 
     /**
      * Gets a random item from the inventory that matches the specified item names.
@@ -1216,12 +1227,19 @@ public class Rs2Inventory {
      * @return A random item that matches the item names, or null if no matching items are found.
      */
     public static Rs2Item getRandom(String... itemNames) {
-        return items().stream()
+        List<Rs2Item> matchingItems = items().stream()
                 .filter(x -> Arrays.stream(itemNames)
                         .anyMatch(i -> i.equalsIgnoreCase(x.name)))
-                .findAny()
-                .orElse(null);
+                .collect(Collectors.toList());
+
+        if (matchingItems.isEmpty()) {
+            return null;
+        }
+
+        java.util.Random random = new java.util.Random();
+        return matchingItems.get(random.nextInt(matchingItems.size()));
     }
+
 
     /**
      * Gets a random item from the inventory that matches the specified item filter.
@@ -1231,11 +1249,18 @@ public class Rs2Inventory {
      * @return A random item that matches the filter criteria, or null if no matching items are found.
      */
     public static Rs2Item getRandom(Predicate<Rs2Item> itemFilter) {
-        return items().stream()
+        List<Rs2Item> matchingItems = items().stream()
                 .filter(itemFilter)
-                .findAny()
-                .orElse(null);
+                .collect(Collectors.toList());
+
+        if (matchingItems.isEmpty()) {
+            return null;
+        }
+
+        java.util.Random random = new java.util.Random();
+        return matchingItems.get(random.nextInt(matchingItems.size()));
     }
+
 
     /**
      * Gets the ID of the currently selected item in the inventory.
@@ -2316,5 +2341,22 @@ public class Rs2Inventory {
 
     public static boolean hasDegradedPouch() {
         return Arrays.stream(Pouch.values()).anyMatch(Pouch::isDegraded);
+    }
+
+    // hover over item in inventory
+    public static boolean hover(Rs2Item item) {
+        if (item == null) return false;
+        if (!Rs2AntibanSettings.naturalMouse) {
+            if(Rs2AntibanSettings.devDebug)
+                Microbot.log("Natural mouse is not enabled, can't hover");
+            return false;
+        }
+        Point point = Rs2UiHelper.getClickingPoint(itemBounds(item), true);
+        // if the point is 1,1 then the object is not on screen and we should return false
+        if (point.getX() == 1 && point.getY() == 1) {
+            return false;
+        }
+        Microbot.getNaturalMouse().moveTo(point.getX(), point.getY());
+        return true;
     }
 }

@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.enums.ActivityIntensity;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.mouse.naturalmouse.api.MouseInfoAccessor;
 import net.runelite.client.plugins.microbot.util.mouse.naturalmouse.api.MouseMotionFactory;
 import net.runelite.client.plugins.microbot.util.mouse.naturalmouse.api.SystemCalls;
@@ -63,6 +64,11 @@ public class NaturalMouse {
 //		}
         int finalDx = dx;
         int finalDy = dy;
+        Point mousePos = Microbot.getMouse().getMousePosition();
+        // check if current mouse position is already at the destination
+        if (mousePos.x == finalDx && mousePos.y == finalDy) {
+            return;
+        }
 
         if (!Microbot.getClient().isClientThread()) {
             move(finalDx, finalDy);
@@ -119,10 +125,26 @@ public class NaturalMouse {
 //		return factory;
     }
 
+    /**
+     * Moves the mouse off screen with a default 100% chance.
+     * This method will always move the mouse off screen when called.
+     */
     public void moveOffScreen() {
-        // 1 in 4 chance of moving off screen
-        if (random.nextInt(4) == 0) {
-            // Edges of the screen
+        // Always move the mouse off screen (default behavior)
+        moveOffScreen(100.0); // Calls the overloaded method with a 100% chance
+    }
+
+    /**
+     * Moves the mouse off screen based on a given percentage chance.
+     *
+     * @param chancePercentage the chance (in percentage) to move the mouse off screen.
+     *                         This value should be between 0.0 and 100.0 (inclusive).
+     *                         Note: This parameter should not be a fractional value between
+     *                         0.0 and 0.99; use values representing a whole percentage (e.g., 25.0, 50.0).
+     */
+    public void moveOffScreen(double chancePercentage) {
+        if (chancePercentage >= 100 || Rs2Random.dicePercentage(chancePercentage)) {
+            // Move off screen if the chance is met
             int horizontal = random.nextBoolean() ? -1 : client.getCanvasWidth() + 1;
             int vertical = random.nextBoolean() ? -1 : client.getCanvasHeight() + 1;
 
@@ -132,7 +154,6 @@ public class NaturalMouse {
             } else {
                 moveTo(random.nextInt(0, client.getCanvasWidth() + 1), vertical);
             }
-
         }
     }
 

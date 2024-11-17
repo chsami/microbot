@@ -378,7 +378,8 @@ public class Rs2Random {
      * @param dev  The standard deviation of the wait time.
      */
     public static void waitEx(double mean, double dev) {
-        wait(Math.abs(Math.round(gaussRand(mean, dev))), 0, EWaitDir.wdMean);
+        long waitTime = Math.abs(Math.round(gaussRand(mean, dev)));
+        systemWait(waitTime);
     }
 
     /**
@@ -388,6 +389,7 @@ public class Rs2Random {
      * @param time The duration to wait in milliseconds.
      */
     private static void systemWait(long time) {
+        log.info("Waiting for {} ms", time);
         Global.sleep((int) time);
     }
 
