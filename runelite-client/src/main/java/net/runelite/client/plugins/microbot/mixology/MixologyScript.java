@@ -45,6 +45,9 @@ public class MixologyScript extends Script {
 
     public boolean run(MixologyConfig config) {
         Microbot.enableAutoRunOn = false;
+        currentMoxPoints = 0;
+        currentAgaPoints = 0;
+        currentLyePoints = 0;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;

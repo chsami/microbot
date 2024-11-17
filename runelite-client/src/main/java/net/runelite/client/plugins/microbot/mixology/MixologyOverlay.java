@@ -16,20 +16,18 @@ public class MixologyOverlay extends OverlayPanel {
     private final MixologyPlugin plugin;
     private final ModelOutlineRenderer modelOutlineRenderer;
 
-    LocalTime startTime;
     @Inject
     MixologyOverlay(MixologyPlugin plugin, ModelOutlineRenderer modelOutlineRenderer) {
         this.plugin = plugin;
         this.modelOutlineRenderer = modelOutlineRenderer;
         this.setPosition(OverlayPosition.DYNAMIC);
         this.setLayer(OverlayLayer.ABOVE_SCENE);
-        startTime = LocalTime.now(); // Capture the start time
     }
 
     public Dimension render(Graphics2D graphics) {
         LocalTime currentTime = LocalTime.now();
 
-        Duration runtime = Duration.between(startTime, currentTime); // Calculate runtime
+        Duration runtime = Duration.between(plugin.startTime, currentTime); // Calculate runtime
 
         panelComponent.setPreferredLocation(new Point(200, 20));
         panelComponent.setPreferredSize(new Dimension(300, 300));
