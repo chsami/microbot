@@ -1,146 +1,87 @@
 package net.runelite.client.plugins.microbot.mixology;
 
 import net.runelite.client.config.*;
-
-import java.awt.*;
+import org.jetbrains.annotations.Range;
 
 @ConfigGroup("mixology")
+@ConfigInformation("<p>Start the script at the bankchest of the mixology minigame room with an empty inventory.</p> <br />" +
+        "<br />Requirements: " +
+        "<ol> " +
+        "<li>60 Herblore</li>" +
+        "<li>Herbs for making mox/aga/lye paste</li>" +
+        "</ol>")
 public interface MixologyConfig extends Config {
-    String CONFIG_GROUP = "masteringmixology";
     @ConfigSection(
-            name = "Highlights",
-            description = "Highlighting related configuration",
-            position = 10
+            name = "Refiner",
+            description = "General configuration",
+            position = 0
     )
-    String HIGHLIGHTS = "Highlights";
+    String refiner = "Refiner";
 
     @ConfigItem(
-            keyName = "potionOrderSorting",
-            name = "Order sorting",
-            description = "Determines how potion orders are sorted in the interface",
-            position = 1
+            keyName = "RefinerHerbMox",
+            name = "Refining Mox Herb",
+            description = "Refine herbs into mox paste",
+            position = 0,
+            section = refiner
     )
-    default PotionOrderSorting potionOrderSorting() {
-        return PotionOrderSorting.VANILLA;
+    default MoxHerbs moxHerb() {
+        return MoxHerbs.GUAM;
+    }
+    @Range(from = 100, to = 3000)
+    @ConfigItem(
+            keyName = "RefinerHerbMoxAmt",
+            name = "Refining Mox Herb Amount",
+            description = "Amount of herbs to refine into mox paste",
+            position = 1,
+            section = refiner
+    )
+    default int amtMoxHerb() {
+        return 1000;
     }
 
     @ConfigItem(
-            keyName = "highlightLevers",
-            name = "Highlight levers",
-            description = "Highlight levers",
-            position = 2
+            keyName = "RefinerHerbLye",
+            name = "Refining Lye Herb",
+            description = "Refine herbs into lye paste",
+            position = 2,
+            section = refiner
     )
-    default boolean highlightLevers() {
-        return true;
+    default LyeHerbs lyeHerb() {
+        return LyeHerbs.Ranarr;
+    }
+    @Range(from = 100, to = 3000)
+    @ConfigItem(
+            keyName = "RefinerHerbLyeAmt",
+            name = "Refining lye Herb Amount",
+            description = "Amount of herbs to refine into lye paste",
+            position = 3,
+            section = refiner
+    )
+    default int amtLyeHerb() {
+        return 1000;
     }
 
     @ConfigItem(
-            keyName = "highlightStations",
-            name = "Highlight stations",
-            description = "Toggles alchemical station highlighting on or off",
-            position = 2
+            keyName = "RefinerHerbAga",
+            name = "Refining Aga Herb",
+            description = "Refine herbs into aga paste",
+            position = 4,
+            section = refiner
     )
-    default boolean highlightStations() {
-        return true;
+    default AgaHerbs agaHerb() {
+        return AgaHerbs.Irit;
+    }
+    @Range(from = 100, to = 3000)
+    @ConfigItem(
+            keyName = "RefinerHerbAgaAmt",
+            name = "Refining Aga Herb Amount",
+            description = "Amount of herbs to refine into aga paste",
+            position = 5,
+            section = refiner
+    )
+    default int amtAgaHerb() {
+        return 1000;
     }
 
-    @ConfigItem(
-            keyName = "highlightQuickActionEvents",
-            name = "Highlight quick-action events",
-            description = "Toggles station quick-action events highlighting on or off",
-            position = 2
-    )
-    default boolean highlightQuickActionEvents() {
-        return true;
-    }
-
-    @ConfigItem(
-            keyName = "identifyPotions",
-            name = "Identify potions",
-            description = "Identify potions in your inventory",
-            position = 2
-    )
-    default boolean identifyPotions() {
-        return true;
-    }
-
-    @ConfigItem(
-            keyName = "displayResin",
-            name = "Display resin amount",
-            description = "Display total resin amounts",
-            position = 2
-    )
-    default boolean displayResin() {
-        return false;
-    }
-
-    @ConfigItem(
-            keyName = "stationHighlightColor",
-            name = "Station color",
-            description = "Configures the default station highlight color",
-            position = 3
-    )
-    default Color stationHighlightColor() {
-        return Color.MAGENTA;
-    }
-
-    @ConfigItem(
-            keyName = "stationQuickActionHighlightColor",
-            name = "Quick-action color",
-            description = "Configures the station quick-action highlight color",
-            position = 4
-    )
-    default Color stationQuickActionHighlightColor() {
-        return Color.GREEN;
-    }
-
-    @ConfigItem(
-            keyName = "notifyDigweed",
-            name = "Notify DigWeed",
-            description = "Toggles digweed notifications on or off",
-            position = 5
-    )
-    default Notification notifyDigWeed() {
-        return Notification.ON;
-    }
-
-    @ConfigItem(
-            keyName = "highlightDigweed",
-            name = "Highlight DigWeed",
-            description = "Toggles digweed highlighting on or off",
-            position = 6
-    )
-    default boolean highlightDigWeed() {
-        return true;
-    }
-
-    @ConfigItem(
-            keyName = "digweedHighlightColor",
-            name = "DigWeed color",
-            description = "Configures the digweed highlight color",
-            position = 7
-    )
-    default Color digweedHighlightColor() {
-        return Color.GREEN;
-    }
-
-    @ConfigItem(
-            section = "Highlights",
-            keyName = "highlightBorderWidth",
-            name = "Border width",
-            description = "Configures the border width of the object highlights"
-    )
-    default int highlightBorderWidth() {
-        return 2;
-    }
-
-    @ConfigItem(
-            section = "Highlights",
-            keyName = "highlightFeather",
-            name = "Feather",
-            description = "Configures the amount of 'feathering' to be applied to the object highlights"
-    )
-    default int highlightFeather() {
-        return 1;
-    }
 }

@@ -459,6 +459,16 @@ public class Rs2Random {
         }
     }
 
+    /**
+     * generate random number between min and max
+     * @param min
+     * @param max
+     * @return
+     */
+    public static int between(final int min, final int max) {
+        final int n = Math.abs(max - min);
+        return Math.min(min, max) + (n == 0 ? 0 : new java.util.Random().nextInt(n));
+    }
 
     enum EWaitDir {
         wdLeft, wdMean, wdRight

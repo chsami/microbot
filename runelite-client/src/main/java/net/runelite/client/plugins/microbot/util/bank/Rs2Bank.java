@@ -246,6 +246,15 @@ public class Rs2Bank {
     /**
      * Query count of item inside of bank
      */
+    public static int count(int id) {
+        Rs2Item bankItem = findBankItem(id);
+        if (bankItem == null) return 0;
+        return bankItem.quantity;
+    }
+
+    /**
+     * Query count of item inside of bank
+     */
     public static int count(String name, boolean exact) {
         Rs2Item bankItem = findBankItem(name, exact);
         if (bankItem == null) return 0;
