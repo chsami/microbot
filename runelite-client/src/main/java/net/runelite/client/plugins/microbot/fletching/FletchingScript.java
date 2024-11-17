@@ -3,7 +3,9 @@ package net.runelite.client.plugins.microbot.fletching;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.runelite.api.Point;
 import net.runelite.api.Skill;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.fletching.enums.FletchingItem;
@@ -13,6 +15,8 @@ import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -93,20 +97,23 @@ public class FletchingScript extends Script {
     private void bankItems(FletchingConfig config) {
         Rs2Bank.openBank();
 
-        // make sure there's no long bows left
-        if (fletchingMode == FletchingMode.STRUNG) {
-            Rs2Bank.depositAll();
-        } else if (fletchingMode == FletchingMode.PROGRESSIVE) {
-            Rs2Bank.depositAll(model.getFletchingItem().getContainsInventoryName());
-            calculateItemToFletch();
-            secondaryItemToFletch = (model.getFletchingMaterial().getName() + " logs").trim();
-        } else {
-            // make sure there's no long bows left
-            Rs2Bank.depositAll(config.fletchingItem().getContainsInventoryName());
+        // Deposit items based on the fletching mode
+        switch (fletchingMode) {
+            case STRUNG:
+                Rs2Bank.depositAll();
+                break;
+            case PROGRESSIVE:
+                Rs2Bank.depositAll(model.getFletchingItem().getContainsInventoryName());
+                calculateItemToFletch();
+                secondaryItemToFletch = (model.getFletchingMaterial().getName() + " logs").trim();
+                break;
+            default:
+                Rs2Bank.depositAll(config.fletchingItem().getContainsInventoryName());
+                break;
         }
 
-
-        if (Rs2Bank.isOpen() && !Rs2Bank.hasItem(primaryItemToFletch) && !Rs2Inventory.hasItem(primaryItemToFletch)) {
+        // Check if the primary item is available
+        if (!Rs2Bank.hasItem(primaryItemToFletch) && !Rs2Inventory.hasItem(primaryItemToFletch)) {
             Rs2Bank.closeBank();
             Microbot.status = "[Shutting down] - Reason: " + primaryItemToFletch + " not found in the bank.";
             Microbot.showMessage(Microbot.status);
@@ -114,19 +121,19 @@ public class FletchingScript extends Script {
             return;
         }
 
-        // Extra check if we for some reason have a full inventory without a knife
+        // Ensure the inventory isn't full without the primary item
         if (!Rs2Inventory.hasItem(primaryItemToFletch) && Rs2Inventory.isFull()) {
             Rs2Bank.depositAll();
-            sleepUntil(Rs2Inventory::isEmpty, 10000);
         }
 
+        // Withdraw the primary item if not already in the inventory
         if (!Rs2Inventory.hasItem(primaryItemToFletch)) {
             Rs2Bank.withdrawX(true, primaryItemToFletch, fletchingMode.getAmount(), true);
-            sleepUntil(() -> Rs2Inventory.hasItem(primaryItemToFletch));
         }
 
-        if (Rs2Bank.isOpen() && !Rs2Bank.hasItem(secondaryItemToFletch)) {
-            if (Rs2Bank.hasBankItem("bow string") && fletchingMode == FletchingMode.UNSTRUNG_STRUNG) {
+        // Check if the secondary item is available
+        if (!Rs2Bank.hasItem(secondaryItemToFletch)) {
+            if (fletchingMode == FletchingMode.UNSTRUNG_STRUNG && Rs2Bank.hasBankItem("bow string")) {
                 Rs2Bank.depositAll();
                 fletchingMode = FletchingMode.STRUNG;
                 return;
@@ -138,20 +145,34 @@ public class FletchingScript extends Script {
             return;
         }
 
-        final String finalSecondaryItemToFletch = secondaryItemToFletch;
-
-        do {
-            if (fletchingMode == FletchingMode.STRUNG)
+        // Withdraw the secondary item if not already in the inventory
+        if (!Rs2Inventory.hasItem(secondaryItemToFletch)) {
+            if (fletchingMode == FletchingMode.STRUNG) {
                 Rs2Bank.withdrawX(true, secondaryItemToFletch, fletchingMode.getAmount());
-            else
+            } else {
                 Rs2Bank.withdrawAll(secondaryItemToFletch);
+            }
+        }
+        if (Rs2AntibanSettings.naturalMouse) {
+            // Testing if completing the mouse movement before the final item check improves the overall flow.
+            // This should allow time for the inventory to update while the mouse is moving.
+            // Enhances the bot's behavior to appear more natural and less automated.
+            Widget closeButton = Rs2Widget.getWidget(786434).getChild(11);
+            Point closePoint = Rs2UiHelper.getClickingPoint(closeButton != null ? closeButton.getBounds() : null, true);
+            Rs2Random.waitEx(200, 100);
+            Microbot.naturalMouse.moveTo(closePoint.getX(), closePoint.getY());
+        }
 
-            sleepUntil(() -> Rs2Inventory.hasItem(finalSecondaryItemToFletch), 2000);
-        } while (!Rs2Inventory.hasItem(finalSecondaryItemToFletch));
+        // Final check to ensure both items are in the inventory
+        if (!Rs2Inventory.hasItem(primaryItemToFletch) || !Rs2Inventory.hasItem(secondaryItemToFletch)) {
+            Microbot.log("waiting for inventory changes.");
+            Rs2Inventory.waitForInventoryChanges(5000);
+        }
 
-        sleep(600, 3000);
+        Rs2Random.waitEx(200,100);
         Rs2Bank.closeBank();
     }
+
 
     private void fletch(FletchingConfig config) {
         Rs2Inventory.combineClosest(primaryItemToFletch, secondaryItemToFletch);

@@ -128,6 +128,65 @@ public class Login {
         return getRandomWorld(isMembers, null);
     }
 
+    public static int getNextWorld(boolean isMembers) {
+        return getNextWorld(isMembers, null);
+    }
+    
+    public static int getNextWorld(boolean isMembers, WorldRegion region) {
+        WorldResult worldResult = Microbot.getWorldService().getWorlds();
+
+        if (worldResult == null) {
+            return isMembers ? 360 : 383;
+        }
+
+        List<World> worlds = worldResult.getWorlds();
+        List<World> filteredWorlds = worlds.stream()
+                .filter(x -> !x.getTypes().contains(WorldType.PVP) &&
+                        !x.getTypes().contains(WorldType.HIGH_RISK) &&
+                        !x.getTypes().contains(WorldType.BOUNTY) &&
+                        !x.getTypes().contains(WorldType.SKILL_TOTAL) &&
+                        !x.getTypes().contains(WorldType.LAST_MAN_STANDING) &&
+                        !x.getTypes().contains(WorldType.QUEST_SPEEDRUNNING) &&
+                        !x.getTypes().contains(WorldType.BETA_WORLD) &&
+                        !x.getTypes().contains(WorldType.DEADMAN) &&
+                        !x.getTypes().contains(WorldType.PVP_ARENA) &&
+                        !x.getTypes().contains(WorldType.TOURNAMENT) &&
+                        !x.getTypes().contains(WorldType.FRESH_START_WORLD) &&
+                        x.getPlayers() < MAX_PLAYER_COUNT &&
+                        x.getPlayers() >= 0)
+                .collect(Collectors.toList());
+
+        filteredWorlds = isMembers
+                ? filteredWorlds.stream().filter(x -> x.getTypes().contains(WorldType.MEMBERS)).collect(Collectors.toList())
+                : filteredWorlds.stream().filter(x -> !x.getTypes().contains(WorldType.MEMBERS)).collect(Collectors.toList());
+
+        if (region != null) {
+            filteredWorlds = filteredWorlds.stream()
+                    .filter(x -> x.getRegion() == region)
+                    .collect(Collectors.toList());
+        }
+
+        int currentWorldId = Microbot.getClient().getWorld();
+        int currentIndex = -1;
+
+        for (int i = 0; i < filteredWorlds.size(); i++) {
+            if (filteredWorlds.get(i).getId() == currentWorldId) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        if (currentIndex != -1) {
+            int nextIndex = (currentIndex + 1) % filteredWorlds.size();
+            return filteredWorlds.get(nextIndex).getId();
+        } else if (!filteredWorlds.isEmpty()) {
+            // If current world is not found in the filtered list, pick the first in the list
+            return filteredWorlds.get(0).getId();
+        }
+
+        return isMembers ? 360 : 383;
+    }
+
     public void setWorld(int worldNumber) {
         try {
             net.runelite.http.api.worlds.World world = Microbot.getWorldService().getWorlds().findWorld(worldNumber);
