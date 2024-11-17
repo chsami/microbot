@@ -18,6 +18,7 @@ public class CoordinateClueTask implements ClueTask {
         CHECKING_ITEMS,
         NAVIGATING_TO_LOCATION,
         DIGGING,
+        INTERACTING_OBJECT,
         COMPLETED,
         FAILED
     }
@@ -56,6 +57,9 @@ public class CoordinateClueTask implements ClueTask {
             case NAVIGATING_TO_LOCATION:
                 return navigateToLocation();
 
+            case INTERACTING_OBJECT:
+                return interactWithObject();
+
             case DIGGING:
                 return digAtLocation();
 
@@ -74,6 +78,11 @@ public class CoordinateClueTask implements ClueTask {
                 state = State.FAILED;
                 return true;
         }
+    }
+
+    private boolean interactWithObject() {
+        //TODO: Implement object interaction
+        return false;
     }
 
     @Override
