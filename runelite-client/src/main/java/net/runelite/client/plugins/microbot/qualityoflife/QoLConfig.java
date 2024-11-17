@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.qualityoflife;
 
 import net.runelite.client.config.*;
+import net.runelite.client.plugins.microbot.fletching.enums.FletchingItem;
 import net.runelite.client.plugins.microbot.qualityoflife.enums.WintertodtActions;
 import net.runelite.client.plugins.microbot.util.misc.SpecialAttackWeaponEnum;
 
@@ -51,6 +52,29 @@ public interface QoLConfig extends Config {
             position = 5
     )
     String inventorySection = "inventorySection";
+
+    // UI section
+    @ConfigSection(
+            name = "UI",
+            description = "Settings related to UI",
+            position = 6
+    )
+    String uiSection = "uiSection";
+    // Wintertodt section
+    @ConfigSection(
+            name = "Wintertodt",
+            description = "Wintertodt settings",
+            position = 7
+    )
+    String wintertodtSection = "wintertodtSection";
+
+    // Fletching section
+    @ConfigSection(
+            name = "Fletching",
+            description = "Fletching settings",
+            position = 8
+    )
+    String fletchingSection = "fletchingSection";
 
     // boolean to render Max Hit Overlay
     @ConfigItem(
@@ -136,21 +160,6 @@ public interface QoLConfig extends Config {
         return true;
     }
 
-    // UI section
-    @ConfigSection(
-            name = "UI",
-            description = "Settings related to UI",
-            position = 6
-    )
-    String uiSection = "uiSection";
-    // Wintertodt section
-    @ConfigSection(
-            name = "Wintertodt",
-            description = "Wintertodt settings",
-            position = 7
-    )
-    String wintertodtSection = "wintertodtSection";
-
 
     // boolean to use Dialogue auto continue
     @ConfigItem(
@@ -161,6 +170,18 @@ public interface QoLConfig extends Config {
             section = dialogueSection
     )
     default boolean useDialogueAutoContinue() {
+        return true;
+    }
+
+    // boolean to automate quest dialogue options
+    @ConfigItem(
+            keyName = "useQuestDialogueOptions",
+            name = "Quest Dialogue Options",
+            description = "Automate Quest Dialogue Options",
+            position = 1,
+            section = dialogueSection
+    )
+    default boolean useQuestDialogueOptions() {
         return true;
     }
 
@@ -254,18 +275,6 @@ public interface QoLConfig extends Config {
     )
     default SpecialAttackWeaponEnum specWeapon() {
         return SpecialAttackWeaponEnum.DRAGON_DAGGER;
-    }
-
-    // boolean to enable auto run
-    @ConfigItem(
-            keyName = "autoRun",
-            name = "Auto Run",
-            description = "Auto Run",
-            position = 7,
-            section = upkeepSection
-    )
-    default boolean autoRun() {
-        return true;
     }
 
     // boolean to auto use stamina potion
@@ -569,6 +578,78 @@ public interface QoLConfig extends Config {
             hidden = true
     )
     default boolean interrupted() {
+        return false;
+    }
+
+    // boolean to quick fletch items
+    @ConfigItem(
+            keyName = "quickFletchItems",
+            name = "Quick Fletch Items",
+            description = "Option to quick fletch logs into items when hovering over knife",
+            position = 0,
+            section = fletchingSection
+    )
+    default boolean quickFletchItems() {
+        return false;
+    }
+
+    // fletching item enum
+    @ConfigItem(
+            keyName = "fletchingItem",
+            name = "Fletching Item",
+            description = "Fletching Item",
+            position = 1,
+            section = fletchingSection
+    )
+    default FletchingItem fletchingItem() {
+        return FletchingItem.ARROW_SHAFT;
+    }
+
+    // boolean to quick fletch darts
+    @ConfigItem(
+            keyName = "quickFletchDarts",
+            name = "Quick Fletch Darts",
+            description = "Option to quick fletch darts, make x setting must be disabled",
+            position = 2,
+            section = fletchingSection
+    )
+    default boolean quickFletchDarts() {
+        return false;
+    }
+
+    // boolean to quick fletch arrows
+    @ConfigItem(
+            keyName = "quickFletchArrows",
+            name = "Quick Fletch Arrows",
+            description = "Option to quick fletch arrows",
+            position = 3,
+            section = fletchingSection
+    )
+    default boolean quickFletchArrows() {
+        return false;
+    }
+
+    // boolean to quick fletch bolts
+    @ConfigItem(
+            keyName = "quickFletchBolts",
+            name = "Quick Fletch Bolts",
+            description = "Option to quick fletch bolts",
+            position = 4,
+            section = fletchingSection
+    )
+    default boolean quickFletchBolts() {
+        return false;
+    }
+
+    // boolean to quick fletch headless arrows
+    @ConfigItem(
+            keyName = "quickFletchHeadlessArrows",
+            name = "Quick Fletch Headless Arrows",
+            description = "Option to quick fletch headless arrows",
+            position = 5,
+            section = fletchingSection
+    )
+    default boolean quickFletchHeadlessArrows() {
         return false;
     }
 
