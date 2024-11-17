@@ -7,7 +7,7 @@ import net.runelite.client.config.ConfigItem;
 import net.runelite.client.plugins.microbot.runecrafting.gotr.data.Mode;
 
 @ConfigGroup("gotr")
-@ConfigInformation("This plugin is in preview & only supports masses. <br /> The script will not create elemental guardians. <br /> Have fun and don't get banned!")
+@ConfigInformation("This plugin is in preview & only supports masses. <br /> The script will not create elemental guardians. <br /> Have fun and don't get banned! <br /> If using NPC Contact to repair pouches, make sure you have Abyssal book in your bank!")
 public interface GotrConfig extends Config {
 
     @ConfigItem(
