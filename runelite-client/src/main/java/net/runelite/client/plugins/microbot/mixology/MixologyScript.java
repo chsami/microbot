@@ -56,7 +56,7 @@ public class MixologyScript extends Script {
 
 
                 if (!isInMinigame && mixologyState != MixologyState.REFINER) {
-                    Rs2Walker.walkTo(1395, 9322, 0, 1);
+                    Rs2Walker.walkTo(1395, 9322, 0, 2);
                     return;
                 }
 
@@ -233,8 +233,6 @@ public class MixologyScript extends Script {
                         break;
                     case MIX_POTION_STAGE_2:
 
-
-
                         // Sort using a custom comparator
                         List<PotionOrder> nonFulfilledPotions = potionOrders
                                 .stream()
@@ -242,15 +240,26 @@ public class MixologyScript extends Script {
                                 .sorted(Comparator.comparingInt(customOrder::indexOf))
                                 .collect(Collectors.toList());
 
+                        if (nonFulfilledPotions.isEmpty()) {
+                            mixologyState = MixologyState.CONVEYER_BELT;
+                            return;
+                        }
+
                         PotionOrder nonFulfilledPotion = nonFulfilledPotions.get(0);
 
                         if (Rs2Player.isAnimating()) {
                             if (agitatorQuickActionTicks > 0) {
-                                quickActionProcessPotion(nonFulfilledPotion);
+                                for (int i = 0; i < Rs2Random.between(6, 10); i++) {
+                                    quickActionProcessPotion(nonFulfilledPotion);
+                                }
                                 agitatorQuickActionTicks = 0;
                             } else if (alembicQuickActionTicks > 0) {
                                 quickActionProcessPotion(nonFulfilledPotion);
                                 alembicQuickActionTicks = 0;
+                            }
+                            if (nonFulfilledPotion.potionModifier().alchemyObject() == AlchemyObject.RETORT) {
+                                quickActionProcessPotion(nonFulfilledPotion);
+                                sleep(350, 400);
                             }
                             return;
                         }

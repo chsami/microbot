@@ -16,14 +16,14 @@ public class MixologyOverlay extends OverlayPanel {
     private final MixologyPlugin plugin;
     private final ModelOutlineRenderer modelOutlineRenderer;
 
-    LocalTime startTime = LocalTime.now(); // Capture the start time
-
+    LocalTime startTime;
     @Inject
     MixologyOverlay(MixologyPlugin plugin, ModelOutlineRenderer modelOutlineRenderer) {
         this.plugin = plugin;
         this.modelOutlineRenderer = modelOutlineRenderer;
         this.setPosition(OverlayPosition.DYNAMIC);
         this.setLayer(OverlayLayer.ABOVE_SCENE);
+        startTime = LocalTime.now(); // Capture the start time
     }
 
     public Dimension render(Graphics2D graphics) {
