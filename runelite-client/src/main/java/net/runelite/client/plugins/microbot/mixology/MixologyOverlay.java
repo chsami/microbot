@@ -9,10 +9,14 @@ import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.time.Duration;
+import java.time.LocalTime;
 
 public class MixologyOverlay extends OverlayPanel {
     private final MixologyPlugin plugin;
     private final ModelOutlineRenderer modelOutlineRenderer;
+
+    LocalTime startTime = LocalTime.now(); // Capture the start time
 
     @Inject
     MixologyOverlay(MixologyPlugin plugin, ModelOutlineRenderer modelOutlineRenderer) {
@@ -23,6 +27,10 @@ public class MixologyOverlay extends OverlayPanel {
     }
 
     public Dimension render(Graphics2D graphics) {
+        LocalTime currentTime = LocalTime.now();
+
+        Duration runtime = Duration.between(startTime, currentTime); // Calculate runtime
+
         panelComponent.setPreferredLocation(new Point(200, 20));
         panelComponent.setPreferredSize(new Dimension(300, 300));
         panelComponent.getChildren().add(TitleComponent.builder()
@@ -44,7 +52,14 @@ public class MixologyOverlay extends OverlayPanel {
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Mox/Aga/Lye points per hour")
-                .right(calculatePointsPerHour())
+                .rightColor(Color.YELLOW)
+                .right(calculatePointsPerHour(runtime.getSeconds()))
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Runtime")
+                .rightColor(Color.GREEN)
+                .right(String.format("%02d:%02d:%02d", runtime.toHours(), runtime.toMinutesPart(), runtime.toSecondsPart()))
                 .build());
 
         for (MixologyPlugin.HighlightedObject highlightedObject : this.plugin.highlightedObjects().values()) {
@@ -54,11 +69,11 @@ public class MixologyOverlay extends OverlayPanel {
         return super.render(graphics);
     }
 
-    private String calculatePointsPerHour() {
-        int elapsedTimeInSeconds = 3600; // Time elapsed (e.g., 1 hour = 3600 seconds)
+    private String calculatePointsPerHour(long seconds) {
+        // int elapsedTimeInSeconds = 3600; // Time elapsed (e.g., 1 hour = 3600 seconds)
 
         // Convert time to hours
-        double elapsedTimeInHours = elapsedTimeInSeconds / 3600.0;
+        double elapsedTimeInHours = seconds / 3600.0;
 
         int gainedMoxPoints = MixologyScript.currentMoxPoints - MixologyScript.startMoxPoints;
         int gainedLyePoints = MixologyScript.currentLyePoints - MixologyScript.startLyePoints;
