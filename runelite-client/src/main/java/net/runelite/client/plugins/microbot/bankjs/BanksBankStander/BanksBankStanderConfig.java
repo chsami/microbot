@@ -198,10 +198,20 @@ public interface BanksBankStanderConfig extends Config {
         return true;
     }
     @ConfigItem(
+            keyName = "depositAll",
+            name = "deposit all",
+            description = "force the bank to deposit all items each time.",
+            position = 6,
+            section = toggles
+    )
+    default boolean depositAll() {
+        return true;
+    }
+    @ConfigItem(
             keyName = "withdrawAll",
             name = "withdraw all",
             description = "for using things like a chisel or knife where the item is not consumed in the process.",
-            position = 6,
+            position = 7,
             section = toggles
     )
     default boolean withdrawAll() {
@@ -211,7 +221,7 @@ public interface BanksBankStanderConfig extends Config {
             keyName = "randomSelection",
             name = "randomSelection",
             description = "select random item in inventory?",
-            position = 7,
+            position = 8,
             section = toggles
     )
     default boolean randomSelection() {
