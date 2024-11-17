@@ -25,10 +25,12 @@
 package net.runelite.client.plugins.cluescrolls.clues;
 
 import net.runelite.api.Item;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.EmoteClue;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.item.ItemRequirement;
+import org.junit.Test;
+
 import static net.runelite.api.ItemID.*;
 import static org.junit.Assert.*;
-import org.junit.Test;
 
 public class EmoteClueTest
 {

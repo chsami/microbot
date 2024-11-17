@@ -25,13 +25,19 @@
 package net.runelite.client.plugins.cluescrolls.clues.hotcold;
 
 import com.google.common.collect.Sets;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.hotcold.HotColdLocation;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.hotcold.HotColdSolver;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.hotcold.HotColdTemperature;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.hotcold.HotColdTemperatureChange;
+import org.junit.Test;
+
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import net.runelite.api.coords.WorldPoint;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.junit.Test;
 
 public class HotColdSolverTest
 {

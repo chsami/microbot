@@ -24,9 +24,13 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues;
 
-import java.util.Map;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.CoordinateClue;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.Enemy;
 import org.junit.Test;
+
+import java.util.Map;
+
 import static org.junit.Assert.assertTrue;
 
 public class CoordinateClueTest

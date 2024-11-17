@@ -9,7 +9,7 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
+import net.runelite.client.plugins.microbot.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 

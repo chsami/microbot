@@ -27,24 +27,26 @@ package net.runelite.client.plugins.banktags;
 import com.google.inject.Guice;
 import com.google.inject.testing.fieldbinder.Bind;
 import com.google.inject.testing.fieldbinder.BoundFieldModule;
-import javax.inject.Inject;
 import net.runelite.api.Client;
-import static net.runelite.api.ItemID.ABYSSAL_WHIP;
 import net.runelite.api.events.ScriptCallbackEvent;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.banktags.tabs.TabInterface;
-import net.runelite.client.plugins.cluescrolls.ClueScrollService;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import net.runelite.client.plugins.microbot.cluescrolls.ClueScrollService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import javax.inject.Inject;
+
+import static net.runelite.api.ItemID.ABYSSAL_WHIP;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BankTagsPluginTest

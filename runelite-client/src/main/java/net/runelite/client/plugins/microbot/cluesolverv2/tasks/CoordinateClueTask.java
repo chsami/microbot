@@ -1,320 +1,155 @@
 package net.runelite.client.plugins.microbot.cluesolverv2.tasks;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.plugins.cluescrolls.clues.CoordinateClue;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
-import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.CoordinateClue;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
-import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
-import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 @Slf4j
 public class CoordinateClueTask implements ClueTask {
+
     private enum State {
         CHECKING_ITEMS,
-        RETRIEVING_ITEMS,
-        VERIFYING_WITHDRAWAL,
-        EQUIPPING_ITEMS,
         NAVIGATING_TO_LOCATION,
-        COMPLETED,
         DIGGING,
-        INTERACTING_WITH_NPC,
+        COMPLETED,
         FAILED
     }
 
     @Inject
-    private Client client;
-
-    @Inject
-    private ClueHelperV2 clueHelper;
-
-
-    private static  Map<String, List<Integer>> REQUIREMENTS_MAP = new HashMap<>();
-
-
-    private CoordinateClue clue;
-
-    @Inject
     private EventBus eventBus;
 
-    private List<ItemRequirement> requiredItems;
-
-    List<ItemRequirement> missingItems;
-
-
-    private Map<Integer, String> requiredItemsMap;
-
-
+    private CoordinateClue clue;
     private State state;
-
-    public CoordinateClueTask() {
-        this.state = State.CHECKING_ITEMS;
-    }
 
     public void setClue(CoordinateClue clue) {
         this.clue = clue;
-        this.requiredItems = clueHelper.determineRequiredItems(clue);
-        this.requiredItemsMap = clueHelper.getRequiredItemsMap();
-
-        log.info("Coordinate Clue task initialized for clue: {}", clue.getClass().getSimpleName());
-        log.info("Number of required items: {}", requiredItems.size());
+        this.state = State.CHECKING_ITEMS;
+        log.info("CoordinateClueTask initialized for clue at location: {}", clue.getLocation(null));
     }
 
     @Override
     public void start() {
-
         if (clue == null) {
-            log.error("Coordinate Clue task instance is null. Cannot start task.");
+            log.error("CoordinateClue is null. Cannot start task.");
             state = State.FAILED;
             return;
         }
-        log.info("Starting Coordinate Clue task for {}", clue.getClass().getSimpleName());
+        log.info("Starting Coordinate Clue Task for location: {}", clue.getLocation(null));
         eventBus.register(this);
     }
 
-
     @Override
     public boolean execute() {
-        log.debug("Executing Coordinate Clue task in state: {}", state);
+        log.debug("Executing Coordinate Clue Task in state: {}", state);
         switch (state) {
             case CHECKING_ITEMS:
-                return checkAndHandleMissingItems();
-
-            case RETRIEVING_ITEMS:
-                retrieveRequiredItems();
-                return false; // Wait for inventory change event to verify
-
-            case VERIFYING_WITHDRAWAL:
-                return verifyItemsPresence();
-
-            case EQUIPPING_ITEMS:
-                return equipItems();
+                return checkRequiredItems();
 
             case NAVIGATING_TO_LOCATION:
                 return navigateToLocation();
 
             case DIGGING:
-                return handleDigging();
+                return digAtLocation();
 
             case COMPLETED:
-                log.info("Coordinate Clue task completed.");
+                log.info("Coordinate Clue Task completed.");
                 eventBus.unregister(this);
                 return true;
 
             case FAILED:
-                log.error("Coordinate Clue task failed.");
+                log.error("Coordinate Clue Task failed.");
                 eventBus.unregister(this);
                 return true;
 
             default:
                 log.error("Unknown state encountered: {}", state);
                 state = State.FAILED;
-                eventBus.unregister(this);
                 return true;
         }
     }
 
-    private boolean handleDigging() {
-        //TODO Implement digging
-        log.info("Digging not implemented yet. Completing task.");
-        state = State.COMPLETED;
-        return true;
-    }
-
     @Override
     public void stop() {
-        log.info("Stopping Coordinate Clue task.");
+        log.info("Stopping Coordinate Clue Task.");
         state = State.FAILED;
         eventBus.unregister(this);
     }
 
-    private boolean checkAndHandleMissingItems() {
-        log.info("Checking for missing items");
-        CountDownLatch latch = new CountDownLatch(1);
-        Microbot.getClientThread().invoke(() -> {
-            try {
-                this.missingItems = clueHelper.getMissingItems(requiredItems);
-                log.info("Number of missing items: {}", missingItems.size());
-            } catch (Exception e) {
-                log.error("Error during missing items check", e);
-                state = State.FAILED;
-            } finally {
-                latch.countDown();
-            }
-        });
+    @Override
+    public String getTaskDescription() {
+        return "Solving Coordinate Clue at location: " + clue.getLocation(null);
+    }
 
-        try {
-            latch.await(); // Wait for the invoke method to complete
-        } catch (InterruptedException e) {
-            log.error("Interrupted while waiting for missing items check", e);
-            Thread.currentThread().interrupt();
+    /**
+     * Step 1: Check if the player has the required items (spade or light source).
+     */
+    private boolean checkRequiredItems() {
+        log.info("Checking for required items (spade or light source).");
+
+        // Check for spade
+        if (!Rs2Inventory.contains("Spade")) {
+            log.error("Player does not have a spade. Task cannot continue.");
             state = State.FAILED;
             return true;
         }
 
-        if (state == State.FAILED) {
-            return true; // Terminate task execution
+        // Check if a light source is required
+        if (clue.isRequiresLight() && !Rs2Inventory.contains("Bullseye lantern") && !Rs2Inventory.contains("Lit candle")) {
+            log.error("Player does not have a required light source. Task cannot continue.");
+            state = State.FAILED;
+            return true;
         }
 
-        if (missingItems.isEmpty()) {
-            log.info("All required items are present. Proceeding to navigation.");
-            state = State.NAVIGATING_TO_LOCATION;
-            return false; // Proceed to navigation
-        } else {
-            log.warn("Some items are missing. Initiating retrieval.");
-            state = State.RETRIEVING_ITEMS;
-            return false; // Transition to retrieve items
-        }
-    }
-
-    /**
-     * Step 2: Retrieve required items from the bank if any are missing.
-     * Initiates withdrawal attempts for missing items.
-     */
-    private void retrieveRequiredItems() {
-        log.info("Attempting to retrieve required items from the bank.");
-
-        boolean success = Rs2Bank.walkToBankAndUseBank();
-
-        if (!success) {
-            log.warn("Failed to walk to the bank. Will retry in the next cycle.");
-            return;
-        }
-
-        if (!Rs2Bank.openBank()) {
-            log.warn("Failed to open the bank. Will retry in the next cycle.");
-            return;
-        }
-
-        // Iterate the required items map and withdraw the items
-        for (Map.Entry<Integer, String> entry : requiredItemsMap.entrySet()) {
-            Integer itemId = entry.getKey();
-            String itemName = entry.getValue();
-            log.info("Attempting to withdraw item: {} With ID: {}", itemName, itemId);
-            Rs2Bank.withdrawItem(itemName);
-            sleep(600);
-            if (Rs2Inventory.contains(itemName)) {
-                sleep(600);
-            } else {
-                log.warn("Failed to initiate withdrawal for item: {} With ID: {}", itemName, itemId);
-            }
-        }
-
-        Rs2Bank.closeBank();
-        state = State.VERIFYING_WITHDRAWAL;
-        log.info("Withdrawal attempts initiated. Waiting to verify item presence.");
-    }
-
-    /**
-     * Step 3: Verify that all required items have been successfully withdrawn.
-     *
-     * @return true if all items are present; false otherwise.
-     */
-    private boolean verifyItemsPresence() {
-        Microbot.getClientThread().invoke(() -> {
-            log.info("Verifying presence of withdrawn items in inventory.");
-            List<ItemRequirement> missingItems = clueHelper.getMissingItems(requiredItems);
-
-            if (missingItems.isEmpty()) {
-                log.info("All required items have been successfully withdrawn.");
-                transitionToNaviState();
-            } else {
-                log.warn("Some items are still missing");
-                state = State.RETRIEVING_ITEMS;
-            }
-        });
-
+        log.info("All required items are present. Proceeding to navigation.");
+        state = State.NAVIGATING_TO_LOCATION;
         return false;
     }
 
     /**
-     * Step 4: Equip / wield / wear the items withdrawn from bank.
-     *
-     * @return true if items are equipped worn or wielded; false otherwise.
+     * Step 2: Navigate to the clue location.
      */
-    private boolean equipItems() {
-        log.info("Equipping items...");
-        boolean allItemsEquipped = true;
+    private boolean navigateToLocation() {
+        WorldPoint location = clue.getLocation(null);
+        if (location == null) {
+            log.error("Clue location is null. Cannot navigate.");
+            state = State.FAILED;
+            return true;
+        }
 
-        // Iterate the required items map and withdraw the items
-        for (Map.Entry<Integer, String> entry : requiredItemsMap.entrySet()) {
-            Integer itemId = entry.getKey();
-            String itemName = entry.getValue();
-            log.info("Attempting to equip item: {} With ID: {}", itemName, itemId);
-            Rs2Inventory.equip(itemName);
-            sleep(300);
-            if (Rs2Equipment.hasEquipped(itemId)) {
-                log.info("Item: {} With ID: {} is already equipped.", itemName, itemId);
-            } else {
-                log.warn("Failed to equip item: {} With ID: {}", itemName, itemId);
-                allItemsEquipped = false;
+        if (Rs2Player.distanceTo(location) > 1) {
+            log.info("Navigating to clue location: {}", location);
+            boolean success = Rs2Walker.walkTo(location, 5);
+            if (!success) {
+                log.warn("Failed to navigate to location. Retrying.");
+                return false;
             }
         }
 
-        return allItemsEquipped;
+        log.info("Arrived at clue location.");
+        state = State.DIGGING;
+        return false;
     }
 
     /**
-     * Helper method to transition to navigation state if all items are equipped.
+     * Step 3: Perform digging at the clue location.
      */
-    private void transitionToNaviState() {
-        if (equipItems()) {
-            log.info("All items equipped successfully. Transitioning to navigation state...");
-            state = State.NAVIGATING_TO_LOCATION;
-        } else {
-            log.warn("Not all items were equipped. Cannot transition to navigation state.");
-        }
-    }
+    private boolean digAtLocation() {
+        log.info("Attempting to dig at clue location.");
 
-    /**
-     * Step 5: Navigate to the specified location.
-     *
-     * @return true if navigation is complete; false otherwise.
-     */
-    private boolean navigateToLocation() {
-        WorldPoint location = clueHelper.getClueLocation(clue);
-        if (location == null) {
-            log.error("Clue location is null. Cannot navigate.");
+        if (Rs2Inventory.interact("Spade", "Dig")) {
+            log.info("Successfully dug at the clue location.");
             state = State.COMPLETED;
             return true;
         }
 
-        WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
-        if (!playerLocation.equals(location)) {
-            log.info("Navigating to location: {}", location);
-            boolean navigationStarted = Rs2Walker.walkTo(location, 1);
-            if (navigationStarted) {
-                log.info("Navigation to {} started.", location);
-            } else {
-                log.warn("Failed to initiate navigation to location: {}", location);
-            }
-            return false; // Wait for navigation to complete
-        }
-
-        log.info("Player has arrived at the clue location.");
-        state = State.DIGGING;
+        log.warn("Failed to dig at the clue location. Retrying.");
         return false;
-
-    }
-
-
-
-    @Override
-    public String getTaskDescription() {
-        return "";
     }
 }

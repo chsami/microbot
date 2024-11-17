@@ -3,18 +3,16 @@ package net.runelite.client.plugins.microbot.cluesolverv2;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
-import net.runelite.client.plugins.cluescrolls.clues.*;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.cluescrolls.ClueScrollPlugin;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.*;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.tasks.AnagramClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.tasks.CoordinateClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.tasks.CrypticClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.tasks.EmoteClueTask;
-import net.runelite.client.plugins.microbot.cluesolverv2.util.ClueHelperV2;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 
 import java.util.concurrent.TimeUnit;
@@ -29,13 +27,8 @@ public class ClueSolverScriptV2 extends Script {
     private final ReentrantLock taskLock = new ReentrantLock();
 
     @Inject
-    private Client client;
-
-    @Inject
     private ClueScrollPlugin clueScrollPlugin;
 
-    @Inject
-    private ClueHelperV2 clueHelper;
 
     @Inject
     private EventBus eventBus;
