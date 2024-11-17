@@ -1420,7 +1420,8 @@ public static GameObject findReachableObject(String objectName, boolean exact, i
      */
     public static boolean hoverOverObject(TileObject object) {
         if (!Rs2AntibanSettings.naturalMouse) {
-            Microbot.log("Natural mouse is not enabled, can't hover");
+            if(Rs2AntibanSettings.devDebug)
+                Microbot.log("Natural mouse is not enabled, can't hover");
             return false;
         }
         Point point = Rs2UiHelper.getClickingPoint(Rs2UiHelper.getObjectClickbox(object), true);
