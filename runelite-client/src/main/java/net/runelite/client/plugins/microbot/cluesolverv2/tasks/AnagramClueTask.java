@@ -118,7 +118,7 @@ public class AnagramClueTask implements ClueTask {
             return true;
         }
 
-        if (Rs2Player.distanceTo(location) > 1) {
+        if (Rs2Player.distanceTo(location) > 5) {
             log.info("Navigating to clue location: {}", location);
             boolean success = Rs2Walker.walkTo(location, 5);
             if (!success) {
@@ -164,6 +164,7 @@ public class AnagramClueTask implements ClueTask {
      *
      * @return true if questions are answered successfully; false otherwise.
      */
+    //TODO Better question implemention currently manual entry for answers
     private boolean answerQuestions() {
         if (clue.getQuestion() != null && clue.getAnswer() != null) {
             log.info("Answering NPC question: {}", clue.getQuestion());
@@ -177,6 +178,10 @@ public class AnagramClueTask implements ClueTask {
                     return true;
                 } else {
                     log.warn("Dialogue still active. Possible incorrect answer or additional steps required.");
+                    if (Rs2Dialogue.hasContinue()) {
+                        Rs2Dialogue.clickContinue();
+                        return true;
+                    }
                     return false;
                 }
             } else {

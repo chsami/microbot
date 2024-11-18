@@ -10,6 +10,9 @@ import net.runelite.client.plugins.microbot.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.microbot.cluescrolls.clues.*;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
 import net.runelite.client.plugins.microbot.cluesolverv2.tasks.*;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.enums.Category;
+import net.runelite.client.plugins.microbot.util.antiban.enums.PlayStyle;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 
 import java.util.concurrent.TimeUnit;
@@ -58,7 +61,9 @@ public class ClueSolverScriptV2 extends Script {
             log.warn("Clue Solver Script V2 is already running.");
             return false;
         }
-
+        Rs2Antiban.activateAntiban();
+        Rs2Antiban.setCategory(Category.SKILLING);
+        Rs2Antiban.setPlayStyle(PlayStyle.BALANCED);
         log.info("Starting Clue Solver Script V2...");
         this.config = config;
         isRunning = true;
