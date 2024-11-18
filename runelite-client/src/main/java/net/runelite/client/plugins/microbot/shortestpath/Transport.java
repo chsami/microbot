@@ -177,24 +177,21 @@ public class Transport {
 
         //START microbot variables
 
-        if ((value = fieldMap.get("menuOption menuTarget objectID")) != null) {
-            // Use a regular expression to capture the action, target, and objectId
-            String regex = "^([^\\s-]+(?:-[^ ]+)*)\\s+(.*?)\\s+(\\d+)$";
+        if ((value = fieldMap.get("menuOption menuTarget objectID")) != null && !value.trim().isEmpty()) {
+            value = value.trim(); // Remove leading/trailing spaces
+
+            // Regex pattern for semicolon-separated values
+            String regex = "^([^;]+);([^;]+);(\\d+)$";
             java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
             java.util.regex.Matcher matcher = pattern.matcher(value);
 
             if (matcher.matches()) {
-                action = matcher.group(1);   // First group: the action (e.g., "Travel")
-                name = matcher.group(2);   // Second group: the target (e.g., "Spirit tree")
-                objectId = Integer.parseInt(matcher.group(3)); // Third group: the objectId (e.g., "26263")
-            } else if (!value.isEmpty()){
-                System.out.println("failed to load transport " + value);
-            }
-
-            //EXCEPTIONS THAT ARE NOT HANDLED BY THE REGEX
-            //Shillo village cart action is: climb over without a dash
-            if (action != null && action.contains("-")) {
-                action = action.replace("-", " ");
+                // Extract matched groups
+                action = matcher.group(1).trim();   // First group: menuOption (action)
+                name = matcher.group(2).trim();    // Second group: menuTarget (name)
+                objectId = Integer.parseInt(matcher.group(3).trim()); // Third group: objectID
+            } else {
+                System.out.println("Skipped invalid value: " + value);
             }
         }
         if ((value = fieldMap.get("Items")) != null) {
