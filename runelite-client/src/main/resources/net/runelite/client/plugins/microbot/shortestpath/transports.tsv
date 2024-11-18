@@ -4498,3 +4498,6 @@
 # Villa entry aldarin							
 1425 2933 0	1427 2933 0	Pass-through;Entryway;54707				4	
 1427 2933 0	1425 2933 0	Pass-through;Entryway;54707				4	
+# Fortis Colosseum							
+1795 3107 0	1799 9506 0	Enter;Colosseum entrance;50749				8	
+1799 9506 0	1795 3107 0	Exit;Stairs;50750				8	
