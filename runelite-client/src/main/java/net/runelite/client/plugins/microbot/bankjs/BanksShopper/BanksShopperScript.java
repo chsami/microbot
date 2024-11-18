@@ -103,6 +103,7 @@ public class BanksShopperScript extends Script {
                                 hopWorld();
                             }
                         }
+                        break;
                     case BANKING:
                         if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(plugin.getItemNames(), initialPlayerLocation))
                             return;
