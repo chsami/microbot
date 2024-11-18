@@ -859,7 +859,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                         if (transport.getType() == TransportType.SHIP || transport.getType() == TransportType.NPC || transport.getType() == TransportType.BOAT
                                 || transport.getType() == TransportType.CHARTER_SHIP) {
 
-                            NPC npc = Rs2Npc.getNpc(transport.getObjectId());
+                            NPC npc = Rs2Npc.getNpc(transport.getName());
 
                             if (Rs2Npc.canWalkTo(npc, 20) && Rs2Npc.interact(npc, transport.getAction())) {
                                 Rs2Player.waitForWalking();

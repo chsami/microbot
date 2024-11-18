@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.microbot.util.inventory;
 
-public enum DropOrder {
+public enum InteractOrder {
     STANDARD,
     EFFICIENT_ROW,
     COLUMN,
@@ -8,7 +8,7 @@ public enum DropOrder {
     RANDOM;
 
     // return a random DropOrder
-    public static DropOrder random() {
+    public static InteractOrder random() {
         return values()[(int) (Math.random() * values().length - 1)];
     }
 }

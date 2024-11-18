@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.microbot.util.math;
 
 import java.util.concurrent.ThreadLocalRandom;
-
+@Deprecated(since = "1.6.0 - Please use Rs2Random", forRemoval = true)
 public class Random {
     public static int random(final int min, final int max) {
         final int n = Math.abs(max - min);

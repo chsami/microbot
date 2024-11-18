@@ -246,6 +246,15 @@ public class Rs2Bank {
     /**
      * Query count of item inside of bank
      */
+    public static int count(int id) {
+        Rs2Item bankItem = findBankItem(id);
+        if (bankItem == null) return 0;
+        return bankItem.quantity;
+    }
+
+    /**
+     * Query count of item inside of bank
+     */
     public static int count(String name, boolean exact) {
         Rs2Item bankItem = findBankItem(name, exact);
         if (bankItem == null) return 0;
@@ -1823,7 +1832,8 @@ public class Rs2Bank {
      */
     public static boolean preHover() {
         if (!Rs2AntibanSettings.naturalMouse) {
-            Microbot.log("Natural mouse is not enabled, can't hover");
+            if(Rs2AntibanSettings.devDebug)
+                Microbot.log("Natural mouse is not enabled, can't hover");
             return false;
         }
 

@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.qualityoflife;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.Rs2InventorySetup;
@@ -63,6 +64,10 @@ public class QoLScript extends Script {
                     handleDialogueContinue();
                 }
 
+                if (config.useQuestDialogueOptions() && Rs2Dialogue.isInDialogue()) {
+                    handleQuestOptionDialogueSelection();
+                }
+
 
             } catch (Exception ex) {
                 log.error("Error in QoLScript execution: {}", ex.getMessage(), ex);
@@ -120,6 +125,19 @@ public class QoLScript extends Script {
     // handle dialogue continue
     private void handleDialogueContinue() {
         Rs2Dialogue.clickContinue();
+    }
+
+    // handle quest option dialogue selection
+    private void handleQuestOptionDialogueSelection() {
+            var options = Rs2Dialogue.getDialogueOptions();
+            // if there are options, and any option starts with [ , select it because it is a option highlighted from quest helper
+            for (Widget option : options) {
+                if (option.getText().startsWith("[")) {
+                    Rs2Dialogue.keyPressForDialogueOption(option.getIndex());
+                    return;
+                }
+            }
+
     }
 
     private void handleWorkbenchActions() {

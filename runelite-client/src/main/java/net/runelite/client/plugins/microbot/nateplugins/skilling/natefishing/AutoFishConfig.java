@@ -5,7 +5,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.plugins.microbot.nateplugins.skilling.natefishing.enums.Fish;
-import net.runelite.client.plugins.microbot.util.inventory.DropOrder;
+import net.runelite.client.plugins.microbot.util.inventory.InteractOrder;
 
 @ConfigGroup("Fishing")
 public interface AutoFishConfig extends Config {
@@ -35,8 +35,8 @@ public interface AutoFishConfig extends Config {
             description = "The order in which to drop items",
             section = generalSection
     )
-    default DropOrder getDropOrder() {
-        return DropOrder.STANDARD;
+    default InteractOrder getDropOrder() {
+        return InteractOrder.STANDARD;
     }
 
     @ConfigItem(

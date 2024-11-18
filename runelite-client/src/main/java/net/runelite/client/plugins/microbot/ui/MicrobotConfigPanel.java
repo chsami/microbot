@@ -38,7 +38,6 @@ import net.runelite.client.events.ProfileChanged;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
-import net.runelite.client.plugins.config.*;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.ui.FontManager;
@@ -598,8 +597,7 @@ class MicrobotConfigPanel extends PluginPanel
 		return dimensionPanel;
 	}
 
-	private JComboBox<Enum<?>> createComboBox(ConfigDescriptor cd, ConfigItemDescriptor cid)
-	{
+	private JComboBox<Enum<?>> createComboBox(ConfigDescriptor cd, ConfigItemDescriptor cid) {
 		Class<? extends Enum> type = (Class<? extends Enum>) cid.getType();
 
 		JComboBox<Enum<?>> box = new JComboBox<Enum<?>>(type.getEnumConstants()); // NOPMD: UseDiamondOperator
@@ -609,17 +607,15 @@ class MicrobotConfigPanel extends PluginPanel
 		box.setRenderer(listCellRenderer);
 		box.setPreferredSize(new Dimension(box.getPreferredSize().width, 22));
 
-		try
-		{
+		try {
 			Enum<?> selectedItem = Enum.valueOf(type, configManager.getConfiguration(cd.getGroup().value(), cid.getItem().keyName()));
 			box.setSelectedItem(selectedItem);
 			box.setToolTipText(Text.titleCase(selectedItem));
 		}
-		catch (IllegalArgumentException ex)
-		{
+		catch(NullPointerException | IllegalArgumentException ex) {
 			log.debug("invalid selected item", ex);
 		}
-		box.addItemListener(e ->
+        box.addItemListener(e ->
 		{
 			if (e.getStateChange() == ItemEvent.SELECTED)
 			{
@@ -671,7 +667,11 @@ class MicrobotConfigPanel extends PluginPanel
 		JCheckBox checkbox = new JCheckBox();
 		{
 			Notification notif = configManager.getConfiguration(cd.getGroup().value(), cid.getItem().keyName(), Notification.class);
-			checkbox.setSelected(notif.isEnabled());
+			if (notif == null) {
+				checkbox.setSelected(false);
+			} else {
+				checkbox.setSelected(notif.isEnabled());
+			}
 		}
 		checkbox.addActionListener(ae ->
 		{

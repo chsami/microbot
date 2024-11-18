@@ -101,6 +101,7 @@ public class Rs2AntibanSettings {
     public static double actionCooldownChance = 0.1; // 10% chance of activating the action cooldown by default
     public static double microBreakChance = 0.1; // 10% chance of taking a micro break by default
     public static double moveMouseRandomlyChance = 0.1; // 10% chance of moving the mouse randomly by default
+    public static double moveMouseOffScreenChance = 0.1; // 10% chance of moving the mouse off screen by default
 
     // reset method to reset all settings to default values
     public static void reset() {
@@ -131,5 +132,6 @@ public class Rs2AntibanSettings {
         actionCooldownChance = 0.1;
         microBreakChance = 0.1;
         moveMouseRandomlyChance = 0.1;
+        moveMouseOffScreenChance = 0.1;
     }
 }
