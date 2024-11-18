@@ -29,7 +29,7 @@ public class CrypticTaskMap {
         addToMap("Pirate", null);
         addToMap("Hill Giant", null);
         addToMap("Man", null);
-        addToMap("Monk", new WorldPoint(3054, 3484, 0)); // Edgeville Monastery
+        addToMap("Monk", new WorldPoint(2607, 3209, 0)); //Ardy
         addToMap("Wizard", new WorldPoint(3096, 9572, 0)); // Wizard's Tower basement
         addToMap("Chicken", null);
         addToMap("Gunthor the Brave", new WorldPoint(3139, 3365, 0)); // Barbarian Camp

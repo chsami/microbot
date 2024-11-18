@@ -295,7 +295,7 @@ public class EmoteClueTask implements ClueTask {
                     Rs2Inventory.equip(itemName);
 
                     // Use dynamic wait
-                    boolean equipped = waitForCondition(() -> Rs2Equipment.hasEquippedContains(itemName), 5000, 600);
+                    boolean equipped = waitForCondition(() -> Rs2Equipment.hasEquippedContains(itemName), 5000, 500);
                     if (!equipped) {
                         log.error("Failed to equip item: {}", itemName);
                         allEquipped = false;
@@ -487,7 +487,6 @@ public class EmoteClueTask implements ClueTask {
             if (!Rs2Bank.hasBankItem(itemName)) {
                 log.error("Item not found in bank: {}", itemName);
                 allWithdrawn = false;
-                continue; // Proceed to the next item
             } else {
                 Rs2Bank.withdrawItem(itemName);
                 log.info("Initiated withdrawal for item: {}", itemName);
