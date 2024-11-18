@@ -15,8 +15,8 @@ import net.runelite.client.config.ConfigSection;
         "    <li>Seed dibber</li>\n" +
         "    <li>Spade</li>\n" +
         "    <li>Rake</li>\n" +
-        "    <li>Ectophial</li>\n" +
-        "    <li>Any Quetzal whistle (WITH CHARGES)</li>\n" +
+        "    <li>Ectophial, or if no ectophial, Fenkenstrain Teleport Tab</li>\n" +
+        "    <li>Any Quetzal whistle (WITH CHARGES), or Civitas Teleport Tab</li>\n" +
         "    <li>Stony Basalt/Trollheim tab</li>\n" +
         "    <li>Icy Basalt</li>\n" +
         "    <li>Skills necklace</li>\n" +
