@@ -24,8 +24,10 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues;
 
-import static org.junit.Assert.assertNull;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.CipherClue;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
 
 public class CipherClueTest
 {

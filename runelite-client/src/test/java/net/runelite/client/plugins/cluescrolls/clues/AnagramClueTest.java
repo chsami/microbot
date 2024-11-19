@@ -24,8 +24,10 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues;
 
-import static org.junit.Assert.assertNull;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.AnagramClue;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
 
 public class AnagramClueTest
 {

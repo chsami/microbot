@@ -24,18 +24,20 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues.hotcold;
 
+import net.runelite.client.plugins.microbot.cluescrolls.clues.hotcold.HotColdTemperatureChange;
+import org.junit.Test;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import org.junit.Test;
 
 public class HotColdTemperatureChangeTest
 {
-	private static final String[] VALID_MESSAGES = {
+	public static final String[] VALID_MESSAGES = {
 		"The device is warm, and warmer than last time.",
 		"The device is cold, but colder than last time.",
 		"The device is very hot, and the same temperature as last time.",
 	};
-	private static final String[] INVALID_MESSAGES = {
+	public static final String[] INVALID_MESSAGES = {
 		"The device is cold.",
 		"The device is ice cold.",
 		"The device is very cold.",

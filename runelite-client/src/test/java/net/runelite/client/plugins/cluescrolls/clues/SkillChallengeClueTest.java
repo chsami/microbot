@@ -24,15 +24,12 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues;
 
-import static net.runelite.api.ItemID.BLOOD_RUNE;
-import static net.runelite.api.ItemID.DARK_ESSENCE_BLOCK;
-import static net.runelite.api.ItemID.LAW_RUNE;
-import static net.runelite.api.ItemID.SOUL_RUNE;
-import net.runelite.client.plugins.cluescrolls.clues.item.ItemRequirement;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.SkillChallengeClue;
+import net.runelite.client.plugins.microbot.cluescrolls.clues.item.ItemRequirement;
 import org.junit.Test;
+
+import static net.runelite.api.ItemID.*;
+import static org.junit.Assert.*;
 
 public class SkillChallengeClueTest
 {
