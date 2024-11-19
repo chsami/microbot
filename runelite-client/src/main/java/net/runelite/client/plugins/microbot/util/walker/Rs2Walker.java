@@ -744,7 +744,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
      * @param target
      */
     public static void setTarget(WorldPoint target) {
-        if (!Microbot.isLoggedIn() && target != null) return;
+        if (target != null && !Microbot.isLoggedIn()) return;
         Player localPlayer = Microbot.getClient().getLocalPlayer();
         if (!ShortestPathPlugin.isStartPointSet() && localPlayer == null) {
             return;

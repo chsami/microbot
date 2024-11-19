@@ -4,10 +4,14 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.pestcontrol.Portal;
 import net.runelite.client.ui.overlay.OverlayManager;
 
@@ -56,6 +60,15 @@ public class PestControlPlugin extends Plugin {
     protected void shutDown() {
         pestControlScript.shutdown();
         overlayManager.remove(pestControlOverlay);
+    }
+
+    @Subscribe
+    public void onGameTick(GameTick event)
+    {
+        boolean isInPestControl = Microbot.getClient().getWidget(ComponentID.PEST_CONTROL_BLUE_SHIELD) != null;
+        if (!isInPestControl) {
+            Rs2Walker.setTarget(null);
+        }
     }
 
     @Subscribe
