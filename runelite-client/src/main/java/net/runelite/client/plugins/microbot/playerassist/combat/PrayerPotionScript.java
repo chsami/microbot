@@ -25,7 +25,7 @@ public class PrayerPotionScript extends Script {
                     return;
                 }
                 for (Rs2Item potion: potions) {
-                    if (potion.name.toLowerCase().contains("prayer") || potion.name.toLowerCase().contains("super restore")) {
+                    if (potion.name.toLowerCase().contains("prayer") || potion.name.toLowerCase().contains("super restore") || potion.name.toLowerCase().contains("moonlight potion")) {
                         Rs2Inventory.interact(potion, "drink");
                         sleep(1200, 2000);
                         Rs2Inventory.dropAll("Vial");

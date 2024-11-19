@@ -7,6 +7,8 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.coords.Rs2WorldArea;
+import net.runelite.client.plugins.microbot.util.coords.Rs2WorldPoint;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -18,7 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class Rs2Tile {
+public abstract class Rs2Tile implements Tile{
 
     @Getter
     public static List<MutablePair<WorldPoint, Integer>> dangerousGraphicsObjectTiles = new ArrayList<>();
@@ -105,6 +107,16 @@ public class Rs2Tile {
         return true;
     }
 
+    public static boolean isWalkable(WorldPoint worldPoint) {
+        Client client = Microbot.getClient();
+        LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
+        if (localPoint == null) {
+            return false;
+        }
+        return isWalkable(localPoint);
+    }
+
+
     public static boolean isWalkable(LocalPoint localPoint) {
         if (localPoint == null)
             return true;
@@ -161,7 +173,8 @@ public class Rs2Tile {
                 var point = kvp.getKey();
                 LocalPoint localPoint;
                 if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
-                    var worldPoint = WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), point).stream().findFirst().get();
+                    var worldPoint = WorldPoint.toLocalInstance(Microbot.getClient().getTopLevelWorldView(), point).stream().findFirst().orElse(null);
+                    if (worldPoint == null) break;
                     localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), worldPoint);
                 } else
                     localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
@@ -218,6 +231,7 @@ public class Rs2Tile {
 
     public static boolean isTileReachable(WorldPoint targetPoint) {
         if (targetPoint == null) return false;
+        if (targetPoint.getPlane() != Rs2Player.getWorldLocation().getPlane()) return false;
         boolean[][] visited = new boolean[104][104];
         int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
         WorldPoint playerLoc = Rs2Player.getWorldLocation();
@@ -256,7 +270,7 @@ public class Rs2Tile {
     }
 
     /**
-     * Checks if any of the tiles immediately surrounding the given object are walkable.
+     * Checks if any of the tiles immediately surrounding the given object are walkable & reachable.
      * The object is defined by its position (worldPoint) and its size (sizeX x sizeY).
      *
      * @param worldPoint The central point of the object.
@@ -368,7 +382,7 @@ public class Rs2Tile {
         for (Direction direction : Direction.values()) {
             WorldPoint neighbour = getNeighbour(direction, source);
             if (neighbour.equals(Rs2Player.getWorldLocation())) continue;
-            if (isTileReachable(neighbour)) {
+            if (isWalkable(neighbour)) {
                 return neighbour;
             }
         }
@@ -395,6 +409,94 @@ public class Rs2Tile {
         }
 
         return null;
+    }
+
+    /**
+     * Finds the nearest walkable tile around a specified game object that the player can interact with.
+     *
+     * <p>This method calculates the closest walkable tile adjacent to the given game object, considering the player's current position.
+     * It ensures that both the player and the object are on the same plane before proceeding. The method retrieves interactable points
+     * around the object, filters out non-walkable tiles, and selects the closest one to the player.</p>
+     *
+     * @param tileObject The {@link GameObject} for which to find the nearest walkable tile.
+     * @return An {@link Rs2WorldPoint} representing the nearest walkable tile around the object, or {@code null} if none are found.
+     */
+    public static Rs2WorldPoint getNearestWalkableTile(GameObject tileObject) {
+        // Cache player's location and top-level world view
+        Rs2WorldPoint playerLocation = Rs2Player.getRs2WorldPoint();
+        WorldView topLevelWorldView = Microbot.getClient().getTopLevelWorldView();
+
+        // Check if player and object are on the same plane
+        if (playerLocation.getPlane() != tileObject.getWorldLocation().getPlane()) {
+            return null;
+        }
+
+        // Get the world area of the game object
+        Rs2WorldArea gameObjectArea = new Rs2WorldArea(Objects.requireNonNull(Rs2GameObject.getWorldArea(tileObject)));
+
+        // Get interactable points around the game object
+        List<WorldPoint> interactablePoints = getInteractablePoints(gameObjectArea, topLevelWorldView);
+
+        if (interactablePoints.isEmpty()) {
+            return null; // No interactable points found
+        }
+
+        // Filter points that are walkable
+        List<WorldPoint> walkablePoints = interactablePoints.stream()
+                .filter(Rs2Tile::isWalkable)
+                .collect(Collectors.toList());
+
+        if (walkablePoints.isEmpty()) {
+            return null; // No walkable points available
+        }
+
+        // Find the nearest walkable interact point to the player
+        WorldPoint nearestPoint = walkablePoints.stream()
+                .min(Comparator.comparingInt(playerLocation::distanceToPath))
+                .orElse(null);
+
+        return new Rs2WorldPoint(nearestPoint);
+    }
+
+    /**
+     * Retrieves a list of interactable points around a given game object area.
+     *
+     * <p>This method calculates interactable points around the specified game object area. If no initial interactable points
+     * are found, it expands the area and collects new points, excluding those within the original object area. It also filters out
+     * points from which the object cannot be reached via melee attacks or points that have walls obstructing interaction.</p>
+     *
+     * @param gameObjectArea   The {@link Rs2WorldArea} representing the area of the game object.
+     * @param topLevelWorldView The top-level {@link WorldView} of the game client.
+     * @return A {@link List} of {@link WorldPoint} objects that are interactable around the game object.
+     */
+    private static List<WorldPoint> getInteractablePoints(Rs2WorldArea gameObjectArea, WorldView topLevelWorldView) {
+        // Get initial interactable points
+        List<WorldPoint> interactablePoints = new ArrayList<>(gameObjectArea.getInteractable());
+
+        if (interactablePoints.isEmpty()) {
+            // If no interactable points, expand the area and get new points
+            Rs2WorldArea expandedArea = gameObjectArea.offset(1);
+            interactablePoints = expandedArea.toWorldPointList();
+
+            // Remove points inside the game object area
+            interactablePoints.removeIf(gameObjectArea::contains);
+
+            // Remove points from which the object cannot be melee'd
+            interactablePoints.removeIf(point -> !gameObjectArea.canMelee(topLevelWorldView, new Rs2WorldArea(point.toWorldArea())));
+        } else {
+            // Filter points from which the object can be melee'd
+            interactablePoints = interactablePoints.stream()
+                    .filter(point -> gameObjectArea.canMelee(topLevelWorldView, new Rs2WorldArea(point.toWorldArea())))
+                    .collect(Collectors.toList());
+
+            if (interactablePoints.isEmpty()) {
+                // If no melee points, remove points with walls
+                interactablePoints = gameObjectArea.getInteractable();
+                interactablePoints.removeIf(Rs2Tile::tileHasWalls);
+            }
+        }
+
+        return interactablePoints;
     }
 
     public static boolean tileHasWalls(WorldPoint source) {
@@ -432,5 +534,256 @@ public class Rs2Tile {
             return true;
         }
         return false;
+    }
+
+    public static List<Tile> pathTo(Tile source,Tile other)
+    {
+
+        int z = source.getPlane();
+        if (z != other.getPlane())
+        {
+            return null;
+        }
+
+        CollisionData[] collisionData = Microbot.getClient().getTopLevelWorldView().getCollisionMaps();
+        if (collisionData == null)
+        {
+            return null;
+        }
+
+        int[][] directions = new int[128][128];
+        int[][] distances = new int[128][128];
+        int[] bufferX = new int[4096];
+        int[] bufferY = new int[4096];
+
+        // Initialise directions and distances
+        for (int i = 0; i < 128; ++i)
+        {
+            for (int j = 0; j < 128; ++j)
+            {
+                directions[i][j] = 0;
+                distances[i][j] = Integer.MAX_VALUE;
+            }
+        }
+
+        Point p1 = source.getSceneLocation();
+        Point p2 = other.getSceneLocation();
+
+        int middleX = p1.getX();
+        int middleY = p1.getY();
+        int currentX = middleX;
+        int currentY = middleY;
+        int offsetX = 64;
+        int offsetY = 64;
+        // Initialise directions and distances for starting tile
+        directions[offsetX][offsetY] = 99;
+        distances[offsetX][offsetY] = 0;
+        int index1 = 0;
+        bufferX[0] = currentX;
+        int index2 = 1;
+        bufferY[0] = currentY;
+        int[][] collisionDataFlags = collisionData[z].getFlags();
+
+        boolean isReachable = false;
+
+        while (index1 != index2)
+        {
+            currentX = bufferX[index1];
+            currentY = bufferY[index1];
+            index1 = index1 + 1 & 4095;
+            // currentX is for the local coordinate while currentMapX is for the index in the directions and distances arrays
+            int currentMapX = currentX - middleX + offsetX;
+            int currentMapY = currentY - middleY + offsetY;
+            if ((currentX == p2.getX()) && (currentY == p2.getY()))
+            {
+                isReachable = true;
+                break;
+            }
+
+            int currentDistance = distances[currentMapX][currentMapY] + 1;
+            if (currentMapX > 0 && directions[currentMapX - 1][currentMapY] == 0 && (collisionDataFlags[currentX - 1][currentY] & 19136776) == 0)
+            {
+                // Able to move 1 tile west
+                bufferX[index2] = currentX - 1;
+                bufferY[index2] = currentY;
+                index2 = index2 + 1 & 4095;
+                directions[currentMapX - 1][currentMapY] = 2;
+                distances[currentMapX - 1][currentMapY] = currentDistance;
+            }
+
+            if (currentMapX < 127 && directions[currentMapX + 1][currentMapY] == 0 && (collisionDataFlags[currentX + 1][currentY] & 19136896) == 0)
+            {
+
+                // Able to move 1 tile east
+                bufferX[index2] = currentX + 1;
+                bufferY[index2] = currentY;
+                index2 = index2 + 1 & 4095;
+                directions[currentMapX + 1][currentMapY] = 8;
+                distances[currentMapX + 1][currentMapY] = currentDistance;
+            }
+
+            if (currentMapY > 0 && directions[currentMapX][currentMapY - 1] == 0 && (collisionDataFlags[currentX][currentY - 1] & 19136770) == 0)
+            {
+                // Able to move 1 tile south
+                bufferX[index2] = currentX;
+                bufferY[index2] = currentY - 1;
+                index2 = index2 + 1 & 4095;
+                directions[currentMapX][currentMapY - 1] = 1;
+                distances[currentMapX][currentMapY - 1] = currentDistance;
+            }
+
+            if (currentMapY < 127 && directions[currentMapX][currentMapY + 1] == 0 && (collisionDataFlags[currentX][currentY + 1] & 19136800) == 0)
+            {
+                // Able to move 1 tile north
+                bufferX[index2] = currentX;
+                bufferY[index2] = currentY + 1;
+                index2 = index2 + 1 & 4095;
+                directions[currentMapX][currentMapY + 1] = 4;
+                distances[currentMapX][currentMapY + 1] = currentDistance;
+            }
+
+            if (currentMapX > 0 && currentMapY > 0 && directions[currentMapX - 1][currentMapY - 1] == 0 && (collisionDataFlags[currentX - 1][currentY - 1] & 19136782) == 0 && (collisionDataFlags[currentX - 1][currentY] & 19136776) == 0 && (collisionDataFlags[currentX][currentY - 1] & 19136770) == 0)
+            {
+                // Able to move 1 tile south-west
+                bufferX[index2] = currentX - 1;
+                bufferY[index2] = currentY - 1;
+                index2 = index2 + 1 & 4095;
+                directions[currentMapX - 1][currentMapY - 1] = 3;
+                distances[currentMapX - 1][currentMapY - 1] = currentDistance;
+            }
+
+            if (currentMapX > 0 && currentMapY < 127 && directions[currentMapX - 1][currentMapY + 1] == 0 && (collisionDataFlags[currentX - 1][currentY + 1] & 19136824) == 0 && (collisionDataFlags[currentX - 1][currentY] & 19136776) == 0 && (collisionDataFlags[currentX][currentY + 1] & 19136800) == 0)
+            {
+                // Able to move 1 tile north-west
+                bufferX[index2] = currentX - 1;
+                bufferY[index2] = currentY + 1;
+                index2 = index2 + 1 & 4095;
+                directions[currentMapX - 1][currentMapY + 1] = 6;
+                distances[currentMapX - 1][currentMapY + 1] = currentDistance;
+            }
+
+            if (currentMapX < 127 && currentMapY > 0 && directions[currentMapX + 1][currentMapY - 1] == 0 && (collisionDataFlags[currentX + 1][currentY - 1] & 19136899) == 0 && (collisionDataFlags[currentX + 1][currentY] & 19136896) == 0 && (collisionDataFlags[currentX][currentY - 1] & 19136770) == 0)
+            {
+                // Able to move 1 tile south-east
+                bufferX[index2] = currentX + 1;
+                bufferY[index2] = currentY - 1;
+                index2 = index2 + 1 & 4095;
+                directions[currentMapX + 1][currentMapY - 1] = 9;
+                distances[currentMapX + 1][currentMapY - 1] = currentDistance;
+            }
+
+            if (currentMapX < 127 && currentMapY < 127 && directions[currentMapX + 1][currentMapY + 1] == 0 && (collisionDataFlags[currentX + 1][currentY + 1] & 19136992) == 0 && (collisionDataFlags[currentX + 1][currentY] & 19136896) == 0 && (collisionDataFlags[currentX][currentY + 1] & 19136800) == 0)
+            {
+                // Able to move 1 tile north-east
+                bufferX[index2] = currentX + 1;
+                bufferY[index2] = currentY + 1;
+                index2 = index2 + 1 & 4095;
+                directions[currentMapX + 1][currentMapY + 1] = 12;
+                distances[currentMapX + 1][currentMapY + 1] = currentDistance;
+            }
+        }
+        if (!isReachable)
+        {
+            // Try find a different reachable tile in the 21x21 area around the target tile, as close as possible to the target tile
+            int upperboundDistance = Integer.MAX_VALUE;
+            int pathLength = Integer.MAX_VALUE;
+            int checkRange = 10;
+            int approxDestinationX = p2.getX();
+            int approxDestinationY = p2.getY();
+            for (int i = approxDestinationX - checkRange; i <= checkRange + approxDestinationX; ++i)
+            {
+                for (int j = approxDestinationY - checkRange; j <= checkRange + approxDestinationY; ++j)
+                {
+                    int currentMapX = i - middleX + offsetX;
+                    int currentMapY = j - middleY + offsetY;
+                    if (currentMapX >= 0 && currentMapY >= 0 && currentMapX < 128 && currentMapY < 128 && distances[currentMapX][currentMapY] < 100)
+                    {
+                        int deltaX = 0;
+                        if (i < approxDestinationX)
+                        {
+                            deltaX = approxDestinationX - i;
+                        }
+                        else if (i > approxDestinationX)
+                        {
+                            deltaX = i - (approxDestinationX);
+                        }
+
+                        int deltaY = 0;
+                        if (j < approxDestinationY)
+                        {
+                            deltaY = approxDestinationY - j;
+                        }
+                        else if (j > approxDestinationY)
+                        {
+                            deltaY = j - (approxDestinationY);
+                        }
+
+                        int distanceSquared = deltaX * deltaX + deltaY * deltaY;
+                        if (distanceSquared < upperboundDistance || distanceSquared == upperboundDistance && distances[currentMapX][currentMapY] < pathLength)
+                        {
+                            upperboundDistance = distanceSquared;
+                            pathLength = distances[currentMapX][currentMapY];
+                            currentX = i;
+                            currentY = j;
+                        }
+                    }
+                }
+            }
+            if (upperboundDistance == Integer.MAX_VALUE)
+            {
+                // No path found
+                return null;
+            }
+        }
+
+        // Getting path from directions and distances
+        bufferX[0] = currentX;
+        bufferY[0] = currentY;
+        int index = 1;
+        int directionNew;
+        int directionOld;
+        for (directionNew = directionOld = directions[currentX - middleX + offsetX][currentY - middleY + offsetY]; p1.getX() != currentX || p1.getY() != currentY; directionNew = directions[currentX - middleX + offsetX][currentY - middleY + offsetY])
+        {
+            if (directionNew != directionOld)
+            {
+                // "Corner" of the path --> new checkpoint tile
+                directionOld = directionNew;
+                bufferX[index] = currentX;
+                bufferY[index++] = currentY;
+            }
+
+            if ((directionNew & 2) != 0)
+            {
+                ++currentX;
+            }
+            else if ((directionNew & 8) != 0)
+            {
+                --currentX;
+            }
+
+            if ((directionNew & 1) != 0)
+            {
+                ++currentY;
+            }
+            else if ((directionNew & 4) != 0)
+            {
+                --currentY;
+            }
+        }
+
+        int checkpointTileNumber = 1;
+        Tile[][][] tiles = Microbot.getClient().getScene().getTiles();
+        List<Tile> checkpointTiles = new ArrayList<>();
+        while (index-- > 0)
+        {
+            checkpointTiles.add(tiles[source.getPlane()][bufferX[index]][bufferY[index]]);
+            if (checkpointTileNumber == 25)
+            {
+                // Pathfinding only supports up to the 25 first checkpoint tiles
+                break;
+            }
+            checkpointTileNumber++;
+        }
+        return checkpointTiles;
     }
 }

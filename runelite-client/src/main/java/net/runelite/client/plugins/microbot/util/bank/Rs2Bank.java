@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.inventory.RunePouchType;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -240,6 +241,15 @@ public class Rs2Bank {
         if (rs2Item == null) return false;
         log.info("Item: " + rs2Item.name + " Amount: " + rs2Item.quantity);
         return findBankItem(Objects.requireNonNull(rs2Item).name, true, amount) != null;
+    }
+
+    /**
+     * Query count of item inside of bank
+     */
+    public static int count(int id) {
+        Rs2Item bankItem = findBankItem(id);
+        if (bankItem == null) return 0;
+        return bankItem.quantity;
     }
 
     /**
@@ -556,7 +566,7 @@ public class Rs2Bank {
      */
     public static boolean depositAllExcept(boolean exact, String... names) {
         if (!exact)
-            return depositAll(x -> Arrays.stream(names).noneMatch(name -> x.name.contains(name.toLowerCase())));
+            return depositAll(x -> Arrays.stream(names).noneMatch(name -> x.name.toLowerCase().contains(name.toLowerCase())));
         else
             return depositAll(x -> Arrays.stream(names).noneMatch(name -> name.equalsIgnoreCase(x.name)));
     }
@@ -629,6 +639,50 @@ public class Rs2Bank {
     public static void withdrawOne(String name, int sleepTime) {
         withdrawOne(name, false);
         sleep(sleepTime);
+    }
+
+    /**
+     * withdraw one item identified by its id.
+     *
+     * @param id the item id
+     */
+    public static void withdrawAllButOne(int id) {
+        withdrawAllButOne(findBankItem(id));
+    }
+
+    /**
+     * withdraw one item identified by its name
+     *
+     * @param name the item name
+     */
+    public static void withdrawAllButOne(String name) {
+        withdrawAllButOne(name, false);
+    }
+
+
+    /**
+     * withdraw one item identified by its name.
+     * set exact to true if you want to identify by the exact name.
+     *
+     * @param name  the item name
+     * @param exact boolean
+     */
+    public static void withdrawAllButOne(String name, boolean exact) {
+        withdrawAllButOne(findBankItem(name, exact));
+    }
+
+    /**
+     * withdraw all but one of an item identified by its ItemWidget.
+     *
+     * @param rs2Item item to withdraw
+     */
+    private static void withdrawAllButOne(Rs2Item rs2Item) {
+        if (!isOpen()) return;
+        if (rs2Item == null) return;
+        if (Rs2Inventory.isFull()) return;
+        container = BANK_ITEM_CONTAINER;
+        
+        invokeMenu(8, rs2Item);
     }
 
     /**
@@ -1075,17 +1129,18 @@ public class Rs2Bank {
      * @return BankLocation
      */
     public static BankLocation getNearestBank() {
+        Microbot.log("Calculating nearest bank path...");
         BankLocation nearest = null;
         double dist = Double.MAX_VALUE;
         int y = Microbot.getClient().getLocalPlayer().getWorldLocation().getY();
-        boolean playerIsInCave = y > 9000;
+        boolean playerIsInCave = y > 6400;
         WorldPoint playerLocation;
         double currDist;
         final int penalty = 10; // penalty if the bank is outside the cave and player is inside cave. This is to avoid being closer than banks in a cave
         for (BankLocation bankLocation : BankLocation.values()) {
-            if (!bankLocation.hasRequirements() && !bankLocation.hasException()) continue;
+            if (!bankLocation.hasRequirements()) continue;
 
-            boolean bankisInCave = bankLocation.getWorldPoint().getY() > 9000;
+            boolean bankisInCave = bankLocation.getWorldPoint().getY() > 6400;
 
             if (!bankisInCave && playerIsInCave) {
                 playerLocation = new WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation().getX(),  Microbot.getClient().getLocalPlayer().getWorldLocation().getY() - 6400, Microbot.getClient().getPlane());
@@ -1102,6 +1157,11 @@ public class Rs2Bank {
                     nearest = bankLocation;
                 }
             }
+        }
+        if (nearest != null) {
+            Microbot.log("Found nearest bank: " + nearest.name());
+        } else {
+            Microbot.log("Unable to find a bank");
         }
         return nearest;
     }
@@ -1331,6 +1391,48 @@ public class Rs2Bank {
         Rs2Widget.clickWidget(786456);
         sleep(600);
         return hasWithdrawAsItem();
+    }
+
+    /**
+     * Withdraws the player's rune pouch if it's available in the bank.
+     *
+     * @return true if the rune pouch was withdrawn, false otherwise.
+     */
+    public static boolean withdrawRunePouch() {
+        return Arrays.stream(RunePouchType.values())
+                .filter(pouch -> Rs2Bank.hasItem(pouch.getItemId()))
+                .findFirst()
+                .map(pouch -> {
+                    withdrawOne(pouch.getItemId());
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    /**
+     * Deposits the player's rune pouch if it's in the inventory.
+     *
+     * @return true if the rune pouch was deposited, false otherwise.
+     */
+    public static boolean depositRunePouch() {
+        return Arrays.stream(RunePouchType.values())
+                .filter(pouch -> Rs2Inventory.hasItem(pouch.getItemId()))
+                .findFirst()
+                .map(pouch -> {
+                    depositOne(pouch.getItemId());
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    /**
+     * Checks if the player has any type of rune pouch in the bank.
+     *
+     * @return true if a rune pouch is found in the bank, false otherwise.
+     */
+    public static boolean hasRunePouch() {
+        return Arrays.stream(RunePouchType.values())
+                .anyMatch(pouch -> Rs2Bank.hasItem(pouch.getItemId()));
     }
 
     /**
@@ -1730,7 +1832,8 @@ public class Rs2Bank {
      */
     public static boolean preHover() {
         if (!Rs2AntibanSettings.naturalMouse) {
-            Microbot.log("Natural mouse is not enabled, can't hover");
+            if(Rs2AntibanSettings.devDebug)
+                Microbot.log("Natural mouse is not enabled, can't hover");
             return false;
         }
 

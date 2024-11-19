@@ -317,7 +317,11 @@ public class Rs2Equipment {
         return equipmentItems.stream().anyMatch(x -> x.getSlot() == EquipmentInventorySlot.SHIELD.getSlotIdx());
     }
 
-    private static void invokeMenu(Rs2Item rs2Item, String action) {
+    public static boolean isNaked() {
+        return equipmentItems.stream().allMatch(x -> x.id == -1);
+    }
+
+    public static void invokeMenu(Rs2Item rs2Item, String action) {
         if (rs2Item == null) return;
 
         Rs2Tab.switchToEquipmentTab();
@@ -328,16 +332,15 @@ public class Rs2Equipment {
         int identifier = action.equalsIgnoreCase("remove") ? 1 : 0;
         MenuAction menuAction = MenuAction.CC_OP;
         if (identifier == 0) {
-            if (!action.isEmpty()) {
-                List<String> actions = rs2Item.getEquipmentActions();
+            if (action.isEmpty()) return;
 
+            List<String> actions = rs2Item.getEquipmentActions();
 
-                for (int i = 0; i < actions.size(); i++) {
-                    System.out.println(actions.get(i));
-                    if (action.equalsIgnoreCase(actions.get(i))) {
-                        identifier = i + 2;
-                        break;
-                    }
+            for (int i = 0; i < actions.size(); i++) {
+                System.out.println(actions.get(i));
+                if (action.equalsIgnoreCase(actions.get(i))) {
+                    identifier = i + 2;
+                    break;
                 }
             }
         }
@@ -368,7 +371,7 @@ public class Rs2Equipment {
         }
 
 
-        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, -1, rs2Item.name), new Rectangle(0, 0, 1, 1));
+        Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, -1, rs2Item.name), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
         //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
     }
 }

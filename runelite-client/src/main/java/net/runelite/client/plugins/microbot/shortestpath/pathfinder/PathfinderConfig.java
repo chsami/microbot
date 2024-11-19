@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -9,6 +10,8 @@ import net.runelite.client.plugins.microbot.shortestpath.*;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,12 +34,14 @@ public class PathfinderConfig {
     private final ThreadLocal<CollisionMap> map;
     /** All transports by origin {@link WorldPoint}. The null key is used for transports centered on the player. */
     private final Map<WorldPoint, Set<Transport>> allTransports;
-    private final Set<Transport> usableTeleports;
+    @Setter
+    private Set<Transport> usableTeleports;
 
     @Getter
     private ConcurrentHashMap<WorldPoint, Set<Transport>> transports;
     // Copy of transports with packed positions for the hotpath; lists are not copied and are the same reference in both maps
     @Getter
+    @Setter
     private PrimitiveIntHashMap<Set<Transport>> transportsPacked;
 
     private final Client client;
@@ -55,6 +60,7 @@ public class PathfinderConfig {
             useFairyRings,
             useGnomeGliders,
             useMinecarts,
+            useQuetzals,
             useSpiritTrees,
             useTeleportationLevers,
             useTeleportationPortals,
@@ -65,6 +71,7 @@ public class PathfinderConfig {
     private int distanceBeforeUsingTeleport;
     @Getter
     private final List<Restriction> resourceRestrictions;
+    @Getter
     private List<Restriction> customRestrictions;
     @Getter
     private Set<Integer> restrictedPointsPacked;
@@ -74,6 +81,11 @@ public class PathfinderConfig {
     private final int[] boostedLevels = new int[Skill.values().length];
     private Map<Quest, QuestState> questStates = new HashMap<>();
     private Map<Integer, Integer> varbitValues = new HashMap<>();
+
+    @Getter
+    @Setter
+    // Used for manual calculating paths without teleport & items in caves
+    private boolean ignoreTeleportAndItems = false;
 
     public PathfinderConfig(SplitFlagMap mapData, Map<WorldPoint, Set<Transport>> transports,
                             List<Restriction> restrictions,
@@ -109,6 +121,7 @@ public class PathfinderConfig {
         useFairyRings = config.useFairyRings();
         useGnomeGliders = config.useGnomeGliders();
         useMinecarts = config.useMinecarts();
+        useQuetzals = config.useQuetzals();
         useSpiritTrees = config.useSpiritTrees();
         useTeleportationItems = config.useTeleportationItems();
         useTeleportationLevers = config.useTeleportationLevers();
@@ -129,6 +142,7 @@ public class PathfinderConfig {
             refreshTransports();
             //START microbot variables
             refreshRestrictionData();
+            Rs2Tab.switchToInventoryTab();
             //END microbot variables
         }
     }
@@ -136,6 +150,7 @@ public class PathfinderConfig {
     /** Specialized method for only updating player-held item and spell transports */
     public void refreshTeleports(int packedLocation, int wildernessLevel) {
         Set<Transport> usableWildyTeleports = new HashSet<>(usableTeleports.size());
+        if (ignoreTeleportAndItems) return;
 
         for (Transport teleport : usableTeleports) {
             if (wildernessLevel <= teleport.getMaxWildernessLevel()) {
@@ -168,6 +183,7 @@ public class PathfinderConfig {
                 || Microbot.getVarbitValue(Varbits.DIARY_LUMBRIDGE_ELITE)  == 1);
         useGnomeGliders &= QuestState.FINISHED.equals(Microbot.getQuestState(Quest.THE_GRAND_TREE));
         useSpiritTrees &= QuestState.FINISHED.equals(Microbot.getQuestState(Quest.TREE_GNOME_VILLAGE));
+        useQuetzals &= QuestState.FINISHED.equals(Microbot.getQuestState(Quest.TWILIGHTS_PROMISE));
 
         transports.clear();
         transportsPacked.clear();
@@ -211,18 +227,69 @@ public class PathfinderConfig {
 
     private void refreshRestrictionData() {
         restrictedPointsPacked.clear();
-        for (var entry : Stream.concat(resourceRestrictions.stream(), customRestrictions.stream()).collect(Collectors.toList())){
-            for (Quest quest : entry.getQuests()) {
-                if (!questStates.containsKey(quest)){
-                    try {
-                        questStates.put(quest, Microbot.getQuestState(quest));
-                    } catch (NullPointerException ignored) {
+
+        Set<Quest> questsToFetch = new HashSet<>();
+        Set<Integer> varbitsToFetch = new HashSet<>();
+        List<Restriction> allRestrictions = Stream.concat(resourceRestrictions.stream(), customRestrictions.stream())
+                .collect(Collectors.toList());
+
+        for (Restriction entry : allRestrictions) {
+            questsToFetch.addAll(entry.getQuests());
+            for (TransportVarbit varbitCheck : entry.getVarbits()) {
+                varbitsToFetch.add(varbitCheck.getVarbitId());
+            }
+        }
+
+        // Fetch quest states and varbit values directly
+        for (Quest quest : questsToFetch) {
+            try {
+                questStates.put(quest, Microbot.getQuestState(quest));
+            } catch (NullPointerException ignored) {
+                // Handle exceptions if necessary
+            }
+        }
+        for (Integer varbitId : varbitsToFetch) {
+            varbitValues.put(varbitId, Microbot.getVarbitValue(varbitId));
+        }
+
+        for (Restriction entry : allRestrictions) {
+            boolean restrictionApplies = false;
+
+            // Check if there are no quests, varbits, or skills, used for explicit restrictions
+            if (entry.getQuests().isEmpty() && entry.getVarbits().isEmpty() && Arrays.stream(entry.getSkillLevels()).allMatch(level -> level == 0)) {
+                restrictionApplies = true;
+            }
+
+            // Quest check
+            if (!restrictionApplies) {
+                for (Quest quest : entry.getQuests()) {
+                    if (questStates.getOrDefault(quest, QuestState.NOT_STARTED) != QuestState.FINISHED) {
+                        restrictionApplies = true;
+                        break;
                     }
                 }
             }
 
-            if (entry.getQuests().isEmpty() || entry.getQuests().stream().anyMatch(x -> questStates.get(x) != QuestState.FINISHED))
+            // Varbit check
+            if (!restrictionApplies) {
+                for (TransportVarbit varbitCheck : entry.getVarbits()) {
+                    int varbitId = varbitCheck.getVarbitId();
+                    int expectedValue = varbitCheck.getValue();
+                    if (varbitValues.getOrDefault(varbitId, -1) != expectedValue) {
+                        restrictionApplies = true;
+                        break;
+                    }
+                }
+            }
+
+            // Skill level check
+            if (!restrictionApplies && !hasRequiredLevels(entry)) {
+                restrictionApplies = true;
+            }
+
+            if (restrictionApplies) {
                 restrictedPointsPacked.add(entry.getPackedWorldPoint());
+            }
         }
     }
 
@@ -290,25 +357,27 @@ public class PathfinderConfig {
 
         TransportType type = transport.getType();
 
-        if (AGILITY_SHORTCUT.equals(type) && !useAgilityShortcuts || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        if (AGILITY_SHORTCUT.equals(type) && (!useAgilityShortcuts || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (GRAPPLE_SHORTCUT.equals(type) && !useGrappleShortcuts || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (GRAPPLE_SHORTCUT.equals(type) && (!useGrappleShortcuts || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (BOAT.equals(type) && !useBoats || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (BOAT.equals(type) && (!useBoats || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (CANOE.equals(type) && !useCanoes || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (CANOE.equals(type) && (!useCanoes || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (CHARTER_SHIP.equals(type) && !useCharterShips || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (CHARTER_SHIP.equals(type) && (!useCharterShips || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
         } else if (SHIP.equals(type) && !useShips) {
             return false;
-        } else if (FAIRY_RING.equals(type) && !useFairyRings || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (FAIRY_RING.equals(type) && (!useFairyRings || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (GNOME_GLIDER.equals(type) && !useGnomeGliders || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (GNOME_GLIDER.equals(type) && (!useGnomeGliders || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (MINECART.equals(type) && !useMinecarts || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (MINECART.equals(type) && (!useMinecarts || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
-        } else if (SPIRIT_TREE.equals(type) && !useSpiritTrees || !client.getWorldType().contains(WorldType.MEMBERS)) {
+        } else if (QUETZAL.equals(type) && (!useQuetzals || !client.getWorldType().contains(WorldType.MEMBERS))) {
+            return false;
+        } else if (SPIRIT_TREE.equals(type) && (!useSpiritTrees || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
         } else if (TELEPORTATION_ITEM.equals(type)) {
             switch (useTeleportationItems) {
@@ -358,8 +427,22 @@ public class PathfinderConfig {
         return true;
     }
 
+    /** Checks if the player has all the required skill levels for the restriction */
+    private boolean hasRequiredLevels(Restriction restriction) {
+        int[] requiredLevels = restriction.getSkillLevels();
+        for (int i = 0; i < boostedLevels.length; i++) {
+            int boostedLevel = boostedLevels[i];
+            int requiredLevel = requiredLevels[i];
+            if (boostedLevel < requiredLevel) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /** Checks if the player has all the required equipment and inventory items for the transport */
     private boolean hasRequiredItems(Transport transport) {
+        if (Rs2Walker.disableTeleports) return false;
         if ((TeleportationItem.ALL.equals(useTeleportationItems) ||
                 TeleportationItem.ALL_NON_CONSUMABLE.equals(useTeleportationItems)) &&
                 TransportType.TELEPORTATION_ITEM.equals(transport.getType())) {

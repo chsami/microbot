@@ -12,6 +12,8 @@ public class MousePanel extends JPanel {
     private final JCheckBox useNaturalMouse = new JCheckBox("Use Natural Mouse");
     private final JCheckBox simulateMistakes = new JCheckBox("Simulate Mistakes");
     private final JCheckBox moveMouseOffScreen = new JCheckBox("Move Mouse Off Screen");
+    private final JSlider moveMouseOffScreenChance = new JSlider(0, 100, (int) (Rs2AntibanSettings.moveMouseOffScreenChance * 100));
+    private final JLabel moveMouseOffScreenChanceLabel = new JLabel("Move Mouse Off Screen (%): " + (int) (Rs2AntibanSettings.moveMouseOffScreenChance * 100));
     private final JCheckBox moveMouseRandomly = new JCheckBox("Move Mouse Randomly");
     private final JSlider moveMouseRandomlyChance = new JSlider(0, 100, (int) (Rs2AntibanSettings.moveMouseRandomlyChance * 100));
     private final JLabel moveMouseRandomlyChanceLabel = new JLabel("Random Mouse Movement (%): " + (int) (Rs2AntibanSettings.moveMouseRandomlyChance * 100));
@@ -43,6 +45,13 @@ public class MousePanel extends JPanel {
         // Add the "Move Mouse Off Screen" checkbox
         add(moveMouseOffScreen, gbc);
 
+        // Add the "Move Mouse Off Screen (%)" label
+        add(moveMouseOffScreenChanceLabel, gbc);
+
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        // Add the "Move Mouse Off Screen (%)" slider
+        add(moveMouseOffScreenChance, gbc);
+
         // Add the "Move Mouse Randomly" checkbox
         add(moveMouseRandomly, gbc);
 
@@ -60,6 +69,10 @@ public class MousePanel extends JPanel {
         useNaturalMouse.addActionListener(e -> Rs2AntibanSettings.naturalMouse = useNaturalMouse.isSelected());
         simulateMistakes.addActionListener(e -> Rs2AntibanSettings.simulateMistakes = simulateMistakes.isSelected());
         moveMouseOffScreen.addActionListener(e -> Rs2AntibanSettings.moveMouseOffScreen = moveMouseOffScreen.isSelected());
+        moveMouseOffScreenChance.addChangeListener(e -> {
+            Rs2AntibanSettings.moveMouseOffScreenChance = moveMouseOffScreenChance.getValue() / 100.0;
+            moveMouseOffScreenChanceLabel.setText("Move Mouse Off Screen (%): " + moveMouseOffScreenChance.getValue());
+        });
         moveMouseRandomly.addActionListener(e -> Rs2AntibanSettings.moveMouseRandomly = moveMouseRandomly.isSelected());
         moveMouseRandomlyChance.addChangeListener(e -> {
             Rs2AntibanSettings.moveMouseRandomlyChance = moveMouseRandomlyChance.getValue() / 100.0;
@@ -72,6 +85,7 @@ public class MousePanel extends JPanel {
         useNaturalMouse.setSelected(Rs2AntibanSettings.naturalMouse);
         simulateMistakes.setSelected(Rs2AntibanSettings.simulateMistakes);
         moveMouseOffScreen.setSelected(Rs2AntibanSettings.moveMouseOffScreen);
+        moveMouseOffScreenChance.setValue((int) (Rs2AntibanSettings.moveMouseOffScreenChance * 100));
         moveMouseRandomly.setSelected(Rs2AntibanSettings.moveMouseRandomly);
         moveMouseRandomlyChance.setValue((int) (Rs2AntibanSettings.moveMouseRandomlyChance * 100));
         moveMouseRandomlyChanceLabel.setText("Random Mouse Movement (%): " + moveMouseRandomlyChance.getValue());

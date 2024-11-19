@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.coords.Rs2WorldPoint;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
@@ -129,6 +130,36 @@ public class Rs2Npc {
         return npcs;
     }
 
+    /**
+     * Returns a stream of attackable NPCs based on specified criteria.
+     *
+     * <p>This method filters the list of NPCs in the game world to identify those that the player can attack.
+     * The NPCs are filtered based on the following conditions:
+     * <ul>
+     *   <li>The NPC has a combat level greater than 0.</li>
+     *   <li>The NPC is not dead.</li>
+     *   <li>If <code>reachable</code> is <code>true</code>, the NPC must be reachable from the player's current location.</li>
+     *   <li>The NPC is either not interacting with any entity or is interacting with the local player.</li>
+     * </ul>
+     * The resulting stream of NPCs is sorted based on their proximity to the player, with closer NPCs appearing first.</p>
+     *
+     * @param reachable If <code>true</code>, only include NPCs that are reachable from the player's current location.
+     *                  If <code>false</code>, include all NPCs matching the other criteria regardless of reachability.
+     * @return A {@link Stream} of {@link NPC} objects that the player can attack, sorted by proximity.
+     */
+    public static Stream<NPC> getAttackableNpcs(boolean reachable) {
+        Rs2WorldPoint playerLocation = new Rs2WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation());
+
+        return Microbot.getClient().getNpcs().stream()
+                .filter((npc) -> npc.getCombatLevel() > 0
+                        && !npc.isDead()
+                        && (!reachable || playerLocation.distanceToPath(npc.getWorldLocation()) < Integer.MAX_VALUE)
+                        && (!npc.isInteracting() || npc.getInteracting() == Microbot.getClient().getLocalPlayer()))
+                .sorted(Comparator.comparingInt(value ->
+                        value.getLocalLocation().distanceTo(Microbot.getClient().getLocalPlayer().getLocalLocation())));
+    }
+
+
     public static Stream<NPC> getAttackableNpcs(String name) {
         return getAttackableNpcs()
                 .filter(x -> x.getName().equalsIgnoreCase(name));
@@ -188,11 +219,11 @@ public class Rs2Npc {
         Microbot.status = action + " " + npc.getName();
         try {
 
-            if (Microbot.cantReachTarget) {
+            if (Microbot.isCantReachTargetDetectionEnabled && Microbot.cantReachTarget) {
                 if (!hasLineOfSight(npc)) {
                     if (Microbot.cantReachTargetRetries >= Random.random(3, 5)) {
                         Microbot.pauseAllScripts = true;
-                        Microbot.showMessage("Your bot tries to interact with an npc for " + Microbot.cantReachTargetRetries + " times but failed. Please take a look at what is happening.");
+                        Microbot.showMessage("Your bot tried to interact with an npc for " + Microbot.cantReachTargetRetries + " times but failed. Please take a look at what is happening.");
                         return false;
                     }
                     Rs2Walker.walkTo(Rs2Tile.getNearestWalkableTileWithLineOfSight(npc.getWorldLocation()), 0);
@@ -391,6 +422,30 @@ public class Rs2Npc {
     }
 
     /**
+     * Get the nearest npc with the given action
+     * @param action
+     * @return npc
+     */
+    public static NPC getNearestNpcWithAction(String action) {
+        Rs2WorldPoint playerLocation = new Rs2WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation());
+        return getNpcs()
+                .filter(value -> (value.getComposition() != null && value.getComposition().getActions() != null &&
+                        Arrays.asList(value.getComposition().getActions()).contains(action)))
+                .min(Comparator.comparingInt(value -> playerLocation.distanceToPath(value.getWorldLocation()))).orElse(null);
+    }
+
+    /**
+     * Get the first npc with the given action
+     * @param action
+     * @return npc
+     */
+    public static NPC getNpcWithAction(String action) {
+        return getNpcs()
+                .filter(value -> (value.getComposition() != null && value.getComposition().getActions() != null &&
+                        Arrays.asList(value.getComposition().getActions()).contains(action))||(value.getComposition().transform() != null && value.getComposition().transform().getActions() != null &&
+                        Arrays.asList(value.getComposition().transform().getActions()).contains(action))).findFirst().orElse(null);
+    }
+    /**
      * Hovers over the given actor (e.g., NPC).
      *
      * @param actor The actor to hover over.
@@ -399,7 +454,8 @@ public class Rs2Npc {
      */
     public static boolean hoverOverActor(Actor actor) {
         if (!Rs2AntibanSettings.naturalMouse) {
-            Microbot.log("Natural mouse is not enabled, can't hover");
+            if(Rs2AntibanSettings.devDebug)
+                Microbot.log("Natural mouse is not enabled, can't hover");
             return false;
         }
         Point point = Rs2UiHelper.getClickingPoint(Rs2UiHelper.getActorClickbox(actor), true);

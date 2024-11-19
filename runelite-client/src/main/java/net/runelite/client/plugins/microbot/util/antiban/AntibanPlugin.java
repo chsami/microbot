@@ -104,6 +104,7 @@ public class AntibanPlugin extends Plugin {
     public static boolean isCooking() {
         return Rs2Player.getAnimation() == AnimationID.COOKING_FIRE
                 || Rs2Player.getAnimation() == AnimationID.COOKING_RANGE
+                || Rs2Player.getAnimation() == AnimationID.COOKING_WINE
                 || Duration.between(lastCookingAction, Instant.now()).getSeconds() < COOK_TIMEOUT;
     }
 

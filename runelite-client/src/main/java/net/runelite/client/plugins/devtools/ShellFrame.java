@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.client.RuneLite;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.jshell.ShellPanel;
 
 @Singleton
@@ -57,7 +58,7 @@ class ShellFrame extends DevToolsFrame
 	@Override
 	public void open()
 	{
-		shellPanel.switchContext(RuneLite.getInjector());
+		shellPanel.switchContext(Microbot.getInjector());
 		super.open();
 	}
 

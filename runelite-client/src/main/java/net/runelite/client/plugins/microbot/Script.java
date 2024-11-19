@@ -70,6 +70,33 @@ public abstract class Script implements IScript {
     }
 
 
+    /**
+ * Sleeps until a specified condition is met, running an action periodically, or until a timeout is reached.
+ *
+ * @param awaitedCondition The condition to wait for.
+ * @param action The action to run periodically while waiting.
+ * @param timeoutMillis The maximum time to wait in milliseconds.
+ * @param sleepMillis The time to sleep between action executions in milliseconds.
+ * @return true if the condition was met within the timeout, false otherwise.
+ */
+public boolean sleepUntil(BooleanSupplier awaitedCondition, Runnable action, long timeoutMillis, int sleepMillis) {
+    long startTime = System.nanoTime();
+    long timeoutNanos = TimeUnit.MILLISECONDS.toNanos(timeoutMillis);
+    try {
+        while (System.nanoTime() - startTime < timeoutNanos) {
+            action.run();
+            if (awaitedCondition.getAsBoolean()) {
+                return true;
+            }
+            sleep(sleepMillis);
+        }
+    } catch (Exception e) {
+        Thread.currentThread().interrupt(); // Restore the interrupt status
+    }
+    return false; // Timeout reached without satisfying the condition
+}
+
+
     public boolean sleepUntil(BooleanSupplier awaitedCondition, BooleanSupplier resetCondition, int timeout) {
         final Stopwatch watch = Stopwatch.createStarted();
         while (!awaitedCondition.getAsBoolean() && watch.elapsed(TimeUnit.MILLISECONDS) < timeout) {
@@ -104,6 +131,7 @@ public abstract class Script implements IScript {
                 Microbot.getClientThread().scheduledFuture.cancel(true);
             initialPlayerLocation = null;
             Microbot.pauseAllScripts = false;
+            Rs2Walker.disableTeleports = false;
             Microbot.getSpecialAttackConfigs().reset();
             Rs2Walker.setTarget(null);
         }
@@ -117,7 +145,9 @@ public abstract class Script implements IScript {
             return false;
 
         if (Microbot.isLoggedIn()) {
-            if (Microbot.enableAutoRunOn)
+            boolean hasRunEnergy = Microbot.getClient().getEnergy() > Microbot.runEnergyThreshold;
+
+            if (Microbot.enableAutoRunOn && hasRunEnergy)
                 Rs2Player.toggleRunEnergy(true);
 
             if (Rs2Widget.getWidget(15269889) != null) { //levelup congratulations interface
@@ -136,7 +166,6 @@ public abstract class Script implements IScript {
                 }
             }
 
-            boolean hasRunEnergy = Microbot.getClient().getEnergy() > Microbot.runEnergyThreshold;
 
             if (!hasRunEnergy && Microbot.useStaminaPotsIfNeeded && Rs2Player.isMoving()) {
                 Rs2Inventory.useRestoreEnergyItem();

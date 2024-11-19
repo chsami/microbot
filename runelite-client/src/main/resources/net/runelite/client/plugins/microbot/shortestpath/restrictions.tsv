@@ -1,13 +1,27 @@
-# X Y Z	Quest
-# Varrock museum
-3265 3442 0	n/a
-3264 3442 0	n/a
-3261 3446 0	n/a
-# Gate between digsite and varrock
-3296 3429 0	n/a
-3296 3428 0	n/a
-3595 3429 0	n/a
-3595 3428 0	n/a
-# keldagrim brown engine secretary
-2890 10192 1	n/a
-2896 10189 1	n/a
+# Origin	Quests	Skills	Varbits
+# Varrock museum			
+3265 3442 0			
+3264 3442 0			
+3261 3446 0			
+# Gate between digsite and varrock			
+3296 3429 0			
+3296 3428 0			
+3595 3429 0			
+3595 3428 0			
+# keldagrim brown engine secretary			
+2890 10192 1			
+2896 10189 1			
+# magic guild			
+2584 3087 0		66 Magic	
+2584 3088 0		66 Magic	
+2597 3087 0		66 Magic	
+2597 3088 0		66 Magic	
+# RFD Room			
+3207 3217 0	Recipe for Disaster		
+3213 3222 0	Recipe for Disaster		
+3213 3221 0	Recipe for Disaster		
+# Al Kharid Gate			
+3267 3228 0	Prince Ali Rescue		
+3267 3227 0	Prince Ali Rescue		
+3268 3227 0	Prince Ali Rescue		
+3268 3228 0	Prince Ali Rescue		
