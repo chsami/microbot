@@ -688,23 +688,50 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
 
         var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 20);
 
-        if (tiles.keySet().isEmpty()) return 2; //start on index 2, instead of 0. 0 can contain teleports
+        //Exception to handle objects that handle long animations or walk
+        /**
+         * Exception to handle objects that handle long animations or walk
+         * ignore colission if we did not find a valid tile to walk on
+         * this is to ensure we stay on the path even if we are on a agility obstacle
+         */
+        if (tiles.keySet().isEmpty()) {
+            tiles = Rs2Tile.getReachableTilesFromTileIgnoreCollision(Rs2Player.getWorldLocation(), 20);
+        }
+        final HashMap<WorldPoint, Integer> _tiles = tiles;
 
         WorldPoint startPoint = path.stream()
-                .min(Comparator.comparingInt(a -> tiles.getOrDefault(a, Integer.MAX_VALUE)))
+                .min(Comparator.comparingInt(a -> _tiles.getOrDefault(a, Integer.MAX_VALUE)))
                 .orElse(null);
 
         boolean noMatchingTileFound = path.stream()
-                .allMatch(a -> tiles.getOrDefault(a, Integer.MAX_VALUE) == Integer.MAX_VALUE);
+                .allMatch(a -> _tiles.getOrDefault(a, Integer.MAX_VALUE) == Integer.MAX_VALUE);
 
+        /**
+         * Check if the startPoint is null or no matching tile is found
+         * If either condition is true, proceed to find the closest index in the path list.
+         */
         if (startPoint == null || noMatchingTileFound) {
-            return 2; //start on index 1, instead of 0. 0 can contain teleports
+            Optional<Integer> closestIndexOptional = IntStream.range(0, path.size())
+                    .boxed()
+                    .min(Comparator.comparingInt(i -> Rs2Player.getWorldLocation().distanceTo(path.get(i))));
+            if (closestIndexOptional.isPresent()) {
+                return closestIndexOptional.get();
+            }
         }
 
         return IntStream.range(0, path.size())
                 .filter(i -> path.get(i).equals(startPoint))
                 .findFirst()
                 .orElse(-1);
+    }
+
+    /**
+     * Force the walker to recalculate path
+     */
+    public static void recalculatePath() {
+        Rs2Walker.setTarget(null);
+        WorldPoint _currentTarget = currentTarget;
+        Rs2Walker.setTarget(_currentTarget);
     }
 
     /**
@@ -914,7 +941,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                         if (handleGlider(transport)) {
                             sleepUntil(() -> !Rs2Player.isAnimating());
                             sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 10);
-                            sleep(600 * 2); // wait 2 extra ticks before walking
+                            sleep(600 * 3); // wait 3 extra ticks before walking
                             break;
                         }
                     }
@@ -1422,10 +1449,12 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
             }
 
             // Interact with fairy ring after equipping the staff
-            Microbot.log("Interacting with the fairy ring using a staff.");
+            Microbot.log("Interacting with the fairy ring using a staff. " + origin.getX() + " " + origin.getY());
             var fairyRing = Rs2GameObject.findObjectByLocation(origin);
             if (Rs2GameObject.interact(fairyRing, "Configure")) {
                 Rs2Player.waitForWalking();
+            } else {
+                recalculatePath();
             }
         }
     }
