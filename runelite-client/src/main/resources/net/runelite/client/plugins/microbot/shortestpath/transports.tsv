@@ -1504,6 +1504,8 @@
 2776 3235 1	2776 3235 0	Climb-down;Ship's ladder;9745					
 2777 3234 1	2776 3235 0	Climb-down;Ship's ladder;9745					
 2775 3234 1	2776 3235 0	Climb-down;Ship's ladder;9745					
+2808 3162 0	2808 3162 1	Climb-up;Ladder;16683				3	
+2808 3162 1	2808 3162 0	Climb-down;Ladder;16679				3	
 							
 # Karamja Volcano							
 2855 3169 0	2855 9569 0	Climb-down;Rocks;11441					
@@ -4483,7 +4485,7 @@
 1616 3686 1	1616 3686 2	Climb-up;Staircase;12536					
 1616 3686 2	1616 3686 1	Climb-down;Staircase;12538					
 1639 3673 0	1666 10050 0	Investigate;Statue;27785					
-1666 10050 0    1639 3673 0	Climb-up Vine ladder 28894						
+1666 10050 0	1639 3673 0	Climb-up;Vine ladder;28894					
 #corsair cove							
 2578 2837 1	2578 2840 0	Cross;Gangplank;31756					
 #mining guild							
@@ -4498,3 +4500,6 @@
 # Villa entry aldarin							
 1425 2933 0	1427 2933 0	Pass-through;Entryway;54707				4	
 1427 2933 0	1425 2933 0	Pass-through;Entryway;54707				4	
+# Fortis Colosseum							
+1795 3107 0	1799 9506 0	Enter;Colosseum entrance;50749				8	
+1799 9506 0	1795 3107 0	Exit;Stairs;50750				8	
