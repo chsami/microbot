@@ -107,6 +107,9 @@ public enum ShootingStarLocation {
     }
 
     public boolean hasRequirements() {
+
+        if (!Microbot.isLoggedIn()) return false;
+
         boolean hasLineOfSight = Microbot.getClient().getLocalPlayer().getWorldArea().hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), this.getWorldPoint());
         switch (this) {
             case CRAFTING_GUILD:
@@ -180,6 +183,8 @@ public enum ShootingStarLocation {
             case CORSAIR_COVE_RESOURCE_AREA:
                 // Requires Dragon Slayer I
                 return Rs2Player.getQuestState(Quest.DRAGON_SLAYER_I) == QuestState.FINISHED;
+            case CANIFIS__BANK:
+                return Rs2Player.getQuestState(Quest.PRIEST_IN_PERIL) == QuestState.FINISHED;
             default:
                 return true;
         }

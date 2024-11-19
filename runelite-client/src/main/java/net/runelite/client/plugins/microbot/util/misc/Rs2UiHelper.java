@@ -86,12 +86,12 @@ public class Rs2UiHelper {
     }
 
     /**
-     * Removes col tags from text
-     * 
-     * @param text
-     * @return cleanedText
+     * Strips color tags from the provided text.
+     *
+     * @param text the text from which to strip color tags.
+     * @return the text without color tags.
      */
     public static String stripColTags(String text) {
-        return text.replaceAll("<.*?>", "");
+        return text != null ? text.replaceAll("<col=[^>]+>|</col>", "") : "";
     }
 }

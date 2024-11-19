@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.bankjs.BanksBankStander;
 
 import net.runelite.client.config.*;
+import net.runelite.client.plugins.microbot.util.inventory.InteractOrder;
 
 @ConfigGroup("BankStander")
 @ConfigInformation("• New features added to Bank's BankStander<br />" +
@@ -237,6 +238,16 @@ public interface BanksBankStanderConfig extends Config {
 
     default String menu() {
         return "use";
+    }
+    @ConfigItem(
+            keyName = "interactOrder",
+            name = "Interact Order",
+            description = "The order in which to interact with items",
+            position = 1,
+            section = interaction
+    )
+    default InteractOrder interactOrder() {
+        return InteractOrder.STANDARD;
     }
     @ConfigItem(
             keyName = "Sleep Min",

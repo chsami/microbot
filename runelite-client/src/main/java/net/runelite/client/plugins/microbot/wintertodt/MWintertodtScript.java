@@ -42,7 +42,7 @@ import static net.runelite.client.plugins.microbot.util.player.Rs2Player.eatAt;
  */
 
 public class MWintertodtScript extends Script {
-    public static String version = "1.4.6";
+    public static String version = "1.4.7";
 
     public static State state = State.BANKING;
     public static boolean resetActions = false;
@@ -50,9 +50,12 @@ public class MWintertodtScript extends Script {
     static MWintertodtPlugin plugin;
     private static boolean lockState = false;
     final WorldPoint BOSS_ROOM = new WorldPoint(1630, 3982, 0);
+    final WorldPoint crateLocation = new WorldPoint(1634, 3982, 0);
+    final WorldPoint sproutingRoots = new WorldPoint(1635, 3978, 0);
     String axe = "";
     int wintertodtHp = -1;
     private GameObject brazier;
+    boolean init = false;
 
     private static void changeState(State scriptState) {
         changeState(scriptState, false);
@@ -95,40 +98,47 @@ public class MWintertodtScript extends Script {
     }
 
     public boolean run(MWintertodtConfig config, MWintertodtPlugin plugin) {
-
-        MWintertodtScript.config = config;
-        MWintertodtScript.plugin = plugin;
-        Rs2Antiban.resetAntibanSettings();
-        Rs2Antiban.antibanSetupTemplates.applyGeneralBasicSetup();
-        Rs2Antiban.setActivity(Activity.GENERAL_WOODCUTTING);
-        Rs2Antiban.setPlayStyle(PlayStyle.EXTREME_AGGRESSIVE);
-        state = State.BANKING;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!Microbot.isLoggedIn()) return;
+                if (!Microbot.isLoggedIn()) {
+                    init = false;
+                    return;
+                }
                 if (!super.run()) return;
                 if (Rs2AntibanSettings.actionCooldownActive) return;
 
                 long startTime = System.currentTimeMillis();
 
-                if (config.axeInInventory()) {
-                    if (!Rs2Inventory.hasItem("axe")) {
-                        Microbot.showMessage("It seems that you selected axeInInventory option but no axe was found in your inventory.");
+                if (!init) {
+                    Microbot.log("Script starting...");
+                    MWintertodtScript.config = config;
+                    MWintertodtScript.plugin = plugin;
+                    Rs2Antiban.resetAntibanSettings();
+                    Rs2Antiban.antibanSetupTemplates.applyGeneralBasicSetup();
+                    Rs2Antiban.setActivity(Activity.GENERAL_WOODCUTTING);
+                    Rs2Antiban.setPlayStyle(PlayStyle.EXTREME_AGGRESSIVE);
+                    state = State.BANKING;
+                    sleep(2000);
+                    Microbot.log("Validating inventory...");
+                    if (config.axeInInventory()) {
+                        if (!Rs2Inventory.hasItem("axe")) {
+                            Microbot.showMessage("It seems that you selected axeInInventory option but no axe was found in your inventory.");
+                            sleep(5000);
+                            return;
+                        }
+                        axe = Rs2Inventory.get("axe").name;
+                    } else if (!Rs2Equipment.isWearing("axe")){
+                        if (Rs2Inventory.hasItem("axe")) {
+                            Rs2Inventory.wear("axe");
+                            sleepUntil(() -> Rs2Equipment.isWearing("axe"));
+                            return;
+                        }
+                        Microbot.showMessage("Please wear an axe OR If you'd like to have an axe in your inventory, you can enable the setting 'Axe In Inventory'.");
                         sleep(5000);
                         return;
                     }
-                    axe = Rs2Inventory.get("axe").name;
-                } else if (!Rs2Equipment.isWearing("axe")){
-                    if (Rs2Inventory.hasItem("axe")) {
-                        Rs2Inventory.wear("axe");
-                        sleepUntil(() -> Rs2Equipment.isWearing("axe"));
-                        return;
-                    }
-                    Microbot.showMessage("Please wear an axe OR If you'd like to have an axe in your inventory, you can enable the setting 'Axe In Inventory'.");
-                    sleep(5000);
-                    return;
+                    init = true;
                 }
-
 
                 boolean wintertodtRespawning = Rs2Widget.hasWidget("returns in");
                 boolean isWintertodtAlive = Rs2Widget.hasWidget("Wintertodt's Energy");
@@ -136,8 +146,9 @@ public class MWintertodtScript extends Script {
                 GameObject brokenBrazier = Rs2GameObject.findObject(ObjectID.BRAZIER_29313, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
                 GameObject fireBrazier = Rs2GameObject.findObject(ObjectID.BURNING_BRAZIER_29314, config.brazierLocation().getOBJECT_BRAZIER_LOCATION());
                 boolean playerIsLowWarmth = getWarmthLevel() < config.warmthTreshhold();
-                boolean needBanking = !Rs2Inventory.hasItemAmount(config.food().getName(), config.minFood(), false, false)
-                        && playerIsLowWarmth || !Rs2Inventory.hasItemAmount(config.food().getName(), config.minFood(), false, false)
+                // if use rejuvenation potion is enabled, we should check for potions instead of food
+                boolean needBanking = !Rs2Inventory.hasItemAmount(config.rejuvenationPotions() ? "Rejuvenation potion " : config.food().getName(), config.minFood(), false, false)
+                        && playerIsLowWarmth || !Rs2Inventory.hasItemAmount(config.rejuvenationPotions() ? "Rejuvenation potion " : config.food().getName(), config.minFood(), false, false)
                         && !isWintertodtAlive;
                 Widget wintertodtHealthbar = Rs2Widget.getWidget(396, 26);
 
@@ -204,13 +215,16 @@ public class MWintertodtScript extends Script {
                         break;
                     case LIGHT_BRAZIER:
                         if (brazier != null && !Rs2Player.isAnimating()) {
-                            Rs2GameObject.interact(brazier, "light");
-                            sleep(1000);
+                            if (Rs2GameObject.interact(brazier, "light")) {
+                                sleepGaussian(600, 150);
+                            }
                             return;
                         }
                         break;
                     case CHOP_ROOTS:
-                        Rs2Combat.setSpecState(true, 1000);
+                        if (Rs2Equipment.isWearing("dragon axe")) {
+                            Rs2Combat.setSpecState(true, 1000);
+                        }
                         if (!Rs2Player.isAnimating()) {
                             Rs2GameObject.interact(ObjectID.BRUMA_ROOTS, "Chop");
                             sleepUntil(Rs2Player::isAnimating, 2000);
@@ -242,7 +256,7 @@ public class MWintertodtScript extends Script {
                             if (brokenBrazier != null && config.fixBrazier()) {
                                 Rs2GameObject.interact(brokenBrazier, "fix");
                                 Microbot.log("Fixing brazier");
-                                sleep(1500);
+                                sleepGaussian(300, 50);
                                 return;
                             }
                             // this extra check is needed in case all braziers are broken or not burning
@@ -262,13 +276,11 @@ public class MWintertodtScript extends Script {
                                 }
                             }
                             if (burningBrazier.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()) < 10 && hasItemsToBurn()) {
-
                                 Rs2GameObject.interact(burningBrazier, "feed");
                                 Microbot.log("Feeding brazier");
                                 resetActions = false;
                                 sleep(GAME_TICK_LENGTH * 3);
                                 Rs2Antiban.actionCooldown();
-
                             }
 
                         }
@@ -311,6 +323,14 @@ public class MWintertodtScript extends Script {
 
     private boolean shouldEat() {
         if (getWarmthLevel() <= config.eatAtWarmthLevel()) {
+            if(config.rejuvenationPotions()) {
+                List<Rs2Item> rejuvenationPotions = Rs2Inventory.getPotions();
+                Rs2Inventory.interact(rejuvenationPotions.get(0), "Drink");
+                sleepGaussian(600, 150);
+                plugin.setFoodConsumed(plugin.getFoodConsumed() + 1);
+                resetActions = true;
+                return true;
+            }
             Rs2Player.useFood();
             sleepGaussian(600, 150);
             plugin.setFoodConsumed(plugin.getFoodConsumed() + 1);
@@ -400,16 +420,12 @@ public class MWintertodtScript extends Script {
             if (!resetActions && graphicsObject.getId() == 502
                     && WorldPoint.fromLocalInstance(Microbot.getClient(),
                     graphicsObject.getLocation()).distanceTo(Rs2Player.getWorldLocation()) == 1) {
-                System.out.println(WorldPoint.fromLocalInstance(Microbot.getClient(),
-                        graphicsObject.getLocation()).distanceTo(Rs2Player.getWorldLocation()));
                 //walk south
                 List<GameObject> gameObjects = new ArrayList<>(Rs2GameObject.getGameObjectsWithinDistance(5));
-                Microbot.log("Game objects: " + gameObjects.size());
                 // we only need to dodge if there are 2 or more snow fall objects
                 if (gameObjects.size() > 2) {
                     Rs2Walker.walkFastCanvas(new WorldPoint(Rs2Player.getWorldLocation().getX(), Rs2Player.getWorldLocation().getY() - 1, Rs2Player.getWorldLocation().getPlane()));
                     Rs2Player.waitForWalking(1000);
-                    sleep(GAME_TICK_LENGTH * 2);
                     resetActions = true;
                 }
 
@@ -418,6 +434,37 @@ public class MWintertodtScript extends Script {
     }
 
     private boolean handleBankLogic(MWintertodtConfig config) {
+        if (config.rejuvenationPotions()) {
+            // Logic to pick up potions inside the minigame from a crate
+            if (Rs2Inventory.hasItemAmount("Rejuvenation potion ", config.foodAmount())) {
+                state = State.ENTER_ROOM;
+                return true;
+            } else {
+                // Logic to interact with the crate to get the potions
+                if (Rs2Player.getWorldLocation().distanceTo(crateLocation) > 5) {
+                    Rs2Walker.walkTo(crateLocation,3);
+                    Rs2Player.waitForWalking(1000);
+                }
+                GameObject crate = Rs2GameObject.getGameObject(crateLocation);
+                if (crate != null) {
+                    sleepUntil(() -> Rs2Inventory.count(ItemID.REJUVENATION_POTION_UNF) >= config.foodAmount(),() -> {
+                        if(Rs2GameObject.interact(crate, "Take-concoction"))
+                            Rs2Inventory.waitForInventoryChanges(3000);
+                    }, 10000, 300);
+                }
+                GameObject roots = Rs2GameObject.getGameObject(sproutingRoots);
+                if (roots != null) {
+                    Rs2GameObject.interact(roots, "Pick");
+                    Rs2Inventory.waitForInventoryChanges(5000);
+                    sleepUntil(() -> Rs2Inventory.count(ItemID.REJUVENATION_POTION_UNF) <= Rs2Inventory.count(ItemID.BRUMA_HERB), 8000);
+                    Rs2Inventory.combineClosest(ItemID.REJUVENATION_POTION_UNF, ItemID.BRUMA_HERB);
+                    Rs2Inventory.waitForInventoryChanges(3000);
+                    sleepUntil(() -> !Rs2Inventory.hasItem(ItemID.REJUVENATION_POTION_UNF), 5000);
+                    return true;
+                }
+            }
+            return true;
+        }
         if (!Rs2Player.isFullHealth() && Rs2Inventory.hasItem(config.food().getName(), false)) {
             eatAt(99);
             return true;
@@ -433,12 +480,7 @@ public class MWintertodtScript extends Script {
         }
         Rs2Bank.useBank();
         if (!Rs2Bank.isOpen()) return true;
-        if(!config.fixBrazier()) {
-            Rs2Bank.depositAll();
-        }
-        else {
-            Rs2Bank.depositAllExcept("hammer", "tinderbox", "knife", config.food().getName());
-        }
+        Rs2Bank.depositAllExcept("hammer", "tinderbox", "knife", config.food().getName(), axe);
         int foodCount = (int) Rs2Inventory.getInventoryFood().stream().count();
         if (config.fixBrazier() && !Rs2Inventory.hasItem("hammer")) {
             Rs2Bank.withdrawX(true, "hammer", 1);

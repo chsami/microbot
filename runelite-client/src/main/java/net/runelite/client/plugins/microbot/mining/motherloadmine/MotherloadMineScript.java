@@ -28,10 +28,11 @@ import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 @Slf4j
 public class MotherloadMineScript extends Script {
-    public static final String version = "1.6.7";
+    public static final String version = "1.6.8";
     private static final WorldArea WEST_UPPER_AREA = new WorldArea(3748, 5676, 7, 9, 0);
     private static final WorldArea EAST_UPPER_AREA = new WorldArea(3755, 5668, 8, 8, 0);
-    private static final WorldPoint HOPPER_DEPOSIT = new WorldPoint(3748, 5674, 0);
+    private static final WorldPoint HOPPER_DEPOSIT_DOWN = new WorldPoint(3748, 5672, 0);
+    private static final WorldPoint HOPPER_DEPOSIT_UP = new WorldPoint(3755, 5677, 0);
     private static final int UPPER_FLOOR_HEIGHT = -490;
     private static final int SACK_LARGE_SIZE = 162;
     private static final int SACK_SIZE = 81;
@@ -195,11 +196,8 @@ public class MotherloadMineScript extends Script {
     }
 
     private void depositHopper() {
-        int plane = isUpperFloor() ? 1 : 0;
-        Optional<GameObject> hopper = Rs2GameObject.getGameObjects().stream().filter(object ->
-                object.getPlane() == plane
-                && object.getId() == ObjectID.HOPPER_26674
-        ).findFirst();
+        WorldPoint HOPPER_DEPOSIT = isUpperFloor() ? HOPPER_DEPOSIT_UP : HOPPER_DEPOSIT_DOWN;
+        Optional<GameObject> hopper = Optional.ofNullable(Rs2GameObject.findObject(ObjectID.HOPPER_26674, HOPPER_DEPOSIT));
 
         if (hopper.isPresent() && Rs2GameObject.interact(hopper.get())) {
             Microbot.log(String.format("Using hopper @ (%s)", hopper.get().getWorldLocation()));
@@ -264,7 +262,10 @@ public class MotherloadMineScript extends Script {
 
     private WallObject findClosestVein() {
         return Rs2GameObject.getWallObjects().stream()
-                .filter(this::isVein).filter(this::isWithinMiningArea).min((a, b) -> Integer.compare(distanceToPlayer(a), distanceToPlayer(b))).orElse(null);
+                .filter(x -> this.isVein(x)
+                        && this.isWithinMiningArea(x)
+                        && Rs2Tile.areSurroundingTilesWalkable(x.getWorldLocation(), 1, 1))
+                .min((a, b) -> Integer.compare(distanceToPlayer(a), distanceToPlayer(b))).orElse(null);
     }
 
     private boolean isVein(WallObject wallObject) {

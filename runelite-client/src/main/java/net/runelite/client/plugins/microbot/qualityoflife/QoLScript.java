@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.qualityoflife;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.Rs2InventorySetup;
@@ -28,7 +29,6 @@ public class QoLScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn() || !super.run()) {
-                    resetMenuEntries();
                     return;
                 }
 
@@ -62,6 +62,10 @@ public class QoLScript extends Script {
 
                 if (config.useDialogueAutoContinue() && Rs2Dialogue.isInDialogue()) {
                     handleDialogueContinue();
+                }
+
+                if (config.useQuestDialogueOptions() && Rs2Dialogue.isInDialogue()) {
+                    handleQuestOptionDialogueSelection();
                 }
 
 
@@ -114,13 +118,26 @@ public class QoLScript extends Script {
         Rs2Player.eatAt(percent);
     }
 
-    private void handleAutoDrinkPrayPot(int percent) {
-        Rs2Player.drinkPrayerPotionAt(percent);
+    private void handleAutoDrinkPrayPot(int points) {
+        Rs2Player.drinkPrayerPotionAt(points);
     }
 
     // handle dialogue continue
     private void handleDialogueContinue() {
         Rs2Dialogue.clickContinue();
+    }
+
+    // handle quest option dialogue selection
+    private void handleQuestOptionDialogueSelection() {
+            var options = Rs2Dialogue.getDialogueOptions();
+            // if there are options, and any option starts with [ , select it because it is a option highlighted from quest helper
+            for (Widget option : options) {
+                if (option.getText().startsWith("[")) {
+                    Rs2Dialogue.keyPressForDialogueOption(option.getIndex());
+                    return;
+                }
+            }
+
     }
 
     private void handleWorkbenchActions() {
@@ -240,6 +257,8 @@ public class QoLScript extends Script {
     }
 
     // reset all stored menu entries
+    //Decrepatated use resetMenuEntries method in main class
+    @Deprecated(since = "1.5.8 Use resetMenuEntries method in main class" , forRemoval = true)
     public void resetMenuEntries() {
         QoLPlugin.bankMenuEntries.clear();
         QoLPlugin.furnaceMenuEntries.clear();

@@ -6,5 +6,6 @@ public enum TitheFarmState {
     TAKE_SEEDS,
     REFILL_WATERCANS,
     PLANTING_SEEDS,
-    HARVEST
+    HARVEST,
+    LEAVE
 }

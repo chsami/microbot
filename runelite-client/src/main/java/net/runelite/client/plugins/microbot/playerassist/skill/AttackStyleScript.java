@@ -51,37 +51,93 @@ public class AttackStyleScript extends Script {
     private int defenceLevel;
     // Time delay to no change attack style to often
     private int attackStyleChangeDelay = 0;
-    private int currentAttackStyleChangeDelayCounter = 0;
+    long lastAttackStyleChangeTime = System.currentTimeMillis();
 
     public boolean run(PlayerAssistConfig config) {
         attackStyleChangeDelay = config.attackStyleChangeDelay();
-        currentAttackStyleChangeDelayCounter = 0;
-        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            if (!Microbot.isLoggedIn() || !super.run() || disableIfMaxed(config.toggleDisableOnMaxCombat())) return;
-            if (currentAttackStyleChangeDelayCounter-- > 0) return;
-
-            if (!initializedLevels) {
-                initializeLevels();
-            }
-
-            if (hasLeveledUp()) {
-                resetLevels();
-                log.info("Leveled up, resetting levels and timer.");
-            }
-
-            int attackStyleVarbit = Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE);
-            equippedWeaponTypeVarbit = Microbot.getVarbitValue(Varbits.EQUIPPED_WEAPON_TYPE);
-            int castingModeVarbit = Microbot.getVarbitValue(Varbits.DEFENSIVE_CASTING_MODE);
-            updateAttackStyle(equippedWeaponTypeVarbit, attackStyleVarbit, castingModeVarbit);
-            selectSkills(config);
-            WidgetInfo componentToDisplay = getComponentToDisplay(config);
-            if (attackStyle != attackStyleToTrain) {
-                changeAttackStyle(config, componentToDisplay);
-            }
-            currentAttackStyleChangeDelayCounter = attackStyleChangeDelay;
-        }, 0, 1, TimeUnit.SECONDS);
+        lastAttackStyleChangeTime = System.currentTimeMillis();
+        mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> scheduledTask(config), 0, 1, TimeUnit.SECONDS);
         return true;
     }
+
+    private void scheduledTask(PlayerAssistConfig config) {
+        // Early exit conditions
+        if (!Microbot.isLoggedIn() || !super.run() || !config.toggleEnableSkilling() || disableIfMaxed(config.toggleDisableOnMaxCombat()))
+            return;
+
+        // Initialize levels if not done yet
+        if (!initializedLevels) {
+            initializeLevels();
+        }
+
+        boolean leveledUp = false;
+
+        // Check if we've leveled up
+        if (hasLeveledUp()) {
+            resetLevels();
+            log.info("Leveled up, resetting levels and timer.");
+            leveledUp = true;
+        }
+
+        // Proceed if it's time to change the attack style or if we've just leveled up
+        if (!isTimeForAttackStyleChange() && !leveledUp) {
+            return;
+        }
+
+        // Update the last attack style change time
+        lastAttackStyleChangeTime = System.currentTimeMillis();
+
+        // Update attack style information
+        updateAttackStyleInfo();
+
+        if (attackStyle == AttackStyle.LONGRANGE || attackStyle == AttackStyle.RANGING) {
+            WeaponAttackType weaponAttackType = WeaponAttackType.getById(equippedWeaponTypeVarbit);
+            // check if any of the attack options is rapid
+            if (weaponAttackType != null && weaponAttackType.getAttackOptions().stream().anyMatch(attackOption -> attackOption.getStyle().equals("Rapid"))) {
+                // if rapid is available, switch to it
+                int attackStyleVarbit = Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE);
+                if (attackStyleVarbit != 1) {
+                    changeAttackStyle(config, WidgetInfo.COMBAT_STYLE_TWO);
+                }
+            }
+            else {
+                // if rapid is not available, switch to first attack style
+                int attackStyleVarbit = Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE);
+                if (attackStyleVarbit != 0) {
+                    changeAttackStyle(config, WidgetInfo.COMBAT_STYLE_ONE);
+                }
+            }
+            return;
+        }
+
+        // Select skills based on configuration
+        selectSkills(config);
+
+        // Get the component to display
+        WidgetInfo componentToDisplay = getComponentToDisplay(config);
+
+        Microbot.log("Current Attack Style: " + attackStyle.getName());
+        Microbot.log("Attack Style to Train: " + attackStyleToTrain.getName());
+        // Change attack style if needed
+        if (attackStyle != attackStyleToTrain) {
+            changeAttackStyle(config, componentToDisplay);
+        }
+
+
+    }
+
+    private boolean isTimeForAttackStyleChange() {
+        long elapsedTime = System.currentTimeMillis() - lastAttackStyleChangeTime;
+        return elapsedTime >= attackStyleChangeDelay * 1000L;
+    }
+
+    private void updateAttackStyleInfo() {
+        int attackStyleVarbit = Microbot.getVarbitPlayerValue(VarPlayer.ATTACK_STYLE);
+        equippedWeaponTypeVarbit = Microbot.getVarbitValue(Varbits.EQUIPPED_WEAPON_TYPE);
+        int castingModeVarbit = Microbot.getVarbitValue(Varbits.DEFENSIVE_CASTING_MODE);
+        updateAttackStyle(equippedWeaponTypeVarbit, attackStyleVarbit, castingModeVarbit);
+    }
+
 
     private void initializeLevels() {
         attackLevel = getSkillLevel(Skill.ATTACK);
@@ -95,7 +151,6 @@ public class AttackStyleScript extends Script {
             Rs2Tab.switchToCombatOptionsTab();
             sleepUntil(() -> Rs2Tab.getCurrentTab() == InterfaceTab.COMBAT, 2000);
         }
-        log.info("Changing Attack Style to: {}", attackStyleToTrain);
         Rs2Combat.setAttackStyle(attackStyleWidgetInfo);
     }
 
@@ -111,7 +166,6 @@ public class AttackStyleScript extends Script {
         attackLevel = getSkillLevel(Skill.ATTACK);
         strengthLevel = getSkillLevel(Skill.STRENGTH);
         defenceLevel = getSkillLevel(Skill.DEFENCE);
-        currentAttackStyleChangeDelayCounter = 0;
     }
 
     private void updateSelectedSkills(boolean enabled, Skill skill) {
@@ -140,12 +194,20 @@ public class AttackStyleScript extends Script {
             String attackStyleName = Microbot.getStructComposition(style).getStringValue(ParamID.ATTACK_STYLE_NAME);
             AttackStyle attackStyle = AttackStyle.valueOf(attackStyleName.toUpperCase());
 
-            if (attackStyle != AttackStyle.OTHER) {
-                if (i == 5 && attackStyle == AttackStyle.DEFENSIVE) {
-                    attackStyle = AttackStyle.DEFENSIVE_CASTING;
-                }
-                styles[i++] = attackStyle;
+            if (attackStyle == AttackStyle.OTHER)
+            {
+                // "Other" is used for no style
+                ++i;
+                continue;
             }
+
+            // "Defensive" is used for Defensive and also Defensive casting
+            if (i == 5 && attackStyle == AttackStyle.DEFENSIVE)
+            {
+                attackStyle = AttackStyle.DEFENSIVE_CASTING;
+            }
+
+            styles[i++] = attackStyle;
         }
         return styles;
     }
@@ -299,9 +361,8 @@ public class AttackStyleScript extends Script {
         return isMaxed() && disable;
     }
 
-    // shutdown
+    @Override
     public void shutdown() {
-        currentAttackStyleChangeDelayCounter = 0;
         super.shutdown();
 
     }

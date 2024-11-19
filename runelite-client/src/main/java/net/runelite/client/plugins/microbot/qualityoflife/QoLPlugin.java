@@ -12,19 +12,16 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.config.ConfigPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.qualityoflife.enums.WintertodtActions;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.AutoRunScript;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.CameraScript;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.NeverLogoutScript;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.SpecialAttackScript;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchOverlay;
-import net.runelite.client.plugins.microbot.qualityoflife.scripts.pouch.PouchScript;
+import net.runelite.client.plugins.microbot.qualityoflife.enums.*;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.*;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtOverlay;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtScript;
 import net.runelite.client.plugins.microbot.util.antiban.FieldUtil;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.ColorScheme;
@@ -36,17 +33,17 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtScript.isInWintertodtRegion;
 import static net.runelite.client.plugins.microbot.util.Global.awaitExecutionUntil;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 @PluginDescriptor(
         name = PluginDescriptor.See1Duck + "QoL",
@@ -86,8 +83,6 @@ public class QoLPlugin extends Plugin {
     @Inject
     WintertodtScript wintertodtScript;
     @Inject
-    PouchScript pouchScript;
-    @Inject
     private QoLConfig config;
     @Inject
     private QoLScript qoLScript;
@@ -100,9 +95,9 @@ public class QoLPlugin extends Plugin {
     @Inject
     private QoLOverlay qoLOverlay;
     @Inject
-    private PouchOverlay pouchOverlay;
-    @Inject
     private WintertodtOverlay wintertodtOverlay;
+    @Inject
+    private CannonScript cannonScript;
 
     @Provides
     QoLConfig provideConfig(ConfigManager configManager) {
@@ -137,21 +132,13 @@ public class QoLPlugin extends Plugin {
     @Override
     protected void startUp() throws AWTException {
         if (overlayManager != null) {
-            overlayManager.add(pouchOverlay);
             overlayManager.add(qoLOverlay);
             overlayManager.add(wintertodtOverlay);
-        }
-        if (config.displayPouchCounter()) {
-            overlayManager.add(pouchOverlay);
-            pouchScript.startUp();
         }
         if (config.useSpecWeapon()) {
             Microbot.getSpecialAttackConfigs().setSpecialAttack(true);
             Microbot.getSpecialAttackConfigs().setSpecialAttackWeapon(config.specWeapon());
             Microbot.getSpecialAttackConfigs().setMinimumSpecEnergy(config.specWeapon().getEnergyRequired());
-        }
-        if (config.autoRun()) {
-            Microbot.enableAutoRunOn = true;
         }
         if (config.autoStamina()) {
             Microbot.useStaminaPotsIfNeeded = true;
@@ -161,6 +148,7 @@ public class QoLPlugin extends Plugin {
         specialAttackScript.run(config);
         qoLScript.run(config);
         wintertodtScript.run(config);
+        cannonScript.run(config);
         awaitExecutionUntil(() ->Microbot.getClientThread().invokeLater(this::updateUiElements), () -> !SplashScreen.isOpen(), 600);
     }
 
@@ -169,7 +157,7 @@ public class QoLPlugin extends Plugin {
         qoLScript.shutdown();
         autoRunScript.shutdown();
         specialAttackScript.shutdown();
-        overlayManager.remove(pouchOverlay);
+        cannonScript.shutdown();
         overlayManager.remove(qoLOverlay);
         overlayManager.remove(wintertodtOverlay);
     }
@@ -198,6 +186,7 @@ public class QoLPlugin extends Plugin {
 
     }
 
+
     @Subscribe
     public void onGameTick(GameTick event) {
         if (!Microbot.isLoggedIn()) return;
@@ -213,10 +202,17 @@ public class QoLPlugin extends Plugin {
         }
     }
 
+    @Subscribe
     public void onGameStateChanged(GameStateChanged event) {
         if (event.getGameState() != GameState.UNKNOWN && lastGameState == GameState.UNKNOWN) {
             updateUiElements();
         }
+
+        if (event.getGameState() == GameState.LOGIN_SCREEN)
+        {
+            resetMenuEntries();
+        }
+
         if (event.getGameState() == GameState.LOGGED_IN) {
             if (config.fixCameraPitch())
                 CameraScript.fixPitch();
@@ -240,7 +236,6 @@ public class QoLPlugin extends Plugin {
 
     @Subscribe
     private void onMenuOptionClicked(MenuOptionClicked event) {
-        pouchScript.onMenuOptionClicked(event);
         MenuEntry menuEntry = event.getMenuEntry();
         if (recordActions) {
             if (Rs2Bank.isOpen() && config.useDoLastBank()) {
@@ -322,6 +317,8 @@ public class QoLPlugin extends Plugin {
         }
     }
 
+
+    // TODO: Rework this method to reduce the size and make it more manageable
     @Subscribe
     private void onMenuEntryAdded(MenuEntryAdded event) {
         String option = event.getOption();
@@ -336,10 +333,41 @@ public class QoLPlugin extends Plugin {
 
         }
 
+        if (config.quickFletchItems() && !isInWintertodtRegion() && event.getItemId() == ItemID.KNIFE && "Use".equals(option)) {
+            menuEntry.setOption("<col=FFA500>Quick fletch: </col>");
+            menuEntry.setTarget(config.fletchingItem().getName());
+            menuEntry.onClick(this::quickFletchOnClicked);
+        }
+
+        if (config.quickFletchHeadlessArrows() && event.getItemId() == ItemID.ARROW_SHAFT && "Use".equals(option)) {
+            menuEntry.setOption("<col=FFA500>Quick fletch: </col>");
+            menuEntry.setTarget("Headless arrow");
+            menuEntry.onClick(this::quickFletchHeadlessArrowOnClicked);
+        }
+
+        if (config.quickFletchDarts() && Arrays.stream(FletchingDarts.values()).anyMatch(dart -> dart.getDartTipId() == event.getItemId() && dart.meetsLevelRequirement()) && "Use".equals(option)) {
+            menuEntry.setOption("<col=FFA500>Quick fletch: </col>");
+            menuEntry.setTarget(Objects.requireNonNull(FletchingDarts.getDartByDartTipId(event.getItemId())).getDart());
+            menuEntry.onClick(this::quickFletchDartsOnClicked);
+
+
+        }
+
+        if (config.quickFletchArrows() && Arrays.stream(FletchingArrow.values()).anyMatch(arrow -> arrow.getArrowTipId() == event.getItemId() && arrow.meetsLevelRequirement()) && "Use".equals(option)) {
+            menuEntry.setOption("<col=FFA500>Quick fletch: </col>");
+            menuEntry.setTarget(Objects.requireNonNull(FletchingArrow.getArrowByArrowTipId(event.getItemId())).getArrow());
+            menuEntry.onClick(this::quickFletchArrowOnClicked);
+        }
+
+        if( config.quickFletchBolts() && Arrays.stream(FletchingBolt.values()).anyMatch(bolt -> bolt.getBoltTipId() == event.getItemId() && bolt.meetsLevelRequirement()) && "Use".equals(option)) {
+            menuEntry.setOption("<col=FFA500>Quick fletch: </col>");
+            menuEntry.setTarget(Objects.requireNonNull(FletchingBolt.getBoltByBoltTipId(event.getItemId())).getBolt());
+            menuEntry.onClick(this::quickFletchBoltsOnClicked);
+        }
+
         if (config.rightClickCameraTracking() && menuEntry.getNpc() != null && menuEntry.getNpc().getId() > 0) {
             addMenuEntry(event, "Track", target, this::customTrackOnClicked);
         }
-
 
         if (config.useDoLastBank()) {
             if ("Talk-to".equals(option)) {
@@ -404,13 +432,6 @@ public class QoLPlugin extends Plugin {
                 configManager.setConfiguration("QoL", "quickFletchKindling", true);
             }
         }
-        if (ev.getKey().equals("displayPouchCounter")) {
-            if (ev.getNewValue() == "true") {
-                overlayManager.add(pouchOverlay);
-            } else {
-                overlayManager.remove(pouchOverlay);
-            }
-        }
         if (ev.getKey().equals("useSpecWeapon") || ev.getKey().equals("specWeapon")) {
             if (config.useSpecWeapon()) {
                 Microbot.getSpecialAttackConfigs().setSpecialAttack(true);
@@ -421,9 +442,6 @@ public class QoLPlugin extends Plugin {
             }
         }
 
-        if (ev.getKey().equals("autoRun")) {
-            Microbot.enableAutoRunOn = config.autoRun();
-        }
         if (ev.getKey().equals("autoStamina")) {
             Microbot.useStaminaPotsIfNeeded = config.autoStamina();
         }
@@ -437,11 +455,7 @@ public class QoLPlugin extends Plugin {
         applySmoothingToAngle(YAW_INDEX);
     }
 
-    @Subscribe
-    public void onItemContainerChanged(final ItemContainerChanged event)
-    {
-        pouchScript.onItemContainerChanged(event);
-    }
+    // TODO: These OnClick methods should be moved to a separate class to reduce the size and make this class more manageable
 
     private void customLoadoutOnClicked(MenuEntry event, String loadoutName) {
         recordActions = false;
@@ -516,6 +530,112 @@ public class QoLPlugin extends Plugin {
         NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", "Bruma root", 0, MenuAction.WIDGET_TARGET_ON_WIDGET, brumaRootSlot, event.getParam1(), false);
         combinedMenuEntry.setItemId(ItemID.BRUMA_ROOT);
         Microbot.doInvoke(combinedMenuEntry, new Rectangle(1, 1));
+    }
+
+    private void quickFletchOnClicked(MenuEntry event) {
+        List<Rs2Item> fletchableLogs = FletchingLogs.getFletchableLogs(config.fletchingItem());
+        if (fletchableLogs.isEmpty()) {
+            Microbot.log("<col=5F1515>No fletchable logs found in inventory</col>");
+            return;
+        }
+        int logSlot = fletchableLogs.get(0).getSlot();
+        if (logSlot == -1) {
+            Microbot.log("<col=5F1515>Couldn't get item slot</col>");
+            return;
+        }
+        Microbot.log("<col=245C2D>Fletching: "+ fletchableLogs.get(0).getName() +" To: "+config.fletchingItem().getName() +"</col>");
+        NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", fletchableLogs.get(0).getName(), 0, MenuAction.WIDGET_TARGET_ON_WIDGET, logSlot, event.getParam1(), false);
+        combinedMenuEntry.setItemId(fletchableLogs.get(0).getId());
+        Microbot.doInvoke(combinedMenuEntry, new Rectangle(1, 1));
+        Microbot.getClientThread().runOnSeperateThread(() -> {
+        sleepUntil(Rs2Widget::isProductionWidgetOpen, 1000);
+        if (Rs2Widget.isProductionWidgetOpen()) {
+            Rs2Widget.clickWidget(config.fletchingItem().getContainsInventoryName(), Optional.of(270),13,false);
+        }
+            return null;
+        });
+    }
+
+    private void quickFletchDartsOnClicked(MenuEntry event) {
+        int featherSlot = Rs2Inventory.slot(ItemID.FEATHER);
+        if (featherSlot == -1) {
+            Microbot.log("<col=5F1515>Feather not found in inventory</col>");
+            return;
+        }
+        FletchingDarts dart = FletchingDarts.getDartByDartTipId(event.getItemId());
+        if (dart == null) {
+            Microbot.log("<col=5F1515>Couldn't get dart type</col>");
+            return;
+        }
+        Microbot.log("<col=245C2D>Fletching: "+ dart.getDartTip() +" To: "+ dart.getDart() +"</col>");
+        NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", "Feather", 0, MenuAction.WIDGET_TARGET_ON_WIDGET, featherSlot, event.getParam1(), false);
+        combinedMenuEntry.setItemId(ItemID.FEATHER);
+        Microbot.getMouse().click(Microbot.getClient().getMouseCanvasPosition(),combinedMenuEntry);
+    }
+
+    private void quickFletchBoltsOnClicked(MenuEntry event) {
+        int featherSlot = Rs2Inventory.slot(ItemID.FEATHER);
+        if (featherSlot == -1) {
+            Microbot.log("<col=5F1515>Feather not found in inventory</col>");
+            return;
+        }
+        FletchingBolt bolt = FletchingBolt.getBoltByBoltTipId(event.getItemId());
+        if (bolt == null) {
+            Microbot.log("<col=5F1515>Couldn't get bolt type</col>");
+            return;
+        }
+        Microbot.log("<col=245C2D>Fletching: "+ bolt.getBoltTip() +" To: "+ bolt.getBolt() +"</col>");
+        NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", "Feather", 0, MenuAction.WIDGET_TARGET_ON_WIDGET, featherSlot, event.getParam1(), false);
+        combinedMenuEntry.setItemId(ItemID.FEATHER);
+        Microbot.getMouse().click(Microbot.getClient().getMouseCanvasPosition(),combinedMenuEntry);
+    }
+
+    private void quickFletchHeadlessArrowOnClicked(MenuEntry event) {
+        int featherSlot = Rs2Inventory.slot(ItemID.FEATHER);
+        if (featherSlot == -1) {
+            Microbot.log("<col=5F1515>Feather not found in inventory</col>");
+            return;
+        }
+
+        Microbot.log("<col=245C2D>Fletching: Headless Arrow</col>");
+        NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", "Feather", 0, MenuAction.WIDGET_TARGET_ON_WIDGET, featherSlot, event.getParam1(), false);
+        combinedMenuEntry.setItemId(ItemID.FEATHER);
+        Microbot.getMouse().click(Microbot.getClient().getMouseCanvasPosition(),combinedMenuEntry);
+        Microbot.getClientThread().runOnSeperateThread(() -> {
+            sleepUntil(Rs2Widget::isProductionWidgetOpen, 1000);
+            if (Rs2Widget.isProductionWidgetOpen()) {
+                Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+            }
+            return null;
+        });
+    }
+
+    private void quickFletchArrowOnClicked(MenuEntry event) {
+        int headlessSlot = Rs2Inventory.slot(ItemID.HEADLESS_ARROW);
+        if (headlessSlot == -1) {
+            Microbot.log("<col=5F1515>Headless Arrow not found in inventory</col>");
+            return;
+        }
+
+        FletchingArrow arrow = FletchingArrow.getArrowByArrowTipId(event.getItemId());
+        if (arrow == null) {
+            Microbot.log("<col=5F1515>Couldn't get arrow type</col>");
+            return;
+        }
+
+        Microbot.log("<col=245C2D>Fletching: "+arrow.getArrow() +"</col>");
+        NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", "Feather", 0, MenuAction.WIDGET_TARGET_ON_WIDGET, headlessSlot, event.getParam1(), false);
+        combinedMenuEntry.setItemId(ItemID.HEADLESS_ARROW);
+        Microbot.getMouse().click(Microbot.getClient().getMouseCanvasPosition(),combinedMenuEntry);
+        Microbot.getClientThread().runOnSeperateThread(() -> {
+            sleepUntil(Rs2Widget::isProductionWidgetOpen, 1000);
+            if (Rs2Widget.isProductionWidgetOpen()) {
+                Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+                //Microbot.getMouse().handleMove(Microbot.getMouse().getLastClick2());
+            }
+            return null;
+        });
+        //Microbot.doInvoke(combinedMenuEntry,event.getWidget() != null ? event.getWidget().getBounds() : new Rectangle(1, 1));
     }
 
     private void applySmoothingToAngle(int index) {
@@ -657,4 +777,15 @@ public class QoLPlugin extends Plugin {
         return (List<?>) FieldUtils.readDeclaredField(pluginListPanel, "pluginList", true);
     }
 
+    public static void resetMenuEntries() {
+        bankMenuEntries.clear();
+        furnaceMenuEntries.clear();
+        anvilMenuEntries.clear();
+        recordActions = false;
+        executeBankActions = false;
+        executeFurnaceActions = false;
+        executeAnvilActions = false;
+        executeWorkbenchActions = false;
+        executeLoadoutActions = false;
+    }
 }

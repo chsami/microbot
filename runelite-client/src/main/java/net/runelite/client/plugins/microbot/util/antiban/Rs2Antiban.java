@@ -308,7 +308,7 @@ public class Rs2Antiban {
         }
 
         if (Rs2AntibanSettings.moveMouseOffScreen)
-            moveMouseOffScreen();
+            moveMouseOffScreen((Rs2AntibanSettings.moveMouseOffScreenChance*100));
     }
 
 
@@ -503,12 +503,28 @@ public class Rs2Antiban {
 
     /**
      * <h1>Move Mouse Off Screen</h1>
-     * This method moves the mouse off the screen with a 1/4 chance to trigger.
+     * This method moves the mouse off the screen with a 100% chance to trigger.
      * This is used to simulate a user moving the mouse off the screen to take a break.
      */
     public static void moveMouseOffScreen() {
-        Microbot.naturalMouse.moveOffScreen();
+        // Always move the mouse off screen
+        Microbot.naturalMouse.moveOffScreen(100.0); // Calls the overloaded method with a 100% chance
     }
+
+    /**
+     * <h1>Move Mouse Off Screen</h1>
+     * This method moves the mouse off the screen based on a specified chance percentage.
+     * This is used to simulate a user moving the mouse off the screen to take a break.
+     *
+     * @param chance the chance (in percentage) to move the mouse off screen.
+     *               This value should be between 0.0 and 100.0 (inclusive).
+     *               Note: This parameter should represent a whole percentage (e.g., 25.0, 50.0)
+     *               and should not be a fractional value between 0.0 and 0.99.
+     */
+    public static void moveMouseOffScreen(double chance) {
+        Microbot.naturalMouse.moveOffScreen(chance);
+    }
+
 
     /**
      * <h1>Move Mouse Randomly</h1>

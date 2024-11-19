@@ -1,66 +1,96 @@
 package net.runelite.client.plugins.microbot.roguesden;
 
-import net.runelite.client.plugins.microbot.roguesden.steps.Step;
-import net.runelite.client.ui.overlay.OverlayPanel;
+
+import net.runelite.api.Client;
+import net.runelite.api.GameObject;
+import net.runelite.api.Perspective;
+import net.runelite.api.Point;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.components.LineComponent;
-import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-public class RoguesDenOverlay extends OverlayPanel {
-    private final RoguesDenPlugin roguesDenPlugin;
+public class RoguesDenOverlay extends Overlay {
+    private static final Color OBJECT_BORDER_COLOR;
+    private static final Color OBJECT_COLOR;
+    private static final Color OBJECT_BORDER_HOVER_COLOR;
+    private final Client client;
+    private final RoguesDenPlugin plugin;
 
     @Inject
-    RoguesDenOverlay(RoguesDenPlugin plugin)
-    {
-        super(plugin);
-        this.roguesDenPlugin = plugin;
-        setPosition(OverlayPosition.TOP_LEFT);
-        setNaughty();
+    public RoguesDenOverlay(Client client, RoguesDenPlugin plugin) {
+        this.setPosition(OverlayPosition.DYNAMIC);
+        this.setLayer(OverlayLayer.ABOVE_SCENE);
+        this.client = client;
+        this.plugin = plugin;
     }
-    @Override
+
     public Dimension render(Graphics2D graphics) {
-        try {
-            panelComponent.setPreferredSize(new Dimension(200, 300));
-            panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Rogues Den " + RoguesDenScript.version)
-                    .color(Color.GREEN)
-                    .build());
+        if (!this.plugin.isHasGem()) {
+            return null;
+        } else {
+            this.plugin.getObstaclesHull().forEach((obstaclex, tile) -> {
+                if (tile.getPlane() == this.client.getPlane()) {
+                    Shape clickBox = obstaclex.getClickbox();
+                    if (clickBox != null) {
+                        Point mouse = this.client.getMouseCanvasPosition();
+                        if (clickBox.contains((double)mouse.getX(), (double)mouse.getY())) {
+                            graphics.setColor(OBJECT_BORDER_HOVER_COLOR);
+                        } else {
+                            graphics.setColor(OBJECT_BORDER_COLOR);
+                        }
 
-            panelComponent.getChildren().add(LineComponent.builder().build());
+                        graphics.draw(clickBox);
+                        graphics.setColor(OBJECT_COLOR);
+                        graphics.fill(clickBox);
+                    } else {
+                        Object p;
+                        if (obstaclex instanceof GameObject) {
+                            p = ((GameObject)obstaclex).getConvexHull();
+                        } else {
+                            p = obstaclex.getCanvasTilePoly();
+                        }
 
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Current Step:")
-                    .right(roguesDenPlugin.script.getCurrentStep().getName())
-                    .build());
+                        if (p != null) {
+                            graphics.setColor(OBJECT_COLOR);
+                            graphics.draw((Shape)p);
+                        }
+                    }
+                }
 
-            if (!roguesDenPlugin.script.getFailuresByStep().isEmpty())
-            {
-                panelComponent.getChildren().add(LineComponent.builder()
-                        .left("Step Run Terminated at:")
-                        .build());
+            });
+            Obstacles.Obstacle[] obstacles = Obstacles.OBSTACLES;
+
+            for(int i = 0; i < obstacles.length; ++i) {
+                Obstacles.Obstacle obstacle = obstacles[i];
+                LocalPoint localPoint = LocalPoint.fromWorld(this.client, obstacle.getTile());
+                if (localPoint != null && obstacle.getTile().getPlane() == this.client.getPlane()) {
+                    if (!obstacle.getHint().isEmpty()) {
+                        Polygon polygon = Perspective.getCanvasTilePoly(this.client, localPoint);
+                        if (polygon != null) {
+                            graphics.setColor(obstacle.getTileColor());
+                            graphics.drawPolygon(polygon);
+                        }
+                    }
+
+                    Point textLocation = Perspective.getCanvasTextLocation(this.client, graphics, localPoint, obstacle.getHint(), 0);
+                    if (textLocation != null) {
+                        graphics.setColor(Color.LIGHT_GRAY);
+                        graphics.drawString(i + ": " + obstacle.getHint(), textLocation.getX(), textLocation.getY());
+                    }
+                }
             }
 
-            for (Map.Entry<Step, Integer> entry : roguesDenPlugin.script.getFailuresByStep()
-                    .entrySet()
-                    .stream()
-                    .sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).collect(Collectors.toList()))
-            {
-                panelComponent.getChildren().add(LineComponent.builder()
-                            .left(entry.getKey().getName())
-                            .right(entry.getValue().toString())
-                            .build());
-            }
-
-
-        } catch(Exception ex) {
-            System.out.println(ex.getMessage());
+            return null;
         }
-        return super.render(graphics);
+    }
+
+    static {
+        OBJECT_BORDER_COLOR = Color.RED;
+        OBJECT_COLOR = new Color(OBJECT_BORDER_COLOR.getRed(), OBJECT_BORDER_COLOR.getGreen(), OBJECT_BORDER_COLOR.getBlue(), 50);
+        OBJECT_BORDER_HOVER_COLOR = OBJECT_BORDER_COLOR.darker();
     }
 }

@@ -16,8 +16,8 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.inventorysetups.InventorySetup;
-import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
+import net.runelite.client.plugins.microbot.inventorysetups.InventorySetup;
+import net.runelite.client.plugins.microbot.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.playerassist.bank.BankerScript;
 import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class PlayerAssistPlugin extends Plugin {
-    public static final String version = "1.2.3";
+    public static final String version = "1.2.4";
     private static final String SET = "Set";
     private static final String CENTER_TILE = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
     // SAFE_SPOT = "Safe Spot";
@@ -87,6 +87,7 @@ public class PlayerAssistPlugin extends Plugin {
     private PlayerAssistInfoOverlay playerAssistInfoOverlay;
     private MenuEntry lastClick;
     private Point lastMenuOpenedPoint;
+    private WorldPoint trueTile;
 
     @Provides
     PlayerAssistConfig provideConfig(ConfigManager configManager) {
@@ -265,6 +266,7 @@ public class PlayerAssistPlugin extends Plugin {
     @Subscribe
     public void onMenuOpened(MenuOpened event) {
         lastMenuOpenedPoint = Microbot.getClient().getMouseCanvasPosition();
+        trueTile = getSelectedWorldPoint();
     }
     @Subscribe
     private void onMenuEntryAdded(MenuEntryAdded event) {
@@ -347,10 +349,10 @@ public class PlayerAssistPlugin extends Plugin {
 
 
         if (entry.getOption().equals(SET) && entry.getTarget().equals(CENTER_TILE)) {
-            setCenter(getSelectedWorldPoint());
+            setCenter(trueTile);
         }
         if (entry.getOption().equals(SET) && entry.getTarget().equals(SAFE_SPOT)) {
-            setSafeSpot(getSelectedWorldPoint());
+            setSafeSpot(trueTile);
         }
 
 

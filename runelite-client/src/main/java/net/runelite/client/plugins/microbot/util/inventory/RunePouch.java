@@ -82,4 +82,22 @@ public class RunePouch {
             return false;
         });
     }
+
+    public static int getItemAmount(int itemId) {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            load();
+            for (int i = 0; i < runeIds.length; i++) {
+                final int _i = i;
+                Runes rune = Arrays.stream(Runes.values())
+                        .filter(x -> x.getId() == runeIds[_i])
+                        .findFirst()
+                        .orElse(null);
+
+                if (rune != null && rune.getItemId() == itemId) {
+                    return amounts[i];
+                }
+            }
+            return 0;
+        });
+    }
 }
