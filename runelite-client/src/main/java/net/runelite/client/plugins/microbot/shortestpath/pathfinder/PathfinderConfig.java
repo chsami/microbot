@@ -20,8 +20,6 @@ import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.shortestpath.TransportType.*;
 
-
-
 public class PathfinderConfig {
     private static final WorldArea WILDERNESS_ABOVE_GROUND = new WorldArea(2944, 3523, 448, 448, 0);
     private static final WorldArea WILDERNESS_ABOVE_GROUND_LEVEL_20 = new WorldArea(2944, 3680, 448, 448, 0);
@@ -274,8 +272,8 @@ public class PathfinderConfig {
             if (!restrictionApplies) {
                 for (TransportVarbit varbitCheck : entry.getVarbits()) {
                     int varbitId = varbitCheck.getVarbitId();
-                    int expectedValue = varbitCheck.getValue();
-                    if (varbitValues.getOrDefault(varbitId, -1) != expectedValue) {
+                    int actualValue = varbitValues.getOrDefault(varbitId, -1);
+                    if (!varbitCheck.matches(actualValue)) {
                         restrictionApplies = true;
                         break;
                     }
@@ -330,7 +328,8 @@ public class PathfinderConfig {
     private boolean varbitChecks(Transport transport) {
         if (varbitValues.isEmpty()) return true;
         for (TransportVarbit varbitCheck : transport.getVarbits()) {
-            if (!varbitValues.get(varbitCheck.getVarbitId()).equals(varbitCheck.getValue())) {
+            int actualValue = varbitValues.getOrDefault(varbitCheck.getVarbitId(), -1);
+            if (!varbitCheck.matches(actualValue)) {
                 return false;
             }
         }

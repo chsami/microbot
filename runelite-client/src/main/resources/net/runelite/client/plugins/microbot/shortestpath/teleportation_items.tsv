@@ -21,7 +21,9 @@
 # Explorer's Ring (2 has 3 teleports per day, 3 and 4 are unlimited)								
 3052 3291 0		13126;13127;13128		4	Explorer's ring	F	20	
 # Rada's Blessing (Kourend Woodland, 1 has 3 teleports, 2 has 5 teleports, 3 and 4 have unlimited. For Mount Karuulum, 3 has 3 teleports and 4 has unlimited)								
-1554 3457 0		22941;22943;22945;22947		4	Rada's blessing: Kourend Woodland	F	20	
+1554 3457 0		22941		4	Rada's blessing: Kourend Woodland	F	20	7937<3
+1554 3457 0		22943		4	Rada's blessing: Kourend Woodland	F	20	7937<5
+1554 3457 0		22945;22947		4	Rada's blessing: Kourend Woodland	F	20	
 1311 3799 0		22945;22947		4	Rada's blessing: Mount Karuulm	F	20	
 								
 # Games Necklace								

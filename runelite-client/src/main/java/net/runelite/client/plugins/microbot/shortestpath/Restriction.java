@@ -80,10 +80,25 @@ public class Restriction {
 
         if ((value = fieldMap.get("Varbits")) != null) {
             for (String varbitCheck : value.split(DELIM_MULTI)) {
-                String[] varbitParts = varbitCheck.split(DELIM_STATE);
-                int varbitId = Integer.parseInt(varbitParts[0]);
-                int varbitValue = Integer.parseInt(varbitParts[1]);
-                varbits.add(new TransportVarbit(varbitId, varbitValue));
+                String[] parts;
+                TransportVarbit.Operator operator;
+
+                if (varbitCheck.contains(">")) {
+                    parts = varbitCheck.split(">");
+                    operator = TransportVarbit.Operator.GREATER_THAN;
+                } else if (varbitCheck.contains("<")) {
+                    parts = varbitCheck.split("<");
+                    operator = TransportVarbit.Operator.LESS_THAN;
+                } else if (varbitCheck.contains("=")) {
+                    parts = varbitCheck.split("=");
+                    operator = TransportVarbit.Operator.EQUAL;
+                } else {
+                    throw new IllegalArgumentException("Invalid varbit format: " + varbitCheck);
+                }
+
+                int varbitId = Integer.parseInt(parts[0]);
+                int varbitValue = Integer.parseInt(parts[1]);
+                varbits.add(new TransportVarbit(varbitId, varbitValue, operator));
             }
         }
     }
