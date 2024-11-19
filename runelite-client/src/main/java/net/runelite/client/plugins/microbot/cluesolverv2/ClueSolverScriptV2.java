@@ -48,6 +48,9 @@ public class ClueSolverScriptV2 extends Script {
     @Inject
     private Provider<MapClueTask> mapClueTaskProvider;
 
+    @Inject
+    private Provider<CipherClueTask> cipherClueTaskProvider;
+
 
     /**
      * Starts the Clue Solver Script V2.
@@ -191,6 +194,10 @@ public class ClueSolverScriptV2 extends Script {
         } else if (clue instanceof MapClue) {
             MapClueTask task = mapClueTaskProvider.get();
             task.setClue((MapClue) clue);
+            return task;
+        } else if (clue instanceof CipherClue) {
+            CipherClueTask task = cipherClueTaskProvider.get();
+            task.setClue((CipherClue) clue);
             return task;
         }
 

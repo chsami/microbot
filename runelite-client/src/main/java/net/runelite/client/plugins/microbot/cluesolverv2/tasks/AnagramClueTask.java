@@ -7,6 +7,7 @@ import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.plugins.microbot.cluescrolls.clues.AnagramClue;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -164,28 +165,40 @@ public class AnagramClueTask implements ClueTask {
      *
      * @return true if questions are answered successfully; false otherwise.
      */
-    //TODO Better question implemention currently manual entry for answers
     private boolean answerQuestions() {
         if (clue.getQuestion() != null && clue.getAnswer() != null) {
             log.info("Answering NPC question: {}", clue.getQuestion());
-            // Assuming Rs2Dialogue handles dialogue options
-            if (Rs2Dialogue.isInDialogue()) {
-                sleep(1000);
 
+            while (Rs2Dialogue.isInDialogue()) {
+                if (Rs2Dialogue.hasContinue()) {
+                    Rs2Dialogue.clickContinue();
+                    sleep(1000);
+                } else {
+                    break; // Exit loop if no "continue" option is available
+                }
+            }
+
+            if (!Rs2Dialogue.isInDialogue()) {
+                log.info("Dialogue ended. Answering question...");
+                Rs2Keyboard.typeString(clue.getAnswer());
+                sleep(2000); // Wait to ensure the input is processed
+                Rs2Keyboard.enter();
+                sleep(1000); // Wait after submitting the answer
+
+                // Verify if dialogue has ended or further action is required
                 if (!Rs2Dialogue.isInDialogue()) {
-                    log.info("Answered the question successfully.");
+                    log.info("Answered the question successfully. Marking task as completed.");
                     state = State.COMPLETED;
                     return true;
                 } else {
                     log.warn("Dialogue still active. Possible incorrect answer or additional steps required.");
                     if (Rs2Dialogue.hasContinue()) {
                         Rs2Dialogue.clickContinue();
-                        return true;
                     }
                     return false;
                 }
             } else {
-                log.warn("Not currently in dialogue. Unable to answer question.");
+                log.warn("Still in dialogue. Unable to answer question at this stage.");
                 return false;
             }
         } else {
@@ -194,4 +207,5 @@ public class AnagramClueTask implements ClueTask {
             return true;
         }
     }
+
 }

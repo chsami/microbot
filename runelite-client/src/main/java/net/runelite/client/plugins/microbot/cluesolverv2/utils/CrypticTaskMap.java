@@ -26,7 +26,7 @@ public class CrypticTaskMap {
         addToMap("Guard", new WorldPoint(2653, 3320, 0)); // Doric's Hut
         addToMap("Guard (Port Sarim Jail)", new WorldPoint(3012, 3222, 0)); // Jailhouse
         addToMap("Guard dog", null);
-        addToMap("Pirate", null);
+        addToMap("Pirate", new WorldPoint(2797, 3163, 0)); // Brimhaven
         addToMap("Hill Giant", null);
         addToMap("Man", null);
         addToMap("Monk", new WorldPoint(2607, 3209, 0)); //Ardy

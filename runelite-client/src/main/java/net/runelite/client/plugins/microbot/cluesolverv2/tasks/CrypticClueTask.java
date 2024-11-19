@@ -134,8 +134,10 @@ public class CrypticClueTask implements ClueTask {
 
     private void initializeKillClueVariables() {
         if (clue.getSolution(plugin) != null && !clue.getSolution(plugin).trim().isEmpty()) {
-            // Attempt to match clue text to NPC in map
-            Map<String, Object> npcData = findNpcFromClueText(clue.getSolution(plugin));
+            String clueSolution = clue.getSolution(plugin);
+
+            // Use findNpcFromClueText to extract relevant NPC data
+            Map<String, Object> npcData = findNpcFromClueText(clueSolution);
 
             if (npcData != null) {
                 currentNpcName = (String) npcData.get("npc");
@@ -143,14 +145,35 @@ public class CrypticClueTask implements ClueTask {
                         ? List.of((WorldPoint) npcData.get("location"))
                         : Collections.emptyList();
 
-                log.info("Matched clue to NPC '{}'. Using predefined locations: {}", currentNpcName, currentNpcLocations);
+                // Check if this clue requires killing the NPC
+                boolean requiresKill = npcData.containsKey("requiresKill") && (boolean) npcData.get("requiresKill");
+
+                log.info("Matched clue to NPC '{}'. Requires kill: {}. Locations: {}", currentNpcName, requiresKill, currentNpcLocations);
+
+                // Set the initial state based on whether the clue requires a kill or interaction
+                if (requiresKill) {
+                    state = State.NAVIGATING_TO_NPC_LOCATION;
+                } else {
+                    state = State.NAVIGATING_TO_LOCATION;
+                }
             } else {
-                log.warn("No match found in map for clue text: {}", clue.getSolution(plugin));
+                log.warn("No match found in map for clue text: {}", clueSolution);
+
+                // Default to navigating to the clue location if NPC data is not found
                 currentNpcName = null;
                 currentNpcLocations = Collections.emptyList();
+                if (clue.getLocation(null) != null) {
+                    state = State.NAVIGATING_TO_LOCATION;
+                } else {
+                    state = State.FAILED;
+                }
             }
+        } else {
+            log.error("Clue solution is null or empty. Cannot initialize variables.");
+            state = State.FAILED;
         }
     }
+
 
 
     private Map<String, Object> findNpcFromClueText(String clueSolution) {
@@ -160,11 +183,17 @@ public class CrypticClueTask implements ClueTask {
         for (Map<String, Object> entry : crypticTaskMap) {
             String npcName = (String) entry.get("npc");
             if (npcName != null && normalizedText.contains(npcName.toLowerCase())) {
+                // Check if the clue solution contains the word "kill"
+                boolean requiresKill = normalizedText.contains("kill") || normalizedText.contains("defeat");
+
+                // Add a marker to the map entry to indicate whether this is a kill task
+                entry.put("requiresKill", requiresKill);
                 return entry; // Return the matching entry
             }
         }
         return null; // No match found
     }
+
 
     private boolean navigateToNpcLocation() {
         if (npcLocationIterator == null) {
