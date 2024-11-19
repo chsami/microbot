@@ -4034,7 +4034,7 @@
 2707 10205 0	2744 3830 1	Exit;Cave;19764					
 2707 10206 0	2744 3830 1	Exit;Cave;19764					
 2707 10204 0	2744 3830 1	Exit;Cave;19764					
-							
+
 # Keldagrim							
 2730 3714 0	2773 10162 0	Enter;Tunnel;5008					
 2773 10162 0	2730 3713 0	Enter;Tunnel;5014					
@@ -4502,4 +4502,6 @@
 1427 2933 0	1425 2933 0	Pass-through;Entryway;54707				4	
 # Fortis Colosseum							
 1795 3107 0	1799 9506 0	Enter;Colosseum entrance;50749				8	
-1799 9506 0	1795 3107 0	Exit;Stairs;50750				8	
+1799 9506 0	1795 3107 0	Exit;Stairs;50750				8
+# Hunter Guild
+1558 3047 0	1558 9451 0	Climb-down;Stairs;51641				8
