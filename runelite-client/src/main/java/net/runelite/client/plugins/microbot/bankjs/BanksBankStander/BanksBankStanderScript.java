@@ -5,6 +5,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import javax.inject.Inject;
@@ -15,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 import static net.runelite.client.plugins.microbot.storm.common.Rs2Storm.getRandomItemWithLimit;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 import static net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory.items;
-import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 // heaps of new features added by Storm
 public class BanksBankStanderScript extends Script {
@@ -88,7 +88,7 @@ public class BanksBankStanderScript extends Script {
             sleepMax = config.sleepMax();
             sleepTarget = config.sleepTarget();
         } else {
-            sleepMax = config.sleepMax() + random(120 - (config.sleepMax() - config.sleepMin()), 151);
+            sleepMax = config.sleepMax() + Rs2Random.between(120 - (config.sleepMax() - config.sleepMin()), 151);
             sleepTarget = sleepMin + ((sleepMax - sleepMin) / 2);
         }
         // Determine whether the first & second item is the ID or Name.
@@ -176,7 +176,7 @@ public class BanksBankStanderScript extends Script {
             if (!Rs2Bank.isOpen()) {
                 Rs2Bank.openBank();
             }
-            sleep = sleepUntilTrue(() -> Rs2Bank.isOpen(), random(67, 97), 18000);
+            sleep = sleepUntilTrue(() -> Rs2Bank.isOpen(), Rs2Random.between(67, 97), 18000);
             sleep(calculateSleepDuration());
             if (config.depositAll()) {
                 Rs2Bank.depositAll();
@@ -327,7 +327,7 @@ public class BanksBankStanderScript extends Script {
                 long bankCloseTime = System.currentTimeMillis();
                 while (this.isRunning() && Rs2Bank.isOpen() && (System.currentTimeMillis() - bankCloseTime < 32000)) {
                     Rs2Bank.closeBank();
-                    sleep = sleepUntilTrue(() -> !Rs2Bank.isOpen(), random(60, 97), 5000);
+                    sleep = sleepUntilTrue(() -> !Rs2Bank.isOpen(), Rs2Random.between(60, 97), 5000);
                     sleep(calculateSleepDuration() - 10);
                 }
                 if (Rs2Bank.isOpen()) {
@@ -358,7 +358,7 @@ public class BanksBankStanderScript extends Script {
         }
         if (Rs2Bank.isOpen()) {
             Rs2Bank.closeBank();
-            sleep = sleepUntilTrue(() -> !Rs2Bank.isOpen(), random(60, 97), 5000);
+            sleep = sleepUntilTrue(() -> !Rs2Bank.isOpen(), Rs2Random.between(60, 97), 5000);
             sleep(calculateSleepDuration());
             return false;
         }
@@ -406,7 +406,7 @@ public class BanksBankStanderScript extends Script {
         if (config.needPromptEntry()) {
             sleep(calculateSleepDuration());
             isWaitingForPrompt = true;
-            sleep = sleepUntilTrue(() -> !isWaitingForPrompt, random(7, 31), random(800, 1200));
+            sleep = sleepUntilTrue(() -> !isWaitingForPrompt, Rs2Random.between(7, 31), Rs2Random.between(800, 1200));
             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
             previousItemChange = System.currentTimeMillis();
             if (secondItemId != null) {
@@ -443,7 +443,7 @@ public class BanksBankStanderScript extends Script {
     public String checkItemSums(){
         if(!Rs2Bank.isOpen()){
             Rs2Bank.openBank();
-            sleep = sleepUntilTrue(Rs2Bank::isOpen, random(67, 97), 18000);
+            sleep = sleepUntilTrue(Rs2Bank::isOpen, Rs2Random.between(67, 97), 18000);
             sleep(200, 600);
         }
         //System.out.println("Attempting to check first item");
