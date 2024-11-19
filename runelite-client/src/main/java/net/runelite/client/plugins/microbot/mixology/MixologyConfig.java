@@ -13,10 +13,16 @@ import org.jetbrains.annotations.Range;
 public interface MixologyConfig extends Config {
     @ConfigSection(
             name = "Refiner",
-            description = "General configuration",
+            description = "Refiner configuration",
             position = 0
     )
     String refiner = "Refiner";
+    @ConfigSection(
+            name = "Minigame",
+            description = "General minigame configuration",
+            position = 0
+    )
+    String minigame = "Minigame";
 
     @ConfigItem(
             keyName = "RefinerHerbMox",
@@ -84,4 +90,70 @@ public interface MixologyConfig extends Config {
         return 1000;
     }
 
+    @ConfigItem(
+            keyName = "useQuickActionRefiner",
+            name = "Use Quick Action on Refiner",
+            description = "Will click while paste to allow for faster completion of the task",
+            position = 5,
+            section = refiner
+    )
+    default boolean useQuickActionRefiner() {
+        return true;
+    }
+
+    // -- MINIGAME SECTION -- //
+
+    @ConfigItem(
+            keyName = "useQuickActionAlembic",
+            name = "Use Quick Action on Alembic",
+            description = "Will click once there is a quick action available on the alembic",
+            position = 0,
+            section = minigame
+    )
+    default boolean useQuickActionOnAlembic() {
+        return true;
+    }
+    @ConfigItem(
+            keyName = "useQuickActionAgitator",
+            name = "Use Quick Action on Agitator",
+            description = "Will click once there is a quick action available on the agitator",
+            position = 1,
+            section = minigame
+    )
+    default boolean useQuickActionOnAgitator() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "useQuickActionRetort",
+            name = "Use Quick Action on Retort",
+            description = "Will click once there is a quick action available on the retort",
+            position = 2,
+            section = minigame
+    )
+    default boolean useQuickActionOnRetort() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "pickDigWeed",
+            name = "Pick DigWeed",
+            description = "Will pick digweed if available to increase points",
+            position = 3,
+            section = minigame
+    )
+    default boolean pickDigWeed() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "useQuickActionLever",
+            name = "Use Qucik Action on Lever",
+            description = "Will click fast when interacting with the lever for mixing potions",
+            position = 4,
+            section = minigame
+    )
+    default boolean useQuickActionLever() {
+        return false;
+    }
 }

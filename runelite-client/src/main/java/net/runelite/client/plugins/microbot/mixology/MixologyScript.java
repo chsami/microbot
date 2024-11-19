@@ -7,6 +7,7 @@ import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -71,7 +72,8 @@ public class MixologyScript extends Script {
                         startLyePoints = getLyePoints();
                     }
 
-                    if (digweed != null && !Rs2Player.isAnimating() && !Rs2Inventory.hasItem("digweed")) {
+                    if (digweed != null && !Rs2Player.isAnimating() && !Rs2Inventory.hasItem("digweed")
+                            && config.pickDigWeed()) {
                         Rs2GameObject.interact(digweed.coordinate());
                         Rs2Player.waitForWalking();
                         Rs2Player.waitForAnimation();
@@ -142,6 +144,9 @@ public class MixologyScript extends Script {
                             Rs2GameObject.interact(ObjectID.REFINER);
                             Rs2Player.waitForAnimation();
                             sleepGaussian(450, 150);
+                            if (!config.useQuickActionRefiner()) {
+                                sleepUntil(() -> !Microbot.isGainingExp, 30000);
+                            }
                             return;
                         }
                         if (Rs2Bank.openBank()) {
@@ -222,9 +227,7 @@ public class MixologyScript extends Script {
                             System.out.println("create potion!");
                             //create potion
                         } else {
-                            createPotion(potionToMake);
-                           // sleepUntil(Rs2Player::isAnimating);
-                             //Rs2Player.waitForAnimation(); // slower and maybe more human friendly
+                            createPotion(potionToMake, config);
                         }
                         break;
                     case TAKE_FROM_MIXIN_VESSEL:
@@ -251,16 +254,17 @@ public class MixologyScript extends Script {
                         PotionOrder nonFulfilledPotion = nonFulfilledPotions.get(0);
 
                         if (Rs2Player.isAnimating()) {
-                            if (agitatorQuickActionTicks > 0) {
-                                for (int i = 0; i < Rs2Random.between(6, 10); i++) {
+                            if (agitatorQuickActionTicks > 0 && config.useQuickActionOnAgitator()) {
+                                int clicks =  Rs2AntibanSettings.naturalMouse ? Rs2Random.between(4, 6) : Rs2Random.between(6, 10);
+                                for (int i = 0; i < clicks; i++) {
                                     quickActionProcessPotion(nonFulfilledPotion);
                                 }
                                 agitatorQuickActionTicks = 0;
-                            } else if (alembicQuickActionTicks > 0) {
+                            } else if (alembicQuickActionTicks > 0  && config.useQuickActionOnAlembic()) {
                                 quickActionProcessPotion(nonFulfilledPotion);
                                 alembicQuickActionTicks = 0;
                             }
-                            if (nonFulfilledPotion.potionModifier().alchemyObject() == AlchemyObject.RETORT) {
+                            if (nonFulfilledPotion.potionModifier().alchemyObject() == AlchemyObject.RETORT && config.useQuickActionOnRetort()) {
                                 quickActionProcessPotion(nonFulfilledPotion);
                                 sleep(350, 400);
                             }
@@ -372,7 +376,7 @@ public class MixologyScript extends Script {
         }
     }
 
-    private void createPotion(PotionOrder potionOrder) {
+    private void createPotion(PotionOrder potionOrder, MixologyConfig config) {
         for (PotionComponent component : potionOrder.potionType().components()) {
             if (canCreatePotion(potionOrder)) break;
             if (component.character() == 'A') {
@@ -383,9 +387,12 @@ public class MixologyScript extends Script {
                 Rs2GameObject.interact(AlchemyObject.MOX_LEVER.objectId());
             }
             sleepUntil(Rs2Player::isAnimating);
-            final int sleep = Rs2Random.between(300, 600);
-            sleepGaussian(sleep, sleep / 4);
-            //Rs2Player.waitForAnimation(); // This is also possible if you want to have slower runs
+            if (config.useQuickActionLever()) {
+                Rs2Player.waitForAnimation();
+            } else {
+                final int sleep = Rs2Random.between(300, 600);
+                sleepGaussian(sleep, sleep / 4);
+            }
         }
     }
 
@@ -420,7 +427,7 @@ public class MixologyScript extends Script {
                     satisfied.add(currentAnimations[i] == LYE_ANIMATION  || currentAnimations[i] == 11611);
                     break;
                 case 'M':
-                    satisfied.add(currentAnimations[i] == 11607 || currentAnimations[i] == MOX_ANIMATION);
+                    satisfied.add(currentAnimations[i] == 11614 || currentAnimations[i] == 11607 || currentAnimations[i] == MOX_ANIMATION);
                     break;
             }
         }
