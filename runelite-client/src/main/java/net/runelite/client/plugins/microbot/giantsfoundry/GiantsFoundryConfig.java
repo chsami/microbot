@@ -36,13 +36,35 @@ public interface GiantsFoundryConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "firstBarAmount",
+            name = "First Bar Amount",
+            description = "Choose the first type of bar",
+            position = 1
+    )
+    default int firstBarAmount()
+    {
+        return 14;
+    }
+
+    @ConfigItem(
             keyName = "SecondBars",
             name = "Second Bar",
             description = "Choose the second type of bar",
-            position = 0
+            position = 2
     )
     default SmithableBars SecondBar()
     {
         return SmithableBars.MITHRIL_BAR;
+    }
+    
+    @ConfigItem(
+            keyName = "secondBarAmount",
+            name = "Second Bar Amount",
+            description = "Choose the second type of bar",
+            position = 3
+    )
+    default int secondBarAmount()
+    {
+        return 14;
     }
 }
