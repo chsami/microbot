@@ -438,11 +438,6 @@ public class BanksBankStanderScript extends Script {
 
         return sleepDuration;
     }
-    public void closeBank() {
-        if (Rs2Bank.isOpen()) {
-            Rs2Widget.clickChildWidget(786434, 11);
-        }
-    }
     public String checkItemSums(){
         if(!Rs2Bank.isOpen()){
             Rs2Bank.openBank();
@@ -450,9 +445,9 @@ public class BanksBankStanderScript extends Script {
             sleep(200,600);
         }
         //System.out.println("Attempting to check first item");
-        if (firstItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == firstItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(firstItemId)))<config.firstItemQuantity()) {
+        if (firstItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == firstItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(firstItemId))) < config.firstItemQuantity()) {
             return firstItemId.toString();
-        } else if (firstItemId == null && (Rs2Bank.count(firstItemIdentifier) + Rs2Inventory.count(firstItemIdentifier))<config.firstItemQuantity()) {
+        } else if (firstItemId == null && (Rs2Bank.count(firstItemIdentifier) + Rs2Inventory.count(firstItemIdentifier)) < config.firstItemQuantity()) {
             return firstItemIdentifier;
         }
         //System.out.println("Attempting to check second item");
@@ -473,7 +468,7 @@ public class BanksBankStanderScript extends Script {
         }
         if (config.fourthItemQuantity() > 0) {
             //System.out.println("Attempting to check fourth item");
-            if (fourthItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == fourthItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(fourthItemId)))<config.fourthItemQuantity()) {
+            if (fourthItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == fourthItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(fourthItemId))) < config.fourthItemQuantity()) {
                 return fourthItemId.toString();
             } else if (fourthItemId == null && (Rs2Bank.count(fourthItemIdentifier) + Rs2Inventory.count(fourthItemIdentifier)) < config.fourthItemQuantity()) {
                 return fourthItemIdentifier;
