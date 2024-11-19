@@ -178,40 +178,42 @@ public class BanksBankStanderScript extends Script {
             }
             sleep = sleepUntilTrue(() -> Rs2Bank.isOpen(), Rs2Random.between(67, 97), 18000);
             sleep(calculateSleepDuration());
-            if (config.depositAll()) {
+            if (config.depositAll() && Rs2Inventory.getEmptySlots() < 28) {
                 Rs2Bank.depositAll();
+                sleep(100,300);
+                return "";
             }
-            if(!config.depositAll() && firstItemId != null && firstItemQuantity < Rs2Inventory.count(firstItemId)) {
+            if(firstItemId != null && firstItemQuantity < Rs2Inventory.count(firstItemId)) {
                 Rs2Bank.depositAll(firstItemId);
                 sleep(100,300);
-            } else if (!config.depositAll() && firstItemId == null && firstItemQuantity < Rs2Inventory.count(firstItemIdentifier)) {
+            } else if (firstItemId == null && firstItemQuantity < Rs2Inventory.count(firstItemIdentifier)) {
                 Rs2Bank.depositAll(firstItemIdentifier);
                 sleep(100,300);
             }
-            if (!config.depositAll() && secondItemId != null && secondItemQuantity < Rs2Inventory.count(secondItemId)) {
+            if (secondItemId != null && secondItemQuantity < Rs2Inventory.count(secondItemId)) {
                 Rs2Bank.depositAll(secondItemId);
                 sleep(100,300);
-            } else if (!config.depositAll() && secondItemId == null && secondItemQuantity < Rs2Inventory.count(secondItemIdentifier)) {
+            } else if (secondItemId == null && secondItemQuantity < Rs2Inventory.count(secondItemIdentifier)) {
                 Rs2Bank.depositAll(secondItemIdentifier);
                 sleep(100,300);
             }
-            if(!config.depositAll() && thirdItemId != null && thirdItemQuantity < Rs2Inventory.count(thirdItemId)) {
+            if(thirdItemId != null && thirdItemQuantity < Rs2Inventory.count(thirdItemId)) {
                 Rs2Bank.depositAll(thirdItemId);
                 sleep(100,300);
-            } else if (!config.depositAll() && thirdItemId == null && thirdItemQuantity < Rs2Inventory.count(thirdItemIdentifier)) {
+            } else if (thirdItemId == null && thirdItemQuantity < Rs2Inventory.count(thirdItemIdentifier)) {
                 Rs2Bank.depositAll(thirdItemIdentifier);
                 sleep(100,300);
             }
-            if(!config.depositAll() && fourthItemId != null && fourthItemQuantity < Rs2Inventory.count(fourthItemId)) {
+            if(fourthItemId != null && fourthItemQuantity < Rs2Inventory.count(fourthItemId)) {
                 Rs2Bank.depositAll(fourthItemId);
                 sleep(100,300);
-            } else if (!config.depositAll() && fourthItemId == null && fourthItemQuantity < Rs2Inventory.count(fourthItemIdentifier)) {
+            } else if (fourthItemId == null && fourthItemQuantity < Rs2Inventory.count(fourthItemIdentifier)) {
                 Rs2Bank.depositAll(fourthItemIdentifier);
                 sleep(100,300);
             }
-            if (!config.depositAll() && firstItemId != null && secondItemId != null && thirdItemId != null && fourthItemId !=null) {
+            if (firstItemId != null && secondItemId != null && thirdItemId != null && fourthItemId !=null) {
                 Rs2Bank.depositAllExcept(firstItemId, secondItemId, thirdItemId, fourthItemId);
-            } else if (!config.depositAll() && firstItemId == null && secondItemId == null && thirdItemId == null && fourthItemId ==null){
+            } else if (firstItemId == null && secondItemId == null && thirdItemId == null && fourthItemId ==null){
                 Rs2Bank.depositAllExcept(firstItemIdentifier, secondItemIdentifier, thirdItemIdentifier, fourthItemIdentifier);
             } else if (!config.depositAll()) {
                 Rs2Bank.depositAll();
