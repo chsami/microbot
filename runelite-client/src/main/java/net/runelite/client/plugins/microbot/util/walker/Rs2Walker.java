@@ -541,6 +541,12 @@ public class Rs2Walker {
                 .intersectsWith2D(objectArea);
     }
 
+    /**
+     * used for quest script interacting with object
+     * also used for finding the nearest bank
+     * @param worldPoint
+     * @return
+     */
     public static boolean canReach(WorldPoint worldPoint) {
         if (ShortestPathPlugin.getPathfinderConfig().getTransports().isEmpty()) {
             ShortestPathPlugin.getPathfinderConfig().refresh();
