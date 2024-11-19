@@ -57,17 +57,6 @@ public interface ThievingConfig extends Config {
         return false;
     }
 
-    @ConfigItem(
-            keyName = "equipBook",
-            name = "Equip book of the dead",
-            description = "Whether or not to equip the book of the dead",
-            position = 0,
-            section = buffsSection
-    )
-    default boolean equipBook() {
-        return true;
-    }
-
 
     @ConfigSection(
             name = "Food",

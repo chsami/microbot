@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 public class ThievingScript extends Script {
 
-    public static String version = "1.5.8";
+    public static String version = "1.5.9";
     ThievingConfig config;
 
     public boolean run(ThievingConfig config) {
@@ -201,11 +201,6 @@ public class ThievingScript extends Script {
                 sleep(75,200);
                 Rs2Bank.withdrawAll(true,"Cosmic rune", true);
                 sleep(75,200);
-                if (config.equipBook()) {
-                    Rs2Bank.withdrawAndEquip("book of the dead");
-                } else {
-                    Rs2Bank.withdrawItem(true, "book of the dead");
-                }
             }
             Rs2Bank.closeBank();
         }
