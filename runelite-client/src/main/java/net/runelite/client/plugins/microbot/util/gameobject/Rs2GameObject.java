@@ -1228,7 +1228,7 @@ public static GameObject findReachableObject(String objectName, boolean exact, i
 
                 for (int i = 0; i < actions.length; i++) {
                     if (actions[i] == null) continue;
-                    if (action.equalsIgnoreCase(actions[i])) {
+                    if (action.equalsIgnoreCase(Rs2UiHelper.stripColTags(actions[i]))) {
                         index = i;
                         break;
                     }
