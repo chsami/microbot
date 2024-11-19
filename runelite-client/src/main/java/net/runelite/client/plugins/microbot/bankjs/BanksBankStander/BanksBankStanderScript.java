@@ -161,7 +161,7 @@ public class BanksBankStanderScript extends Script {
     }
 
 
-    private boolean fetchItems() {
+    private String fetchItems() {
         if (config.pause()) {
             while (this.isRunning() && config.pause()) {
                 if (!config.pause() || !this.isRunning()) { break; }
@@ -216,7 +216,10 @@ public class BanksBankStanderScript extends Script {
             }
             sleep = sleepUntilTrue(() -> !Rs2Inventory.isFull(), 100, 6000);
             sleep(100, 300);
-            if (!checkItemSums()) { return false; }
+            String missingItem = checkItemSums();
+            if (!missingItem.isEmpty()) {
+                return missingItem;
+            }
             if (firstItemId != null) {
                 if (Rs2Bank.hasItem(firstItemId) && Rs2Inventory.count(firstItemId) < firstItemQuantity) {
                     int missingQuantity = Rs2Inventory.count(firstItemId) < firstItemQuantity
@@ -321,7 +324,7 @@ public class BanksBankStanderScript extends Script {
                 }
                 long bankCloseTime = System.currentTimeMillis();
                 while (this.isRunning() && Rs2Bank.isOpen() && (System.currentTimeMillis() - bankCloseTime < 32000)) {
-                    closeBank();
+                    Rs2Bank.closeBank();
                     sleep = sleepUntilTrue(() -> !Rs2Bank.isOpen(), random(60, 97), 5000);
                     sleep(calculateSleepDuration() - 10);
                 }
@@ -331,17 +334,17 @@ public class BanksBankStanderScript extends Script {
                     sleep(calculateSleepDuration());
                 }
                 currentStatus = CurrentStatus.COMBINE_ITEMS;
-                return true;
+                return "";
             }
         }
-        return true;
+        return "";
     }
 
     private boolean combineItems() {
         if (!hasItems()) {
-            boolean fetchedItems = fetchItems();
-            if (!fetchedItems) {
-                Microbot.showMessage("Insufficient items found.");
+            String missingItem = fetchItems();
+            if (!missingItem.isEmpty()) {
+                Microbot.showMessage("Insufficient " + missingItem);
                 while (this.isRunning()) {
                     if (hasItems()) {
                         break;
@@ -404,7 +407,11 @@ public class BanksBankStanderScript extends Script {
             sleep = sleepUntilTrue(() -> !isWaitingForPrompt, random(7, 31), random(800, 1200));
             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
             previousItemChange = System.currentTimeMillis();
-            sleep = sleepUntilTrue(() -> !Rs2Inventory.hasItem(secondItemId != null ? String.valueOf(secondItemId) : secondItemIdentifier), 10, 40000);
+            if (secondItemId != null) {
+                sleep = sleepUntilTrue(() -> !Rs2Inventory.hasItem(secondItemId), 30, 40000);
+            } else {
+                sleep = sleepUntilTrue(() -> !Rs2Inventory.hasItem(secondItemIdentifier), 30, 40000);
+            }
         }
         sleep(calculateSleepDuration());
         return true;
@@ -436,7 +443,7 @@ public class BanksBankStanderScript extends Script {
             Rs2Widget.clickChildWidget(786434, 11);
         }
     }
-    public boolean checkItemSums(){
+    public String checkItemSums(){
         if(!Rs2Bank.isOpen()){
             Rs2Bank.openBank();
             sleep = sleepUntilTrue(() -> Rs2Bank.isOpen(), random(67,97), 18000);
@@ -444,35 +451,35 @@ public class BanksBankStanderScript extends Script {
         }
         //System.out.println("Attempting to check first item");
         if (firstItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == firstItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(firstItemId)))<config.firstItemQuantity()) {
-            return false;
+            return firstItemId.toString();
         } else if (firstItemId == null && (Rs2Bank.count(firstItemIdentifier) + Rs2Inventory.count(firstItemIdentifier))<config.firstItemQuantity()) {
-            return false;
+            return firstItemIdentifier;
         }
         //System.out.println("Attempting to check second item");
         if(config.secondItemQuantity() > 0) {
             if (secondItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == secondItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(secondItemId))) < config.secondItemQuantity()) {
-                return false;
+                return secondItemId.toString();
             } else if (secondItemId == null && (Rs2Bank.count(secondItemIdentifier) + Rs2Inventory.count(secondItemIdentifier)) < config.secondItemQuantity()) {
-                return false;
+                return secondItemIdentifier;
             }
         }
         if(config.thirdItemQuantity() > 0) {
             //System.out.println("Attempting to check third item");
             if (thirdItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == thirdItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(thirdItemId))) < config.thirdItemQuantity()) {
-                return false;
+                return thirdItemId.toString();
             } else if (thirdItemId == null && (Rs2Bank.count(thirdItemIdentifier) + Rs2Inventory.count(thirdItemIdentifier)) < config.thirdItemQuantity()) {
-                return false;
+                return thirdItemIdentifier;
             }
         }
         if (config.fourthItemQuantity() > 0) {
             //System.out.println("Attempting to check fourth item");
             if (fourthItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == fourthItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(fourthItemId)))<config.fourthItemQuantity()) {
-                return false;
+                return fourthItemId.toString();
             } else if (fourthItemId == null && (Rs2Bank.count(fourthItemIdentifier) + Rs2Inventory.count(fourthItemIdentifier)) < config.fourthItemQuantity()) {
-                return false;
+                return fourthItemIdentifier;
             }
         }
-        return true;
+        return "";
     }
 
     // method to parse string to integer, returns null if parsing fails
