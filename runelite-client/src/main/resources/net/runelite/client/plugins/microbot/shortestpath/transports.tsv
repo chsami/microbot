@@ -1504,6 +1504,8 @@
 2776 3235 1	2776 3235 0	Climb-down;Ship's ladder;9745					
 2777 3234 1	2776 3235 0	Climb-down;Ship's ladder;9745					
 2775 3234 1	2776 3235 0	Climb-down;Ship's ladder;9745					
+2808 3162 0	2808 3162 1	Climb-up;Ladder;16683				3	
+2808 3162 1	2808 3162 0	Climb-down;Ladder;16679				3	
 							
 # Karamja Volcano							
 2855 3169 0	2855 9569 0	Climb-down;Rocks;11441					
