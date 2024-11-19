@@ -121,4 +121,11 @@ public class Star {
         Star other = (Star) obj;
         return this.getWorld() == other.getWorld() && this.getShootingStarLocation().equals(other.getShootingStarLocation());
     }
+
+    @Override
+    public int hashCode() {
+        int result = Integer.hashCode(world);
+        result = 31 * result + (shootingStarLocation != null ? shootingStarLocation.hashCode() : 0);
+        return result;
+    }
 }
