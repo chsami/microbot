@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.itemcharges.ItemChargeConfig;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.*;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -19,8 +20,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.shortestpath.TransportType.*;
-
-
 
 public class PathfinderConfig {
     private static final WorldArea WILDERNESS_ABOVE_GROUND = new WorldArea(2944, 3523, 448, 448, 0);
@@ -274,8 +273,8 @@ public class PathfinderConfig {
             if (!restrictionApplies) {
                 for (TransportVarbit varbitCheck : entry.getVarbits()) {
                     int varbitId = varbitCheck.getVarbitId();
-                    int expectedValue = varbitCheck.getValue();
-                    if (varbitValues.getOrDefault(varbitId, -1) != expectedValue) {
+                    int actualValue = varbitValues.getOrDefault(varbitId, -1);
+                    if (!varbitCheck.matches(actualValue)) {
                         restrictionApplies = true;
                         break;
                     }
@@ -330,7 +329,8 @@ public class PathfinderConfig {
     private boolean varbitChecks(Transport transport) {
         if (varbitValues.isEmpty()) return true;
         for (TransportVarbit varbitCheck : transport.getVarbits()) {
-            if (!varbitValues.get(varbitCheck.getVarbitId()).equals(varbitCheck.getValue())) {
+            int actualValue = varbitValues.getOrDefault(varbitCheck.getVarbitId(), -1);
+            if (!varbitCheck.matches(actualValue)) {
                 return false;
             }
         }
@@ -383,6 +383,21 @@ public class PathfinderConfig {
             switch (useTeleportationItems) {
                 case ALL:
                 case INVENTORY:
+                    if (transport.getItemIdRequirements().stream().flatMap(Collection::stream).anyMatch(itemId -> itemId == ItemID.CHRONICLE)) {
+                        String charges = Microbot.getConfigManager().getRSProfileConfiguration(ItemChargeConfig.GROUP, ItemChargeConfig.KEY_CHRONICLE);
+                        if (charges == null || charges.isEmpty()) {
+                            if (Rs2Inventory.hasItem(ItemID.CHRONICLE)) {
+                                Rs2Inventory.interact(ItemID.CHRONICLE, "Check charges");
+                                charges = Microbot.getConfigManager().getRSProfileConfiguration(ItemChargeConfig.GROUP, ItemChargeConfig.KEY_CHRONICLE);
+                            } else if (Rs2Equipment.hasEquipped(ItemID.CHRONICLE)) {
+                                Rs2Equipment.interact(ItemID.CHRONICLE, "Check charges");
+                                charges = Microbot.getConfigManager().getRSProfileConfiguration(ItemChargeConfig.GROUP, ItemChargeConfig.KEY_CHRONICLE);
+                            } else {
+                                return false;
+                            }
+                        }
+                        return Integer.parseInt(charges) > 0;
+                    }
                     break;
                 case NONE:
                     return false;
