@@ -15,7 +15,6 @@ import net.runelite.client.plugins.microbot.cluescrolls.clues.emote.Emote;
 import net.runelite.client.plugins.microbot.cluescrolls.clues.item.ItemRequirement;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
@@ -29,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
-import java.util.function.Predicate;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
@@ -224,22 +222,19 @@ public class EmoteClueTask implements ClueTask {
         boolean allItemsEquipped = true;
 
         for (String itemName : itemRequirementMap.keySet()) {
-            Predicate<Rs2Item> itemPredicate = item -> item.getName().toLowerCase().contains(itemName.toLowerCase());
-
-            if (Rs2Inventory.contains(itemPredicate) && !Rs2Equipment.contains(itemPredicate)) {
+            if (Rs2Inventory.contains(itemName) && !Rs2Equipment.isWearing(itemName)) {
                 itemsToEquip.add(itemName);
             }
         }
 
         for (String itemName : itemsToEquip) {
             log.info("Equipping item: {}", itemName);
-            Predicate<Rs2Item> itemPredicate = item -> item.getName().toLowerCase().contains(itemName.toLowerCase());
 
             try {
                 Rs2Inventory.equip(itemName);
 
                 // Use dynamic wait to ensure the item is equipped
-                boolean equipped = waitForCondition(() -> Rs2Equipment.contains(itemPredicate), 5000, 500);
+                boolean equipped = waitForCondition(() -> Rs2Equipment.isWearing(itemName), 5000, 500);
                 if (!equipped) {
                     log.error("Failed to equip item: {}", itemName);
                     allItemsEquipped = false;
@@ -291,18 +286,16 @@ public class EmoteClueTask implements ClueTask {
         boolean allEquipped = true;
 
         for (String itemName : itemRequirementMap.keySet()) {
-            Predicate<Rs2Item> itemPredicate = item -> item.getName().toLowerCase().contains(itemName.toLowerCase());
-
-            if (!Rs2Equipment.contains(itemPredicate)) {
+            if (!Rs2Equipment.hasEquippedContains(itemName)) {
                 log.warn("Item not equipped: {}", itemName);
 
                 // Attempt to equip the item if it's in the inventory
-                if (Rs2Inventory.contains(itemPredicate)) {
+                if (Rs2Inventory.contains(itemName)) {
                     log.info("Equipping missing item: {}", itemName);
                     Rs2Inventory.equip(itemName);
 
                     // Use dynamic wait
-                    boolean equipped = waitForCondition(() -> Rs2Equipment.contains(itemPredicate), 5000, 500);
+                    boolean equipped = waitForCondition(() -> Rs2Equipment.hasEquippedContains(itemName), 5000, 600);
                     if (!equipped) {
                         log.error("Failed to equip item: {}", itemName);
                         allEquipped = false;
@@ -336,10 +329,7 @@ public class EmoteClueTask implements ClueTask {
         boolean allPresent = true;
 
         for (String itemName : itemRequirementMap.keySet()) {
-            Predicate<Rs2Item> itemPredicate = item -> item.getName().toLowerCase().contains(itemName.toLowerCase());
-            log.info("Verifying item: {}", itemName + " " + itemPredicate);
-
-            if (!Rs2Inventory.contains(itemPredicate)) {
+            if (!Rs2Inventory.contains(itemName)) {
                 log.warn("Item still missing: {}", itemName);
                 allPresent = false;
             }
@@ -399,15 +389,6 @@ public class EmoteClueTask implements ClueTask {
             return false;
         }
 
-        if (Rs2Dialogue.isInDialogue()) {
-            log.info("In dialogue. Proceeding...");
-            return true;
-        }
-
-        while (Rs2Dialogue.hasContinue()) {
-            Rs2Dialogue.clickContinue();
-        }
-
         log.info("NPC interaction successful. Task completed.");
         setState(State.COMPLETED);
         return true;
@@ -443,20 +424,9 @@ public class EmoteClueTask implements ClueTask {
         boolean allItemsPresent = true;
 
         for (String itemName : itemRequirementMap.keySet()) {
-            Predicate<Rs2Item> itemPredicate = item -> item.getName().toLowerCase().contains(itemName.toLowerCase());
-            log.info("Checking item: {}", itemName + " " + itemPredicate);
-
-            boolean isItemInInventory = Rs2Inventory.contains(itemPredicate);
-            boolean isItemEquipped = Rs2Equipment.contains(itemPredicate);
-            log.info("Item in inventory: {}, Item equipped: {}", isItemInInventory, isItemEquipped);
-
-            if (!isItemInInventory && !isItemEquipped) {
+            if (!Rs2Inventory.contains(itemName)) {
                 log.warn("Missing item: {}", itemName);
                 itemsToWithdraw.add(itemName);
-                allItemsPresent = false;
-            } else if (!isItemEquipped) {
-                log.warn("Item not equipped: {}", itemName);
-                itemsToEquip.add(itemName);
                 allItemsPresent = false;
             }
         }
@@ -506,13 +476,10 @@ public class EmoteClueTask implements ClueTask {
 
         boolean allWithdrawn = true;
 
-
         for (String itemName : itemsToWithdraw) {
-            Predicate<Rs2Item> itemPredicate = item -> item.getName().toLowerCase().contains(itemName.toLowerCase());
-
             log.info("Attempting to withdraw item: {}", itemName);
 
-            if (Rs2Inventory.contains(itemPredicate)) {
+            if (Rs2Inventory.contains(itemName)) {
                 log.info("Item already in inventory: {}", itemName);
                 continue;
             }
@@ -520,11 +487,12 @@ public class EmoteClueTask implements ClueTask {
             if (!Rs2Bank.hasBankItem(itemName)) {
                 log.error("Item not found in bank: {}", itemName);
                 allWithdrawn = false;
+                continue; // Proceed to the next item
             } else {
                 Rs2Bank.withdrawItem(itemName);
                 log.info("Initiated withdrawal for item: {}", itemName);
 
-                boolean itemWithdrawn = waitForCondition(() -> Rs2Inventory.contains(itemPredicate), 5000, 500);
+                boolean itemWithdrawn = waitForCondition(() -> Rs2Inventory.contains(itemName), 5000, 500);
                 if (!itemWithdrawn) {
                     log.warn("Failed to withdraw item: {}", itemName);
                     allWithdrawn = false;

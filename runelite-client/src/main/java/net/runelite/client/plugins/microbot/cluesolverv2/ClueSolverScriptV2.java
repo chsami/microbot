@@ -9,10 +9,10 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.cluescrolls.ClueScrollPlugin;
 import net.runelite.client.plugins.microbot.cluescrolls.clues.*;
 import net.runelite.client.plugins.microbot.cluesolverv2.taskinterface.ClueTask;
-import net.runelite.client.plugins.microbot.cluesolverv2.tasks.*;
-import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
-import net.runelite.client.plugins.microbot.util.antiban.enums.Category;
-import net.runelite.client.plugins.microbot.util.antiban.enums.PlayStyle;
+import net.runelite.client.plugins.microbot.cluesolverv2.tasks.AnagramClueTask;
+import net.runelite.client.plugins.microbot.cluesolverv2.tasks.CoordinateClueTask;
+import net.runelite.client.plugins.microbot.cluesolverv2.tasks.CrypticClueTask;
+import net.runelite.client.plugins.microbot.cluesolverv2.tasks.EmoteClueTask;
 import net.runelite.client.plugins.microbot.util.npc.Rs2NpcManager;
 
 import java.util.concurrent.TimeUnit;
@@ -44,12 +44,6 @@ public class ClueSolverScriptV2 extends Script {
 
     @Inject
     private Provider<CrypticClueTask> crypticClueTaskProvider;
-
-    @Inject
-    private Provider<MapClueTask> mapClueTaskProvider;
-
-    @Inject
-    private Provider<CipherClueTask> cipherClueTaskProvider;
 
 
     /**
@@ -190,14 +184,6 @@ public class ClueSolverScriptV2 extends Script {
         } else if (clue instanceof CrypticClue) {
             CrypticClueTask task = crypticClueTaskProvider.get();
             task.setClue((CrypticClue) clue);
-            return task;
-        } else if (clue instanceof MapClue) {
-            MapClueTask task = mapClueTaskProvider.get();
-            task.setClue((MapClue) clue);
-            return task;
-        } else if (clue instanceof CipherClue) {
-            CipherClueTask task = cipherClueTaskProvider.get();
-            task.setClue((CipherClue) clue);
             return task;
         }
 
