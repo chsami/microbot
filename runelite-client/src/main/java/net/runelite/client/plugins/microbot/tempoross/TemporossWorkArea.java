@@ -132,7 +132,7 @@ public class TemporossWorkArea
     Rs2WorldPoint totemLocation = new Rs2WorldPoint(totem.getWorldLocation());
     Rs2WorldPoint playerLocation = new Rs2WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation());
 
-    return mastLocation.distanceToPath(Microbot.getClient(),playerLocation.getWorldPoint()) <
-            totemLocation.distanceToPath(Microbot.getClient(),playerLocation.getWorldPoint()) ? mast : totem;
+    return mastLocation.distanceToPath(playerLocation.getWorldPoint()) <
+            totemLocation.distanceToPath(playerLocation.getWorldPoint()) ? mast : totem;
 }
 }

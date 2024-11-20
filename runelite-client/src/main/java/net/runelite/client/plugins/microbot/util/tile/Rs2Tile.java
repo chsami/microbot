@@ -7,6 +7,8 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.coords.Rs2WorldArea;
+import net.runelite.client.plugins.microbot.util.coords.Rs2WorldPoint;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -161,7 +163,46 @@ public abstract class Rs2Tile implements Tile{
         return worldPoints;
     }
 
-    public static HashMap<WorldPoint, Integer> getReachableTilesFromTile(WorldPoint tile, int distance) {
+    /**
+     * This method calculates the reachable tiles from a given starting tile without
+     * considering any collision data. It is essentially a wrapper around the
+     * getReachableTilesFromTile method that sets the 'ignoreCollision' parameter
+     * to true, meaning collision checks will be bypassed during the distance
+     * calculation.
+     *
+     * The method performs the same distance calculation but disregards movement
+     * restrictions imposed by collisions, allowing for a broader range of reachable
+     * tiles.
+     *
+     * @param tile The starting tile from which reachable tiles will be calculated.
+     * @param distance The maximum distance to calculate to neighboring tiles.
+     * @return A HashMap containing WorldPoints and their corresponding distances
+     *         from the start tile, ignoring collision data.
+     */
+    public static HashMap<WorldPoint, Integer> getReachableTilesFromTileIgnoreCollision(WorldPoint tile, int distance) {
+        return getReachableTilesFromTile(tile, distance, true);
+    }
+
+    /**
+     * This method calculates the distances to a specified tile in the game world
+     * using a breadth-first search (BFS) algorithm, considering movement restrictions
+     * and collision data. The distances are stored in a HashMap where the key is a
+     * WorldPoint (representing a tile location), and the value is the distance
+     * from the starting tile. The method accounts for movement flags that block
+     * movement in specific directions (east, west, north, south) and removes
+     * unreachable tiles based on collision data.
+     *
+     * The method iterates over a range of distances, progressively updating
+     * reachable tiles and adding them to the tileDistances map. It checks if a
+     * tile can be reached by verifying its collision flags and whether it’s blocked
+     * for movement in any direction.
+     *
+     * @param tile The starting tile for the distance calculation.
+     * @param distance The maximum distance to calculate to neighboring tiles.
+     * @param ignoreCollision If true, ignores collision data during the calculation.
+     * @return A HashMap containing WorldPoints and their corresponding distances from the start tile.
+     */
+    public static HashMap<WorldPoint, Integer> getReachableTilesFromTile(WorldPoint tile, int distance, boolean ignoreCollision) {
         var tileDistances = new HashMap<WorldPoint, Integer>();
         tileDistances.put(tile, 0);
 
@@ -185,7 +226,7 @@ public abstract class Rs2Tile implements Tile{
 
                     Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
 
-                    if (!tile.equals(point)) {
+                    if (!ignoreCollision && !tile.equals(point)) {
                         if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FULL)
                                 || movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_FLOOR)) {
                             tileDistances.remove(point);
@@ -211,22 +252,45 @@ public abstract class Rs2Tile implements Tile{
         return tileDistances;
     }
 
-    public static List<LocalPoint> getTilesAroundPlayer(int radius) {
-        List<LocalPoint> localPoints = new ArrayList<>();
-        LocalPoint playerLocalPosition = Rs2Player.getLocalLocation();
-
-        for (int dx = -radius; dx <= radius; dx++) {
-            for (int dy = -radius; dy <= radius; dy++) {
-                if (dx == 0 && dy == 0) continue; // Skip the player's current position
-                LocalPoint localPoint;
-                WorldPoint worldPoint;
-                localPoint = new LocalPoint(playerLocalPosition.getX() + (dx * 128), playerLocalPosition.getY() + (dy * 128), -1);
-                localPoints.add(localPoint);
-            }
-        }
-        return localPoints;
+    /**
+     * This method calculates the reachable tiles from a given starting tile
+     * considering collision data during the distance calculation. It is a wrapper
+     * around the getReachableTilesFromTile method that sets the 'ignoreCollision'
+     * parameter to false, meaning collision checks will be applied when calculating
+     * reachable tiles.
+     *
+     * The method calculates the distance to neighboring tiles while taking into
+     * account any movement restrictions imposed by collision data, ensuring that
+     * only tiles that are not blocked for movement are considered reachable.
+     *
+     * @param tile The starting tile from which reachable tiles will be calculated.
+     * @param distance The maximum distance to calculate to neighboring tiles.
+     * @return A HashMap containing WorldPoints and their corresponding distances
+     *         from the start tile, considering collision data.
+     */
+    public static HashMap<WorldPoint, Integer> getReachableTilesFromTile(WorldPoint tile, int distance) {
+        return getReachableTilesFromTile(tile, distance, false);
     }
 
+    /**
+     * This method checks if a given target tile (WorldPoint) is reachable from the
+     * player's current location, considering collision data and the plane of the
+     * world. The method uses a breadth-first search (BFS) algorithm to traverse
+     * neighboring tiles while checking for movement blocks in the four cardinal
+     * directions (north, south, east, west). It ensures the target tile is within
+     * the same plane as the player and that movement between tiles is not blocked.
+     *
+     * The method initializes a queue to explore the world grid, marking visited
+     * tiles to avoid revisiting. It checks the flags for collision data to determine
+     * whether movement is allowed in each direction, and only adds neighboring tiles
+     * to the queue if they are not blocked. Finally, it verifies if the target point
+     * has been visited during the traversal and returns true if reachable, false otherwise.
+     *
+     * @param targetPoint The WorldPoint representing the target tile to check for
+     *                    reachability.
+     * @return True if the target tile is reachable from the player's location,
+     *         otherwise false.
+     */
     public static boolean isTileReachable(WorldPoint targetPoint) {
         if (targetPoint == null) return false;
         if (targetPoint.getPlane() != Rs2Player.getWorldLocation().getPlane()) return false;
@@ -268,7 +332,7 @@ public abstract class Rs2Tile implements Tile{
     }
 
     /**
-     * Checks if any of the tiles immediately surrounding the given object are walkable.
+     * Checks if any of the tiles immediately surrounding the given object are walkable & reachable.
      * The object is defined by its position (worldPoint) and its size (sizeX x sizeY).
      *
      * @param worldPoint The central point of the object.
@@ -303,10 +367,44 @@ public abstract class Rs2Tile implements Tile{
         return false;
     }
 
+    /**
+     * This method checks if the given coordinates (x, y) are within the valid bounds
+     * of the game world grid. It ensures that the coordinates are non-negative and
+     * within the range of the grid dimensions (0 to 103 for both x and y).
+     *
+     * The method is used to prevent out-of-bounds errors when accessing world tiles
+     * by ensuring that the coordinates provided for the tile are within the valid
+     * range before performing further operations.
+     *
+     * @param x The x-coordinate of the tile to check.
+     * @param y The y-coordinate of the tile to check.
+     * @return True if the coordinates are within bounds (0 <= x, y < 104), otherwise false.
+     */
     private static boolean isWithinBounds(int x, int y) {
         return x >= 0 && y >= 0 && x < 104 && y < 104;
     }
 
+    /**
+     * This method checks a neighboring tile and adds it to the queue if it is valid
+     * and not blocked for movement. It considers both the current tile's collision
+     * data and the neighboring tile’s collision flags to determine whether movement
+     * in the specified direction (dx, dy) is possible. The method ensures the neighboring
+     * tile is within bounds, hasn't been visited, and doesn't have movement restrictions
+     * (such as full-block movement or movement in the specified direction).
+     *
+     * The method performs a bitwise check on the tile’s flags to determine if movement
+     * in the given direction is allowed and ensures that the neighboring tile is not
+     * already visited before adding it to the queue.
+     *
+     * @param queue The queue that stores the coordinates of tiles to be visited.
+     * @param visited A 2D boolean array tracking which tiles have already been visited.
+     * @param flags A 2D array containing the collision flags for each tile.
+     * @param x The current tile’s x-coordinate.
+     * @param y The current tile’s y-coordinate.
+     * @param dx The change in x-coordinate for the neighboring tile.
+     * @param dy The change in y-coordinate for the neighboring tile.
+     * @param blockMovementFlag The collision flag that blocks movement in a given direction.
+     */
     private static void checkAndAddNeighbour(ArrayDeque<Integer> queue, boolean[][] visited, int[][] flags, int x, int y, int dx, int dy, int blockMovementFlag) {
         int nx = x + dx;
         int ny = y + dy;
@@ -317,6 +415,22 @@ public abstract class Rs2Tile implements Tile{
         }
     }
 
+    /**
+     * This method checks whether a given WorldPoint has been visited during the
+     * traversal of the game world. It calculates the tile’s local coordinates relative
+     * to the base coordinates, considering whether the client is in an instanced region
+     * or not. The method then checks if the calculated coordinates are within bounds
+     * and if the tile has been marked as visited in the provided visited array.
+     *
+     * The method ensures that the given WorldPoint corresponds to a valid tile on
+     * the game map by verifying if its coordinates fall within the bounds of the
+     * world grid, and if so, it checks whether that tile has already been visited
+     * during the search or traversal process.
+     *
+     * @param worldPoint The WorldPoint representing the tile to check for visit status.
+     * @param visited A 2D boolean array tracking visited tiles during world traversal.
+     * @return True if the tile has been visited and is within bounds, otherwise false.
+     */
     private static boolean isVisited(WorldPoint worldPoint, boolean[][] visited) {
         int baseX = 0;
         int baseY = 0;
@@ -388,6 +502,26 @@ public abstract class Rs2Tile implements Tile{
         return null;
     }
 
+    /**
+     * This method attempts to find the nearest walkable tile from a given source
+     * tile that has a line of sight, meaning there are no obstacles or walls blocking
+     * the path. It first checks if the source tile itself is walkable, considering
+     * both its tile validity and whether it is free of obstacles. If the source tile
+     * is walkable, it is returned immediately.
+     *
+     * If the source tile is not walkable, the method checks the neighboring tiles
+     * in all directions (north, south, east, west, etc.) to find the closest walkable
+     * tile. It excludes the player’s current location from being considered as a
+     * valid neighbor. The method ensures that each neighbor is not blocked by walls
+     * and that it is valid and walkable, or alternatively a bank booth.
+     *
+     * If no walkable tile is found, the method returns null.
+     *
+     * @param source The WorldPoint representing the source tile from which to
+     *               search for a walkable neighbor.
+     * @return The nearest walkable tile with a line of sight, or null if no such
+     *         tile is found.
+     */
     public static WorldPoint getNearestWalkableTileWithLineOfSight(WorldPoint source) {
         // check if source is walkable
         if (!tileHasWalls(source)
@@ -409,10 +543,125 @@ public abstract class Rs2Tile implements Tile{
         return null;
     }
 
+    /**
+     * Finds the nearest walkable tile around a specified game object that the player can interact with.
+     *
+     * <p>This method calculates the closest walkable tile adjacent to the given game object, considering the player's current position.
+     * It ensures that both the player and the object are on the same plane before proceeding. The method retrieves interactable points
+     * around the object, filters out non-walkable tiles, and selects the closest one to the player.</p>
+     *
+     * @param tileObject The {@link GameObject} for which to find the nearest walkable tile.
+     * @return An {@link Rs2WorldPoint} representing the nearest walkable tile around the object, or {@code null} if none are found.
+     */
+    public static Rs2WorldPoint getNearestWalkableTile(GameObject tileObject) {
+        // Cache player's location and top-level world view
+        Rs2WorldPoint playerLocation = Rs2Player.getRs2WorldPoint();
+        WorldView topLevelWorldView = Microbot.getClient().getTopLevelWorldView();
+
+        // Check if player and object are on the same plane
+        if (playerLocation.getPlane() != tileObject.getWorldLocation().getPlane()) {
+            return null;
+        }
+
+        // Get the world area of the game object
+        Rs2WorldArea gameObjectArea = new Rs2WorldArea(Objects.requireNonNull(Rs2GameObject.getWorldArea(tileObject)));
+
+        // Get interactable points around the game object
+        List<WorldPoint> interactablePoints = getInteractablePoints(gameObjectArea, topLevelWorldView);
+
+        if (interactablePoints.isEmpty()) {
+            return null; // No interactable points found
+        }
+
+        // Filter points that are walkable
+        List<WorldPoint> walkablePoints = interactablePoints.stream()
+                .filter(Rs2Tile::isWalkable)
+                .collect(Collectors.toList());
+
+        if (walkablePoints.isEmpty()) {
+            return null; // No walkable points available
+        }
+
+        // Find the nearest walkable interact point to the player
+        WorldPoint nearestPoint = walkablePoints.stream()
+                .min(Comparator.comparingInt(playerLocation::distanceToPath))
+                .orElse(null);
+
+        return new Rs2WorldPoint(nearestPoint);
+    }
+
+    /**
+     * Retrieves a list of interactable points around a given game object area.
+     *
+     * <p>This method calculates interactable points around the specified game object area. If no initial interactable points
+     * are found, it expands the area and collects new points, excluding those within the original object area. It also filters out
+     * points from which the object cannot be reached via melee attacks or points that have walls obstructing interaction.</p>
+     *
+     * @param gameObjectArea   The {@link Rs2WorldArea} representing the area of the game object.
+     * @param topLevelWorldView The top-level {@link WorldView} of the game client.
+     * @return A {@link List} of {@link WorldPoint} objects that are interactable around the game object.
+     */
+    private static List<WorldPoint> getInteractablePoints(Rs2WorldArea gameObjectArea, WorldView topLevelWorldView) {
+        // Get initial interactable points
+        List<WorldPoint> interactablePoints = new ArrayList<>(gameObjectArea.getInteractable());
+
+        if (interactablePoints.isEmpty()) {
+            // If no interactable points, expand the area and get new points
+            Rs2WorldArea expandedArea = gameObjectArea.offset(1);
+            interactablePoints = expandedArea.toWorldPointList();
+
+            // Remove points inside the game object area
+            interactablePoints.removeIf(gameObjectArea::contains);
+
+            // Remove points from which the object cannot be melee'd
+            interactablePoints.removeIf(point -> !gameObjectArea.canMelee(topLevelWorldView, new Rs2WorldArea(point.toWorldArea())));
+        } else {
+            // Filter points from which the object can be melee'd
+            interactablePoints = interactablePoints.stream()
+                    .filter(point -> gameObjectArea.canMelee(topLevelWorldView, new Rs2WorldArea(point.toWorldArea())))
+                    .collect(Collectors.toList());
+
+            if (interactablePoints.isEmpty()) {
+                // If no melee points, remove points with walls
+                interactablePoints = gameObjectArea.getInteractable();
+                interactablePoints.removeIf(Rs2Tile::tileHasWalls);
+            }
+        }
+
+        return interactablePoints;
+    }
+
+    /**
+     * This method checks if the given tile (WorldPoint) contains any walls or
+     * obstacles by searching through the game’s wall objects. It filters the
+     * list of wall objects to find any that match the provided source tile's
+     * location. If a wall object is found at the specified location, the method
+     * returns true, indicating that the tile has walls; otherwise, it returns false.
+     *
+     * The method utilizes the stream API to filter the wall objects and check if
+     * any of them match the WorldPoint provided. If no matching wall object is
+     * found, the tile is considered free of walls.
+     *
+     * @param source The WorldPoint representing the tile to check for walls.
+     * @return True if the tile has walls or obstacles, false otherwise.
+     */
     public static boolean tileHasWalls(WorldPoint source) {
         return Rs2GameObject.getWallObjects().stream().filter(x -> x.getWorldLocation().equals(source)).findFirst().orElse(null) != null;
     }
 
+    /**
+     * This method checks if the given tile (WorldPoint) contains a bank booth.
+     * It searches through the game’s game objects to find any object that matches
+     * the specified location. If a game object is found at the given WorldPoint,
+     * the method retrieves its object composition and checks if its name is "bank booth".
+     *
+     * If the object at the tile is a bank booth (case-insensitive), the method
+     * returns true; otherwise, it returns false. If no game object is found at
+     * the specified location, the method returns false.
+     *
+     * @param source The WorldPoint representing the tile to check for a bank booth.
+     * @return True if the tile contains a bank booth, false otherwise.
+     */
     public static boolean isBankBooth(WorldPoint source) {
         GameObject gameObject = Rs2GameObject.getGameObjects().stream().filter(x -> x.getWorldLocation().equals(source)).findFirst().orElse(null);
         if (gameObject != null) {
@@ -422,6 +671,20 @@ public abstract class Rs2Tile implements Tile{
         return false;
     }
 
+    /**
+     * This method retrieves the tile at the specified coordinates (x, y) on the current plane.
+     * It first creates a WorldPoint for the given coordinates and checks if the point is within
+     * the scene using the `isInScene` method. If the WorldPoint is valid and within the scene,
+     * it converts the WorldPoint to a LocalPoint, then retrieves and returns the corresponding
+     * Tile from the game scene.
+     *
+     * If the WorldPoint is out of bounds or the LocalPoint is null, the method returns null
+     * to indicate that no valid tile is found at the given coordinates.
+     *
+     * @param x The x-coordinate of the tile.
+     * @param y The y-coordinate of the tile.
+     * @return The Tile at the specified coordinates, or null if the tile is invalid or not in the scene.
+     */
     public static Tile getTile(int x, int y) {
         WorldPoint worldPoint = new WorldPoint(x, y, Microbot.getClient().getPlane());
         if (worldPoint.isInScene(Microbot.getClient())) {
@@ -432,6 +695,19 @@ public abstract class Rs2Tile implements Tile{
         return null;
     }
 
+    /**
+     * This method checks if the given Tile is valid for movement. It retrieves the collision
+     * flags for the tile’s location from the game’s collision map and checks if any movement
+     * restrictions are applied. The method returns true if the tile has no movement flags
+     * (i.e., it is not blocked), indicating the tile is valid for movement. Otherwise, it returns
+     * false if the tile is blocked by movement flags.
+     *
+     * The method utilizes the collision map for the current plane and the `MovementFlag` class
+     * to determine whether the tile is accessible or restricted by obstacles.
+     *
+     * @param tile The Tile to check for validity.
+     * @return True if the tile is valid (not blocked by movement restrictions), false otherwise.
+     */
     public static boolean isValidTile(Tile tile) {
         if (tile == null) return false;
         int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
@@ -446,6 +722,28 @@ public abstract class Rs2Tile implements Tile{
         return false;
     }
 
+    /**
+     * This method attempts to find a path from the source tile to the destination tile
+     * using a pathfinding algorithm. It employs a breadth-first search (BFS) approach
+     * that considers the game's collision data and movement restrictions for each tile.
+     * The method calculates the shortest possible path to the target tile while accounting
+     * for walkability, obstacles, and the ability to traverse tiles in all directions (north,
+     * south, east, west, and diagonal directions). It returns a list of tiles representing the
+     * path from the source to the destination.
+     *
+     * The algorithm checks the walkability of each tile by evaluating the collision flags for
+     * each tile and moves through the tiles that are not blocked. If the target tile is unreachable,
+     * the method attempts to find the closest reachable tile within a 21x21 area surrounding the target
+     * tile.
+     *
+     * If a valid path is found, the method traces the path from the destination back to the source
+     * using the directions and distances calculated during the search. It then constructs and returns
+     * a list of checkpoint tiles along the path (up to a maximum of 25 tiles).
+     *
+     * @param source The starting tile from which to find the path.
+     * @param other The destination tile to reach.
+     * @return A list of tiles representing the path from source to destination, or null if no path is found.
+     */
     public static List<Tile> pathTo(Tile source,Tile other)
     {
 

@@ -1,15 +1,18 @@
 package net.runelite.client.plugins.microbot.util.coords;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class Rs2WorldPoint {
     @Setter
     private WorldPoint worldPoint;
@@ -42,15 +45,16 @@ public class Rs2WorldPoint {
         return worldPoint;
     }
 
-    public List<WorldPoint> pathTo(Client client, WorldPoint other)
+    public List<WorldPoint> pathTo(WorldPoint other)
     {
+        Client client = Microbot.getClient();
         if (getPlane() != other.getPlane())
         {
             return null;
         }
 
-        LocalPoint sourceLp = LocalPoint.fromWorld(client, getX(), getY());
-        LocalPoint targetLp = LocalPoint.fromWorld(client, other.getX(), other.getY());
+        LocalPoint sourceLp = LocalPoint.fromWorld(client.getTopLevelWorldView(), getX(), getY());
+        LocalPoint targetLp = LocalPoint.fromWorld(client.getTopLevelWorldView(), other.getX(), other.getY());
         if (sourceLp == null || targetLp == null)
         {
             return null;
@@ -61,7 +65,7 @@ public class Rs2WorldPoint {
         int otherX = targetLp.getSceneX();
         int otherY = targetLp.getSceneY();
 
-        Tile[][][] tiles = client.getScene().getTiles();
+        Tile[][][] tiles = client.getTopLevelWorldView().getScene().getTiles();
         Tile sourceTile = tiles[getPlane()][thisX][thisY];
 
         Tile targetTile = tiles[getPlane()][otherX][otherY];
@@ -82,9 +86,13 @@ public class Rs2WorldPoint {
         return checkpointWPs;
     }
 
-    public int distanceToPath(Client client, WorldPoint other)
+    public int distanceToPath(WorldPoint other)
     {
-        List<WorldPoint> checkpointWPs = this.pathTo(client, other);
+        if(other == null)
+        {
+            return Integer.MAX_VALUE;
+        }
+        List<WorldPoint> checkpointWPs = this.pathTo(other);
         if (checkpointWPs == null)
         {
             // No path found

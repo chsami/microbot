@@ -177,24 +177,21 @@ public class Transport {
 
         //START microbot variables
 
-        if ((value = fieldMap.get("menuOption menuTarget objectID")) != null) {
-            // Use a regular expression to capture the action, target, and objectId
-            String regex = "^([^\\s-]+(?:-[^ ]+)*)\\s+(.*?)\\s+(\\d+)$";
+        if ((value = fieldMap.get("menuOption menuTarget objectID")) != null && !value.trim().isEmpty()) {
+            value = value.trim(); // Remove leading/trailing spaces
+
+            // Regex pattern for semicolon-separated values
+            String regex = "^([^;]+);([^;]+);(\\d+)$";
             java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
             java.util.regex.Matcher matcher = pattern.matcher(value);
 
             if (matcher.matches()) {
-                action = matcher.group(1);   // First group: the action (e.g., "Travel")
-                name = matcher.group(2);   // Second group: the target (e.g., "Spirit tree")
-                objectId = Integer.parseInt(matcher.group(3)); // Third group: the objectId (e.g., "26263")
-            } else if (!value.isEmpty()){
-                System.out.println("failed to load transport " + value);
-            }
-
-            //EXCEPTIONS THAT ARE NOT HANDLED BY THE REGEX
-            //Shillo village cart action is: climb over without a dash
-            if (objectId == 2216) {
-                action = action.replace("-", " ");
+                // Extract matched groups
+                action = matcher.group(1).trim();   // First group: menuOption (action)
+                name = matcher.group(2).trim();    // Second group: menuTarget (name)
+                objectId = Integer.parseInt(matcher.group(3).trim()); // Third group: objectID
+            } else {
+                System.out.println("Skipped invalid value: " + value);
             }
         }
         if ((value = fieldMap.get("Items")) != null) {
@@ -256,6 +253,7 @@ public class Transport {
             // Teleportation items and spells should always have a non-zero wait,
             // so the pathfinder doesn't calculate the cost by distance
             //MICROBOT - The reason we commented this out is to avoid using teleport items when being to close to the target
+            // We overwrite this value based on a config "distance to teleport"
             // this.duration = duration;
         }
 
@@ -273,10 +271,25 @@ public class Transport {
 
         if ((value = fieldMap.get("Varbits")) != null) {
             for (String varbitCheck : value.split(DELIM_MULTI)) {
-                String[] varbitParts = varbitCheck.split(DELIM_STATE);
-                int varbitId = Integer.parseInt(varbitParts[0]);
-                int varbitValue = Integer.parseInt(varbitParts[1]);
-                varbits.add(new TransportVarbit(varbitId, varbitValue));
+                String[] parts;
+                TransportVarbit.Operator operator;
+
+                if (varbitCheck.contains(">")) {
+                    parts = varbitCheck.split(">");
+                    operator = TransportVarbit.Operator.GREATER_THAN;
+                } else if (varbitCheck.contains("<")) {
+                    parts = varbitCheck.split("<");
+                    operator = TransportVarbit.Operator.LESS_THAN;
+                } else if (varbitCheck.contains("=")) {
+                    parts = varbitCheck.split("=");
+                    operator = TransportVarbit.Operator.EQUAL;
+                } else {
+                    throw new IllegalArgumentException("Invalid varbit format: " + varbitCheck);
+                }
+
+                int varbitId = Integer.parseInt(parts[0]);
+                int varbitValue = Integer.parseInt(parts[1]);
+                varbits.add(new TransportVarbit(varbitId, varbitValue, operator));
             }
         }
 
@@ -424,6 +437,7 @@ public class Transport {
         addTransports(transports, "gnome_gliders.tsv", TransportType.GNOME_GLIDER, 6);
         addTransports(transports, "minecarts.tsv", TransportType.MINECART);
         addTransports(transports, "spirit_trees.tsv", TransportType.SPIRIT_TREE, 5);
+        addTransports(transports, "quetzals.tsv", TransportType.QUETZAL, 6);
         addTransports(transports, "teleportation_items.tsv", TransportType.TELEPORTATION_ITEM);
         addTransports(transports, "teleportation_levers.tsv", TransportType.TELEPORTATION_LEVER);
         addTransports(transports, "teleportation_portals.tsv", TransportType.TELEPORTATION_PORTAL);

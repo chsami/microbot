@@ -35,19 +35,10 @@ public class BanksShopperOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)
                     .build());
-            if (config.action() == Actions.BUY) {
-                panelComponent.getChildren().add(LineComponent.builder()
-                        .left("Total gp items bought " + formattedProfit())
-                        .build());
-            }
 
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         return super.render(graphics);
-    }
-
-    public static String formattedProfit() {
-        return QuantityFormatter.quantityToRSDecimalStack(BanksShopperScript.getProfit(), true);
     }
 }

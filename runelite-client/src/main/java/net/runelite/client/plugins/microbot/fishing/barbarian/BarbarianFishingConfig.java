@@ -4,7 +4,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.microbot.util.inventory.DropOrder;
+import net.runelite.client.plugins.microbot.util.inventory.InteractOrder;
 
 import static net.runelite.client.plugins.microbot.fishing.barbarian.BarbarianFishingConfig.GROUP;
 
@@ -40,8 +40,8 @@ public interface BarbarianFishingConfig extends Config {
             position = 1,
             section = generalSection
     )
-    default DropOrder dropOrder() {
-        return DropOrder.STANDARD;
+    default InteractOrder dropOrder() {
+        return InteractOrder.STANDARD;
     }
 
 }

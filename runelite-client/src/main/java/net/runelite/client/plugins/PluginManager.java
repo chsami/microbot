@@ -44,6 +44,7 @@ import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.PluginChanged;
 import net.runelite.client.events.ProfileChanged;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.task.Schedule;
 import net.runelite.client.task.ScheduledMethod;
 import net.runelite.client.task.Scheduler;
@@ -179,7 +180,7 @@ public class PluginManager
 		List<Injector> injectors = new ArrayList<>();
 		if (plugins == null)
 		{
-			injectors.add(RuneLite.getInjector());
+			injectors.add(Microbot.getInjector());
 			plugins = getPlugins();
 		}
 		plugins.forEach(pl -> injectors.add(pl.getInjector()));
@@ -551,7 +552,7 @@ public class PluginManager
 
 		try
 		{
-			Injector parent = RuneLite.getInjector();
+			Injector parent = Microbot.getInjector();
 
 			if (deps.size() > 1)
 			{

@@ -126,7 +126,7 @@ public interface BankConfig extends Config
 
 	@ConfigItem(
 		keyName = "bankPinKeyboard",
-		name = "Keyboard Bankpin",
+		name = "Keyboard bankpin",
 		description = "Allows using the keyboard keys for bank pin input",
 		position = 9
 	)
@@ -137,7 +137,7 @@ public interface BankConfig extends Config
 
 	@ConfigItem(
 		keyName = "searchKeybind",
-		name = "Search Shortcut",
+		name = "Search shortcut",
 		description = "Keyboard shortcut for initiating a bank or seed vault search",
 		position = 10
 	)

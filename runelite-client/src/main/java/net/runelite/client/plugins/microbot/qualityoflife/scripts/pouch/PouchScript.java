@@ -21,7 +21,7 @@ import static java.lang.Math.min;
 public class PouchScript extends Script {
     private final int INVENTORY_SIZE = 28;
 
-    private final Pattern POUCH_CHECK_MESSAGE = Pattern.compile("^There (?:is|are) ([a-z]+)(?: pure| daeyalt)? essences? in this pouch\\.$");
+    private final Pattern POUCH_CHECK_MESSAGE = Pattern.compile("^There (?:is|are) ([a-z-]+)(?: pure| daeyalt)? essences? in this pouch\\.$");
     private final ImmutableMap<String, Integer> TEXT_TO_NUMBER = ImmutableMap.<String, Integer>builder()
             .put("no", 0)
             .put("one", 1)
@@ -36,6 +36,34 @@ public class PouchScript extends Script {
             .put("ten", 10)
             .put("eleven", 11)
             .put("twelve", 12)
+            .put("thirteen", 13)
+            .put("fourteen", 14)
+            .put("fifteen", 15)
+            .put("sixteen", 16)
+            .put("seventeen", 17)
+            .put("eighteen", 18)
+            .put("nineteen", 19)
+            .put("twenty", 20)
+            .put("twenty-one", 21)
+            .put("twenty-two", 22)
+            .put("twenty-three", 23)
+            .put("twenty-four", 24)
+            .put("twenty-five", 25)
+            .put("twenty-six", 26)
+            .put("twenty-seven", 27)
+            .put("twenty-eight", 28)
+            .put("twenty-nine", 29)
+            .put("thirty", 30)
+            .put("thirty-one", 31)
+            .put("thirty-two", 32)
+            .put("thirty-three", 33)
+            .put("thirty-four", 34)
+            .put("thirty-five", 35)
+            .put("thirty-six", 36)
+            .put("thirty-seven", 37)
+            .put("thirty-eight", 38)
+            .put("thirty-nine", 39)
+            .put("forty", 40)
             .build();
 
     private final Deque<ClickOperation> clickedItems = new ArrayDeque<>();
@@ -189,6 +217,7 @@ public class PouchScript extends Script {
             Pouch pouch = op.pouch;
 
             final boolean fill = op.delta > 0;
+            System.out.println(pouch.getRemaining() + " " + pouch.getHolding());
             // How much ess can either be deposited or withdrawn
             final int required = fill ? pouch.getRemaining() : pouch.getHolding();
             // Bound to how much ess or free space we actually have, and optionally negate

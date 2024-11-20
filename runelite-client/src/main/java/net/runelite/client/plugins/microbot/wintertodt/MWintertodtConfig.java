@@ -139,6 +139,18 @@ public interface MWintertodtConfig extends Config {
         return 20;
     }
 
+    // use rejuvenation potions instead of food
+    @ConfigItem(
+            keyName = "RejuvenationPotions",
+            name = "Rejuvenation Potions",
+            description = "Use rejuvenation potions instead of food",
+            position = 6,
+            section = foodSection
+    )
+    default boolean rejuvenationPotions() {
+        return false;
+    }
+
     @ConfigItem(
             keyName = "Brazier",
             name = "Brazier",

@@ -4,7 +4,6 @@ import net.runelite.api.Point;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 
 import java.util.List;
@@ -65,13 +64,13 @@ public class Rs2WorldArea extends WorldArea {
     public List<WorldPoint> getInteractable()
     {
 
-        Rs2WorldArea surrounding = this.offset(1);
+        List<WorldPoint> surrounding = this.offset(1).toWorldPointList();
 
-        // List of tiles that can interact with worldArea and can be walked on
-        return surrounding.toWorldPointList().stream()
-                .filter(p -> !this.contains(p))
-                .filter(p -> this.canMelee(Microbot.getClient().getTopLevelWorldView(), new Rs2WorldArea(p.toWorldArea()) ))
-                .filter(p -> !Rs2Tile.isWalkable(p))
+        surrounding.removeIf(this::contains);
+
+
+        return surrounding.stream()
+                .filter(Rs2Tile::isWalkable)
                 .collect(Collectors.toList());
     }
 }

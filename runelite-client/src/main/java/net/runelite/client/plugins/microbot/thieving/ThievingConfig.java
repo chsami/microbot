@@ -57,17 +57,6 @@ public interface ThievingConfig extends Config {
         return false;
     }
 
-    @ConfigItem(
-            keyName = "equipBook",
-            name = "Equip book of the dead",
-            description = "Whether or not to equip the book of the dead",
-            position = 0,
-            section = buffsSection
-    )
-    default boolean equipBook() {
-        return true;
-    }
-
 
     @ConfigSection(
             name = "Food",
@@ -77,10 +66,19 @@ public interface ThievingConfig extends Config {
     String food = "Food";
 
     @ConfigItem(
+            keyName = "UseFood",
+            name = "Auto eat food",
+            description = "Automatically eats food",
+            position = 1,
+            section = food
+    )
+    default boolean useFood() { return true; }
+
+    @ConfigItem(
             keyName = "Hitpoints",
             name = "Eat at %",
             description = "Use food below certain hitpoint percent",
-            position = 1,
+            position = 2,
             section = food
     )
     default int hitpoints()
@@ -92,7 +90,7 @@ public interface ThievingConfig extends Config {
             keyName = "Food",
             name = "Food",
             description = "type of food",
-            position = 2,
+            position = 3,
             section = food
     )
     default Rs2Food food()
@@ -104,7 +102,7 @@ public interface ThievingConfig extends Config {
             keyName = "FoodAmount",
             name = "Food Amount",
             description = "Amount of food to withdraw from bank",
-            position = 2,
+            position = 4,
             section = food
     )
     default int foodAmount()

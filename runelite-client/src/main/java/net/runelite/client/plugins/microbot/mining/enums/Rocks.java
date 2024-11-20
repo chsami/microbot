@@ -18,6 +18,10 @@ public enum Rocks {
     GEM("gem rocks", 40),
     MITHRIL("mithril rocks", 55),
     ADAMANTITE("adamantite rocks", 70),
+    BASALT("Basalt rocks", 72),
+    URT_SALT("Urt salt rocks", 72),
+    EFH_SALT("Efh salt rocks", 72),
+    TE_SALT("Te salt rocks", 72),
     RUNITE("runite rocks", 85);
 
     private final String name;

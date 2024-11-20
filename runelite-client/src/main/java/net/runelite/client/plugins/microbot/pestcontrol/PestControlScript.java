@@ -11,7 +11,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
-import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -28,7 +28,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2Walker.distanc
 import static net.runelite.client.plugins.pestcontrol.Portal.*;
 
 public class PestControlScript extends Script {
-    public static double version = 2.0;
+    public static double version = 2.1;
 
     boolean walkToCenter = false;
     PestControlConfig config;
@@ -138,7 +138,7 @@ public class PestControlScript extends Script {
                     Rs2Walker.setTarget(null);
                     resetPortals();
                     walkToCenter = false;
-                    sleep(Random.random(1600, 1800));
+                    sleep(Rs2Random.between(1600, 1800));
                     if (!isInBoat) {
                         if (Microbot.getClient().getLocalPlayer().getCombatLevel() >= 100) {
                             Rs2GameObject.interact(ObjectID.GANGPLANK_25632);
@@ -155,9 +155,10 @@ public class PestControlScript extends Script {
                     }
                 }
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                ex.printStackTrace();
+                Microbot.log(ex.getMessage());
             }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+        }, 0, 300, TimeUnit.MILLISECONDS);
         return true;
     }
 
@@ -217,6 +218,7 @@ public class PestControlScript extends Script {
     private static boolean attackPortal() {
         if (!Microbot.getClient().getLocalPlayer().isInteracting()) {
             net.runelite.api.NPC npcPortal = Rs2Npc.getNpc("portal");
+            if (npcPortal == null) return false;
             NPCComposition npc = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcDefinition(npcPortal.getId()));
             if (Arrays.stream(npc.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("attack"))) {
                 return Rs2Npc.attack("portal");

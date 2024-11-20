@@ -104,8 +104,8 @@ public class CollisionMap {
                 }
             }
 
-            if (transport.getType() != TransportType.TRANSPORT) {
-                neighbors.add(new TransportNode(transport.getDestination(), node, config.getDistanceBeforeUsingTeleport(), transport.getType(), transport.getDisplayInfo()));
+            if (transport.getType() == TransportType.TELEPORTATION_ITEM || transport.getType() == TransportType.TELEPORTATION_SPELL) {
+                neighbors.add(new TransportNode(transport.getDestination(), node, config.getDistanceBeforeUsingTeleport() + transport.getDuration(), transport.getType(), transport.getDisplayInfo()));
             } else {
                 neighbors.add(new TransportNode(transport.getDestination(), node, transport.getDuration(), transport.getType(), transport.getDisplayInfo()));
             }

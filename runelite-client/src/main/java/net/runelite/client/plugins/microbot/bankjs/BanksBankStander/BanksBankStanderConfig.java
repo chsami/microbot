@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.bankjs.BanksBankStander;
 
 import net.runelite.client.config.*;
+import net.runelite.client.plugins.microbot.util.inventory.InteractOrder;
 
 @ConfigGroup("BankStander")
 @ConfigInformation("• New features added to Bank's BankStander<br />" +
@@ -185,7 +186,7 @@ public interface BanksBankStanderConfig extends Config {
             section = toggles
     )
     default boolean needPromptEntry() {
-        return false;
+        return true;
     }
     @ConfigItem(
             keyName = "WaitForProcess",
@@ -195,23 +196,33 @@ public interface BanksBankStanderConfig extends Config {
             section = toggles
     )
     default boolean waitForAnimation() {
-        return false;
+        return true;
+    }
+    @ConfigItem(
+            keyName = "depositAll",
+            name = "deposit all",
+            description = "force the bank to deposit all items each time.",
+            position = 6,
+            section = toggles
+    )
+    default boolean depositAll() {
+        return true;
     }
     @ConfigItem(
             keyName = "withdrawAll",
             name = "withdraw all",
             description = "for using things like a chisel or knife where the item is not consumed in the process.",
-            position = 6,
+            position = 7,
             section = toggles
     )
     default boolean withdrawAll() {
-        return false;
+        return true;
     }
     @ConfigItem(
             keyName = "randomSelection",
             name = "randomSelection",
             description = "select random item in inventory?",
-            position = 7,
+            position = 8,
             section = toggles
     )
     default boolean randomSelection() {
@@ -227,6 +238,16 @@ public interface BanksBankStanderConfig extends Config {
 
     default String menu() {
         return "use";
+    }
+    @ConfigItem(
+            keyName = "interactOrder",
+            name = "Interact Order",
+            description = "The order in which to interact with items",
+            position = 1,
+            section = interaction
+    )
+    default InteractOrder interactOrder() {
+        return InteractOrder.STANDARD;
     }
     @ConfigItem(
             keyName = "Sleep Min",

@@ -21,9 +21,6 @@ public class AutoRunScript extends Script {
                 if (!super.run()) {
                     return;
                 }
-                if (Microbot.enableAutoRunOn != config.autoRun()) {
-                    configManager.setConfiguration("QoL", "autoRun", Microbot.enableAutoRunOn);
-                }
                 if(Microbot.useStaminaPotsIfNeeded != config.autoStamina()) {
                     configManager.setConfiguration("QoL", "autoStamina", Microbot.useStaminaPotsIfNeeded);
                 }

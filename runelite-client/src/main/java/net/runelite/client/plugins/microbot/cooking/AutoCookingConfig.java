@@ -5,7 +5,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.plugins.microbot.cooking.enums.*;
-import net.runelite.client.plugins.microbot.util.inventory.DropOrder;
+import net.runelite.client.plugins.microbot.util.inventory.InteractOrder;
 
 @ConfigGroup("autocooking")
 public interface AutoCookingConfig extends Config {
@@ -100,7 +100,7 @@ public interface AutoCookingConfig extends Config {
             description = "The order in which to drop items",
             section = cookingSection
     )
-    default DropOrder getDropOrder() {
-        return DropOrder.STANDARD;
+    default InteractOrder getDropOrder() {
+        return InteractOrder.STANDARD;
     }
 }

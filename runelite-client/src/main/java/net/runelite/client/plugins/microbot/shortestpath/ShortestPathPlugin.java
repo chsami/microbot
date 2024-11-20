@@ -181,12 +181,7 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         pathfinderConfig = new PathfinderConfig(map, transports, restrictions, client, config);
 
         panel = injector.getInstance(ShortestPathPanel.class);
-        BufferedImage icon;
-        try {
-            icon = ImageUtil.loadImageResource(ShortestPathPlugin.class, "/net/runelite/client/plugins/microbot/shortestpath/panel_icon.png");
-        } catch (IllegalArgumentException e) {
-            icon = null;
-        }
+        final BufferedImage icon = ImageUtil.loadImageResource(ShortestPathPlugin.class, "panel_icon.png");
         navButton = NavigationButton.builder()
                 .tooltip("Web Walker")
                 .icon(icon)
@@ -217,6 +212,9 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
         overlayManager.remove(pathMapOverlay);
         overlayManager.remove(pathMapTooltipOverlay);
         overlayManager.remove(debugOverlayPanel);
+        clientToolbar.removeNavigation(navButton);
+        navButton = null;
+        panel = null;
 
         shortestPathScript.shutdown();
 
