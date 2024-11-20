@@ -19,12 +19,14 @@
 # Western Banner (3 has 1 teleport per day, 4 is unlimited)								
 2339 3649 0		13143;13144		4	Western banner	F	20	
 # Explorer's Ring (2 has 3 teleports per day, 3 and 4 are unlimited)								
-3052 3291 0		13126;13127;13128		4	Explorer's ring	F	20	
+3052 3291 0		13126		4	Explorer's ring	F	20	4552<3
+3052 3291 0		13127;13128		4	Explorer's ring	F	20	
 # Rada's Blessing (Kourend Woodland, 1 has 3 teleports, 2 has 5 teleports, 3 and 4 have unlimited. For Mount Karuulum, 3 has 3 teleports and 4 has unlimited)								
 1554 3457 0		22941		4	Rada's blessing: Kourend Woodland	F	20	7937<3
 1554 3457 0		22943		4	Rada's blessing: Kourend Woodland	F	20	7937<5
 1554 3457 0		22945;22947		4	Rada's blessing: Kourend Woodland	F	20	
-1311 3799 0		22945;22947		4	Rada's blessing: Mount Karuulm	F	20	
+1311 3799 0		22945		4	Rada's blessing: Mount Karuulm	F	20	7938<3
+1311 3799 0		22947		4	Rada's blessing: Mount Karuulm	F	20	
 								
 # Games Necklace								
 2520 3571 0		3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Barbarian Outpost	T	20	
@@ -282,11 +284,11 @@
 2336 3802 0		23458		4	Enchanted lyre (i): Neitiznot	F	20	4494=1
 3105 9315 0		6707		4	Camulet: Enakhra's Temple	F	20	
 3191 2924 0		6707		4	Camulet: Bandit Camp Quarry	F	20	
-1713 3612 0		21760;25818	The Depths of Despair	4	Kharedst's memoirs: Lunch by the Lancalliums	T	20	
-1802 3748 0		21760;25818	The Queen of Thieves	4	Kharedst's memoirs: The Fisher's Flute	T	20	
-1478 3576 0		21760;25818	Tale of the Righteous	4	Kharedst's memoirs: History and Hearsay	T	20	
-1544 3762 0		21760;25818	The Forsaken Tower	4	Kharedst's memoirs: Jewelry of Jubilation	T	20	
-1680 3746 0		21760;25818	The Ascent of Arceuus	4	Kharedst's memoirs: A Dark Disposition	T	20	
+1713 3612 0		21760;25818	The Depths of Despair	4	Kharedst's memoirs: Lunch by the Lancalliums	T	20	6035>1
+1802 3748 0		21760;25818	The Queen of Thieves	4	Kharedst's memoirs: The Fisher's Flute	T	20	6035>1
+1478 3576 0		21760;25818	Tale of the Righteous	4	Kharedst's memoirs: History and Hearsay	T	20	6035>1
+1544 3762 0		21760;25818	The Forsaken Tower	4	Kharedst's memoirs: Jewelry of Jubilation	T	20	6035>1
+1680 3746 0		21760;25818	The Ascent of Arceuus	4	Kharedst's memoirs: A Dark Disposition	T	20	6035>1
 3649 3230 0		22400		4	Drakan's medallion: Ver Sinhaza	F	20	
 3592 3337 0		22400	Sins of the Father	4	Drakan's medallion: Darkmeyer	F	20	
 # todo: this only works if you've used a Slepey tablet on the medallion								
