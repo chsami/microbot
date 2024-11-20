@@ -109,6 +109,7 @@ public class MicrobotPlugin extends Plugin {
         Microbot.setInfoBoxManager(infoBoxManager);
         Microbot.setWorldMapPointManager(worldMapPointManager);
         Microbot.setChatMessageManager(chatMessageManager);
+        Microbot.setConfigManager(configManager);
         if (overlayManager != null) {
             overlayManager.add(microbotOverlay);
         }

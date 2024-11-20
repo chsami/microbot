@@ -155,17 +155,17 @@ public class GiantsFoundryScript extends Script {
             return;
         }
 
-        if (!Rs2Inventory.hasItemAmount(config.FirstBar().getName(), 14)
-                && !Rs2Inventory.hasItemAmount(config.FirstBar().getName(), 14) && !canPour()) {
+        if (!Rs2Inventory.hasItemAmount(config.FirstBar().getName(), config.firstBarAmount())
+                && !Rs2Inventory.hasItemAmount(config.SecondBar().getName(), config.secondBarAmount()) && !canPour()) {
             Rs2Bank.useBank();
             //check if inv is empty and deposit all inv items
-            if(Rs2Bank.count(config.FirstBar().getName()) < 14 || Rs2Bank.count(config.SecondBar().getName()) < 14) {
+            if(Rs2Bank.count(config.FirstBar().getName()) < config.firstBarAmount() || Rs2Bank.count(config.SecondBar().getName()) < config.secondBarAmount()) {
                 Microbot.log("Insufficient bars in bank to continue");
                 this.shutdown();
                 return;
             }
-            Rs2Bank.withdrawX(true, config.FirstBar().getName(), 14);
-            Rs2Bank.withdrawX(true, config.SecondBar().getName(), 14);
+            Rs2Bank.withdrawX(true, config.FirstBar().getName(), config.firstBarAmount());
+            Rs2Bank.withdrawX(true, config.SecondBar().getName(), config.secondBarAmount());
             Rs2Bank.closeBank();
             return;
         }

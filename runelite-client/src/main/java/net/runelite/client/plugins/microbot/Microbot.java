@@ -13,6 +13,7 @@ import net.runelite.client.RuneLiteDebug;
 import net.runelite.client.RuneLiteProperties;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.ProfileManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.NPCManager;
@@ -108,6 +109,9 @@ public class Microbot {
     @Getter
     @Setter
     private static ProfileManager profileManager;
+    @Getter
+    @Setter
+    private static ConfigManager configManager;
     @Getter
     @Setter
     private static WorldService worldService;

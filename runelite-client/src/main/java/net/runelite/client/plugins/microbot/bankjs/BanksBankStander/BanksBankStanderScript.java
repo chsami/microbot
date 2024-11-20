@@ -5,6 +5,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import javax.inject.Inject;
@@ -15,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 import static net.runelite.client.plugins.microbot.storm.common.Rs2Storm.getRandomItemWithLimit;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntilTrue;
 import static net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory.items;
-import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 // heaps of new features added by Storm
 public class BanksBankStanderScript extends Script {
@@ -88,7 +88,7 @@ public class BanksBankStanderScript extends Script {
             sleepMax = config.sleepMax();
             sleepTarget = config.sleepTarget();
         } else {
-            sleepMax = config.sleepMax() + random(120 - (config.sleepMax() - config.sleepMin()), 151);
+            sleepMax = config.sleepMax() + Rs2Random.between(120 - (config.sleepMax() - config.sleepMin()), 151);
             sleepTarget = sleepMin + ((sleepMax - sleepMin) / 2);
         }
         // Determine whether the first & second item is the ID or Name.
@@ -166,27 +166,56 @@ public class BanksBankStanderScript extends Script {
     private String fetchItems() {
         if (config.pause()) {
             while (this.isRunning() && config.pause()) {
-                if (!config.pause() || !this.isRunning()) {
-                    break;
-                }
+                if (!config.pause() || !this.isRunning()) { break; }
                 sleep(100, 1000);
             }
         }
-        if (currentStatus != CurrentStatus.FETCH_SUPPLIES) {
-            currentStatus = CurrentStatus.FETCH_SUPPLIES;
-        }
+        if (currentStatus != CurrentStatus.FETCH_SUPPLIES) { currentStatus = CurrentStatus.FETCH_SUPPLIES; }
         sleep(calculateSleepDuration());
         if (!hasItems()) {
             if (!Rs2Bank.isOpen()) {
                 Rs2Bank.openBank();
             }
-            sleep = sleepUntilTrue(Rs2Bank::isOpen, random(67, 97), 18000);
+            sleep = sleepUntilTrue(() -> Rs2Bank.isOpen(), Rs2Random.between(67, 97), 18000);
             sleep(calculateSleepDuration());
-            if (firstItemId != null && secondItemId != null && thirdItemId != null && fourthItemId != null) {
+            if (config.depositAll() && Rs2Inventory.getEmptySlots() < 28) {
+                Rs2Bank.depositAll();
+                sleep(100,300);
+                return "";
+            }
+            if(firstItemId != null && firstItemQuantity < Rs2Inventory.count(firstItemId)) {
+                Rs2Bank.depositAll(firstItemId);
+                sleep(100,300);
+            } else if (firstItemId == null && firstItemQuantity < Rs2Inventory.count(firstItemIdentifier)) {
+                Rs2Bank.depositAll(firstItemIdentifier);
+                sleep(100,300);
+            }
+            if (secondItemId != null && secondItemQuantity < Rs2Inventory.count(secondItemId)) {
+                Rs2Bank.depositAll(secondItemId);
+                sleep(100,300);
+            } else if (secondItemId == null && secondItemQuantity < Rs2Inventory.count(secondItemIdentifier)) {
+                Rs2Bank.depositAll(secondItemIdentifier);
+                sleep(100,300);
+            }
+            if(thirdItemId != null && thirdItemQuantity < Rs2Inventory.count(thirdItemId)) {
+                Rs2Bank.depositAll(thirdItemId);
+                sleep(100,300);
+            } else if (thirdItemId == null && thirdItemQuantity < Rs2Inventory.count(thirdItemIdentifier)) {
+                Rs2Bank.depositAll(thirdItemIdentifier);
+                sleep(100,300);
+            }
+            if(fourthItemId != null && fourthItemQuantity < Rs2Inventory.count(fourthItemId)) {
+                Rs2Bank.depositAll(fourthItemId);
+                sleep(100,300);
+            } else if (fourthItemId == null && fourthItemQuantity < Rs2Inventory.count(fourthItemIdentifier)) {
+                Rs2Bank.depositAll(fourthItemIdentifier);
+                sleep(100,300);
+            }
+            if (firstItemId != null && secondItemId != null && thirdItemId != null && fourthItemId !=null) {
                 Rs2Bank.depositAllExcept(firstItemId, secondItemId, thirdItemId, fourthItemId);
-            } else if (firstItemId == null && secondItemId == null && thirdItemId == null && fourthItemId == null) {
+            } else if (firstItemId == null && secondItemId == null && thirdItemId == null && fourthItemId ==null){
                 Rs2Bank.depositAllExcept(firstItemIdentifier, secondItemIdentifier, thirdItemIdentifier, fourthItemIdentifier);
-            } else {
+            } else if (!config.depositAll()) {
                 Rs2Bank.depositAll();
             }
             sleep = sleepUntilTrue(() -> !Rs2Inventory.isFull(), 100, 6000);
@@ -217,8 +246,8 @@ public class BanksBankStanderScript extends Script {
                     if (Rs2Bank.hasItem(secondItemId) && Rs2Inventory.count(secondItemId) < secondItemQuantity) {
                         if (!config.withdrawAll()) {
                             int missingQuantity = Rs2Inventory.count(secondItemId) < secondItemQuantity
-                                    ? secondItemQuantity - Rs2Inventory.count(secondItemId)
-                                    : 0;
+                                ? secondItemQuantity - Rs2Inventory.count(secondItemId)
+                                : 0;
                             Rs2Bank.withdrawX(true, secondItemId, missingQuantity);
                         } else {
                             Rs2Bank.withdrawAll(secondItemId);
@@ -282,9 +311,7 @@ public class BanksBankStanderScript extends Script {
                     }
                 }
             }
-            if (!hasItems()) {
-                Rs2Inventory.waitForInventoryChanges(700);
-            }
+            if (!hasItems()) { Rs2Inventory.waitForInventoryChanges(700); }
             if (hasItems()) {
                 previousItemChange = (System.currentTimeMillis() - 2500);
                 if (firstItemSum == 0) {
@@ -302,12 +329,12 @@ public class BanksBankStanderScript extends Script {
                 long bankCloseTime = System.currentTimeMillis();
                 while (this.isRunning() && Rs2Bank.isOpen() && (System.currentTimeMillis() - bankCloseTime < 32000)) {
                     Rs2Bank.closeBank();
-                    sleep = sleepUntilTrue(() -> !Rs2Bank.isOpen(), random(60, 97), 5000);
+                    sleep = sleepUntilTrue(() -> !Rs2Bank.isOpen(), Rs2Random.between(60, 97), 5000);
                     sleep(calculateSleepDuration() - 10);
                 }
                 if (Rs2Bank.isOpen()) {
                     sleep(calculateSleepDuration());
-                    Rs2Player.logout();
+                    if (this.isRunning()) { Rs2Player.logout(); }
                     sleep(calculateSleepDuration());
                 }
                 currentStatus = CurrentStatus.COMBINE_ITEMS;
@@ -333,24 +360,18 @@ public class BanksBankStanderScript extends Script {
         }
         if (Rs2Bank.isOpen()) {
             Rs2Bank.closeBank();
-            sleep = sleepUntilTrue(() -> !Rs2Bank.isOpen(), random(60, 97), 5000);
+            sleep = sleepUntilTrue(() -> !Rs2Bank.isOpen(), Rs2Random.between(60, 97), 5000);
             sleep(calculateSleepDuration());
             return false;
         }
         if (config.waitForAnimation()) {
-            if (Rs2Player.isAnimating() || (System.currentTimeMillis() - previousItemChange) < 2400) {
-                return false;
-            }
+            if (Rs2Player.isAnimating() || (System.currentTimeMillis() - previousItemChange) < 2400) { return false; }
         }
-        if (currentStatus != CurrentStatus.COMBINE_ITEMS) {
-            currentStatus = CurrentStatus.COMBINE_ITEMS;
-        }
+        if (currentStatus != CurrentStatus.COMBINE_ITEMS) { currentStatus = CurrentStatus.COMBINE_ITEMS; }
         if (config.pause()) {
             while (this.isRunning() && config.pause()) {
-                if (!config.pause()) {
-                    break;
-                }
-                sleep(100, 1000);
+                if (!config.pause()){ break; }
+                sleep(100,1000);
             }
         }
         if (firstItemId != null && secondItemId != null) {
@@ -387,10 +408,14 @@ public class BanksBankStanderScript extends Script {
         if (config.needPromptEntry()) {
             sleep(calculateSleepDuration());
             isWaitingForPrompt = true;
-            sleep = sleepUntilTrue(() -> !isWaitingForPrompt, random(7, 31), random(800, 1200));
+            sleep = sleepUntilTrue(() -> !isWaitingForPrompt, Rs2Random.between(7, 31), Rs2Random.between(800, 1200));
             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
             previousItemChange = System.currentTimeMillis();
-            sleep = sleepUntilTrue(() -> !Rs2Inventory.hasItem(secondItemIdentifier == null ? String.valueOf(secondItemId) : secondItemIdentifier) || !Rs2Inventory.waitForInventoryChanges(3000), 10, 40000);
+            if (secondItemId != null) {
+                sleep = sleepUntilTrue(() -> !Rs2Inventory.hasItem(secondItemId), 30, 40000);
+            } else {
+                sleep = sleepUntilTrue(() -> !Rs2Inventory.hasItem(secondItemIdentifier), 30, 40000);
+            }
         }
         sleep(calculateSleepDuration());
         return true;
@@ -417,11 +442,10 @@ public class BanksBankStanderScript extends Script {
 
         return sleepDuration;
     }
-
-    public String checkItemSums() {
-        if (!Rs2Bank.isOpen()) {
+    public String checkItemSums(){
+        if(!Rs2Bank.isOpen()){
             Rs2Bank.openBank();
-            sleep = sleepUntilTrue(Rs2Bank::isOpen, random(67, 97), 18000);
+            sleep = sleepUntilTrue(Rs2Bank::isOpen, Rs2Random.between(67, 97), 18000);
             sleep(200, 600);
         }
         //System.out.println("Attempting to check first item");
@@ -450,7 +474,7 @@ public class BanksBankStanderScript extends Script {
             //System.out.println("Attempting to check fourth item");
             if (fourthItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == fourthItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(fourthItemId))) < config.fourthItemQuantity()) {
                 return fourthItemId.toString();
-            } else if(fourthItemId != null || (Rs2Bank.count(fourthItemIdentifier) + Rs2Inventory.count(fourthItemIdentifier)) >= config.fourthItemQuantity()) {
+            } else if (fourthItemId != null || (Rs2Bank.count(fourthItemIdentifier) + Rs2Inventory.count(fourthItemIdentifier)) >= config.fourthItemQuantity()) {
                 return fourthItemIdentifier;
             }
         }

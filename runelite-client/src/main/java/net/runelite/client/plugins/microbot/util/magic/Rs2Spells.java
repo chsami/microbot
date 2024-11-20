@@ -35,7 +35,7 @@ public enum Rs2Spells {
     CURSE(19,
             new Pair[] {Pair.of("earth rune", 3), Pair.of("water rune", 2), Pair.of("body rune", 1)},
             new WorldPoint(-1, -1, 0), "<col=00ff00>Weaken</col>", "", MagicAction.CURSE),
-    VULNERABILITY(76,
+    VULNERABILITY(66,
             new Pair[] {Pair.of("earth rune", 5), Pair.of("water rune", 5), Pair.of("soul rune", 1)},
             new WorldPoint(-1, -1, 0), "<col=00ff00>Weaken</col>", "", MagicAction.VULNERABILITY),
     ENFEEBLE(73,
