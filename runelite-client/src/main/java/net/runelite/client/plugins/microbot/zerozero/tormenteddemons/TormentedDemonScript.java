@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.Rs2InventorySetup;
 import net.runelite.client.plugins.microbot.util.grounditem.LootingParameters;
+import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.zerozero.tormenteddemons.TormentedDemonConfig.MODE;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -329,7 +330,7 @@ public class TormentedDemonScript extends Script {
         return Rs2Npc.getAttackableNpcs("Tormented Demon")
                 .filter(npc -> npc.getInteracting() == null || npc.getInteracting() == Microbot.getClient().getLocalPlayer())
                 .filter(npc -> {
-                    HeadIcon demonHeadIcon = getHeadIcon(npc);
+                    HeadIcon demonHeadIcon = Rs2Reflection.getHeadIcon(npc);
                     if (demonHeadIcon != null) {
                         switchGear(config, demonHeadIcon);
                         return true;
@@ -480,33 +481,6 @@ public class TormentedDemonScript extends Script {
             Microbot.log(message);
             lastChatMessage = message;
         }
-    }
-
-    @SneakyThrows
-    public static HeadIcon getHeadIcon(NPC npc) {
-        Field aq = npc.getClass().getDeclaredField("ay");
-        aq.setAccessible(true);
-        Object aqObj = aq.get(npc);
-        if (aqObj == null) {
-            aq.setAccessible(false);
-            System.out.println("Error: aqObj is null for NPC " + npc.getName());
-            return getOldHeadIcon(npc);
-        }
-        Field aeField = aqObj.getClass().getDeclaredField("aw");
-        aeField.setAccessible(true);
-        short[] ae = (short[]) aeField.get(aqObj);
-        aeField.setAccessible(false);
-        aq.setAccessible(false);
-        if (ae == null) {
-            System.out.println("Error: ae is null for NPC " + npc.getName());
-            return getOldHeadIcon(npc);
-        }
-        short headIcon = ae[0];
-        return headIcon == -1 ? getOldHeadIcon(npc) : HeadIcon.values()[headIcon];
-    }
-
-    private static HeadIcon getOldHeadIcon(NPC npc) {
-        return null;
     }
 
     @Override

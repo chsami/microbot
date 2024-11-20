@@ -160,14 +160,14 @@ public class Rs2Reflection {
      */
     @SneakyThrows
     public static HeadIcon getHeadIcon(NPC npc) {
-        Field aq = npc.getClass().getDeclaredField("aq");
+        Field aq = npc.getClass().getDeclaredField("ab");
         aq.setAccessible(true);
         Object aqObj = aq.get(npc);
         if (aqObj == null) {
             aq.setAccessible(false);
             return getOldHeadIcon(npc);
         }
-        Field aeField = aqObj.getClass().getDeclaredField("ae");
+        Field aeField = aqObj.getClass().getDeclaredField("bd");
         aeField.setAccessible(true);
         short[] ae = (short[]) aeField.get(aqObj);
         aeField.setAccessible(false);
