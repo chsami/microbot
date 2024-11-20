@@ -2,27 +2,20 @@ package net.runelite.client.plugins.microbot.giantsfoundry;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigInformation;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.plugins.microbot.giantsfoundry.enums.SmithableBars;
 import net.runelite.client.plugins.microbot.thieving.enums.ThievingNpc;
 
 @ConfigGroup(GiantsFoundryConfig.GROUP)
+@ConfigInformation(
+        "• Start at the giants foundry minigame. <br />" +
+        "• Please select the bars in your UI <br />" +
+        "• Make sure you are wearing ice gloves & no weapon/shield equipped <br />"
+)
 public interface GiantsFoundryConfig extends Config {
 
     String GROUP = "GiantsFoundry";
-
-    @ConfigItem(
-            keyName = "guide",
-            name = "How to use",
-            description = "How to use this plugin",
-            position = 1
-    )
-    default String GUIDE() {
-        return "Start at the giants foundry minigame\n" +
-                "Please select the bars in your UI\n" +
-                "Make sure to have ice gloves on\n" +
-                "Make sure to have no weapon or shield on";
-    }
 
     @ConfigItem(
             keyName = "FirstBar",
