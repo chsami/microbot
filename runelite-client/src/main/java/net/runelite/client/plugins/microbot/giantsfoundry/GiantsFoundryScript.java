@@ -156,7 +156,7 @@ public class GiantsFoundryScript extends Script {
         }
 
         if (!Rs2Inventory.hasItemAmount(config.FirstBar().getName(), config.firstBarAmount())
-                && !Rs2Inventory.hasItemAmount(config.FirstBar().getName(), config.secondBarAmount()) && !canPour()) {
+                && !Rs2Inventory.hasItemAmount(config.SecondBar().getName(), config.secondBarAmount()) && !canPour()) {
             Rs2Bank.useBank();
             //check if inv is empty and deposit all inv items
             if(Rs2Bank.count(config.FirstBar().getName()) < config.firstBarAmount() || Rs2Bank.count(config.SecondBar().getName()) < config.secondBarAmount()) {
