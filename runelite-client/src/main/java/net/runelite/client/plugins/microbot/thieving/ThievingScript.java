@@ -16,7 +16,6 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
-import net.runelite.client.plugins.timersandbuffs.GameTimer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class ThievingScript extends Script {
 
-    public static String version = "1.5.9";
+    public static String version = "1.6.0";
     ThievingConfig config;
 
     public boolean run(ThievingConfig config) {
@@ -42,7 +41,7 @@ public class ThievingScript extends Script {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
                 }
 
-                if (isStunned())
+                if (Rs2Player.isStunned())
                     return;
 
 
@@ -166,10 +165,6 @@ public class ThievingScript extends Script {
                 sleep(300, 600);
             }
         }
-    }
-
-    private boolean isStunned() {
-        return Microbot.isTimerActive(GameTimer.PICKPOCKET_STUN);
     }
 
     private void handleShadowVeil() {
