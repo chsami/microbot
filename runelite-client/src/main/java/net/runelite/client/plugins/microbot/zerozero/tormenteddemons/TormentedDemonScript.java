@@ -218,7 +218,7 @@ public class TormentedDemonScript extends Script {
 
             currentTarget = findNewTarget(config);
             if (currentTarget != null) {
-                currentOverheadIcon = getHeadIcon(currentTarget);
+                currentOverheadIcon = Rs2Reflection.getHeadIcon(currentTarget);
                 if (currentOverheadIcon == null) {
                     logOnceToChat("Failed to retrieve HeadIcon for target.");
                     return;
