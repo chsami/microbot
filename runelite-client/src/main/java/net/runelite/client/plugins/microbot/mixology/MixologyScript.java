@@ -50,11 +50,17 @@ public class MixologyScript extends Script {
         currentMoxPoints = 0;
         currentAgaPoints = 0;
         currentLyePoints = 0;
+        leverRetries = 0;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 long startTime = System.currentTimeMillis();
+
+                if (leverRetries >= 20) {
+                    Microbot.log("Failed to create a potion. Please do this step manually and restart the script.");
+                    return;
+                }
 
 
                 boolean isInMinigame = Rs2Widget.getWidget(882, 2) != null;
@@ -225,8 +231,7 @@ public class MixologyScript extends Script {
 
                         if (canCreatePotion(potionToMake)) {
                             mixologyState = MixologyState.TAKE_FROM_MIXIN_VESSEL;
-                            System.out.println("create potion!");
-                            //create potion
+                            leverRetries = 0;
                         } else {
                             createPotion(potionToMake, config);
                         }
@@ -394,6 +399,7 @@ public class MixologyScript extends Script {
                 final int sleep = Rs2Random.between(300, 600);
                 sleepGaussian(sleep, sleep / 4);
             }
+            leverRetries++;
         }
     }
 
