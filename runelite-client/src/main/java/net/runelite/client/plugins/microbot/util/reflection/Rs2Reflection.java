@@ -167,10 +167,10 @@ public class Rs2Reflection {
             ab.setAccessible(false);
             return getOldHeadIcon(npc);
         }
-        Field abField = aqObj.getClass().getDeclaredField("bd");
-        abField.setAccessible(true);
-        short[] bd = (short[]) abField.get(aqObj);
-        abField.setAccessible(false);
+        Field bdField = aqObj.getClass().getDeclaredField("bd");
+        bdField.setAccessible(true);
+        short[] bd = (short[]) bdField.get(aqObj);
+        bdField.setAccessible(false);
         ab.setAccessible(false);
         if (bd == null) {
             return getOldHeadIcon(npc);
@@ -208,6 +208,8 @@ public class Rs2Reflection {
                 if (headIcon == null) {
                     continue;
                 }
+                System.out.println("old := " + getHeadIconMethod.getName());
+
                 return HeadIcon.values()[headIcon[0]];
             }
         }
