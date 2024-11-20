@@ -17,10 +17,11 @@ public interface MixologyConfig extends Config {
             position = 0
     )
     String refiner = "Refiner";
+
     @ConfigSection(
             name = "Minigame",
             description = "General minigame configuration",
-            position = 0
+            position = 1
     )
     String minigame = "Minigame";
 
@@ -148,12 +149,12 @@ public interface MixologyConfig extends Config {
 
     @ConfigItem(
             keyName = "useQuickActionLever",
-            name = "Use Qucik Action on Lever",
+            name = "Use Quick Action on Lever",
             description = "Will click fast when interacting with the lever for mixing potions",
             position = 4,
             section = minigame
     )
     default boolean useQuickActionLever() {
-        return false;
+        return true;
     }
 }

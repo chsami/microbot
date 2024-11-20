@@ -27,7 +27,7 @@ import static net.runelite.client.plugins.microbot.util.Global.sleepGaussian;
 
 public class MixologyScript extends Script {
 
-    public final static String version = "1.0.0-beta";
+    public final static String version = "1.0.1-beta";
 
     public java.util.List<PotionOrder> potionOrders = Collections.emptyList();
 
@@ -38,6 +38,7 @@ public class MixologyScript extends Script {
     public int agitatorQuickActionTicks = 0;
     public int alembicQuickActionTicks = 0;
     public AlchemyObject digweed;
+    public int leverRetries = 0;
     public List<PotionModifier> customOrder = Arrays.asList(
             PotionModifier.CRYSTALISED,
             PotionModifier.CONCENTRATED,
@@ -386,10 +387,10 @@ public class MixologyScript extends Script {
             } else if (component.character() == 'M') {
                 Rs2GameObject.interact(AlchemyObject.MOX_LEVER.objectId());
             }
-            sleepUntil(Rs2Player::isAnimating);
             if (config.useQuickActionLever()) {
                 Rs2Player.waitForAnimation();
             } else {
+                sleepUntil(Rs2Player::isAnimating);
                 final int sleep = Rs2Random.between(300, 600);
                 sleepGaussian(sleep, sleep / 4);
             }
