@@ -434,7 +434,7 @@ public class MixologyScript extends Script {
                     satisfied.add(currentAnimations[i] == AGA_ANIMATION || currentAnimations[i] == 11609 || currentAnimations[i] == 11612);
                     break;
                 case 'L':
-                    satisfied.add(currentAnimations[i] == LYE_ANIMATION  || currentAnimations[i] == 11611);
+                    satisfied.add(currentAnimations[i] == LYE_ANIMATION  || currentAnimations[i] == 11611 || currentAnimations[i] == 11618);
                     break;
                 case 'M':
                     satisfied.add(currentAnimations[i] == 11614 || currentAnimations[i] == 11607 || currentAnimations[i] == MOX_ANIMATION);
