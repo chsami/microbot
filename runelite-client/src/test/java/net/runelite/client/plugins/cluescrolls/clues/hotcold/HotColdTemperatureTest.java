@@ -24,10 +24,10 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues.hotcold;
 
-import net.runelite.client.plugins.microbot.cluescrolls.clues.hotcold.HotColdTemperature;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class HotColdTemperatureTest
 {

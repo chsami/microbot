@@ -24,10 +24,8 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues;
 
-import net.runelite.client.plugins.microbot.cluescrolls.clues.MusicClue;
-import org.junit.Test;
-
 import static org.junit.Assert.assertNull;
+import org.junit.Test;
 
 public class MusicClueTest
 {

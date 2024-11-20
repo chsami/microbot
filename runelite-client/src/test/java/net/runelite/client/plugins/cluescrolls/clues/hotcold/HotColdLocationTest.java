@@ -24,7 +24,6 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues.hotcold;
 
-import net.runelite.client.plugins.microbot.cluescrolls.clues.hotcold.HotColdLocation;
 import org.junit.Test;
 
 public class HotColdLocationTest

@@ -24,15 +24,12 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues;
 
-import net.runelite.client.plugins.microbot.cluescrolls.clues.*;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import static org.junit.Assert.fail;
+import org.junit.Test;
 
 public class ConfigKeyTest
 {

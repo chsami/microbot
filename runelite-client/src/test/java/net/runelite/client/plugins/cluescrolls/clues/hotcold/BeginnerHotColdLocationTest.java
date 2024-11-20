@@ -24,14 +24,11 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues.hotcold;
 
-import net.runelite.client.plugins.microbot.cluescrolls.clues.hotcold.HotColdLocation;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class BeginnerHotColdLocationTest
 {

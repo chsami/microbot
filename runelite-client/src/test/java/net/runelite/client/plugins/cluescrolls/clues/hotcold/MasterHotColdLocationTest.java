@@ -24,21 +24,18 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues.hotcold;
 
-import net.runelite.client.plugins.microbot.cluescrolls.clues.hotcold.HotColdLocation;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class MasterHotColdLocationTest
 {
-	public static final Set<HotColdLocation> MASTER_HOT_COLD_LOCATIONS = Arrays.stream(HotColdLocation.values())
+	private static final Set<HotColdLocation> MASTER_HOT_COLD_LOCATIONS = Arrays.stream(HotColdLocation.values())
 		.filter(l -> !l.isBeginnerClue())
 		.collect(Collectors.toSet());
-	public static final int EXPECTED_DIMENSION_SIZE = 9;
+	private static final int EXPECTED_DIMENSION_SIZE = 9;
 
 	@Test
 	public void beginnerHotColdLocationAreaTest()

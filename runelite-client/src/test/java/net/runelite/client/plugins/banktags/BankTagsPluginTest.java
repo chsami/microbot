@@ -28,28 +28,23 @@ import com.google.inject.Guice;
 import com.google.inject.testing.fieldbinder.Bind;
 import com.google.inject.testing.fieldbinder.BoundFieldModule;
 import javax.inject.Inject;
-import javax.inject.Named;
 import net.runelite.api.Client;
+import static net.runelite.api.ItemID.ABYSSAL_WHIP;
 import net.runelite.api.events.ScriptCallbackEvent;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.game.ItemManager;
-import static net.runelite.client.plugins.banktags.BankTagsPlugin.ITEM_KEY_PREFIX;
 import net.runelite.client.plugins.banktags.tabs.TabInterface;
-import net.runelite.client.plugins.microbot.cluescrolls.ClueScrollService;
+import net.runelite.client.plugins.cluescrolls.ClueScrollService;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import javax.inject.Inject;
-
-import static net.runelite.api.ItemID.ABYSSAL_WHIP;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BankTagsPluginTest
@@ -86,10 +81,6 @@ public class BankTagsPluginTest
 	@Bind
 	private ChatMessageManager chatMessageManager;
 
-	@Bind
-	@Named("developerMode")
-	boolean developerMode;
-
 	@Inject
 	private TagManager tagManager;
 
@@ -117,21 +108,21 @@ public class BankTagsPluginTest
 		when(client.getStringStack()).thenReturn(new String[]{"tag:whip"});
 
 		when(configManager.getConfiguration(BankTagsPlugin.CONFIG_GROUP,
-			ITEM_KEY_PREFIX + ABYSSAL_WHIP)).thenReturn("herb,bossing,whip");
+			TagManager.ITEM_KEY_PREFIX + ABYSSAL_WHIP)).thenReturn("herb,bossing,whip");
 		bankTagsPlugin.onScriptCallbackEvent(EVENT);
 		assertEquals(1, client.getIntStack()[0]);
 
 		// Search should be found at the start of the tag
 		when(client.getIntStack()).thenReturn(new int[]{0, ABYSSAL_WHIP});
 		when(configManager.getConfiguration(BankTagsPlugin.CONFIG_GROUP,
-			ITEM_KEY_PREFIX + ABYSSAL_WHIP)).thenReturn("herb,bossing,whip long tag");
+			TagManager.ITEM_KEY_PREFIX + ABYSSAL_WHIP)).thenReturn("herb,bossing,whip long tag");
 		bankTagsPlugin.onScriptCallbackEvent(EVENT);
 		assertEquals(1, client.getIntStack()[0]);
 
 		// Search should not be be found in the middle of the tag
 		// and explicit search does not allow fall through
 		when(configManager.getConfiguration(BankTagsPlugin.CONFIG_GROUP,
-			ITEM_KEY_PREFIX + ABYSSAL_WHIP)).thenReturn("herb,bossing whip");
+			TagManager.ITEM_KEY_PREFIX + ABYSSAL_WHIP)).thenReturn("herb,bossing whip");
 		bankTagsPlugin.onScriptCallbackEvent(EVENT);
 		assertEquals(0, client.getIntStack()[0]);
 	}
@@ -143,7 +134,7 @@ public class BankTagsPluginTest
 		when(client.getStringStack()).thenReturn(new String[]{"whip"});
 
 		when(configManager.getConfiguration(BankTagsPlugin.CONFIG_GROUP,
-			ITEM_KEY_PREFIX + ABYSSAL_WHIP)).thenReturn("herb,bossing");
+			TagManager.ITEM_KEY_PREFIX + ABYSSAL_WHIP)).thenReturn("herb,bossing");
 
 		assertFalse(tagManager.findTag(ABYSSAL_WHIP, "whip"));
 		bankTagsPlugin.onScriptCallbackEvent(EVENT);
@@ -157,7 +148,7 @@ public class BankTagsPluginTest
 		when(client.getStringStack()).thenReturn(new String[]{"whip"});
 
 		when(configManager.getConfiguration(BankTagsPlugin.CONFIG_GROUP,
-			ITEM_KEY_PREFIX + ABYSSAL_WHIP)).thenReturn("herb,bossing,whip long tag");
+			TagManager.ITEM_KEY_PREFIX + ABYSSAL_WHIP)).thenReturn("herb,bossing,whip long tag");
 
 		bankTagsPlugin.onScriptCallbackEvent(EVENT);
 		assertEquals(1, client.getIntStack()[0]);
