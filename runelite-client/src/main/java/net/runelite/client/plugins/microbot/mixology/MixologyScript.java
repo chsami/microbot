@@ -51,6 +51,9 @@ public class MixologyScript extends Script {
         currentAgaPoints = 0;
         currentLyePoints = 0;
         leverRetries = 0;
+        if (!Rs2AntibanSettings.naturalMouse) {
+            Microbot.log("Hey! Did you know this script works really well with natural mouse? Feel free to enable it in the antiban settings.");
+        }
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
