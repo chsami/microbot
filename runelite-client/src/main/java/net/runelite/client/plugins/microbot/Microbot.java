@@ -41,7 +41,6 @@ import net.runelite.http.api.worlds.World;
 import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -151,23 +150,6 @@ public class Microbot {
                 getInputArguments().toString().contains("-agentlib:jdwp");
     }
 
-    @Deprecated(since = "Use isMoving", forRemoval = true)
-    public static boolean isWalking() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
-                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
-    }
-
-    @Deprecated(since = "1.2.4 - use Rs2Player variant", forRemoval = true)
-    public static boolean isMoving() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
-                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
-    }
-
-    @Deprecated(since = "1.2.4 - use Rs2Player variant", forRemoval = true)
-    public static boolean isAnimating() {
-        return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getAnimation() != -1);
-    }
-
     public static int getVarbitValue(int varbit) {
         return getClientThread().runOnClientThread(() -> getClient().getVarbitValue(varbit));
     }
@@ -207,11 +189,6 @@ public class Microbot {
         if (client == null) return false;
         GameState idx = client.getGameState();
         return idx == GameState.HOPPING;
-    }
-
-    @Deprecated(since = "1.4.0 - use Rs2Player variant", forRemoval = true)
-    public static boolean hasLevel(int levelRequired, Skill skill) {
-        return Microbot.getClient().getRealSkillLevel(skill) >= levelRequired;
     }
 
     public static boolean hopToWorld(int worldNumber) {
@@ -347,12 +324,6 @@ public class Microbot {
         if (!Microbot.getClient().isClientThread()) {
             sleep(50, 80);
         }
-    }
-
-    @Deprecated(since = "1.3.8 - use Mouse class", forRemoval = true)
-    private static void mouseEvent(int id, Point point) {
-        MouseEvent e = new MouseEvent(client.getCanvas(), id, System.currentTimeMillis(), 0, point.getX(), point.getY(), 1, false, 1);
-        client.getCanvas().dispatchEvent(e);
     }
 
     public static List<LootTrackerRecord> getAggregateLootRecords() {
