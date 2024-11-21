@@ -25,6 +25,7 @@ import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.enums.PrayerStyle;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
 import net.runelite.client.plugins.microbot.playerassist.skill.AttackStyleScript;
+import net.runelite.client.plugins.microbot.pvmfighter.PvmFighterState;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
@@ -88,6 +89,7 @@ public class PlayerAssistPlugin extends Plugin {
     private MenuEntry lastClick;
     private Point lastMenuOpenedPoint;
     private WorldPoint trueTile;
+    public static PlayerAssistState playerState = PlayerAssistState.COMBAT;
 
     @Provides
     PlayerAssistConfig provideConfig(ConfigManager configManager) {
@@ -140,6 +142,10 @@ public class PlayerAssistPlugin extends Plugin {
         resetLocation();
         overlayManager.remove(playerAssistOverlay);
         overlayManager.remove(playerAssistInfoOverlay);
+    }
+
+    public static boolean fulfillConditionsToRun() {
+        return !Microbot.isLoggedIn() || Microbot.pauseAllScripts || !Microbot.isLoggedIn();
     }
 
     private void resetLocation() {
