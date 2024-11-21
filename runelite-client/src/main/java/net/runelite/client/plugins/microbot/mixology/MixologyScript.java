@@ -27,7 +27,7 @@ import static net.runelite.client.plugins.microbot.util.Global.sleepGaussian;
 
 public class MixologyScript extends Script {
 
-    public final static String version = "1.0.1-beta";
+    public final static String version = "1.0.2-beta";
 
     public java.util.List<PotionOrder> potionOrders = Collections.emptyList();
 
