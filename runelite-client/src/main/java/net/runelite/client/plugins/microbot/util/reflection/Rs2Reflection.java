@@ -16,6 +16,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ *     @Export("sequence")
+ *     int sequence = -1;
+ *     @ObfuscatedName("cz")
+ *     @ObfuscatedGetter(
+ *         intValue = -1043355907
+ *     )
+ *
+ *     @ObfuscatedName("hw")
+ * @Implements("NPCComposition")
+ * public class NPCComposition extends DualNode
+ *
+ *     @ObfuscatedName("bd")
+ *     @Export("headIconSpriteIndex")
+ *     short[] headIconSpriteIndex = null;
+ */
+
 public class Rs2Reflection {
     static String animationField = null;
     static Method doAction = null;
@@ -24,7 +41,7 @@ public class Rs2Reflection {
      * sequence maps to an actor animation
      * actor can be an npc/player
      */
-    static int sequence = -1489920319;
+    static int sequence = -1043355907;
 
     /**
      * Credits to EthanApi
