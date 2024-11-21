@@ -769,4 +769,8 @@ public class Rs2Player {
     public static boolean hasStaminaActive() {
         return Microbot.getVarbitValue(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) != 0;
     }
+
+    public static boolean isStunned() {
+        return Microbot.getClient().getLocalPlayer().hasSpotAnim(245);
+    }
 }

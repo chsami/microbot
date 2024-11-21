@@ -434,7 +434,7 @@ public class RuneLiteDebug {
 
         // This will initialize configuration
         microbotPluginManager.loadCorePlugins(Arrays.asList("net.runelite.client.plugins.microbot", "net.runelite.client.plugins.config",
-                "net.runelite.client.plugins.devtools", "net.runelite.client.plugins.stretchedmode", "net.runelite.client.plugins.gpu"));
+                "net.runelite.client.plugins.devtools", "net.runelite.client.plugins.stretchedmode", "net.runelite.client.plugins.gpu", "net.runelite.client.plugins.rsnhider"));
 
         // Start plugins later so we can already login
         pluginManager.startPlugins();

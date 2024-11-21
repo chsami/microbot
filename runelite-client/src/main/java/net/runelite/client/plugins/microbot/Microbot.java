@@ -32,9 +32,6 @@ import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.mouse.Mouse;
 import net.runelite.client.plugins.microbot.util.mouse.naturalmouse.NaturalMouse;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.timersandbuffs.GameTimer;
-import net.runelite.client.plugins.timersandbuffs.TimersAndBuffsPlugin;
-import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
@@ -370,19 +367,6 @@ public class Microbot {
                 .orElse(null);
     }
 
-    public static boolean isTimerActive(GameTimer gameTimer) {
-        if (!isPluginEnabled(TimersAndBuffsPlugin.class.getName())) {
-            log("Please enable the timers plugin to make sure the script is working properly.");
-            return true;
-        }
-        for (InfoBox key : infoBoxManager.getInfoBoxes()) {
-            if (key.getName().equals(gameTimer.name())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static void log(String message) {
         if (!Microbot.isLoggedIn()) {
             System.out.println(message);
@@ -447,6 +431,7 @@ public class Microbot {
                          return true;
                      } else {
                          System.out.println("Version mismatch detected...updating client.");
+                         Microbot.writeVersionToFile(currentVersion);
                      }
                  }
              } catch(Exception ex) {
