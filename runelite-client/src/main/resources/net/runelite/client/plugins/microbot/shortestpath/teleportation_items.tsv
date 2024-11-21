@@ -11,7 +11,8 @@
 3683 9888 0		13113;13114;13115		4	Morytania legs: Slime Pit	F	20	
 3482 3230 0		13114;13115		4	Morytania legs: Burgh de Rott	F	20	
 # Fremennik sea boots (1,2,3 have 1 teleport per day, 4 is unlimited)								
-2643 3675 0		13129;13130;13131;13132		4	Fremennik sea boots	F	20	
+2643 3675 0		13129;13130;13131		4	Fremennik sea boots	F	20	5005=0
+2643 3675 0		13132		4	Fremennik sea boots	F	20	
 # Kandarin headgear (3 has 1 teleport per day, 4 is unlimited)								
 2729 3409 0		13137;13138;13139;13140		4	Kandarin headgear	F	20	
 # Wilderness Sword (3 has 1 teleport per day, 4 is unlimited)								
@@ -278,10 +279,10 @@
 2551 3755 0		3691;6125;6126;6127;13079		4	Enchanted lyre: Waterbirth Island	T	20	4493=1
 2409 3809 0		3691;6125;6126;6127;13079		4	Enchanted lyre: Jatizso	T	20	4494=1
 2336 3802 0		3691;6125;6126;6127;13079		4	Enchanted lyre: Neitiznot	T	20	4494=1
-2662 3644 0		23458		4	Enchanted lyre (i): Rellekka	F	20	
-2551 3755 0		23458		4	Enchanted lyre (i): Waterbirth Island	F	20	4493=1
-2409 3809 0		23458		4	Enchanted lyre (i): Jatizso	F	20	4494=1
-2336 3802 0		23458		4	Enchanted lyre (i): Neitiznot	F	20	4494=1
+2662 3644 0		23458		4	Enchanted lyre(i): Rellekka	F	20	
+2551 3755 0		23458		4	Enchanted lyre(i): Waterbirth Island	F	20	4493=1
+2409 3809 0		23458		4	Enchanted lyre(i): Jatizso	F	20	4494=1
+2336 3802 0		23458		4	Enchanted lyre(i): Neitiznot	F	20	4494=1
 3105 9315 0		6707		4	Camulet: Enakhra's Temple	F	20	
 3191 2924 0		6707		4	Camulet: Bandit Camp Quarry	F	20	
 1713 3612 0		21760;25818	The Depths of Despair	4	Kharedst's memoirs: Lunch by the Lancalliums	T	20	6035>1
