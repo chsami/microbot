@@ -15,8 +15,8 @@ import net.runelite.client.config.ConfigSection;
         "    <li>Seed dibber</li>\n" +
         "    <li>Spade</li>\n" +
         "    <li>Rake</li>\n" +
-        "    <li>Ectophial</li>\n" +
-        "    <li>Any Quetzal whistle (WITH CHARGES)</li>\n" +
+        "    <li>Ectophial, or if no ectophial, Fenkenstrain Teleport Tab</li>\n" +
+        "    <li>Any Quetzal whistle (WITH CHARGES), or Civitas Teleport Tab</li>\n" +
         "    <li>Stony Basalt/Trollheim tab</li>\n" +
         "    <li>Icy Basalt</li>\n" +
         "    <li>Skills necklace</li>\n" +
@@ -29,42 +29,6 @@ import net.runelite.client.config.ConfigSection;
 
 public interface HerbrunConfig extends Config {
 
-//    @ConfigSection(
-//            name = "Guide",
-//            description = "Guide",
-//            position = 1
-//    )
-//    String guideSection = "Guide";
-
-
-//    @ConfigItem(
-//            keyName = "guide",
-//            name = "How to use",
-//            description = "How to use this plugin",
-//            position = 1,
-//            section = guideSection
-//    )
-//    default String GUIDE() {
-//        return "Start next to a bank\n" +
-//                "Have the following in your bank:\n" +
-//                "1. Ardougne cloak\n" +
-//                "2. Ultracompost or Bottomless compost bucket (filled)\n" +
-//                "3. Magic Secatuers\n" +
-//                "4. Seed dibber\n" +
-//                "5. Spade\n" +
-//                "6. Rake\n" +
-//                "7. Ectophial \n" +
-//                "8. Any Quetzal whistle (WITH CHARGES)\n" +
-//                "9. Stony Basalt/Trollheim tab\n" +
-//                "10. Icy Basalt\n" +
-//                "11. Skills necklace \n" +
-//                "12. Explorer's Ring \n" +
-//                "13. Herb seeds \n" +
-//                "14. Camelot teleport tab\n" +
-//                "15. Xeric's talisman\n" +
-//                "16. If using Harmony Island patch, have Harmony Teleport tab";
-//
-//    }
 
     @ConfigItem(
             keyName = "fastHerb",
@@ -164,6 +128,28 @@ public interface HerbrunConfig extends Config {
     )
     default HerbrunInfo.ring RING() {
         return HerbrunInfo.ring.EXPLORERS_RING_3;
+    }
+
+    @ConfigItem(
+            keyName = "morytanita_teleport",
+            name = "Use Ectophial?",
+            description = "Do you have an ectophial? If not Fenkenstrain tab will be used.",
+            position = 4,
+            section = settingsSection
+    )
+    default boolean USE_ECTOPHIAL() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "varlamore_teleport",
+            name = "Use Quetzal Whistle??",
+            description = "Use Quetzal Whistle? If not Civitas tab will be used.",
+            position = 4,
+            section = settingsSection
+    )
+    default boolean USE_QUETZAL_WHISTLE() {
+        return true;
     }
 
     @ConfigItem(

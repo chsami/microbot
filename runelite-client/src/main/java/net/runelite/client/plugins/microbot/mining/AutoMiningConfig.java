@@ -1,12 +1,21 @@
 package net.runelite.client.plugins.microbot.mining;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
 import net.runelite.client.plugins.microbot.mining.enums.Rocks;
 
 @ConfigGroup("Mining")
+@ConfigInformation("<h2>Auto Mining</h2>" +
+        "<h3>Version: "+ AutoMiningScript.version + "</h3>" +
+        "<p>1. <strong>Ore Selection:</strong> Choose the type of ore you wish to mine. The default ore is <em>TIN</em>.</p>" +
+        "<p></p>"+
+        "<p>2. <strong>Distance to Stray:</strong> Set the maximum distance in tiles that the bot can travel from its initial position. The default distance is <em>20 tiles</em>.</p>" +
+        "<p></p>"+
+        "<p>3. <strong>Banking Option:</strong> Enable or disable the use of a bank. If enabled, the bot will walk back to the original location after banking. The default setting is <em>disabled</em>.</p>" +
+        "<p></p>"+
+        "<p>4. <strong>Items to Bank:</strong> Specify the items to be banked, separated by commas. The default value is <em>'ore'</em>.</p>"+
+        "<p></p>"+
+        "<p>5. <strong>Basalt:</strong> If mining basalt, ensure UseBank is checked and it will automatically note at Snowflake</em>.</p>")
+
 public interface AutoMiningConfig extends Config {
     @ConfigSection(
             name = "General",

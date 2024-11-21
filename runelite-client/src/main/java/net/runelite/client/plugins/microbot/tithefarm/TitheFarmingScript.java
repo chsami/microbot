@@ -58,6 +58,8 @@ public class TitheFarmingScript extends Script {
 
     public static int gricollerCanCharges = -1;
 
+    public static boolean init = true;
+
     public void init(TitheFarmingConfig config) {
         TitheFarmLanes lane = config.Lanes();
 
@@ -161,15 +163,19 @@ public class TitheFarmingScript extends Script {
 
 
     public boolean run(TitheFarmingConfig config) {
-        if (!Microbot.isLoggedIn()) return false;
-        state = STARTING;
-        plants = new ArrayList<>();
-        Rs2Item rs2ItemSeed = Rs2Inventory.get(TitheFarmMaterial.getSeedForLevel().getFruitId());
-        initialFruit = rs2ItemSeed == null ? 0 : rs2ItemSeed.quantity;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
+
+                if (init) {
+                    state = STARTING;
+                    plants = new ArrayList<>();
+                    Rs2Item rs2ItemSeed = Rs2Inventory.get(TitheFarmMaterial.getSeedForLevel().getFruitId());
+                    initialFruit = rs2ItemSeed == null ? 0 : rs2ItemSeed.quantity;
+                    init = false;
+                    sleep(2000); //extra sleep to have the game initialize correctly
+                }
 
                 //Dialogue stuff only applicable if you enter for the first time
                 if (Rs2Dialogue.isInDialogue()) {
@@ -184,12 +190,17 @@ public class TitheFarmingScript extends Script {
                     return;
                 }
 
-                if (!isInMinigame()) {
+                if (!isInMinigame() && !Rs2Inventory.hasItem(TitheFarmMaterial.getSeedForLevel().getName())) {
                     state = TitheFarmState.TAKE_SEEDS;
                 }
 
                 if (validateSeedsAndPatches() && isInMinigame()) {
                     state = TitheFarmState.LEAVE;
+                }
+
+                if (Rs2Inventory.hasItemAmount(TitheFarmMaterial.getSeedForLevel().getFruitId(), config.storeFruitTreshhold())) {
+                    depositSack();
+                    return;
                 }
 
                 switch (state) {
@@ -349,6 +360,7 @@ public class TitheFarmingScript extends Script {
             if (Microbot.getClient().getEnergy() < 4000 && hasAllEmptyPatches() && state != RECHARING_RUN_ENERGY) {
                 state = RECHARING_RUN_ENERGY;
                 Microbot.log("Recharging run energy...");
+                Rs2Inventory.useRestoreEnergyItem();
             } else if (state == RECHARING_RUN_ENERGY && Microbot.getClient().getEnergy() >= 4000) {
                 state = STARTING;
             }
@@ -431,7 +443,7 @@ public class TitheFarmingScript extends Script {
             Rs2Inventory.drop(TitheFarmMaterial.getSeedForLevel().getName());
             sleep(400, 600);
         }
-        Rs2GameObject.interact("Seed table");
+        Rs2GameObject.interact(ObjectID.SEED_TABLE);
         boolean result = Rs2Widget.sleepUntilHasWidget(TitheFarmMaterial.getSeedForLevel().getName());
         if (!result) return;
         keyPress(TitheFarmMaterial.getSeedForLevel().getOption());
@@ -450,7 +462,9 @@ public class TitheFarmingScript extends Script {
 
     private boolean depositSack() {
         if (Rs2Inventory.hasItem(TitheFarmMaterial.getSeedForLevel().getFruitId())) {
+            Microbot.log("Storing fruits into sack for experience...");
             Rs2GameObject.interact(ObjectID.SACK_27431);
+            Rs2Player.waitForWalking();
             Rs2Player.waitForAnimation();
             return true;
         }

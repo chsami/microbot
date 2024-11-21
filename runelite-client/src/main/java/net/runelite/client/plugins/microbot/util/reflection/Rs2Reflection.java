@@ -16,6 +16,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ *     @Export("sequence")
+ *     int sequence = -1;
+ *     @ObfuscatedName("cz")
+ *     @ObfuscatedGetter(
+ *         intValue = -1043355907
+ *     )
+ *
+ *     @ObfuscatedName("hw")
+ * @Implements("NPCComposition")
+ * public class NPCComposition extends DualNode
+ *
+ *     @ObfuscatedName("bd")
+ *     @Export("headIconSpriteIndex")
+ *     short[] headIconSpriteIndex = null;
+ */
+
 public class Rs2Reflection {
     static String animationField = null;
     static Method doAction = null;
@@ -24,7 +41,7 @@ public class Rs2Reflection {
      * sequence maps to an actor animation
      * actor can be an npc/player
      */
-    static int sequence = -1489920319;
+    static int sequence = -1043355907;
 
     /**
      * Credits to EthanApi
@@ -160,25 +177,25 @@ public class Rs2Reflection {
      */
     @SneakyThrows
     public static HeadIcon getHeadIcon(NPC npc) {
-        Field aq = npc.getClass().getDeclaredField("aq");
-        aq.setAccessible(true);
-        Object aqObj = aq.get(npc);
+        Field ab = npc.getClass().getDeclaredField("ab");
+        ab.setAccessible(true);
+        Object aqObj = ab.get(npc);
         if (aqObj == null) {
-            aq.setAccessible(false);
+            ab.setAccessible(false);
             return getOldHeadIcon(npc);
         }
-        Field aeField = aqObj.getClass().getDeclaredField("ae");
-        aeField.setAccessible(true);
-        short[] ae = (short[]) aeField.get(aqObj);
-        aeField.setAccessible(false);
-        aq.setAccessible(false);
-        if (ae == null) {
+        Field bdField = aqObj.getClass().getDeclaredField("bd");
+        bdField.setAccessible(true);
+        short[] bd = (short[]) bdField.get(aqObj);
+        bdField.setAccessible(false);
+        ab.setAccessible(false);
+        if (bd == null) {
             return getOldHeadIcon(npc);
         }
-        if (ae.length == 0) {
+        if (bd.length == 0) {
             return getOldHeadIcon(npc);
         }
-        short headIcon = ae[0];
+        short headIcon = bd[0];
         if (headIcon == -1) {
             return getOldHeadIcon(npc);
         }
@@ -208,6 +225,8 @@ public class Rs2Reflection {
                 if (headIcon == null) {
                     continue;
                 }
+                System.out.println("old := " + getHeadIconMethod.getName());
+
                 return HeadIcon.values()[headIcon[0]];
             }
         }

@@ -55,6 +55,7 @@ public class Rs2Magic {
      */
     public static boolean canCast(MagicAction magicSpell) {
         if (!oneTimeSpellBookCheck()) {
+            Microbot.log("Your spellbook filtering seems off...Microbot is trying to fix this");
             return false;
         }
 
@@ -96,6 +97,7 @@ public class Rs2Magic {
     }
 
     public static boolean quickCanCast(String spellName) {
+        if (spellName == null) return false;
         MagicAction magicAction = Arrays.stream(MagicAction.values()).filter(x -> x.getName().toLowerCase().contains(spellName.toLowerCase())).findFirst().orElse(null);
         if (magicAction == null) return false;
         return quickCanCast(magicAction);

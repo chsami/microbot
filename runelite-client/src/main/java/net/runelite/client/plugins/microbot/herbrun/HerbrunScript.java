@@ -62,8 +62,6 @@ public class HerbrunScript extends Script {
     public boolean run(HerbrunConfig config) {
 
         int seedToPlant = config.SEED().getItemId();
-        int cloak = config.CLOAK().getItemId();
-        int ring = config.RING().getItemId();
 
         Microbot.enableAutoRunOn = false;
         botStatus = states.GEARING;
@@ -152,8 +150,8 @@ public class HerbrunScript extends Script {
                         break;
                     case MORYTANIA_TELEPORT:
                         if (config.enableMorytania()) {
-                            handleTeleportToMorytania();
-                            sleep(600,1200);
+                            handleTeleportToMorytania(config);
+                            sleep(600, 1200);
                         } else {
                             botStatus = states.VARLAMORE_TELEPORT;
                         }
@@ -179,7 +177,7 @@ public class HerbrunScript extends Script {
                         break;
                     case VARLAMORE_TELEPORT:
                         if (config.enableVarlamore()) {
-                            handleTeleportToVarlamore();
+                            handleTeleportToVarlamore(config);
                         } else {
                             botStatus = states.HOSIDIUS_TELEPORT;
                         }
@@ -386,15 +384,23 @@ public class HerbrunScript extends Script {
         Rs2Bank.withdrawOne(ItemID.SEED_DIBBER);
         Rs2Bank.withdrawOne(ItemID.SPADE);
         if (config.enableMorytania()) {
-            Rs2Bank.withdrawOne(ItemID.ECTOPHIAL);
+            if (config.USE_ECTOPHIAL()) {
+                Rs2Bank.withdrawOne(ItemID.ECTOPHIAL);
+            } else {
+                Rs2Bank.withdrawOne(ItemID.FENKENSTRAINS_CASTLE_TELEPORT);
+            }
         }
         if (config.enableVarlamore()) {
-            if (Rs2Bank.hasItem(ItemID.PERFECTED_QUETZAL_WHISTLE)) {
-                Rs2Bank.withdrawOne(ItemID.PERFECTED_QUETZAL_WHISTLE);
-            } else if (Rs2Bank.hasItem(ItemID.ENHANCED_QUETZAL_WHISTLE)) {
-                Rs2Bank.withdrawOne(ItemID.ENHANCED_QUETZAL_WHISTLE);
-            } else if (Rs2Bank.hasItem(ItemID.BASIC_QUETZAL_WHISTLE)) {
-                Rs2Bank.withdrawOne(ItemID.BASIC_QUETZAL_WHISTLE);
+            if (config.USE_QUETZAL_WHISTLE()) {
+                if (Rs2Bank.hasItem(ItemID.PERFECTED_QUETZAL_WHISTLE)) {
+                    Rs2Bank.withdrawOne(ItemID.PERFECTED_QUETZAL_WHISTLE);
+                } else if (Rs2Bank.hasItem(ItemID.ENHANCED_QUETZAL_WHISTLE)) {
+                    Rs2Bank.withdrawOne(ItemID.ENHANCED_QUETZAL_WHISTLE);
+                } else if (Rs2Bank.hasItem(ItemID.BASIC_QUETZAL_WHISTLE)) {
+                    Rs2Bank.withdrawOne(ItemID.BASIC_QUETZAL_WHISTLE);
+                }
+            } else {
+                Rs2Bank.withdrawOne(ItemID.CIVITAS_ILLA_FORTIS_TELEPORT);
             }
         }
         if (config.enableHosidius()) {
@@ -424,7 +430,7 @@ public class HerbrunScript extends Script {
                 }
             } else {
                 if (Rs2Bank.hasItem(ItemID.FARMING_CAPE)) {
-                Rs2Bank.withdrawOne(ItemID.FARMING_CAPE);
+                    Rs2Bank.withdrawOne(ItemID.FARMING_CAPE);
                 } else if (Rs2Bank.hasItem(ItemID.FARMING_CAPET)) {
                     Rs2Bank.withdrawOne(ItemID.FARMING_CAPET);
                 }
@@ -531,23 +537,27 @@ public class HerbrunScript extends Script {
     }
 
 
-    private boolean morytaniaTeleport() {
+    private boolean morytaniaTeleport(HerbrunConfig config) {
         sleep(100);
         if (!Rs2Player.isAnimating()) {
             System.out.println("Teleporting to Morytania");
-            boolean success = Rs2Inventory.interact(ItemID.ECTOPHIAL, "empty");
+            if (config.USE_ECTOPHIAL()) {
+                Rs2Inventory.interact(ItemID.ECTOPHIAL, "empty");
+            } else {
+                Rs2Inventory.interact(ItemID.FENKENSTRAINS_CASTLE_TELEPORT, "break");
+            }
             Rs2Player.waitForAnimation();
             sleepUntil(() -> !Rs2Player.isAnimating());
-            return success;
+            return true;
         }
         return false;
     }
 
 
-    private void handleTeleportToMorytania() {
+    private void handleTeleportToMorytania(HerbrunConfig config) {
         if (!Rs2Player.isAnimating()) {
             System.out.println("Teleporting to Morytania...");
-            boolean success = morytaniaTeleport();  // Perform the teleport
+            boolean success = morytaniaTeleport(config);  // Perform the teleport
 
             if (success) {
                 // Wait until the player has stopped animating and moving
@@ -560,11 +570,21 @@ public class HerbrunScript extends Script {
         }
     }
 
-    private boolean varlamoreTeleport() {
+    private boolean varlamoreTeleport(HerbrunConfig config) {
         sleep(100);
         if (!Rs2Player.isAnimating()) {
             System.out.println("Teleporting to Varlamore");
-            boolean success = Rs2Inventory.interact(ItemID.PERFECTED_QUETZAL_WHISTLE, "Signal");
+            if (config.USE_QUETZAL_WHISTLE()) {
+                if (Rs2Inventory.contains(ItemID.PERFECTED_QUETZAL_WHISTLE)) {
+                    boolean success = Rs2Inventory.interact(ItemID.PERFECTED_QUETZAL_WHISTLE, "Signal");
+                } else if (Rs2Inventory.contains(ItemID.ENHANCED_QUETZAL_WHISTLE)) {
+                    boolean success = Rs2Inventory.interact(ItemID.ENHANCED_QUETZAL_WHISTLE, "Signal");
+                } else if (Rs2Inventory.contains(ItemID.BASIC_QUETZAL_WHISTLE)) {
+                    boolean success = Rs2Inventory.interact(ItemID.BASIC_QUETZAL_WHISTLE, "Signal");
+                }
+            } else {
+                boolean success = Rs2Inventory.interact(ItemID.CIVITAS_ILLA_FORTIS_TELEPORT, "break");
+            }
             Rs2Player.waitForAnimation();
             sleepUntil(() -> !Rs2Player.isAnimating());
             return true;
@@ -573,10 +593,10 @@ public class HerbrunScript extends Script {
     }
 
 
-    private void handleTeleportToVarlamore() {
+    private void handleTeleportToVarlamore(HerbrunConfig config) {
         if (!Rs2Player.isAnimating()) {
             System.out.println("Teleporting to Varlamore...");
-            boolean success = varlamoreTeleport();  // Perform teleportation
+            boolean success = varlamoreTeleport(config);  // Perform teleportation
             if (success) {
                 sleepUntil(() -> !Rs2Player.isAnimating() && !Rs2Player.isMoving());
                 System.out.println("Arrived at Varlamore teleport spot.");
@@ -806,7 +826,7 @@ public class HerbrunScript extends Script {
                 }
             }
 
-            // If no herb patch is found, print an error and return
+            // If no herb patch is, print an error and return
             if (herbPatch == null) {
                 System.out.println("Herb patch not found with any of the possible actions!");
                 return;

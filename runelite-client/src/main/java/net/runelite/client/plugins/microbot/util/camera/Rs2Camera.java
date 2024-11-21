@@ -1,13 +1,16 @@
 package net.runelite.client.plugins.microbot.util.camera;
 
+import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.RuneLite;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.camera.CameraPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -30,6 +33,12 @@ public class Rs2Camera {
     public static int angleToTile(LocalPoint localPoint) {
         int angle = (int) Math.toDegrees(Math.atan2(localPoint.getY() - Microbot.getClient().getLocalPlayer().getLocalLocation().getY(),
                 localPoint.getX() - Microbot.getClient().getLocalPlayer().getLocalLocation().getX()));
+        return angle >= 0 ? angle : 360 + angle;
+    }
+
+    public static int angleToTile(WorldPoint worldPoint) {
+        int angle = (int) Math.toDegrees(Math.atan2(worldPoint.getY() - Rs2Player.getWorldLocation().getY(),
+                worldPoint.getX() - Rs2Player.getWorldLocation().getX()));
         return angle >= 0 ? angle : 360 + angle;
     }
 
@@ -103,7 +112,7 @@ public class Rs2Camera {
         if (Microbot.isPluginEnabled(CameraPlugin.class)) {
             String configGroup = "zoom";
             String configKey = "cameraSpeed";
-            defaultCameraSpeed = RuneLite.getInjector().getInstance(ConfigManager.class).getConfiguration(configGroup, configKey, double.class);
+            defaultCameraSpeed = Microbot.getInjector().getInstance(ConfigManager.class).getConfiguration(configGroup, configKey, double.class);
         }
         // Set the camera speed to 3 to make the camera move faster
         Microbot.getClient().setCameraSpeed(3f);
@@ -227,15 +236,20 @@ public class Rs2Camera {
     }
 
     public static boolean isTileOnScreen(LocalPoint localPoint) {
-        int viewportHeight = Microbot.getClient().getViewportHeight();
-        int viewportWidth = Microbot.getClient().getViewportWidth();
+        Client client = Microbot.getClient();
+        int viewportHeight = client.getViewportHeight();
+        int viewportWidth = client.getViewportWidth();
 
-
-        Polygon poly = Perspective.getCanvasTilePoly(Microbot.getClient(), localPoint);
-
+        Polygon poly = Perspective.getCanvasTilePoly(client, localPoint);
         if (poly == null) return false;
 
-        return poly.getBounds2D().getX() <= viewportWidth && poly.getBounds2D().getY() <= viewportHeight;
+        // Check if any part of the polygon intersects with the screen bounds
+        Rectangle viewportBounds = new Rectangle(0, 0, viewportWidth, viewportHeight);
+        if (!poly.intersects(viewportBounds)) return false;
+
+        // Optionally, check if the tile is in front of the camera
+        Point canvasPoint = Perspective.localToCanvas(client, localPoint, client.getPlane());
+        return canvasPoint != null;
     }
 
     // get the camera zoom
@@ -248,5 +262,23 @@ public class Rs2Camera {
             Microbot.getClient().runScript(ScriptID.CAMERA_DO_ZOOM, zoom, zoom);
         });
     }
+
+    /**
+ * Resets the camera pitch to 280 if it is currently less than 280.
+ */
+public static void resetPitch() {
+    // Set the camera pitch to 280
+    if (getPitch() < 280)
+        setPitch(280);
+}
+
+/**
+ * Resets the camera zoom to 200 if it is currently greater than 200.
+ */
+public static void resetZoom() {
+    // Set the camera zoom to 200
+    if (getZoom() > 200)
+        setZoom(200);
+}
 }
 

@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.zerozero.bluedragons;
 
+import net.runelite.api.ItemID;
 import net.runelite.api.NPC;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
@@ -11,7 +12,6 @@ import net.runelite.client.plugins.microbot.util.grounditem.LootingParameters;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.RunePouch;
-import net.runelite.client.plugins.microbot.util.magic.Runes;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -28,7 +28,7 @@ public class BlueDragonsScript extends Script {
     private Integer currentTargetId = null;
 
     public boolean run(BlueDragonsConfig config) {
-        currentState = BlueDragonState.STARTING;
+        currentState = BlueDragonState.BANKING;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!super.run() || !Microbot.isLoggedIn()) return;
@@ -65,6 +65,7 @@ public class BlueDragonsScript extends Script {
             Rs2Bank.depositAll("Dragon bones");
             Rs2Bank.depositAll("Dragon spear");
             Rs2Bank.depositAll("Shield left half");
+            Rs2Bank.depositAll("Scaly blue dragonhide");
 
             if (config.lootEnsouledHead()) {
                 Rs2Bank.depositAll("Ensouled dragon head");
@@ -81,13 +82,8 @@ public class BlueDragonsScript extends Script {
     }
 
     private void determineStartingState(BlueDragonsConfig config) {
-        boolean hasFood = hasRequiredFood(config);
         boolean hasTeleport = hasTeleportToFalador();
         boolean hasAgilityOrKey = Microbot.getClient().getRealSkillLevel(Skill.AGILITY) >= 70 || hasDustyKey();
-
-        if (!hasFood) {
-            Microbot.log("Missing required food for the trip.");
-        }
 
         if (!hasTeleport) {
             Microbot.log("Missing teleport to Falador or required runes.");
@@ -98,8 +94,8 @@ public class BlueDragonsScript extends Script {
         }
 
         // Check if all requirements are met
-        if (hasFood && hasTeleport && hasAgilityOrKey) {
-            currentState = BlueDragonState.TRAVEL_TO_DRAGONS;
+        if (hasTeleport && hasAgilityOrKey) {
+            currentState = BlueDragonState.BANKING;
         } else {
             Microbot.log("Starting conditions not met. Stopping the plugin.");
             stop();
@@ -119,10 +115,10 @@ public class BlueDragonsScript extends Script {
             return true;
         }
 
-        int lawRuneId = Runes.LAW.getItemId();
-        int waterRuneId = Runes.WATER.getItemId();
-        int dustRuneId = Runes.DUST.getItemId();
-        int airRuneId = Runes.AIR.getItemId();
+        int lawRuneId = ItemID.LAW_RUNE;
+        int waterRuneId = ItemID.WATER_RUNE;
+        int dustRuneId = ItemID.DUST_RUNE;
+        int airRuneId = ItemID.AIR_RUNE;
 
         int requiredLawRunes = 1;
         int requiredAirRunes = 3;
@@ -138,7 +134,7 @@ public class BlueDragonsScript extends Script {
     }
 
     private boolean checkRuneAvailability(int runeId, int requiredAmount, boolean checkRunePouch) {
-        boolean inInventory = Rs2Inventory.contains(runeId) && Rs2Inventory.count(runeId) >= requiredAmount;
+        boolean inInventory = Rs2Inventory.hasItemAmount(runeId, requiredAmount);
         boolean inRunePouch = checkRunePouch && RunePouch.contains(runeId, requiredAmount);
         return inInventory || inRunePouch;
     }
@@ -220,7 +216,10 @@ public class BlueDragonsScript extends Script {
         int amount = config.foodAmount();
         if (food != null && amount > 0 && Rs2Bank.isOpen() && !hasRequiredFood(config)) {
             Microbot.log("Withdrawing " + amount + "x " + food.getName() + " for dragon fight.");
-            Rs2Bank.withdrawX(food.getName(), amount);
+            if (!Rs2Bank.withdrawX(true, food.getName(), amount, true)) {
+                Microbot.log("Failed to find food...shutting down script");
+                stop();
+            }
         } else if (hasRequiredFood(config)) {
             Microbot.log("Already have the required amount of food in inventory. No need to withdraw.");
         }
@@ -263,9 +262,6 @@ public class BlueDragonsScript extends Script {
 
     public void stop() {
         Microbot.log("Blue Dragons plugin stopped.");
-        if (mainScheduledFuture != null) {
-            mainScheduledFuture.cancel(true);
-            super.shutdown();
-        }
+        super.shutdown();
     }
 }

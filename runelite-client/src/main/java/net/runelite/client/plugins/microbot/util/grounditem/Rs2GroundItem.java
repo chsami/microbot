@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.grounditems.GroundItem;
 import net.runelite.client.plugins.grounditems.GroundItemsPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -17,9 +18,7 @@ import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -543,5 +542,19 @@ public class Rs2GroundItem {
                 1,
                 1)
                 .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+    }
+
+    /**
+     * Loot first item based on worldpoint & id
+     * @param worldPoint
+     * @param itemId
+     * @return
+     */
+    public static boolean loot(final WorldPoint worldPoint, final int itemId)
+    {
+        final Optional<RS2Item> item = Arrays.stream(Rs2GroundItem.getAllAt(worldPoint.getX(), worldPoint.getY()))
+                .filter(i -> i.getItem().getId() == itemId)
+                .findFirst();
+        return Rs2GroundItem.interact(item.orElse(null));
     }
 }

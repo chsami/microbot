@@ -69,6 +69,8 @@ public class Rs2Walker {
     // Set this to true, if you want to calculate the path but do not want to walk to it
     static boolean debug = false;
 
+    public static boolean disableTeleports = false;
+
     public static boolean walkTo(int x, int y, int plane) {
         return walkTo(x, y, plane, config.reachedDistance());
     }
@@ -541,6 +543,12 @@ public class Rs2Walker {
                 .intersectsWith2D(objectArea);
     }
 
+    /**
+     * used for quest script interacting with object
+     * also used for finding the nearest bank
+     * @param worldPoint
+     * @return
+     */
     public static boolean canReach(WorldPoint worldPoint) {
         if (ShortestPathPlugin.getPathfinderConfig().getTransports().isEmpty()) {
             ShortestPathPlugin.getPathfinderConfig().refresh();
@@ -554,6 +562,21 @@ public class Rs2Walker {
         return pathArea
                 .intersectsWith2D(objectArea);
     }
+
+    /**
+ * Retrieves the walk path from the player's current location to the specified target location.
+ *
+ * @param target The target `WorldPoint` to which the path should be calculated.
+ * @return A list of `WorldPoint` objects representing the path from the player's current location to the target.
+ */
+public static List<WorldPoint> getWalkPath(WorldPoint target) {
+    if (ShortestPathPlugin.getPathfinderConfig().getTransports().isEmpty()) {
+        ShortestPathPlugin.getPathfinderConfig().refresh();
+    }
+    Pathfinder pathfinder = new Pathfinder(ShortestPathPlugin.getPathfinderConfig(), Rs2Player.getWorldLocation(), target);
+    pathfinder.run();
+    return pathfinder.getPath();
+}
 
     public static boolean isCloseToRegion(int distance, int regionX, int regionY) {
         WorldPoint worldPoint = WorldPoint.fromRegion(Microbot.getClient().getLocalPlayer().getWorldLocation().getRegionID(),
@@ -673,17 +696,35 @@ public class Rs2Walker {
 
         var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 20);
 
-        if (tiles.keySet().isEmpty()) return 1; //start on index 1, instead of 0. 0 can contain teleports
+        //Exception to handle objects that handle long animations or walk
+        /**
+         * Exception to handle objects that handle long animations or walk
+         * ignore colission if we did not find a valid tile to walk on
+         * this is to ensure we stay on the path even if we are on a agility obstacle
+         */
+        if (tiles.keySet().isEmpty()) {
+            tiles = Rs2Tile.getReachableTilesFromTileIgnoreCollision(Rs2Player.getWorldLocation(), 20);
+        }
+        final HashMap<WorldPoint, Integer> _tiles = tiles;
 
         WorldPoint startPoint = path.stream()
-                .min(Comparator.comparingInt(a -> tiles.getOrDefault(a, Integer.MAX_VALUE)))
+                .min(Comparator.comparingInt(a -> _tiles.getOrDefault(a, Integer.MAX_VALUE)))
                 .orElse(null);
 
         boolean noMatchingTileFound = path.stream()
-                .allMatch(a -> tiles.getOrDefault(a, Integer.MAX_VALUE) == Integer.MAX_VALUE);
+                .allMatch(a -> _tiles.getOrDefault(a, Integer.MAX_VALUE) == Integer.MAX_VALUE);
 
+        /**
+         * Check if the startPoint is null or no matching tile is found
+         * If either condition is true, proceed to find the closest index in the path list.
+         */
         if (startPoint == null || noMatchingTileFound) {
-            return 1; //start on index 1, instead of 0. 0 can contain teleports
+            Optional<Integer> closestIndexOptional = IntStream.range(0, path.size())
+                    .boxed()
+                    .min(Comparator.comparingInt(i -> Rs2Player.getWorldLocation().distanceTo(path.get(i))));
+            if (closestIndexOptional.isPresent()) {
+                return closestIndexOptional.get();
+            }
         }
 
         return IntStream.range(0, path.size())
@@ -693,10 +734,19 @@ public class Rs2Walker {
     }
 
     /**
+     * Force the walker to recalculate path
+     */
+    public static void recalculatePath() {
+        Rs2Walker.setTarget(null);
+        WorldPoint _currentTarget = currentTarget;
+        Rs2Walker.setTarget(_currentTarget);
+    }
+
+    /**
      * @param target
      */
     public static void setTarget(WorldPoint target) {
-        if (!Microbot.isLoggedIn() && target != null) return;
+        if (target != null && !Microbot.isLoggedIn()) return;
         Player localPlayer = Microbot.getClient().getLocalPlayer();
         if (!ShortestPathPlugin.isStartPointSet() && localPlayer == null) {
             return;
@@ -844,7 +894,7 @@ public class Rs2Walker {
                         if (transport.getType() == TransportType.SHIP || transport.getType() == TransportType.NPC || transport.getType() == TransportType.BOAT
                                 || transport.getType() == TransportType.CHARTER_SHIP) {
 
-                            NPC npc = Rs2Npc.getNpc(transport.getObjectId());
+                            NPC npc = Rs2Npc.getNpc(transport.getName());
 
                             if (Rs2Npc.canWalkTo(npc, 20) && Rs2Npc.interact(npc, transport.getAction())) {
                                 Rs2Player.waitForWalking();
@@ -854,7 +904,7 @@ public class Rs2Walker {
                                 }
                                 sleepUntil(() -> !Rs2Player.isAnimating());
                                 sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 10);
-                                sleep(600 * 2);
+                                sleep(600 * 4);
                             } else {
                                 Rs2Walker.walkFastCanvas(path.get(i));
                                 sleep(1200, 1600);
@@ -887,13 +937,19 @@ public class Rs2Walker {
                             break;
                         }
                     }
-
+                    
+                    if (transport.getType() == TransportType.QUETZAL) {
+                        if (handleQuetzal(transport)) {
+                            sleep(600 * 2); // wait 2 extra ticks before walking
+                            break;
+                        }
+                    }
 
                     if (transport.getType() == TransportType.GNOME_GLIDER) {
                         if (handleGlider(transport)) {
                             sleepUntil(() -> !Rs2Player.isAnimating());
                             sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < 10);
-                            sleep(600 * 2); // wait 2 extra ticks before walking
+                            sleep(600 * 3); // wait 3 extra ticks before walking
                             break;
                         }
                     }
@@ -1022,7 +1078,7 @@ public class Rs2Walker {
         List<String> locationKeyWords = Arrays.asList("farm", "monastery", "lletya", "prifddinas", "rellekka", "waterbirth island", "neitiznot", "jatiszo",
                 "ver sinhaza", "darkmeyer", "slepe", "troll stronghold", "weiss", "ecto", "burgh", "duradel", "gem mine", "nardah", "kalphite cave",
                 "kourend woodland", "mount karuulm");
-        List<String> genericKeyWords = Arrays.asList("invoke", "empty", "consume", "rub", "break", "teleport", "reminisce");
+        List<String> genericKeyWords = Arrays.asList("invoke", "empty", "consume", "rub", "break", "teleport", "reminisce", "signal");
 
         boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
         String destination = hasMultipleDestination
@@ -1056,7 +1112,7 @@ public class Rs2Walker {
                 return interactWithAdventureLog(transport);
             }
 
-            if (itemAction.equalsIgnoreCase("rub")) {
+            if (itemAction.equalsIgnoreCase("rub") || itemAction.equalsIgnoreCase("reminisce")) {
                 sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
                 Rs2Widget.sleepUntilHasWidgetText(destination, 219, 1, false, 5000);
                 Rs2Widget.clickWidget(destination, Optional.of(219), 1, false);
@@ -1228,6 +1284,32 @@ public class Rs2Walker {
         return false;
 
     }
+    
+    private static boolean handleQuetzal(Transport transport) {
+        int varlamoreMapParentID = 874;
+        String displayInfo = transport.getDisplayInfo();
+        if (displayInfo == null || displayInfo.isEmpty()) return false;
+        
+        NPC renu = Rs2Npc.getNpc(NpcID.RENU_13350);
+
+        if (Rs2Npc.canWalkTo(renu, 20) && Rs2Npc.interact(renu, "travel")) {
+            Rs2Player.waitForWalking();
+            sleepUntil(() -> Rs2Widget.isWidgetVisible(varlamoreMapParentID, 2));
+            List<Widget> dynamicWidgetChildren = Arrays.stream(Rs2Widget.getWidget(varlamoreMapParentID, 15).getDynamicChildren())
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            Widget actionWidget = dynamicWidgetChildren.stream()
+                    .filter(w -> Arrays.stream(Objects.requireNonNull(w.getActions())).anyMatch(act -> act.toLowerCase().contains(displayInfo.toLowerCase())))
+                    .findFirst()
+                    .orElse(null);
+            if (actionWidget != null) {
+                Rs2Widget.clickWidget(actionWidget);
+                Microbot.log("Traveling to " + transport.getDisplayInfo());
+                return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
+            }
+        }
+        return false;
+    } 
 
     /**
      * interact with interfaces like spirit tree & xeric talisman etc...
@@ -1331,37 +1413,57 @@ public class Rs2Walker {
 
     public static void handleFairyRing(WorldPoint origin, String fairyRingCode) {
 
-        if (startingWeapon == null) {
-            startingWeapon = Rs2Equipment.get(EquipmentInventorySlot.WEAPON);
-            startingWeaponId = startingWeapon.getId();
-        }
-
         // Check if the widget is already visible
         if (!Rs2Widget.isHidden(ComponentID.FAIRY_RING_TELEPORT_BUTTON)) {
             rotateSlotToDesiredRotation(SLOT_ONE, Rs2Widget.getWidget(SLOT_ONE).getRotationY(), getDesiredRotation(fairyRingCode.charAt(0)), SLOT_ONE_ACW_ROTATION, SLOT_ONE_CW_ROTATION);
             rotateSlotToDesiredRotation(SLOT_TWO, Rs2Widget.getWidget(SLOT_TWO).getRotationY(), getDesiredRotation(fairyRingCode.charAt(1)), SLOT_TWO_ACW_ROTATION, SLOT_TWO_CW_ROTATION);
             rotateSlotToDesiredRotation(SLOT_THREE, Rs2Widget.getWidget(SLOT_THREE).getRotationY(), getDesiredRotation(fairyRingCode.charAt(2)), SLOT_THREE_ACW_ROTATION, SLOT_THREE_CW_ROTATION);
             Rs2Widget.clickWidget(TELEPORT_BUTTON);
-            Rs2Player.waitForAnimation();
-            if (!Rs2Equipment.isWearing(startingWeaponId)) {
-                sleep(3000, 3600); // Required due to long animation time
+            
+            Rs2Player.waitForAnimation(Random.random(4200, 4800)); // Required due to long animation time
+            
+            // Re-equip the starting weapon if it was unequipped
+            if (startingWeapon != null & !Rs2Equipment.isWearing(startingWeaponId)) {
                 Microbot.log("Equipping Starting Weapon: " + startingWeaponId);
                 Rs2Inventory.equip(startingWeaponId);
+                sleep(600);
             }
+            return;
         }
 
-
-        if (Rs2Equipment.isWearing("Dramen staff") || Rs2Equipment.isWearing("Lunar staff")) {
+        if (Microbot.getVarbitValue(Varbits.DIARY_LUMBRIDGE_ELITE) == 1) {
+            // Direct interaction without staff if elite Lumbridge Diary is complete
             Microbot.log("Interacting with the fairy ring directly.");
             var fairyRing = Rs2GameObject.findObjectByLocation(origin);
             Rs2GameObject.interact(fairyRing, "Configure");
             Rs2Player.waitForWalking();
-        } else if (Rs2Inventory.contains("Dramen staff")) {
-            Rs2Inventory.equip("Dramen staff");
-            sleep(600);
-        } else if (Rs2Inventory.contains("Lunar staff")) {
-            Rs2Inventory.equip("Lunar staff");
-            sleep(600);
+        } 
+        else {
+            // Manage weapon and staff as needed if elite Lumbridge Diary is not complete
+            if (startingWeapon == null) {
+                startingWeapon = Rs2Equipment.get(EquipmentInventorySlot.WEAPON);
+                startingWeaponId = startingWeapon.getId();
+            }
+
+            if (!Rs2Equipment.isWearing("Dramen staff") && !Rs2Equipment.isWearing("Lunar staff")) {
+                // Equip Dramen or Lunar staff if not already equipped
+                if (Rs2Inventory.contains("Dramen staff")) {
+                    Rs2Inventory.equip("Dramen staff");
+                    sleep(600);
+                } else if (Rs2Inventory.contains("Lunar staff")) {
+                    Rs2Inventory.equip("Lunar staff");
+                    sleep(600);
+                }
+            }
+
+            // Interact with fairy ring after equipping the staff
+            Microbot.log("Interacting with the fairy ring using a staff. " + origin.getX() + " " + origin.getY());
+            var fairyRing = Rs2GameObject.findObjectByLocation(origin);
+            if (Rs2GameObject.interact(fairyRing, "Configure")) {
+                Rs2Player.waitForWalking();
+            } else {
+                recalculatePath();
+            }
         }
     }
 

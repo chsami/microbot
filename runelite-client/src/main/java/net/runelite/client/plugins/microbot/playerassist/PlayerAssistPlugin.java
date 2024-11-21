@@ -16,8 +16,8 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.inventorysetups.InventorySetup;
-import net.runelite.client.plugins.inventorysetups.MInventorySetupsPlugin;
+import net.runelite.client.plugins.microbot.inventorysetups.InventorySetup;
+import net.runelite.client.plugins.microbot.inventorysetups.MInventorySetupsPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.playerassist.bank.BankerScript;
 import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
@@ -42,14 +42,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @PluginDescriptor(
-        name = "PVM Fighter Fork",
+        name = PluginDescriptor.Mocrosoft + "AIO Fighter",
         description = "Microbot Fighter plugin",
         tags = {"fight", "microbot", "misc", "combat", "playerassistant"},
         enabledByDefault = false
 )
 @Slf4j
 public class PlayerAssistPlugin extends Plugin {
-    public static final String version = "0.1";
+    public static final String version = "1.2.4";
     private static final String SET = "Set";
     private static final String CENTER_TILE = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
     // SAFE_SPOT = "Safe Spot";
@@ -88,7 +88,6 @@ public class PlayerAssistPlugin extends Plugin {
     private MenuEntry lastClick;
     private Point lastMenuOpenedPoint;
     private WorldPoint trueTile;
-    public static PlayerAssistState playerState = PlayerAssistState.COMBAT;
 
     @Provides
     PlayerAssistConfig provideConfig(ConfigManager configManager) {
@@ -105,65 +104,42 @@ public class PlayerAssistPlugin extends Plugin {
         }
         if (!config.toggleCenterTile() && Microbot.isLoggedIn())
             setCenter(Rs2Player.getWorldLocation());
-
-        // Combat
-        attackNpc.run(config);
-        safeSpotScript.run(config);
-//        flickerScript.run(config);
-//        useSpecialAttackScript.run(config);
-//        cannonScript.run(config);
-        // Food & Potions
-//        combatPotion.run(config);
-        foodScript.run(config);
-//        prayerPotionScript.run(config);
-//        antiPoisonScript.run(config);
-        // Loot
         lootScript.run(config);
-        // Prayer
-//        prayerScript.run(config);
-//        buryScatterScript.run(config);
-        // Skilling
-//        attackStyleScript.run(config);
-        // Gear
-
-        // Banking
+        cannonScript.run(config);
+        attackNpc.run(config);
+        combatPotion.run(config);
+        foodScript.run(config);
+        prayerPotionScript.run(config);
+        safeSpotScript.run(config);
+        flickerScript.run(config);
+        useSpecialAttackScript.run(config);
+        antiPoisonScript.run(config);
+        buryScatterScript.run(config);
+        attackStyleScript.run(config);
         bankerScript.run(config);
-
+        prayerScript.run(config);
         Microbot.getSpecialAttackConfigs()
                 .setSpecialAttack(true);
     }
 
     protected void shutDown() {
-        playerState = PlayerAssistState.COMBAT;
-
-        // Combat
-        attackNpc.shutdown();
-        safeSpotScript.shutdown();
-//        flickerScript.shutdown();
-//        useSpecialAttackScript.shutdown();
-//        cannonScript.shutdown();
-        // Food & Potions
-//        combatPotion.shutdown();
-        foodScript.shutdown();
-//        prayerPotionScript.shutdown();
-//        antiPoisonScript.shutdown();
-        // Loot
         lootScript.shutdown();
-        // Prayer
-//        prayerScript.shutdown();
-//        buryScatterScript.shutdown();
-        // Skilling
-//        attackStyleScript.shutdown();
-        // Banking
+        cannonScript.shutdown();
+        attackNpc.shutdown();
+        combatPotion.shutdown();
+        foodScript.shutdown();
+        prayerPotionScript.shutdown();
+        safeSpotScript.shutdown();
+        flickerScript.shutdown();
+        useSpecialAttackScript.shutdown();
+        antiPoisonScript.shutdown();
+        buryScatterScript.shutdown();
+        attackStyleScript.shutdown();
         bankerScript.shutdown();
-
+        prayerScript.shutdown();
         resetLocation();
         overlayManager.remove(playerAssistOverlay);
         overlayManager.remove(playerAssistInfoOverlay);
-    }
-
-    public static boolean fulfillConditionsToRun() {
-        return !Microbot.isLoggedIn() || Microbot.pauseAllScripts || !Microbot.isLoggedIn();
     }
 
     private void resetLocation() {

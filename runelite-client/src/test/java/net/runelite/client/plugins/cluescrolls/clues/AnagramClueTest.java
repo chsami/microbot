@@ -24,8 +24,9 @@
  */
 package net.runelite.client.plugins.cluescrolls.clues;
 
-import static org.junit.Assert.assertNull;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
 
 public class AnagramClueTest
 {

@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MahoganyHomesScript extends Script {
 
+    public static String version = "0.0.2";
     @Inject
     MahoganyHomesPlugin plugin;
 
@@ -63,6 +64,31 @@ public class MahoganyHomesScript extends Script {
                 .collect(Collectors.toList());
     }
 
+    // Custom logging methods
+    private void log(String message) {
+        if (plugin.getConfig().logMessages()) {
+            Microbot.log(message);
+        }
+    }
+
+    private void log(String format, Object... args) {
+        if (plugin.getConfig().logMessages()) {
+            Microbot.log(String.format(format, args));
+        }
+    }
+
+    private void logInfo(String message) {
+        if (plugin.getConfig().logMessages()) {
+            log.info(message);
+        }
+    }
+
+    private void logInfo(String format, Object... args) {
+        if (plugin.getConfig().logMessages()) {
+            log.info(format, args);
+        }
+    }
+
     // Tasks section
 
     private void fix() {
@@ -72,72 +98,104 @@ public class MahoganyHomesScript extends Script {
             return;
         }
 
-        Rs2WorldPoint playerLocation = new Rs2WorldPoint(Rs2Player.getWorldLocation());
+        Rs2WorldPoint playerLocation = Rs2Player.getRs2WorldPoint();
         MahoganyHomesOverlay.setFixableObjects(getFixableObjects());
 
         // Sort fixable objects by plane and distance
         List<GameObject> sortedObjects = getFixableObjects().stream()
-                .sorted(Comparator.comparingInt(TileObject::getPlane))
+                .sorted(Comparator.comparingInt(TileObject::getPlane).thenComparingInt(o -> o.getWorldLocation().distanceTo2D(playerLocation.getWorldPoint())))
                 .collect(Collectors.toList());
 
 
-        GameObject object = sortedObjects.get(0);
+        GameObject object = sortedObjects.stream()
+                .findFirst()
+                .orElse(null);
+
+        if (object == null) {
+            log("No fixable objects found.");
+            return;
+        }
+
 
         // Find the closest walkable tile around the object
-        WorldPoint closestWalkableObjectTile = Rs2Tile.getWalkableTilesAroundTile(object.getWorldLocation(), 2).stream()
-                .min(Comparator.comparingInt(wp -> Rs2Player.getWorldLocation().distanceTo(wp))
-                )
-                .orElse(null);
-            Rs2WorldPoint objectLocation = new Rs2WorldPoint(closestWalkableObjectTile != null ? closestWalkableObjectTile : object.getWorldLocation());
+        Rs2WorldPoint objectLocation = Rs2Tile.getNearestWalkableTile(object);
 
-        int pathDistance = objectLocation.distanceToPath(Microbot.getClient(), Rs2Player.getWorldLocation());
-        Microbot.log("Local Path Distance: " + pathDistance);
+
+        int pathDistance = objectLocation != null ? objectLocation.distanceToPath(playerLocation.getWorldPoint()) : Integer.MAX_VALUE;
+        log("Local Path Distance: " + pathDistance);
 
         if (pathDistance > 20) {
             if (openDoorToObject(object, objectLocation)) {
                 return;
             }
-            Microbot.log("Local Path Distance is too far or unreachable, switching to WebWalker.");
-            WalkerState state = Rs2Walker.walkWithState(object.getWorldLocation(), 2);
+            if (plugin.getCurrentHome().equals(Home.ROSS)) {
+                log("Ross home, trying to use ladder.");
+                tryToUseLadder();
+                return;
+            }
+            log("Local Path Distance is too far or unreachable, switching to WebWalker.");
+
+            WalkerState state = Rs2Walker.walkWithState(object.getWorldLocation(), 3);
             if (state == WalkerState.UNREACHABLE) {
                 if (Rs2Player.getWorldLocation().getPlane() != object.getWorldLocation().getPlane()) {
                     tryToUseLadder();
-                    return;
                 } else {
-                    Microbot.log("All pathing failed, trying to interact anyways.");
+                    log("All pathing failed, trying to interact anyways.");
                     interactWithObject(object);
                 }
             } else if (state == WalkerState.ARRIVED) {
-                sleep(1200, 2200);
+                log("Arrived at object, trying to interact.");
+                interactWithObject(object);
             }
-            return;
-        }
 
-        Rs2Walker.setTarget(null);
-        interactWithObject(object);
+        } else
+            interactWithObject(object);
+
     }
 
     private void interactWithObject(GameObject object) {
-        String action = Objects.requireNonNull(Hotspot.getByObjectId(object.getId())).getRequiredAction();
+        Hotspot hotspot = Hotspot.getByObjectId(object.getId());
+        String action = Objects.requireNonNull(hotspot).getRequiredAction();
         if (Rs2GameObject.interact(object, action)) {
-            sleepUntil(() -> !action.equals(Objects.requireNonNull(Hotspot.getByObjectId(object.getId())).getRequiredAction()), 5000);
+            sleepUntil(() -> {
+                String newAction = Objects.requireNonNull(Hotspot.getByObjectId(object.getId())).getRequiredAction();
+                return !newAction.equals(action);
+            }, 5000);
+            sleep(200, 600);
         }
-        sleep(800, 1200);
+
     }
 
     private boolean openDoorToObject(GameObject object, Rs2WorldPoint objectLocation) {
         if (Rs2Player.getWorldLocation().getPlane() != object.getWorldLocation().getPlane()) {
             return false;
         }
-        Microbot.log("Local Path seems to be blocked, checking for doors to open.");
-        List<TileObject> doors = Rs2GameObject.getAll().stream()
-                .filter(Objects::nonNull)
-                .filter(w -> w.getWorldLocation().distanceTo2D(Rs2Player.getWorldLocation()) < 10)
-                .filter(w -> "Door".equals(Objects.requireNonNull(Rs2GameObject.getObjectComposition(w.getId())).getName()))
-                .collect(Collectors.toList());
+        log("Local Path seems to be blocked, checking for doors to open.");
+        List<WorldPoint> walkerPath = Rs2Walker.getWalkPath(objectLocation.getWorldPoint());
+        List<TileObject> doors = new ArrayList<>();
+        for (WorldPoint wp : walkerPath) {
+            TileObject door = null;
+            var tile = Rs2Walker.getTile(wp);
 
-        log.info("Found {} doors", doors.size());
-        log.info("Doors: {}", doors);
+            if (tile != null)
+                door = tile.getWallObject();
+
+            if (door == null)
+                door = Rs2GameObject.getGameObject(wp);
+
+            if (door == null) continue;
+
+            var objectComp = Rs2GameObject.getObjectComposition(door.getId());
+            if (objectComp == null) continue;
+
+            if (Arrays.asList(objectComp.getActions()).contains("Open")) {
+                doors.add(door);
+            }
+
+        }
+
+        logInfo("Found {} doors", doors.size());
+        log("Doors found: %s", doors.size());
 
         for (TileObject door : doors) {
             ObjectComposition doorComp = Rs2GameObject.getObjectComposition(door.getId());
@@ -146,16 +204,15 @@ public class MahoganyHomesScript extends Script {
                 actions = Arrays.asList(doorComp.getActions());
             }
             if (actions != null && actions.contains("Open")) {
-                List<WorldPoint> walkableTiles = Rs2Tile.getWalkableTilesAroundTile(door.getWorldLocation(), 2);
-                WorldPoint closestTile = walkableTiles.stream()
-                        .min(Comparator.comparingInt(wp -> objectLocation.distanceToPath(Microbot.getClient(), wp)))
-                        .orElse(null);
-                if (closestTile != null && objectLocation.distanceToPath(Microbot.getClient(), closestTile) < 10) {
-                    Microbot.log("Opening door to get to object");
-                    if (Rs2GameObject.interact(door, "Open")) {
-                        Rs2Player.waitForWalking();
+
+                log("Opening door at: %s", door.getWorldLocation());
+                logInfo("Opening door at: {}", door.getWorldLocation());
+                if (Rs2GameObject.interact(door, "Open")) {
+                    Rs2Player.waitForWalking();
+                    sleep(200, 500);
+                    // if it's the last door in the list return true
+                    if (door.equals(doors.get(doors.size() - 1)))
                         return true;
-                    }
                 }
             }
         }
@@ -163,44 +220,46 @@ public class MahoganyHomesScript extends Script {
     }
 
     private void tryToUseLadder() {
-        Microbot.log("Walker missing transport, trying to find ladder manually.");
+        log("Walker missing transport, trying to find ladder manually.");
+        int plane = Rs2Player.getWorldLocation().getPlane();
         TileObject closestLadder = Rs2GameObject.findObject(plugin.getCurrentHome().getLadders());
-        Rs2GameObject.interact(closestLadder);
-        sleep(600, 1200);
+        if (Rs2GameObject.interact(closestLadder)) {
+            sleepUntil(() -> Rs2Player.getWorldLocation().getPlane() != plane, 5000);
+            sleep(200, 600);
+        }
     }
 
 
     // Finish by talking to the NPC
     private void finish() {
-        if(plugin.getCurrentHome() != null
-        && plugin.getCurrentHome().isInside(Rs2Player.getWorldLocation())
-        && Hotspot.isEverythingFixed()) {
+        if (plugin.getCurrentHome() != null
+                && plugin.getCurrentHome().isInside(Rs2Player.getWorldLocation())
+                && Hotspot.isEverythingFixed()) {
             NPC npc = Rs2Npc.getNpc(plugin.getCurrentHome().getNpcId());
-            if(npc == null && Rs2Player.getWorldLocation().getPlane()>0) {
-                Microbot.log("We are on the wrong floor, Trying to find ladder to go down");
+            if (npc == null && Rs2Player.getWorldLocation().getPlane() > 0) {
+                log("We are on the wrong floor, Trying to find ladder to go down");
                 TileObject closestLadder = Rs2GameObject.findObject(plugin.getCurrentHome().getLadders());
-                if(Rs2GameObject.interact(closestLadder))
+                if (Rs2GameObject.interact(closestLadder))
                     sleepUntil(
                             () -> Rs2Player.getWorldLocation().getPlane() == 0
                             , 5000);
-                sleep(600,1200);
                 return;
             }
-            if(npc != null) {
+            if (npc != null) {
                 Rs2WorldPoint npcLocation = new Rs2WorldPoint(npc.getWorldLocation());
-                Microbot.log("Local NPC path distance: " + npcLocation.distanceToPath(Microbot.getClient(), Rs2Player.getWorldLocation()));
-                if(npcLocation.distanceToPath(Microbot.getClient(), Rs2Player.getWorldLocation()) < 10){
-                    if(Rs2Npc.interact(npc, "Talk-to")) {
-                        Microbot.log("Getting reward from NPC");
+                log("Local NPC path distance: " + npcLocation.distanceToPath(Rs2Player.getWorldLocation()));
+                if (npcLocation.distanceToPath(Rs2Player.getWorldLocation()) < 20) {
+                    if (Rs2Npc.interact(npc, "Talk-to")) {
+                        log("Getting reward from NPC");
                         sleepUntil(Rs2Dialogue::hasContinue, 10000);
-                        sleepUntil(() -> !Rs2Player.isInteracting() , 5000);
-                        sleep(1200,2200);
+                        sleepUntil(() -> !Rs2Dialogue.isInDialogue(), Rs2Dialogue::clickContinue, 6000, 300);
+                        sleep(600, 1200);
 
                     }
                 } else {
-                    Microbot.log("Local NPC path distance is too far, switching to WebWalker.");
+                    log("Local NPC path distance is too far, switching to WebWalker.");
                     Rs2Walker.walkTo(npc.getWorldLocation());
-                    sleep(1200,2200);
+                    sleep(1200, 2200);
                 }
             }
         }
@@ -208,33 +267,27 @@ public class MahoganyHomesScript extends Script {
 
     // Get new contract
     private void getNewContract() {
-        if(plugin.getCurrentHome() == null) {
+        if (plugin.getCurrentHome() == null) {
             WorldPoint contractLocation = getClosestContractLocation();
-            if(contractLocation.distanceTo2D(Rs2Player.getWorldLocation()) > 10) {
-                Microbot.log("Walking to contract NPC");
-                Rs2Walker.walkWithState(contractLocation,5);
+            if (contractLocation.distanceTo2D(Rs2Player.getWorldLocation()) > 10) {
+                log("Walking to contract NPC");
+                Rs2Walker.walkWithState(contractLocation, 5);
 
-            }
-            else {
-                Microbot.log("Getting new contract");
-                List<NPC> allNpcs = Rs2Npc.getNpcs().filter(n -> n.getWorldLocation().distanceTo(Rs2Player.getWorldLocation())<10).collect(Collectors.toList());
-                NPC finalNpc = null;
-                for(NPC npc : allNpcs) {
-                    // Mahogany Homes NPCs require both composition and transform to get correct actions
-                    if(Arrays.toString(npc.getComposition().transform().getActions()).contains("Contract")) {
-                        finalNpc = npc;
-                        break;
-                    }
+            } else {
+                log("Getting new contract");
+
+
+                NPC npc = Rs2Npc.getNpcWithAction("Contract");
+                if (npc == null) {
+                    return;
                 }
-
-
-                NPC npc = finalNpc;
-                Microbot.log("NPC found: " + (npc != null ? npc.getComposition().transform().getName() : null));
+                log("NPC found: " + npc.getComposition().transform().getName());
                 if (Rs2Npc.interact(npc, "Contract")) {
                     sleepUntil(Rs2Dialogue::hasSelectAnOption, 5000);
-                    sleep(1200, 2200);
                     Rs2Dialogue.keyPressForDialogueOption(plugin.getConfig().currentTier().getPlankSelection().getChatOption());
-                    sleepUntil(() -> !Rs2Dialogue.hasSelectAnOption(), 5000);
+                    sleepUntil(Rs2Dialogue::hasContinue, 10000);
+                    sleep(400, 800);
+                    sleepUntil(() -> !Rs2Dialogue.isInDialogue(), Rs2Dialogue::clickContinue, 6000, 300);
                     sleep(1200, 2200);
                 }
 
@@ -246,31 +299,29 @@ public class MahoganyHomesScript extends Script {
 
     // Bank if we need to
     private void bank() {
-        if(plugin.getCurrentHome() != null
-        && !plugin.getCurrentHome().isInside(Rs2Player.getWorldLocation())
-        && isMissingItems()) {
-            if(Rs2Bank.walkToBankAndUseBank()){
-                sleep(600,1200);
-                if(Rs2Inventory.getEmptySlots()-steelBarsNeeded() > 0)
-                    Rs2Bank.withdrawX(plugin.getConfig().currentTier().getPlankSelection().getPlankId(),Rs2Inventory.getEmptySlots()-steelBarsNeeded());
-                sleep(600,1200);
-                if(steelBarsNeeded()>steelBarsInInventory()) {
-                    Rs2Bank.withdrawX(ItemID.STEEL_BAR,steelBarsNeeded());
-                    sleep(600,1200);
+        if (plugin.getCurrentHome() != null
+                && !plugin.getCurrentHome().isInside(Rs2Player.getWorldLocation())
+                && isMissingItems()) {
+            if (Rs2Bank.walkToBankAndUseBank()) {
+                sleep(600, 1200);
+                if (Rs2Inventory.getEmptySlots() - steelBarsNeeded() > 0)
+                    Rs2Bank.withdrawX(plugin.getConfig().currentTier().getPlankSelection().getPlankId(), Rs2Inventory.getEmptySlots() - steelBarsNeeded());
+                sleep(600, 1200);
+                if (steelBarsNeeded() > steelBarsInInventory()) {
+                    Rs2Bank.withdrawX(ItemID.STEEL_BAR, steelBarsNeeded());
+                    sleep(600, 1200);
                 }
                 Rs2Bank.closeBank();
-                return;
             }
-            sleep(600,1200);
         }
     }
 
     // Walk to current home
     private void walkToHome() {
-        if(plugin.getCurrentHome() != null
-        && !plugin.getCurrentHome().isInside(Rs2Player.getWorldLocation())
-        && !isMissingItems()) {
-            Rs2Walker.walkWithState(plugin.getCurrentHome().getLocation(),3);
+        if (plugin.getCurrentHome() != null
+                && !plugin.getCurrentHome().isInside(Rs2Player.getWorldLocation())
+                && !isMissingItems()) {
+            Rs2Walker.walkWithState(plugin.getCurrentHome().getLocation(), 3);
         }
     }
 

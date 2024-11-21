@@ -2,7 +2,7 @@ package net.runelite.client.plugins.microbot.playerassist;
 
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.config.*;
-import net.runelite.client.plugins.inventorysetups.InventorySetup;
+import net.runelite.client.plugins.microbot.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.microbot.playerassist.enums.PlayStyle;
 import net.runelite.client.plugins.microbot.playerassist.enums.PrayerStyle;
 

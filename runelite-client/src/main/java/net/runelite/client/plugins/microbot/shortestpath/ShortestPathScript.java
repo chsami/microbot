@@ -19,7 +19,6 @@ public class ShortestPathScript extends Script {
     private WorldPoint triggerWalker;
 
     public boolean run() {
-        Microbot.enableAutoRunOn = true;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;

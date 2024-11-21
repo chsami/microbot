@@ -238,10 +238,10 @@ public class BlastoiseFurnaceScript extends Script {
     }
 
     private void retrieveGold() {
-        Rs2Bank.withdrawAll(GOLD_ORE);
-        sleep(100);
-        sleepUntil(() -> Rs2Inventory.hasItem(GOLD_ORE));
-        sleep(100);
+        if (!Rs2Inventory.hasItem(GOLD_ORE)) {
+            Rs2Bank.withdrawAll(GOLD_ORE);
+            return;
+        }
        depositOre();
 
         Rs2Walker.walkFastCanvas(new WorldPoint(1940, 4962, 0));

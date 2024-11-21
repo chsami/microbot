@@ -18,7 +18,7 @@ public class Rs2LocalPoint {
         // Extract the coordinates from the WorldPoint
         int worldX = worldPoint.getX();
         int worldY = worldPoint.getY();
-        int worldPlane = 0;
+        int worldPlane = Microbot.getClient().getTopLevelWorldView().getPlane();
 
         // Loop through all chunks to find which one contains the world point
         for (int chunkX = 0; chunkX < instanceTemplateChunks[worldPlane].length; chunkX++)

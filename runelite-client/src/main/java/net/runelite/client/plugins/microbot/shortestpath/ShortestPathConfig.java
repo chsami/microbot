@@ -320,6 +320,17 @@ public interface ShortestPathConfig extends Config {
         return true;
     }
 
+    @ConfigItem(
+            keyName = "useQuetzals",
+            name = "Use quetzals",
+            description = "Whether to include quetzals in the path.<br>",
+            position = 25,
+            section = sectionSettings
+    )
+    default boolean useQuetzals() {
+        return true;
+    }
+
     @ConfigSection(
             name = "Display",
             description = "Options for displaying the path on the world map, minimap and scene tiles",

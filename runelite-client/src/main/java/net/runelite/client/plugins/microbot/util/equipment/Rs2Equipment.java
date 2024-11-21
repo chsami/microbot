@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class Rs2Equipment {
     public static ItemContainer equipment() {
@@ -114,6 +115,43 @@ public class Rs2Equipment {
 
     public static Rs2Item get(String name) {
         return get(name, false);
+    }
+
+    /**
+     * Checks if the equipment contains an item that matches the specified predicate.
+     *
+     * @param predicate The predicate to apply.
+     * @return True if the equipment contains an item that matches the predicate, false otherwise.
+     */
+    public static boolean contains(Predicate<Rs2Item> predicate) {
+        return items().stream().anyMatch(predicate);
+    }
+
+    /**
+     * Retrieves an equipped item that matches the specified predicate.
+     *
+     * @param predicate The predicate to apply.
+     * @return The matching `Rs2Item` if found, or null otherwise.
+     */
+    public static Rs2Item get(Predicate<Rs2Item> predicate) {
+        return items().stream().filter(predicate).findFirst().orElse(null);
+    }
+
+
+    /**
+     * Interacts with an equipped item matching the predicate.
+     *
+     * @param predicate The predicate to identify the item.
+     * @param action    The action to perform.
+     * @return True if the interaction was successful, false otherwise.
+     */
+    public static boolean interact(Predicate<Rs2Item> predicate, String action) {
+        Rs2Item item = get(predicate);
+        if (item != null) {
+            invokeMenu(item, action);
+            return true;
+        }
+        return false;
     }
 
 
@@ -315,6 +353,10 @@ public class Rs2Equipment {
 
     public static boolean isWearingShield() {
         return equipmentItems.stream().anyMatch(x -> x.getSlot() == EquipmentInventorySlot.SHIELD.getSlotIdx());
+    }
+
+    public static boolean isNaked() {
+        return equipmentItems.stream().allMatch(x -> x.id == -1);
     }
 
     public static void invokeMenu(Rs2Item rs2Item, String action) {

@@ -3,7 +3,6 @@ package net.runelite.client.plugins.microbot.shadeskiller.enums;
 import lombok.AllArgsConstructor;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.questhelper.requirements.util.Operation;
 
 import java.util.Arrays;
 import java.util.List;

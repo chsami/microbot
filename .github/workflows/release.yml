@@ -27,11 +27,11 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "1.6.0"
+          automatic_release_tag: "1.6.1.1"
           prerelease: false
-          title: "Release 1.6.0"
+          title: "Release 1.6.1.1"
           files: |
-            /home/runner/work/microbot/microbot/runelite-client/target/microbot-*.jar
+            /home/runner/work/Microbot/Microbot/runelite-client/target/microbot-*.jar
 
       - name: Upload Jar
         uses: "bacongobbler/azure-blob-storage-upload@main"
