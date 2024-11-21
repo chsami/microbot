@@ -474,7 +474,7 @@ public class BanksBankStanderScript extends Script {
             //System.out.println("Attempting to check fourth item");
             if (fourthItemId != null && ((Rs2Bank.bankItems.stream().filter(item -> item.id == fourthItemId).mapToInt(item -> item.quantity).sum() + Rs2Inventory.count(fourthItemId))) < config.fourthItemQuantity()) {
                 return fourthItemId.toString();
-            } else if (fourthItemId == null || (Rs2Bank.count(fourthItemIdentifier) + Rs2Inventory.count(fourthItemIdentifier)) >= config.fourthItemQuantity()) {
+            } else if (fourthItemId == null && (Rs2Bank.count(fourthItemIdentifier) + Rs2Inventory.count(fourthItemIdentifier)) >= config.fourthItemQuantity()) {
                 return fourthItemIdentifier;
             }
         }
