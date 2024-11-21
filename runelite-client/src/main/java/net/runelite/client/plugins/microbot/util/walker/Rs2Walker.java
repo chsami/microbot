@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.util.walker;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
@@ -54,6 +55,7 @@ import static net.runelite.client.plugins.microbot.util.walker.Rs2MiniMap.worldT
  * TODO:
  * 1. fix teleports starting from inside the POH
  */
+@Slf4j
 public class Rs2Walker {
     @Setter
     public static ShortestPathConfig config;
@@ -248,7 +250,8 @@ public class Rs2Walker {
             for (int i = indexOfStartPoint; i < path.size(); i++) {
                 WorldPoint currentWorldPoint = path.get(i);
 
-                System.out.println("start loop " + i);
+//                System.out.println("start loop " + i);
+                log.info("Walker loop: {}", i);
 
                 if (ShortestPathPlugin.getMarker() == null) {
                     System.out.println("market is null");
@@ -290,7 +293,6 @@ public class Rs2Walker {
                     }
                 }
             }
-
 
             if (!doorOrTransportResult) {
                 if (!path.isEmpty()) {

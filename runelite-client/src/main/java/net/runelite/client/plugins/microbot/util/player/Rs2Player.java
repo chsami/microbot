@@ -526,6 +526,15 @@ public class Rs2Player {
     }
 
     /**
+     * Checks player current health
+     *
+     * @return
+     */
+    public static int checkCurrentHealth() {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS);
+    }
+
+    /**
      * Checks if the player has full health
      *
      * @return
