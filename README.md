@@ -24,12 +24,16 @@ If you enjoy my open source work and would like to support me, consider buying m
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-donate-yellow)](https://www.paypal.com/paypalme/MicrobotBE?country.x=BE)
 
 
-![image](https://github.com/user-attachments/assets/4413ee64-8d64-401b-bc01-ad0ed57c361c)
+![image](https://github.com/user-attachments/assets/c510631d-5ecf-4968-a916-2942f9b754f8)
 
 
-Address: bc1q4c63nc5jt9wem87cy7llsk2ur5psjnqhltt2kf
+BTC Address: bc1q4c63nc5jt9wem87cy7llsk2ur5psjnqhltt2kf
 
-![image](https://github.com/user-attachments/assets/f19be9cd-d43d-4102-89bc-bdce03dda923)
+LTC Address: ltc1qgk0dkchfd8tf7jvtj5708vheq82k2wyqucrqs7
+
+ETC Address: 0xf8A6d6Fae32319A93341aE45F1ED87DA2Aa04132
+
+DOGE Address: DNHQDHKn7MKdMQRZyoSrJ68Lnd1D9bjbTn
 
 
 Thank you for your support! 😊
