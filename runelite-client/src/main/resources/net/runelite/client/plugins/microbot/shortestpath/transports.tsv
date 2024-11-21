@@ -4506,3 +4506,6 @@
 # Hunter Guild
 1558 3047 0	1558 9451 0	Climb-down;Stairs;51641				8
 1558 9451 0	1558 3047 0	Climb-up;Stairs;51642				8
+# Piscatoris Hunting Area
+2371 3622 0	2371 3620 0	Climb-over;Stile;19222				8
+2371 3620 0	2371 3622 0	Climb-over;Stile;19222				8
