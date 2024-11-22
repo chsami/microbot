@@ -1,7 +1,7 @@
 # Destination	Skills	Item IDs	Quests	Duration	Display info	Consumable	Wilderness level	Varbits
 # Ardougne Cloaks (2-4's farm teleport is limited to 3,5, or infinite times - can this be validated?)								
 2606 3221 0		13121;13122;13123;13124;20760		4	Ardougne cloak: Kandarin Monastery	F	20	
-2664 3374 0		13122;13123;13124;20760		4	Ardougne cloak: Farm	F	20	
+2664 3374 0		13122;13123;13124;20760		4	Ardougne cloak: Ardougne Farm	F	20	
 # Karamja Gloves								
 2840 9387 0		11140;13103		4	Karamja gloves	F	20	
 # Desert Amulets (2 and 3 have one teleport per day, 4 is unlimited)								
