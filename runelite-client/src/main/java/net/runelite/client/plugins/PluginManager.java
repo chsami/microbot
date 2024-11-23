@@ -106,7 +106,6 @@ public class PluginManager
 	{
 		this.developerMode = developerMode;
 		this.safeMode = safeMode;
-		this.disableWalkerUpdate = disableWalkerUpdate;
 		this.eventBus = eventBus;
 		this.scheduler = scheduler;
 		this.configManager = configManager;
