@@ -209,7 +209,7 @@ public class AgilityScript extends Script {
                             Rs2Magic.alch(config.item(), 50, 100);
                         }
                         if (Rs2Player.getWorldLocation().distanceTo(startCourse) < 100) {//extra check for prif course
-                            Rs2Walker.walkTo(startCourse, 15);
+                            Rs2Walker.walkTo(startCourse, 8);
                             Microbot.log("Going back to course's starting point");
                             isWalkingToStart = true;
                             return;
