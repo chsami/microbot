@@ -293,13 +293,14 @@ public class Rs2Walker {
                 }
             }
 
-
             if (!doorOrTransportResult) {
                 if (!path.isEmpty()) {
                     var moveableTiles = Rs2Tile.getReachableTilesFromTile(path.get(path.size() - 1), Math.min(3, distance)).keySet().toArray(new WorldPoint[0]);
                     var finalTile = moveableTiles.length > 0 ? moveableTiles[Random.random(0, moveableTiles.length)] : path.get(path.size() - 1);
 
-                    if (Rs2Tile.isTileReachable(finalTile)) {
+
+                    Microbot.log("Distance check: " + (Rs2Player.getWorldLocation().distanceTo(target) > distance));
+                    if (Rs2Tile.isTileReachable(finalTile) && Rs2Player.getWorldLocation().distanceTo(target) > distance) {
                         if (Rs2Walker.walkFastCanvas(finalTile)) {
                             sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo(finalTile) < 2, 3000);
                         }
@@ -309,6 +310,7 @@ public class Rs2Walker {
             }
             if (Rs2Player.getWorldLocation().distanceTo(target) < distance) {
                 setTarget(null);
+                sleep(300);
                 return WalkerState.ARRIVED;
             } else {
                 return processWalk(target, distance);
@@ -324,6 +326,7 @@ public class Rs2Walker {
         }
         return WalkerState.EXIT;
     }
+
 
     public static boolean walkNextTo(GameObject target) {
         Rs2WorldArea gameObjectArea = new Rs2WorldArea(Objects.requireNonNull(Rs2GameObject.getWorldArea(target)));
