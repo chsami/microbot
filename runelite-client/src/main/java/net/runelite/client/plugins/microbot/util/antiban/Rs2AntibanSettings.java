@@ -96,8 +96,8 @@ public class Rs2AntibanSettings {
     public static boolean takeMicroBreaks = false; // will take micro breaks lasting 3-15 minutes at random intervals by default.
     public static boolean playSchedule = false; //TODO: Implement this
     public static boolean universalAntiban = false; // Will attempt to use the same antiban settings for all plugins that has not yet implemented their own antiban settings.
-    public static int microBreakDurationLow = 3; // 3 minutes
-    public static int microBreakDurationHigh = 15; // 15 minutes
+    public static int microBreakDurationLow = AntibanPlugin.MICRO_BREAK_DURATION_LOW_DEFAULT; // 3 minutes
+    public static int microBreakDurationHigh = AntibanPlugin.MICRO_BREAK_DURATION_HIGH_DEFAULT; // 15 minutes
     public static double actionCooldownChance = 0.1; // 10% chance of activating the action cooldown by default
     public static double microBreakChance = 0.1; // 10% chance of taking a micro break by default
     public static double moveMouseRandomlyChance = 0.1; // 10% chance of moving the mouse randomly by default

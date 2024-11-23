@@ -80,7 +80,6 @@ import java.util.TimerTask;
         hidden = true
 )
 
-
 public class AntibanPlugin extends Plugin {
 
     private static final int COOK_TIMEOUT = 3;
@@ -94,6 +93,12 @@ public class AntibanPlugin extends Plugin {
     private boolean ready;
     private Skill lastSkillChanged;
     private NavigationButton navButton;
+    public static final int MICRO_BREAK_DURATION_LOW_DEFAULT = 3;
+    public static final int MICRO_BREAK_DURATION_HIGH_DEFAULT = 15;
+    private static final int MICRO_BREAK_DURATION_LOW_MIN = 1;
+    private static final int MICRO_BREAK_DURATION_LOW_MAX = 10;
+    private static final int MICRO_BREAK_DURATION_HIGH_MIN = 1;
+    private static final int MICRO_BREAK_DURATION_HIGH_MAX = 30;
 
     @Inject
     private OverlayManager overlayManager;
@@ -153,6 +158,8 @@ public class AntibanPlugin extends Plugin {
                 .priority(1)
                 .panel(panel)
                 .build();
+        
+        validateAndSetBreakDurations();
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -223,6 +230,8 @@ public class AntibanPlugin extends Plugin {
             }
             idleTicks = 0;
         }
+
+        validateAndSetBreakDurations();
 
         if (Rs2AntibanSettings.takeMicroBreaks && !Microbot.isPluginEnabled(BreakHandlerPlugin.class)) {
             if (Rs2AntibanSettings.devDebug)
@@ -305,5 +314,51 @@ public class AntibanPlugin extends Plugin {
         }
     }
 
+    /**
+     * Validates and ensures the micro break duration settings are within acceptable thresholds.
+     *
+     * <p>This method checks the values of {@code Rs2AntibanSettings.microBreakDurationLow} and
+     * {@code Rs2AntibanSettings.microBreakDurationHigh} to ensure they fall within their
+     * respective minimum and maximum bounds. If a value is outside the allowed range,
+     * it is reset to its default value. Additionally, it ensures that the low duration
+     * does not exceed the high duration, resetting both to their defaults if necessary.</p>
+     *
+     * <h3>Validation Rules:</h3>
+     * <ul>
+     *   <li>{@code microBreakDurationLow} must be between {@code MICRO_BREAK_DURATION_LOW_MIN} and {@code MICRO_BREAK_DURATION_LOW_MAX}.</li>
+     *   <li>{@code microBreakDurationHigh} must be between {@code MICRO_BREAK_DURATION_HIGH_MIN} and {@code MICRO_BREAK_DURATION_HIGH_MAX}.</li>
+     *   <li>{@code microBreakDurationLow} must not exceed {@code microBreakDurationHigh}.</li>
+     * </ul>
+     *
+     * <h3>Behavior:</h3>
+     * <ul>
+     *   <li>If {@code microBreakDurationLow} is out of bounds, it is reset to {@code MICRO_BREAK_DURATION_LOW_DEFAULT}.</li>
+     *   <li>If {@code microBreakDurationHigh} is out of bounds, it is reset to {@code MICRO_BREAK_DURATION_HIGH_DEFAULT}.</li>
+     *   <li>If {@code microBreakDurationLow} exceeds {@code microBreakDurationHigh}, both are reset to their defaults.</li>
+     * </ul>
+     *
+     * <h3>Usage:</h3>
+     * <p>This method should be called during plugin initialization or whenever the settings
+     * are loaded or modified to ensure the durations remain consistent and valid.</p>
+     */
+    private void validateAndSetBreakDurations() {
+        // Validate and correct microBreakDurationLow
+        if (Rs2AntibanSettings.microBreakDurationLow < MICRO_BREAK_DURATION_LOW_MIN
+                || Rs2AntibanSettings.microBreakDurationLow > MICRO_BREAK_DURATION_LOW_MAX) {
+            Rs2AntibanSettings.microBreakDurationLow = MICRO_BREAK_DURATION_LOW_DEFAULT;
+        }
+
+        // Validate and correct microBreakDurationHigh
+        if (Rs2AntibanSettings.microBreakDurationHigh < MICRO_BREAK_DURATION_HIGH_MIN
+                || Rs2AntibanSettings.microBreakDurationHigh > MICRO_BREAK_DURATION_HIGH_MAX) {
+            Rs2AntibanSettings.microBreakDurationHigh = MICRO_BREAK_DURATION_HIGH_DEFAULT;
+        }
+
+        // Ensure microBreakDurationLow is not greater than microBreakDurationHigh
+        if (Rs2AntibanSettings.microBreakDurationLow > Rs2AntibanSettings.microBreakDurationHigh) {
+            Rs2AntibanSettings.microBreakDurationLow = MICRO_BREAK_DURATION_LOW_DEFAULT;
+            Rs2AntibanSettings.microBreakDurationHigh = MICRO_BREAK_DURATION_HIGH_DEFAULT;
+        }
+    }
 }
 
