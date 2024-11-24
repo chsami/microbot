@@ -19,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -31,6 +32,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -483,12 +485,25 @@ public class Rs2Player {
         return false;
     }
 
+    /**
+     * Get a list of players around you
+     * @return
+     */
     public static List<Player> getPlayers() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getPlayers()
+        return Microbot.getClient()
+                .getTopLevelWorldView()
+                .players()
                 .stream()
+                .filter(Objects::nonNull)
                 .filter(x -> x != Microbot.getClient().getLocalPlayer())
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
     }
+
+ /*   public static List<Player> getPlayersInNonCombat() {
+        return getPlayers()
+                .stream()
+                .filter(x -> x.)
+    }*/
 
     /**
      * Gets the players current world location
@@ -772,5 +787,80 @@ public class Rs2Player {
 
     public static boolean isStunned() {
         return Microbot.getClient().getLocalPlayer().hasSpotAnim(245);
+    }
+
+    /**
+     * Invokes the "attack" action on the specified player.
+     *
+     * @param player the player to attack
+     * @return true if the action was invoked successfully, false otherwise
+     */
+    public static boolean attack(Player player) {
+        return invokeMenu(player, "attack");
+    }
+
+    /**
+     * Invokes the "walk here" action to move to the same location as the specified player.
+     *
+     * @param player the player under whose position to walk
+     * @return true if the action was invoked successfully, false otherwise
+     */
+    public static boolean walkUnder(Player player) {
+        return invokeMenu(player, "walk here");
+    }
+
+    /**
+     * Invokes the "trade with" action on the specified player.
+     *
+     * @param player the player to trade with
+     * @return true if the action was invoked successfully, false otherwise
+     */
+    public static boolean trade(Player player) {
+        return invokeMenu(player, "trade with");
+    }
+
+    /**
+     * Invokes the "follow" action on the specified player.
+     *
+     * @param player the player to follow
+     * @return true if the action was invoked successfully, false otherwise
+     */
+    public static boolean follow(Player player) {
+        return invokeMenu(player, "follow");
+    }
+
+    /**
+     * Executes a specific menu action on a given player.
+     *
+     * @param player the player to interact with
+     * @param action the action to invoke (e.g., "attack", "walk here", "trade with", "follow")
+     * @return true if the action was invoked successfully, false otherwise
+     */
+    private static boolean invokeMenu(Player player, String action) {
+        if (player == null) return false;
+
+        // Set the current status for the action being performed
+        Microbot.status = action + " " + player.getName();
+
+        // Determine the appropriate menu action based on the action string
+        MenuAction menuAction = MenuAction.CC_OP;
+
+        if (action.equalsIgnoreCase("attack")) {
+            menuAction = MenuAction.PLAYER_SECOND_OPTION;
+        } else if (action.equalsIgnoreCase("walk here")) {
+            menuAction = MenuAction.WALK;
+        } else if (action.equalsIgnoreCase("follow")) {
+            menuAction = MenuAction.PLAYER_THIRD_OPTION;
+        } else if (action.equalsIgnoreCase("trade with")) {
+            menuAction = MenuAction.PLAYER_FOURTH_OPTION;
+        }
+
+        // Invoke the menu entry using the selected action
+        Microbot.doInvoke(
+                new NewMenuEntry(0, 0, menuAction.getId(), player.getId(), -1, player.getName(), player),
+                Rs2UiHelper.getActorClickbox(player)
+        );
+
+        return true;
     }
 }
