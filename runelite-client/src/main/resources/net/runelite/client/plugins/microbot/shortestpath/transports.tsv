@@ -2289,8 +2289,8 @@
 2914 3222 1	2913 3221 0	Climb-down;Ship's ladder;9745				2	
 2914 3220 1	2913 3221 0	Climb-down;Ship's ladder;9745				2	
 2915 3221 1	2913 3221 0	Climb-down;Ship's ladder;9745				2	
-2909 3226 0	2909 3229 1	Cross;Gangplank;34667				3	
-2909 3229 1	2909 3226 0	Cross;Gangplank;34668				3	
+2909 3226 0	2909 3229 1	Cross;Gangplank;34667				1	
+2909 3229 1	2909 3226 0	Cross;Gangplank;34668				1	
 2933 3289 0	2933 3288 0	Open;Guild Door;14910	40 Crafting	1 Brown apron		1	
 2933 3288 0	2933 3289 0	Open;Guild Door;14910				1	
 2941 3248 0	2940 3248 0	Open;Door;2595		1 Maze key		1	
@@ -4486,7 +4486,8 @@
 1639 3673 0	1666 10050 0	Investigate;Statue;27785					
 1666 10050 0	1639 3673 0	Climb-up;Vine ladder;28894					
 #corsair cove							
-2578 2837 1	2578 2840 0	Cross;Gangplank;31756					
+2578 2840 0	2578 2837 1	Cross;Gangplank;31756				1	
+2578 2837 1	2578 2840 0	Cross;Gangplank;31756				1	
 #mining guild							
 3021 9739 0	3021 3339 0	Climb-up;Ladder;17385					
 3021 3339 0	3021 9739 0	Climb-down;Ladder;30367					
