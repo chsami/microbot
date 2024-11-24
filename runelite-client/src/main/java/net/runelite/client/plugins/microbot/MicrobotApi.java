@@ -75,7 +75,7 @@ public class MicrobotApi {
                 .build())
                 .execute()) {
             if (!response.isSuccessful()) {
-                throw new IOException("Unsuccessful ping");
+                throw new IOException("Unsuccessful in sending runtime statistics to api");
             }
         }
     }
