@@ -68,7 +68,7 @@ public class MicrobotApi {
         Map<String, Integer> scriptRuntimeMap = Microbot.getActiveScripts().stream()
                 .collect(Collectors.toMap(
                         x -> x.getClass().getSimpleName(), // Key: Simple name of the class
-                        x -> (int) x.getRunTime().toMinutes()   // Value: Runtime in seconds
+                        x -> (int) x.getRunTime().toMinutes()   // Value: Runtime in minutes
                 ));
         try (Response response = client.newCall(new Request.Builder().url(microbotApiUrl + "/script/runtime")
                 .post(RequestBody.create(JSON, gson.toJson(new ScriptStats(scriptRuntimeMap))))
