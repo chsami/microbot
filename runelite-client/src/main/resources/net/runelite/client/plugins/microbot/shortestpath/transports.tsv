@@ -1506,7 +1506,6 @@
 2775 3234 1	2776 3235 0	Climb-down;Ship's ladder;9745					
 2808 3162 0	2808 3162 1	Climb-up;Ladder;16683				3	
 2808 3162 1	2808 3162 0	Climb-down;Ladder;16679				3	
-							
 # Karamja Volcano							
 2855 3169 0	2855 9569 0	Climb-down;Rocks;11441					
 2855 9569 0	2856 3167 0	Climb;Climbing rope;18969					
@@ -4509,3 +4508,5 @@
 # Piscatoris Hunting Area
 2371 3622 0	2371 3620 0	Climb-over;Stile;19222				8
 2371 3620 0	2371 3622 0	Climb-over;Stile;19222				8
+# Taverly dungeon
+2924 9803 0	2923 9803 0	Open;Gate;2623		1590			Taverly gate

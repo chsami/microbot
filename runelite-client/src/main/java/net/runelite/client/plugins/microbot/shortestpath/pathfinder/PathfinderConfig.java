@@ -357,6 +357,10 @@ public class PathfinderConfig {
 
         TransportType type = transport.getType();
 
+        if (transport.getObjectId() == 28849) {
+            System.out.println("hello world");
+        }
+
         if (AGILITY_SHORTCUT.equals(type) && (!useAgilityShortcuts || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
         } else if (GRAPPLE_SHORTCUT.equals(type) && (!useGrappleShortcuts || !client.getWorldType().contains(WorldType.MEMBERS))) {
@@ -446,8 +450,12 @@ public class PathfinderConfig {
     private boolean hasRequiredLevels(Restriction restriction) {
         int[] requiredLevels = restriction.getSkillLevels();
         for (int i = 0; i < boostedLevels.length; i++) {
+
+            if (Skill.values()[i] == Skill.AGILITY && requiredLevels[i] > 0 && !config.useAgilityShortcuts()) return false;
+
             int boostedLevel = boostedLevels[i];
             int requiredLevel = requiredLevels[i];
+
             if (boostedLevel < requiredLevel) {
                 return false;
             }
