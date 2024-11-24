@@ -357,9 +357,6 @@ public class PathfinderConfig {
 
         TransportType type = transport.getType();
 
-        if (transport.getObjectId() == 28849) {
-            System.out.println("hello world");
-        }
 
         if (AGILITY_SHORTCUT.equals(type) && (!useAgilityShortcuts || !client.getWorldType().contains(WorldType.MEMBERS))) {
             return false;
