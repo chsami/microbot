@@ -29,7 +29,7 @@ public enum BankLocation {
     CASTLE_WARS(new WorldPoint(2443, 3083, 0)),
     CATHERBY(new WorldPoint(2808, 3441, 0)),
     COOKS_GUILD(new WorldPoint(3147,3450,0)),
-    CORSAIR_COVE(new WorldPoint(2570, 2854, 0)),
+    CORSAIR_COVE(new WorldPoint(2570, 2864, 0)),
     CRAFTING_GUILD(new WorldPoint(2936, 3281, 0)),
     DIHN_BANK(new WorldPoint(1640, 3944, 0)),
     DRAYNOR(new WorldPoint(3092, 3243, 0)),
