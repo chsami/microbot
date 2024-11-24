@@ -5,10 +5,12 @@
 # Karamja Gloves								
 2840 9387 0		11140;13103		4	Karamja gloves	F	20	
 # Desert Amulets (2 and 3 have one teleport per day, 4 is unlimited)								
-3420 2917 0		13134;13135		4	Desert amulet	F	20	
+3420 2917 0		13134;13135		4	Desert amulet	F	20	4558=0
 3426 2927 0		13136		4	Desert amulet	F	20	
 # Morytania Legs (2 and 3 have 5 teleports per day to slime, 4 is unlimited)								
-3683 9888 0		13113;13114;13115		4	Morytania legs: Slime Pit	F	20	
+3683 9888 0		13112		4	Morytania legs: Ectofuntus Pit	F	20	4542<2
+3683 9888 0		13113;13114		4	Morytania legs: Ectofuntus Pit	F	20	4542<5
+3683 9888 0		13115		4	Morytania legs: Ectofuntus Pit	F	20	
 3482 3230 0		13114;13115		4	Morytania legs: Burgh de Rott	F	20	
 # Fremennik sea boots (1,2,3 have 1 teleport per day, 4 is unlimited)								
 2643 3675 0		13129;13130;13131		4	Fremennik sea boots	F	20	5005=0
