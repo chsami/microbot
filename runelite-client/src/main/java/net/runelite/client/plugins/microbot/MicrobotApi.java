@@ -6,7 +6,6 @@ import net.runelite.client.RuneLiteProperties;
 import okhttp3.*;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,19 +16,18 @@ import java.util.stream.Collectors;
 
 import static net.runelite.http.api.RuneLiteAPI.JSON;
 
+/**
+ * Class that communicates with the microbot api
+ */
 public class MicrobotApi {
 
     private final OkHttpClient client;
-    private final HttpUrl sessionUrl;
     private final Gson gson;
 
     private final String microbotApiUrl = "https://microbot-api.azurewebsites.net/api";
-
-
     @Inject
-    MicrobotApi(OkHttpClient client, @Named("runelite.session") HttpUrl sessionUrl, Gson gson) {
+    MicrobotApi(OkHttpClient client, Gson gson) {
         this.client = client;
-        this.sessionUrl = sessionUrl;
         this.gson = gson;
     }
 
