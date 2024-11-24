@@ -25,7 +25,6 @@ public class ShortestPathScript extends Script {
 
                 if (getTriggerWalker() != null) {
                     WalkerState state = Rs2Walker.walkWithState(getTriggerWalker());
-                    Microbot.log("FINISHED LOOP : " + state.toString());
                     if (state == WalkerState.ARRIVED || state == WalkerState.UNREACHABLE) {
                         setTriggerWalker(null);
                     }
