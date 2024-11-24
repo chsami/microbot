@@ -7,6 +7,7 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.kit.KitType;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -29,10 +30,8 @@ import net.runelite.http.api.worlds.WorldType;
 import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -278,6 +277,7 @@ public class Rs2Player {
 
     /**
      * Checks if a player is in a member world
+     *
      * @return true if in a member world
      */
     public static boolean isInMemberWorld() {
@@ -487,6 +487,7 @@ public class Rs2Player {
 
     /**
      * Get a list of players around you
+     *
      * @return
      */
     public static List<Player> getPlayers() {
@@ -499,11 +500,75 @@ public class Rs2Player {
                 .collect(Collectors.toList());
     }
 
- /*   public static List<Player> getPlayersInNonCombat() {
+    /**
+     * Use this method to get a list of players that are in combat
+     *
+     * @return a list of players that are in combat
+     */
+    public static List<Player> getPlayersInCombat() {
         return getPlayers()
                 .stream()
-                .filter(x -> x.)
-    }*/
+                .filter(x -> x != null && x.getHealthRatio() != -1)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Calculates the player's health as a percentage.
+     *
+     * @param player The player or actor to calculate health for.
+     * @return The health percentage, or -1 if health information is unavailable.
+     */
+    public static int calculateHealthPercentage(Player player) {
+        int healthRatio = player.getHealthRatio();
+        int healthScale = player.getHealthScale();
+
+        // Check if health information is available
+        if (healthRatio == -1 || healthScale == -1 || healthScale == 0) {
+            return -1; // Health information is missing or invalid
+        }
+
+        // Calculate health percentage
+        return (int) ((healthRatio / (double) healthScale) * 100);
+    }
+
+    /**
+     * This method retrieves the id of the equipment
+     *
+     * @param player
+     * @return
+     */
+    public static Map<KitType, Integer> getPlayerEquipmentIds(Player player) {
+
+        Map<KitType, Integer> list = new HashMap<>();
+
+        for (KitType kitType : KitType.values()) {
+            int itemId = player.getPlayerComposition().getEquipmentId(kitType);
+            list.put(kitType, itemId);
+        }
+
+        return list;
+    }
+
+    /**
+     * This method retrieves the names of the equipment
+     *
+     * @param player
+     * @return
+     */
+    public static Map<KitType, String> getPlayerEquipmentNames(Player player) {
+
+        Map<KitType, String> list = Microbot.getClientThread().runOnClientThread(() -> {
+            Map<KitType, String> _list = new HashMap<>();
+            for (KitType kitType : KitType.values()) {
+                String item = Microbot.getItemManager().getItemComposition(player.getPlayerComposition().getEquipmentId(kitType)).getName();
+                _list.put(kitType, item);
+            }
+            return _list;
+        });
+
+        return list;
+    }
+
 
     /**
      * Gets the players current world location
@@ -759,6 +824,7 @@ public class Rs2Player {
 
     /**
      * Checks wether a player is in a cave
+     *
      * @return
      */
     public static boolean isInCave() {
@@ -771,6 +837,7 @@ public class Rs2Player {
 
     /**
      * Returns run energy of a player in 100
+     *
      * @return
      */
     public static int getRunEnergy() {
@@ -779,6 +846,7 @@ public class Rs2Player {
 
     /**
      * Returns true if a player has stamina effect active
+     *
      * @return
      */
     public static boolean hasStaminaActive() {
