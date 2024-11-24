@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.example;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
-import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,9 +17,7 @@ public class ExampleScript extends Script {
                 if (!super.run()) return;
                 long startTime = System.currentTimeMillis();
 
-                test = false;
-
-                System.out.println(Rs2Bank.count("irit leaf"));
+                //CODE HERE
 
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;

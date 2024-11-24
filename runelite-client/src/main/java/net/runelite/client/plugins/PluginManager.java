@@ -34,6 +34,7 @@ import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import com.google.inject.Module;
 import com.google.inject.*;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.RuneLite;
@@ -84,6 +85,7 @@ public class PluginManager
 	private final ConfigManager configManager;
 	private final Provider<GameEventManager> sceneTileManager;
 	private final List<Plugin> plugins = new CopyOnWriteArrayList<>();
+	@Getter
 	private final List<Plugin> activePlugins = new CopyOnWriteArrayList<>();
 
 	@Setter
