@@ -8,7 +8,6 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
 
@@ -77,11 +76,31 @@ public class VarrockCleanerScript extends Script {
     }
 
     private void storeFindsInCrate() {
+        String[] rareItems = {
+                "Old symbol",
+                "Ancient symbol",
+                "Old coin",
+                "Ancient coin",
+                "Clean necklace",
+                "Pottery",
+                "Jewellery",
+                "Old chipped vase",
+                "Arrowheads"
+        };
+
         if (!Rs2Inventory.contains("Uncleaned find") && Rs2GameObject.interact(ObjectID.STORAGE_CRATE, "Add finds")) {
             Rs2Keyboard.keyPress('2');
-            boolean widgetVisible = Rs2Widget.sleepUntilHasWidget("Thanks for helping us out") ||
-                    Rs2Widget.isWidgetVisible(15138822, 0);
-            if (widgetVisible) {
+            sleep(1000);
+
+            boolean hasRareItems = false;
+            for (String rareItem : rareItems) {
+                if (Rs2Inventory.contains(rareItem)) {
+                    hasRareItems = true;
+                    break;
+                }
+            }
+
+            if (!hasRareItems) {
                 currentState = State.DROP_ITEMS;
             }
         }
@@ -94,9 +113,9 @@ public class VarrockCleanerScript extends Script {
         }
     }
 
-    @Override
-    public void shutdown() {
+    public void stop() {
+        Microbot.log("Varrack Cleaner plugin stopped.");
+        currentState = VarrockCleanerScript.State.TAKE_UNCLEANED;
         super.shutdown();
-        currentState = State.TAKE_UNCLEANED;
     }
 }

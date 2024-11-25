@@ -41,17 +41,15 @@ import net.runelite.http.api.worlds.World;
 import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -146,26 +144,12 @@ public class Microbot {
 
     public static int cantReachTargetRetries = 0;
 
+    @Getter
+    public static HashMap<String, Integer> scriptRuntimes = new HashMap<>();
+
     public static boolean isDebug() {
         return java.lang.management.ManagementFactory.getRuntimeMXBean().
                 getInputArguments().toString().contains("-agentlib:jdwp");
-    }
-
-    @Deprecated(since = "Use isMoving", forRemoval = true)
-    public static boolean isWalking() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
-                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
-    }
-
-    @Deprecated(since = "1.2.4 - use Rs2Player variant", forRemoval = true)
-    public static boolean isMoving() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getPoseAnimation()
-                != Microbot.getClient().getLocalPlayer().getIdlePoseAnimation());
-    }
-
-    @Deprecated(since = "1.2.4 - use Rs2Player variant", forRemoval = true)
-    public static boolean isAnimating() {
-        return Microbot.getClientThread().runOnClientThread(() -> getClient().getLocalPlayer().getAnimation() != -1);
     }
 
     public static int getVarbitValue(int varbit) {
@@ -207,11 +191,6 @@ public class Microbot {
         if (client == null) return false;
         GameState idx = client.getGameState();
         return idx == GameState.HOPPING;
-    }
-
-    @Deprecated(since = "1.4.0 - use Rs2Player variant", forRemoval = true)
-    public static boolean hasLevel(int levelRequired, Skill skill) {
-        return Microbot.getClient().getRealSkillLevel(skill) >= levelRequired;
     }
 
     public static boolean hopToWorld(int worldNumber) {
@@ -349,12 +328,6 @@ public class Microbot {
         }
     }
 
-    @Deprecated(since = "1.3.8 - use Mouse class", forRemoval = true)
-    private static void mouseEvent(int id, Point point) {
-        MouseEvent e = new MouseEvent(client.getCanvas(), id, System.currentTimeMillis(), 0, point.getX(), point.getY(), 1, false, 1);
-        client.getCanvas().dispatchEvent(e);
-    }
-
     public static List<LootTrackerRecord> getAggregateLootRecords() {
         return LootTrackerPlugin.panel.aggregateRecords;
     }
@@ -448,5 +421,68 @@ public class Microbot {
         }
         return RuneLite.getInjector();
      }
+
+    /**
+     * Retrieves a list of active plugins that are part of the "microbot" package, excluding specific plugins.
+     *
+     * This method filters the active plugins managed by the `pluginManager` to include only those whose
+     * package name contains "microbot" (case-insensitive). It further excludes certain plugins based on
+     * their class names, such as "QuestHelperPlugin", "MInventorySetupsPlugin", "MicrobotPlugin",
+     * "MicrobotConfigPlugin", "ShortestPathPlugin", "AntibanPlugin", and "ExamplePlugin".
+     *
+     * @return a list of active plugins belonging to the "microbot" package, excluding the specified plugins.
+     */
+     public static List<Plugin> getActiveMicrobotPlugins() {
+         return pluginManager.getActivePlugins().stream()
+                 .filter(x -> x.getClass().getPackage().getName().toLowerCase().contains("microbot"))
+                 .filter(x -> !x.getClass().getSimpleName().equalsIgnoreCase("QuestHelperPlugin")
+                         && !x.getClass().getSimpleName().equalsIgnoreCase("MInventorySetupsPlugin")
+                         && !x.getClass().getSimpleName().equalsIgnoreCase("MicrobotPlugin")
+                         && !x.getClass().getSimpleName().equalsIgnoreCase("MicrobotConfigPlugin")
+                         && !x.getClass().getSimpleName().equalsIgnoreCase("ShortestPathPlugin")
+                         && !x.getClass().getSimpleName().equalsIgnoreCase("AntibanPlugin")
+                         && !x.getClass().getSimpleName().equalsIgnoreCase("ExamplePlugin"))
+                 .collect(Collectors.toList());
+     }
+
+    /**
+     * Retrieves a list of active `Script` instances from the currently active microbot plugins.
+     *
+     * This method iterates through all active microbot plugins and inspects their fields using reflection
+     * to find fields of type `Script` or its subclasses. The identified `Script` fields are extracted
+     * and returned as a list.
+     *
+     * Key Details:
+     * - The method uses reflection to access the fields of each plugin class.
+     * - Only fields that are assignable to the `Script` type are included.
+     * - Private fields are made accessible via `field.setAccessible(true)` to retrieve their values.
+     * - Any exceptions encountered during field access (e.g., `IllegalAccessException`) are logged, and
+     *   the corresponding field is skipped.
+     * - Null values resulting from inaccessible or uninitialized fields are filtered out.
+     *
+     * @return a list of active `Script` instances extracted from the microbot plugins.
+     */
+    public static List<Script> getActiveScripts() {
+        return getActiveMicrobotPlugins().stream()
+                .flatMap(x -> {
+                    // Get all fields of the class
+                    Field[] fields = x.getClass().getDeclaredFields();
+
+                    // Filter fields that are assignable to Script
+                    return java.util.Arrays.stream(fields)
+                            .filter(field -> Script.class.isAssignableFrom(field.getType()))
+                            .map(field -> {
+                                field.setAccessible(true); // Allow access to private fields
+                                try {
+                                    return (Script) field.get(x); // Map the field to a Script instance
+                                } catch (IllegalAccessException e) {
+                                    e.printStackTrace();
+                                    return null; // Handle exception if field cannot be accessed
+                                }
+                            });
+                })
+                .filter(Objects::nonNull) // Exclude nulls
+                .collect(Collectors.toList());
+    }
 }
 

@@ -8,6 +8,7 @@ import net.runelite.client.plugins.microbot.crafting.enums.BoltTips;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +22,7 @@ public class GemsScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
-                if (!Microbot.hasLevel(config.gemType().getLevelRequired(), Skill.CRAFTING)) {
+                if (!Rs2Player.getSkillRequirement(Skill.CRAFTING, config.gemType().getLevelRequired())) {
                     Microbot.showMessage("Crafting level too low to craft " + config.gemType().getName());
                     shutdown();
                     return;
@@ -56,7 +57,7 @@ public class GemsScript extends Script {
                     if (config.fletchIntoBoltTips()) {
                         Microbot.status = "FLETCHING BOLT TIPS";
                         BoltTips boltTip = BoltTips.valueOf(config.gemType().name());
-                        if (Microbot.hasLevel(boltTip.getFletchingLevelRequired(), Skill.FLETCHING) &&
+                        if (Rs2Player.getSkillRequirement(Skill.FLETCHING, boltTip.getFletchingLevelRequired()) &&
                                 Rs2Inventory.hasItem(config.gemType().getName()) &&
                                 Rs2Inventory.hasItem("chisel")) {
                             Rs2Inventory.use("chisel");

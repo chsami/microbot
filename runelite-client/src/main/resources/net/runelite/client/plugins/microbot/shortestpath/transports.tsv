@@ -1506,7 +1506,6 @@
 2775 3234 1	2776 3235 0	Climb-down;Ship's ladder;9745					
 2808 3162 0	2808 3162 1	Climb-up;Ladder;16683				3	
 2808 3162 1	2808 3162 0	Climb-down;Ladder;16679				3	
-							
 # Karamja Volcano							
 2855 3169 0	2855 9569 0	Climb-down;Rocks;11441					
 2855 9569 0	2856 3167 0	Climb;Climbing rope;18969					
@@ -2290,8 +2289,8 @@
 2914 3222 1	2913 3221 0	Climb-down;Ship's ladder;9745				2	
 2914 3220 1	2913 3221 0	Climb-down;Ship's ladder;9745				2	
 2915 3221 1	2913 3221 0	Climb-down;Ship's ladder;9745				2	
-2909 3226 0	2909 3229 1	Cross;Gangplank;34667				3	
-2909 3229 1	2909 3226 0	Cross;Gangplank;34668				3	
+2909 3226 0	2909 3229 1	Cross;Gangplank;34667				1	
+2909 3229 1	2909 3226 0	Cross;Gangplank;34668				1	
 2933 3289 0	2933 3288 0	Open;Guild Door;14910	40 Crafting	1 Brown apron		1	
 2933 3288 0	2933 3289 0	Open;Guild Door;14910				1	
 2941 3248 0	2940 3248 0	Open;Door;2595		1 Maze key		1	
@@ -4487,7 +4486,8 @@
 1639 3673 0	1666 10050 0	Investigate;Statue;27785					
 1666 10050 0	1639 3673 0	Climb-up;Vine ladder;28894					
 #corsair cove							
-2578 2837 1	2578 2840 0	Cross;Gangplank;31756					
+2578 2840 0	2578 2837 1	Cross;Gangplank;31756				1	
+2578 2837 1	2578 2840 0	Cross;Gangplank;31756				1	
 #mining guild							
 3021 9739 0	3021 3339 0	Climb-up;Ladder;17385					
 3021 3339 0	3021 9739 0	Climb-down;Ladder;30367					
@@ -4506,3 +4506,8 @@
 # Hunter Guild
 1558 3047 0	1558 9451 0	Climb-down;Stairs;51641				8
 1558 9451 0	1558 3047 0	Climb-up;Stairs;51642				8
+# Piscatoris Hunting Area
+2371 3622 0	2371 3620 0	Climb-over;Stile;19222				8
+2371 3620 0	2371 3622 0	Climb-over;Stile;19222				8
+# Taverly dungeon
+2924 9803 0	2923 9803 0	Open;Gate;2623		1590			Taverly gate

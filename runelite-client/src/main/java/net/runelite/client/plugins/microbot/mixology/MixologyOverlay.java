@@ -10,7 +10,6 @@ import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 import javax.inject.Inject;
 import java.awt.*;
 import java.time.Duration;
-import java.time.LocalTime;
 
 public class MixologyOverlay extends OverlayPanel {
     private final MixologyPlugin plugin;
@@ -25,9 +24,6 @@ public class MixologyOverlay extends OverlayPanel {
     }
 
     public Dimension render(Graphics2D graphics) {
-        LocalTime currentTime = LocalTime.now();
-
-        Duration runtime = Duration.between(plugin.startTime, currentTime); // Calculate runtime
 
         panelComponent.setPreferredLocation(new Point(200, 20));
         panelComponent.setPreferredSize(new Dimension(300, 300));
@@ -47,6 +43,8 @@ public class MixologyOverlay extends OverlayPanel {
                 .left("Mox/Aga/Lye paste")
                 .right(String.valueOf(MixologyScript.moxPasteAmount) + "/" + String.valueOf(MixologyScript.agaPasteAmount) + "/" + String.valueOf(MixologyScript.lyePasteAmount))
                 .build());
+
+        Duration runtime = plugin.mixologyScript.getRunTime();
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Mox/Aga/Lye points per hour")

@@ -70,7 +70,7 @@ public interface ShortestPathConfig extends Config {
             section = sectionSettings
     )
     default boolean useCanoes() {
-        return false;
+        return true;
     }
 
     @ConfigItem(
@@ -81,7 +81,7 @@ public interface ShortestPathConfig extends Config {
             section = sectionSettings
     )
     default boolean useCharterShips() {
-        return false;
+        return true;
     }
 
     @ConfigItem(
@@ -263,7 +263,7 @@ public interface ShortestPathConfig extends Config {
             section = sectionSettings
     )
     default TileCounter showTileCounter() {
-        return TileCounter.DISABLED;
+        return TileCounter.REMAINING;
     }
 
     @ConfigItem(

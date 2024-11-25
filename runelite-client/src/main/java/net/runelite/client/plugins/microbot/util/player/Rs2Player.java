@@ -7,6 +7,7 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.kit.KitType;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -19,6 +20,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -28,9 +30,8 @@ import net.runelite.http.api.worlds.WorldType;
 import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -276,6 +277,7 @@ public class Rs2Player {
 
     /**
      * Checks if a player is in a member world
+     *
      * @return true if in a member world
      */
     public static boolean isInMemberWorld() {
@@ -483,12 +485,90 @@ public class Rs2Player {
         return false;
     }
 
+    /**
+     * Get a list of players around you
+     *
+     * @return
+     */
     public static List<Player> getPlayers() {
-        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getPlayers()
+        return Microbot.getClient()
+                .getTopLevelWorldView()
+                .players()
                 .stream()
+                .filter(Objects::nonNull)
                 .filter(x -> x != Microbot.getClient().getLocalPlayer())
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
     }
+
+    /**
+     * Use this method to get a list of players that are in combat
+     *
+     * @return a list of players that are in combat
+     */
+    public static List<Player> getPlayersInCombat() {
+        return getPlayers()
+                .stream()
+                .filter(x -> x != null && x.getHealthRatio() != -1)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Calculates the player's health as a percentage.
+     *
+     * @param player The player or actor to calculate health for.
+     * @return The health percentage, or -1 if health information is unavailable.
+     */
+    public static int calculateHealthPercentage(Player player) {
+        int healthRatio = player.getHealthRatio();
+        int healthScale = player.getHealthScale();
+
+        // Check if health information is available
+        if (healthRatio == -1 || healthScale == -1 || healthScale == 0) {
+            return -1; // Health information is missing or invalid
+        }
+
+        // Calculate health percentage
+        return (int) ((healthRatio / (double) healthScale) * 100);
+    }
+
+    /**
+     * This method retrieves the id of the equipment
+     *
+     * @param player
+     * @return
+     */
+    public static Map<KitType, Integer> getPlayerEquipmentIds(Player player) {
+
+        Map<KitType, Integer> list = new HashMap<>();
+
+        for (KitType kitType : KitType.values()) {
+            int itemId = player.getPlayerComposition().getEquipmentId(kitType);
+            list.put(kitType, itemId);
+        }
+
+        return list;
+    }
+
+    /**
+     * This method retrieves the names of the equipment
+     *
+     * @param player
+     * @return
+     */
+    public static Map<KitType, String> getPlayerEquipmentNames(Player player) {
+
+        Map<KitType, String> list = Microbot.getClientThread().runOnClientThread(() -> {
+            Map<KitType, String> _list = new HashMap<>();
+            for (KitType kitType : KitType.values()) {
+                String item = Microbot.getItemManager().getItemComposition(player.getPlayerComposition().getEquipmentId(kitType)).getName();
+                _list.put(kitType, item);
+            }
+            return _list;
+        });
+
+        return list;
+    }
+
 
     /**
      * Gets the players current world location
@@ -744,6 +824,7 @@ public class Rs2Player {
 
     /**
      * Checks wether a player is in a cave
+     *
      * @return
      */
     public static boolean isInCave() {
@@ -756,6 +837,7 @@ public class Rs2Player {
 
     /**
      * Returns run energy of a player in 100
+     *
      * @return
      */
     public static int getRunEnergy() {
@@ -764,6 +846,7 @@ public class Rs2Player {
 
     /**
      * Returns true if a player has stamina effect active
+     *
      * @return
      */
     public static boolean hasStaminaActive() {
@@ -772,5 +855,80 @@ public class Rs2Player {
 
     public static boolean isStunned() {
         return Microbot.getClient().getLocalPlayer().hasSpotAnim(245);
+    }
+
+    /**
+     * Invokes the "attack" action on the specified player.
+     *
+     * @param player the player to attack
+     * @return true if the action was invoked successfully, false otherwise
+     */
+    public static boolean attack(Player player) {
+        return invokeMenu(player, "attack");
+    }
+
+    /**
+     * Invokes the "walk here" action to move to the same location as the specified player.
+     *
+     * @param player the player under whose position to walk
+     * @return true if the action was invoked successfully, false otherwise
+     */
+    public static boolean walkUnder(Player player) {
+        return invokeMenu(player, "walk here");
+    }
+
+    /**
+     * Invokes the "trade with" action on the specified player.
+     *
+     * @param player the player to trade with
+     * @return true if the action was invoked successfully, false otherwise
+     */
+    public static boolean trade(Player player) {
+        return invokeMenu(player, "trade with");
+    }
+
+    /**
+     * Invokes the "follow" action on the specified player.
+     *
+     * @param player the player to follow
+     * @return true if the action was invoked successfully, false otherwise
+     */
+    public static boolean follow(Player player) {
+        return invokeMenu(player, "follow");
+    }
+
+    /**
+     * Executes a specific menu action on a given player.
+     *
+     * @param player the player to interact with
+     * @param action the action to invoke (e.g., "attack", "walk here", "trade with", "follow")
+     * @return true if the action was invoked successfully, false otherwise
+     */
+    private static boolean invokeMenu(Player player, String action) {
+        if (player == null) return false;
+
+        // Set the current status for the action being performed
+        Microbot.status = action + " " + player.getName();
+
+        // Determine the appropriate menu action based on the action string
+        MenuAction menuAction = MenuAction.CC_OP;
+
+        if (action.equalsIgnoreCase("attack")) {
+            menuAction = MenuAction.PLAYER_SECOND_OPTION;
+        } else if (action.equalsIgnoreCase("walk here")) {
+            menuAction = MenuAction.WALK;
+        } else if (action.equalsIgnoreCase("follow")) {
+            menuAction = MenuAction.PLAYER_THIRD_OPTION;
+        } else if (action.equalsIgnoreCase("trade with")) {
+            menuAction = MenuAction.PLAYER_FOURTH_OPTION;
+        }
+
+        // Invoke the menu entry using the selected action
+        Microbot.doInvoke(
+                new NewMenuEntry(0, 0, menuAction.getId(), player.getId(), -1, player.getName(), player),
+                Rs2UiHelper.getActorClickbox(player)
+        );
+
+        return true;
     }
 }

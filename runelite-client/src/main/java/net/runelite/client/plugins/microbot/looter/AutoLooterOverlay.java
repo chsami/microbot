@@ -1,8 +1,6 @@
 package net.runelite.client.plugins.microbot.looter;
 
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.farming.FarmingPlugin;
-import net.runelite.client.plugins.microbot.farming.FarmingScript;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
