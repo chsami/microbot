@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -79,8 +80,13 @@ public class DefaultScript extends Script {
                         }
                         break;
                     case BANKING:
-                        if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(Rs2Inventory.all().stream().map(Rs2Item::getName).collect(Collectors.toList()), initialPlayerLocation, config.minFreeSlots()))
-                            return;
+                        if (config.looterStyle() == DefaultLooterStyle.ITEM_LIST) {
+                            if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(Arrays.stream(config.listOfItemsToLoot().split(",")).collect(Collectors.toList()), initialPlayerLocation, config.minFreeSlots()))
+                                return;
+                        } else {
+                            if (!Rs2Bank.bankItemsAndWalkBackToOriginalPosition(Rs2Inventory.all().stream().map(Rs2Item::getName).collect(Collectors.toList()), initialPlayerLocation, config.minFreeSlots()))
+                                return;
+                        }
                         state = LooterState.LOOTING;
                         break;
                 }
@@ -115,7 +121,6 @@ public class DefaultScript extends Script {
         Rs2AntibanSettings.dynamicIntensity = true;
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.moveMouseRandomly = true;
-        Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 15;
         Rs2AntibanSettings.actionCooldownChance = 0.4;

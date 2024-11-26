@@ -47,27 +47,28 @@ public class AutoLooterPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
-
-        if(config.looterActivity() == LooterActivity.DEFAULT){
-            defaultScript.run(config);
-        } else if (config.looterActivity() == LooterActivity.FLAX) {
-            flaxScript.run(config);
-        } else if (config.looterActivity() == LooterActivity.NATURE_RUNE_CHEST) {
-            natureRuneChestScript.run(config);
+        
+        switch (config.looterActivity()) {
+            case DEFAULT:
+                defaultScript.run(config);
+                break;
+            case FLAX:
+                flaxScript.run(config);
+                break;
+            case NATURE_RUNE_CHEST:
+                natureRuneChestScript.run(config);
+                break;
         }
+        
         if(overlayManager != null){
             overlayManager.add(autoLooterOverlay);
         }
     }
 
     protected void shutDown() throws Exception {
-        if(config.looterActivity() == LooterActivity.DEFAULT){
-            defaultScript.shutdown();
-        } else if (config.looterActivity() == LooterActivity.FLAX) {
-            flaxScript.shutdown();
-        } else if (config.looterActivity() == LooterActivity.NATURE_RUNE_CHEST) {
-            natureRuneChestScript.shutdown();
-        }
+        defaultScript.shutdown();
+        flaxScript.shutdown();
+        natureRuneChestScript.shutdown();
         overlayManager.remove(autoLooterOverlay);
     }
 }
