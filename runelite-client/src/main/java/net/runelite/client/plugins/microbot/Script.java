@@ -9,15 +9,17 @@ import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -32,6 +34,7 @@ public abstract class Script implements IScript {
     public ScheduledFuture<?> mainScheduledFuture;
     public static boolean hasLeveledUp = false;
     public static boolean useStaminaPotsIfNeeded = true;
+
     public boolean isRunning() {
         return mainScheduledFuture != null && !mainScheduledFuture.isDone();
     }
@@ -39,25 +42,36 @@ public abstract class Script implements IScript {
     @Getter
     protected static WorldPoint initialPlayerLocation;
 
+    public LocalTime startTime;
+
+    public Script() {
+
+    }
+
+    /**
+     * Get the total runtime of the script
+     * @return
+     */
+    public Duration getRunTime() {
+        if (startTime == null) return Duration.ofSeconds(0);
+
+        LocalTime currentTime = LocalTime.now();
+
+        Duration runtime = Duration.between(startTime, currentTime); // Calculate runtime
+
+        return runtime;
+    }
+
     public void sleep(int time) {
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
+        Global.sleep(time);
     }
 
     public void sleep(int start, int end) {
-        int randTime = Random.random(start, end);
-        try {
-            Thread.sleep(randTime);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
+        Global.sleep(start, end);
     }
 
     public boolean sleepUntil(BooleanSupplier awaitedCondition) {
-        return sleepUntil(awaitedCondition, 5000);
+        return Global.sleepUntil(awaitedCondition, 5000);
     }
 
     public boolean sleepUntil(BooleanSupplier awaitedCondition, int time) {
@@ -71,30 +85,30 @@ public abstract class Script implements IScript {
 
 
     /**
- * Sleeps until a specified condition is met, running an action periodically, or until a timeout is reached.
- *
- * @param awaitedCondition The condition to wait for.
- * @param action The action to run periodically while waiting.
- * @param timeoutMillis The maximum time to wait in milliseconds.
- * @param sleepMillis The time to sleep between action executions in milliseconds.
- * @return true if the condition was met within the timeout, false otherwise.
- */
-public boolean sleepUntil(BooleanSupplier awaitedCondition, Runnable action, long timeoutMillis, int sleepMillis) {
-    long startTime = System.nanoTime();
-    long timeoutNanos = TimeUnit.MILLISECONDS.toNanos(timeoutMillis);
-    try {
-        while (System.nanoTime() - startTime < timeoutNanos) {
-            action.run();
-            if (awaitedCondition.getAsBoolean()) {
-                return true;
+     * Sleeps until a specified condition is met, running an action periodically, or until a timeout is reached.
+     *
+     * @param awaitedCondition The condition to wait for.
+     * @param action           The action to run periodically while waiting.
+     * @param timeoutMillis    The maximum time to wait in milliseconds.
+     * @param sleepMillis      The time to sleep between action executions in milliseconds.
+     * @return true if the condition was met within the timeout, false otherwise.
+     */
+    public boolean sleepUntil(BooleanSupplier awaitedCondition, Runnable action, long timeoutMillis, int sleepMillis) {
+        long startTime = System.nanoTime();
+        long timeoutNanos = TimeUnit.MILLISECONDS.toNanos(timeoutMillis);
+        try {
+            while (System.nanoTime() - startTime < timeoutNanos) {
+                action.run();
+                if (awaitedCondition.getAsBoolean()) {
+                    return true;
+                }
+                sleep(sleepMillis);
             }
-            sleep(sleepMillis);
+        } catch (Exception e) {
+            Thread.currentThread().interrupt(); // Restore the interrupt status
         }
-    } catch (Exception e) {
-        Thread.currentThread().interrupt(); // Restore the interrupt status
+        return false; // Timeout reached without satisfying the condition
     }
-    return false; // Timeout reached without satisfying the condition
-}
 
 
     public boolean sleepUntil(BooleanSupplier awaitedCondition, BooleanSupplier resetCondition, int timeout) {
@@ -138,6 +152,10 @@ public boolean sleepUntil(BooleanSupplier awaitedCondition, Runnable action, lon
     }
 
     public boolean run() {
+        if (startTime == null) {
+            startTime = LocalTime.now();
+        }
+
         hasLeveledUp = false;
         //Microbot.getSpecialAttackConfigs().useSpecWeapon();
 

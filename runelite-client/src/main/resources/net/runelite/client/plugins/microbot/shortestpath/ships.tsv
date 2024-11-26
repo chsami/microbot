@@ -10,8 +10,8 @@
 2915 3225 0	2683 3268 1	Ardougne;Captain Barnaby;8763		30 Coins		6	Ardougne
 2915 3225 0	2775 3233 1	Brimhaven;Captain Barnaby;8763		30 Coins		6	Brimhaven
 # NEEDS FIXING - Rimmington, Corsair Cove							
-2909 3226 0	2578 2837 1	Travel;Cabin Boy Colin;7967			The Corsair Curse	6	
-2578 2837 0	2909 3226 1	Travel;Cabin Boy Colin;7967			The Corsair Curse	6	
+2910 3226 0	2578 2837 1	Travel;Cabin Boy Colin;7967			The Corsair Curse	6	Corsair Cove
+2574 2837 1	2909 3230 1	Travel;Cabin Boy Colin;7967			The Corsair Curse	6	Rimmington
 # Digsite, Fossil Island							
 3362 3445 0	3724 3807 0	Quick-Travel;Barge guard;8012			Bone Voyage	12	
 3724 3807 0	3362 3445 0	Travel;Rowboat;30914			Bone Voyage	12	
@@ -33,6 +33,10 @@
 3055 3245 0	1504 3395 1	Land's End;Veos;10724				6	Land's End
 1824 3691 0	3055 3242 1	Port Sarim;Veos;10724				6	Port Sarim
 1824 3691 0	1504 3395 1	Land's End;Veos;10724				6	Land's End
+3055 3245 0	1824 3695 1	Port Piscarilius;Cabin Boy Herbert;10932			A Kingdom Divided	6	Port Piscarilius
+3055 3245 0	1504 3395 1	Land's End;Cabin Boy Herbert;10932			A Kingdom Divided	6	Land's End
+1824 3691 0	3055 3242 1	Port Sarim;Cabin Boy Herbert;10932			A Kingdom Divided	6	Port Sarim
+1824 3691 0	1504 3395 1	Land's End;Cabin Boy Herbert;10932			A Kingdom Divided	6	Land's End
 1504 3399 0	3055 3242 1	Port Sarim;Captain Magoro;7471				6	Port Sarim
 1504 3399 0	1824 3695 1	Port Piscarilius;Captain Magoro;7471				6	Port Piscarilius
 							
@@ -40,6 +44,6 @@
 3048 3234 0	2834 3331 1	Travel-boat;Monk of Entrana;1165				15	
 2834 3335 0	3048 3231 1	Travel-boat;Monk of Entrana;1168				15	
 							
-Port Sarim, Void Knights' Outpost							
+# Port Sarim, Void Knights' Outpost							
 3041 3202 0	2662 2677 1	Travel;Squire;1770				11	
 2659 2676 0	3042 3199 1	Travel;Squire;1769				11	

@@ -13,7 +13,6 @@ import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
@@ -164,7 +163,7 @@ public class AutoWoodcuttingScript extends Script {
         if (!isFiremake()) {
             Rs2Inventory.waitForInventoryChanges(() -> {
                 Rs2Inventory.use("tinderbox");
-                sleep(Random.random(300, 600));
+                sleep(Rs2Random.between(300, 600));
                 Rs2Inventory.use(config.TREE().getLog());
             });
         }
@@ -193,7 +192,7 @@ public class AutoWoodcuttingScript extends Script {
 
             // Return a random point from the closest points
             if (!closestPoints.isEmpty()) {
-                int randomIndex = Random.random(0, closestPoints.size());
+                int randomIndex = Rs2Random.between(0, closestPoints.size());
                 return closestPoints.get(randomIndex);
             }
         }
@@ -226,7 +225,7 @@ public class AutoWoodcuttingScript extends Script {
     }
 
     private void walkBack(AutoWoodcuttingConfig config) {
-        Rs2Walker.walkTo(new WorldPoint(calculateReturnPoint(config).getX() - Random.random(-1, 1), calculateReturnPoint(config).getY() - Random.random(-1, 1), calculateReturnPoint(config).getPlane()));
+        Rs2Walker.walkTo(new WorldPoint(calculateReturnPoint(config).getX() - Rs2Random.between(-1, 1), calculateReturnPoint(config).getY() - Rs2Random.between(-1, 1), calculateReturnPoint(config).getPlane()));
         sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo(calculateReturnPoint(config)) <= 4);
     }
 

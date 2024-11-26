@@ -25,12 +25,11 @@ import java.util.stream.Collectors;
 
 public class ThievingScript extends Script {
 
-    public static String version = "1.6.0";
+    public static String version = "1.6.1";
     ThievingConfig config;
 
     public boolean run(ThievingConfig config) {
         this.config = config;
-        Rs2Walker.setTarget(null);
         Microbot.isCantReachTargetDetectionEnabled = true;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
@@ -85,6 +84,7 @@ public class ThievingScript extends Script {
     @Override
     public void shutdown() {
         super.shutdown();
+        Rs2Walker.setTarget(null);
         Microbot.isCantReachTargetDetectionEnabled = false;
     }
 

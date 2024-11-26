@@ -49,7 +49,6 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.PathfinderConfig;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.SplitFlagMap;
-import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -339,14 +338,6 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
             if (Microbot.getClientThread().scheduledFuture != null) {
                 Microbot.getClientThread().scheduledFuture.cancel(true);
             }
-            return;
-        }
-
-        if (!startPointSet && !isNearPath(Rs2Player.getWorldLocation())) {
-            if (config.cancelInstead()) {
-                return;
-            }
-            restartPathfinding(Rs2Player.getWorldLocation(), pathfinder.getTarget());
         }
     }
 

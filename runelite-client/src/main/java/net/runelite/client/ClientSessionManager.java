@@ -24,20 +24,22 @@
  */
 package net.runelite.client;
 
-import java.io.IOException;
-import java.util.UUID;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ClientShutdown;
+import net.runelite.client.plugins.microbot.MicrobotApi;
 import net.runelite.client.util.RunnableExceptionLogger;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 @Slf4j
@@ -52,15 +54,17 @@ public class ClientSessionManager
 
 	private UUID sessionId;
 	private UUID microbotSessionId;
+	private MicrobotApi microbotApi;
 
 	@Inject
 	ClientSessionManager(ScheduledExecutorService executorService,
 		@Nullable Client client,
-		SessionClient sessionClient)
+		SessionClient sessionClient, MicrobotApi microbotApi)
 	{
 		this.executorService = executorService;
 		this.client = client;
 		this.sessionClient = sessionClient;
+		this.microbotApi = microbotApi;
 	}
 
 	public void start()
@@ -70,7 +74,7 @@ public class ClientSessionManager
 			try
 			{
 				sessionId = sessionClient.open();
-				microbotSessionId = sessionClient.microbotOpen();
+				microbotSessionId = microbotApi.microbotOpen();
 				log.debug("Opened session {}", sessionId);
 			}
 			catch (IOException ex)
@@ -100,7 +104,8 @@ public class ClientSessionManager
 				UUID localMicrobotUuid = microbotSessionId;
 				if (localMicrobotUuid != null)
 				{
-					sessionClient.microbotDelete(localMicrobotUuid);
+					microbotApi.sendScriptStatistics();
+					microbotApi.microbotDelete(localMicrobotUuid);
 				}
 			}
 			catch (IOException ex)
@@ -151,7 +156,7 @@ public class ClientSessionManager
 		try
 		{
 			if (microbotSessionId == null) {
-				microbotSessionId = sessionClient.microbotOpen();
+				microbotSessionId = microbotApi.microbotOpen();
 				return;
 			}
 		}
@@ -170,7 +175,7 @@ public class ClientSessionManager
 
 		try
 		{
-			sessionClient.microbotPing(microbotSessionId, loggedIn);
+			microbotApi.microbotPing(microbotSessionId, loggedIn);
 		}
 		catch (IOException ex)
 		{

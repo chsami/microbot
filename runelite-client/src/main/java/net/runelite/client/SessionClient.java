@@ -41,45 +41,11 @@ class SessionClient {
     private final HttpUrl sessionUrl;
     private final Gson gson;
 
-    //TODO: put this in the runelite.properties
-    private final String microbotApiUrl = "https://microbot-api.azurewebsites.net/api";
-
     @Inject
     private SessionClient(OkHttpClient client, @Named("runelite.session") HttpUrl sessionUrl, Gson gson) {
         this.client = client;
         this.sessionUrl = sessionUrl;
         this.gson = gson;
-    }
-
-    UUID microbotOpen() throws IOException {
-        try (Response response = client.newCall(new Request.Builder().url(microbotApiUrl + "/session").build()).execute()) {
-            ResponseBody body = response.body();
-
-            InputStream in = body.byteStream();
-            return gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), UUID.class);
-        } catch (JsonParseException | IllegalArgumentException ex) // UUID.fromString can throw IllegalArgumentException
-        {
-            throw new IOException(ex);
-        }
-    }
-
-    void microbotPing(UUID uuid, boolean loggedIn) throws IOException {
-        try (Response response = client.newCall(new Request.Builder().url(microbotApiUrl + "/session?sessionId=" + uuid.toString()
-                + "&isLoggedIn=" + loggedIn
-                + "&version=1.10.26" ).build()).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Unsuccessful ping");
-            }
-        }
-    }
-
-    void microbotDelete(UUID uuid) throws IOException {
-        Request request = new Request.Builder()
-                .delete()
-                .url(microbotApiUrl + "/session?sessionId=" + uuid)
-                .build();
-
-        client.newCall(request).execute().close();
     }
 
     UUID open() throws IOException {
