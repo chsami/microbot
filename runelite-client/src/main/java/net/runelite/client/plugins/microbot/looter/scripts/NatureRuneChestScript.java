@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
@@ -60,9 +61,8 @@ public class NatureRuneChestScript extends Script {
                         if (natureRuneChest.isPresent()) {
                             if(Rs2GameObject.interact(natureRuneChest.get(), "Search for traps")){
                                 Rs2Antiban.actionCooldown();
-                                Rs2Antiban.takeMicroBreakByChance();
                                 sleepUntilTrue(() -> !Rs2Player.isInteracting(), 500, 8000);
-                                sleep(Random.random(18000, 20000));
+                                sleep(Rs2Random.between(18000, 20000));
                             }
                         }
                         break;
@@ -118,7 +118,6 @@ public class NatureRuneChestScript extends Script {
         Rs2AntibanSettings.dynamicIntensity = true;
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.moveMouseRandomly = true;
-        Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 15;
         Rs2AntibanSettings.actionCooldownChance = 0.4;
