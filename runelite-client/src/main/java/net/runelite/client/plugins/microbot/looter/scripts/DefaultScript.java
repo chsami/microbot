@@ -71,7 +71,6 @@ public class DefaultScript extends Script {
                             if (Rs2GroundItem.lootItemBasedOnValue(valueParams)) {
                                 Microbot.pauseAllScripts = false;
                                 Rs2Antiban.actionCooldown();
-                                Rs2Antiban.takeMicroBreakByChance();
                             }
                         }
                         if (Rs2Inventory.getEmptySlots() <= config.minFreeSlots()) {

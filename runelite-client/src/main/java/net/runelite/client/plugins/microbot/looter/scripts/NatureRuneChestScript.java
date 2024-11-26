@@ -61,7 +61,6 @@ public class NatureRuneChestScript extends Script {
                         if (natureRuneChest.isPresent()) {
                             if(Rs2GameObject.interact(natureRuneChest.get(), "Search for traps")){
                                 Rs2Antiban.actionCooldown();
-                                Rs2Antiban.takeMicroBreakByChance();
                                 sleepUntilTrue(() -> !Rs2Player.isInteracting(), 500, 8000);
                                 sleep(Rs2Random.between(18000, 20000));
                             }

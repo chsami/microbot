@@ -60,7 +60,6 @@ public class FlaxScript extends Script {
                         if (flaxObject != null) {
                             if(Rs2GameObject.interact(flaxObject, "pick")){
                                 Rs2Antiban.actionCooldown();
-                                Rs2Antiban.takeMicroBreakByChance();
                             }
                         }
                         break;
