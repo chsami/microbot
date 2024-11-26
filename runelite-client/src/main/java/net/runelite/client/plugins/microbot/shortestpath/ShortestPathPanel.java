@@ -266,7 +266,7 @@ public class ShortestPathPanel extends PluginPanel {
     private JPanel createHunterCreaturePanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(createCenteredTitledBorder("Travel to Hunter Creature", "/net/runelite/client/plugins/microbot/shortestpath/Map_link_icon.png"));
+        panel.setBorder(createCenteredTitledBorder("Travel to Hunter Creature", "/net/runelite/client/plugins/microbot/shortestpath/Hunter_icon.png"));
 
         hunterCreatureComboBox = new JComboBox<>(HuntingAreas.values());
         hunterCreatureComboBox.setRenderer(new ComboBoxListRenderer());
