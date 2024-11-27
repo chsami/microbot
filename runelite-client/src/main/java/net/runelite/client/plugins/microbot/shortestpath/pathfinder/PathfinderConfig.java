@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.shortestpath.*;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
@@ -175,14 +176,14 @@ public class PathfinderConfig {
     }
 
     private void refreshTransports() {
-        useFairyRings &= !QuestState.NOT_STARTED.equals(Microbot.getQuestState(Quest.FAIRYTALE_II__CURE_A_QUEEN))
+        useFairyRings &= !QuestState.NOT_STARTED.equals(Rs2Player.getQuestState(Quest.FAIRYTALE_II__CURE_A_QUEEN))
                 && (Rs2Inventory.contains(ItemID.DRAMEN_STAFF, ItemID.LUNAR_STAFF)
                 || Rs2Equipment.isWearing(ItemID.DRAMEN_STAFF)
                 || Rs2Equipment.isWearing(ItemID.LUNAR_STAFF)
                 || Microbot.getVarbitValue(Varbits.DIARY_LUMBRIDGE_ELITE)  == 1);
-        useGnomeGliders &= QuestState.FINISHED.equals(Microbot.getQuestState(Quest.THE_GRAND_TREE));
-        useSpiritTrees &= QuestState.FINISHED.equals(Microbot.getQuestState(Quest.TREE_GNOME_VILLAGE));
-        useQuetzals &= QuestState.FINISHED.equals(Microbot.getQuestState(Quest.TWILIGHTS_PROMISE));
+        useGnomeGliders &= QuestState.FINISHED.equals(Rs2Player.getQuestState(Quest.THE_GRAND_TREE));
+        useSpiritTrees &= QuestState.FINISHED.equals(Rs2Player.getQuestState(Quest.TREE_GNOME_VILLAGE));
+        useQuetzals &= QuestState.FINISHED.equals(Rs2Player.getQuestState(Quest.TWILIGHTS_PROMISE));
 
         transports.clear();
         transportsPacked.clear();
@@ -192,7 +193,13 @@ public class PathfinderConfig {
                 for (Transport transport : entry.getValue()) {
                     for (Quest quest : transport.getQuests()) {
                         try {
-                            questStates.put(quest, Microbot.getQuestState(quest));
+                            QuestState currentState = questStates.get(quest);
+                            QuestState newState = Rs2Player.getQuestState(quest);
+
+                            // Only update if the new state is more progressed
+                            if (currentState == null || isMoreProgressed(newState, currentState)) {
+                                questStates.put(quest, newState);
+                            }
                         } catch (NullPointerException ignored) {
                             System.out.println(ignored.getMessage());
                         }
@@ -242,7 +249,13 @@ public class PathfinderConfig {
         // Fetch quest states and varbit values directly
         for (Quest quest : questsToFetch) {
             try {
-                questStates.put(quest, Microbot.getQuestState(quest));
+                QuestState currentState = questStates.get(quest);
+                QuestState newState = Rs2Player.getQuestState(quest);
+
+                // Only update if the new state is more progressed
+                if (currentState == null || isMoreProgressed(newState, currentState)) {
+                    questStates.put(quest, newState);
+                }
             } catch (NullPointerException ignored) {
                 // Handle exceptions if necessary
             }
@@ -319,7 +332,8 @@ public class PathfinderConfig {
 
     private boolean completedQuests(Transport transport) {
         for (Quest quest : transport.getQuests()) {
-            if (!QuestState.FINISHED.equals(questStates.getOrDefault(quest, QuestState.NOT_STARTED))) {
+            QuestState state = questStates.getOrDefault(quest, QuestState.NOT_STARTED);
+            if (state != QuestState.FINISHED) {
                 return false;
             }
         }
@@ -338,94 +352,18 @@ public class PathfinderConfig {
     }
 
     private boolean useTransport(Transport transport) {
-        final boolean isQuestLocked = transport.isQuestLocked();
-
-        //START microbot variables
-        final boolean isNpc = transport.getType() == TransportType.NPC;
-        if (isNpc && !useNpcs){
-            return false;
-        }
-        //END microbot variables
-
-        if (!hasRequiredLevels(transport)) {
-            return false;
-        }
-
-        //ship charters, mine cart will check for coins before using them
-        if (transport.getAmtItemRequired() > 0 && !Rs2Inventory.hasItemAmount(transport.getItemRequired(), transport.getAmtItemRequired()))
-            return false;
-
-        TransportType type = transport.getType();
-
-
-        if (AGILITY_SHORTCUT.equals(type) && (!useAgilityShortcuts || !client.getWorldType().contains(WorldType.MEMBERS))) {
-            return false;
-        } else if (GRAPPLE_SHORTCUT.equals(type) && (!useGrappleShortcuts || !client.getWorldType().contains(WorldType.MEMBERS))) {
-            return false;
-        } else if (BOAT.equals(type) && (!useBoats || !client.getWorldType().contains(WorldType.MEMBERS))) {
-            return false;
-        } else if (CANOE.equals(type) && (!useCanoes || !client.getWorldType().contains(WorldType.MEMBERS))) {
-            return false;
-        } else if (CHARTER_SHIP.equals(type) && (!useCharterShips || !client.getWorldType().contains(WorldType.MEMBERS))) {
-            return false;
-        } else if (SHIP.equals(type) && !useShips) {
-            return false;
-        } else if (FAIRY_RING.equals(type) && (!useFairyRings || !client.getWorldType().contains(WorldType.MEMBERS))) {
-            return false;
-        } else if (GNOME_GLIDER.equals(type) && (!useGnomeGliders || !client.getWorldType().contains(WorldType.MEMBERS))) {
-            return false;
-        } else if (MINECART.equals(type) && (!useMinecarts || !client.getWorldType().contains(WorldType.MEMBERS))) {
-            return false;
-        } else if (QUETZAL.equals(type) && (!useQuetzals || !client.getWorldType().contains(WorldType.MEMBERS))) {
-            return false;
-        } else if (SPIRIT_TREE.equals(type) && (!useSpiritTrees || !client.getWorldType().contains(WorldType.MEMBERS))) {
-            return false;
-        } else if (TELEPORTATION_ITEM.equals(type)) {
-            switch (useTeleportationItems) {
-                case ALL:
-                case INVENTORY:
-                    if (transport.getItemIdRequirements().stream().flatMap(Collection::stream).anyMatch(itemId -> itemId == ItemID.CHRONICLE)) {
-                        String charges = Microbot.getConfigManager().getRSProfileConfiguration(ItemChargeConfig.GROUP, ItemChargeConfig.KEY_CHRONICLE);
-                        if (charges == null || charges.isEmpty()) {
-                            if (Rs2Inventory.hasItem(ItemID.CHRONICLE)) {
-                                Rs2Inventory.interact(ItemID.CHRONICLE, "Check charges");
-                                charges = Microbot.getConfigManager().getRSProfileConfiguration(ItemChargeConfig.GROUP, ItemChargeConfig.KEY_CHRONICLE);
-                            } else if (Rs2Equipment.hasEquipped(ItemID.CHRONICLE)) {
-                                Rs2Equipment.interact(ItemID.CHRONICLE, "Check charges");
-                                charges = Microbot.getConfigManager().getRSProfileConfiguration(ItemChargeConfig.GROUP, ItemChargeConfig.KEY_CHRONICLE);
-                            } else {
-                                return false;
-                            }
-                        }
-                        return Integer.parseInt(charges) > 0;
-                    }
-                    break;
-                case NONE:
-                    return false;
-                case INVENTORY_NON_CONSUMABLE:
-                case ALL_NON_CONSUMABLE:
-                    if (transport.isConsumable()) {
-                        return false;
-                    }
-                    break;
-            }
-        } else if (TELEPORTATION_LEVER.equals(type) && !useTeleportationLevers) {
-            return false;
-        } else if (TELEPORTATION_PORTAL.equals(type) && !useTeleportationPortals) {
-            return false;
-        } else if (TELEPORTATION_SPELL.equals(type) && !useTeleportationSpells) {
-            return false;
-        } else if (WILDERNESS_OBELISK.equals(type) && !useWildernessObelisks) {
-            return false;
-        }
-
-        if (isQuestLocked && !completedQuests(transport)) {
-            return false;
-        }
-
-        if (!varbitChecks(transport)) {
-            return false;
-        }
+        // Check if the feature flag is disabled
+        if (!isFeatureEnabled(transport.getType())) return false;
+        // If you don't meet level requirements
+        if (!hasRequiredLevels(transport)) return false;
+        // If you don't have the required Items & Amount for transport (used for charters & minecarts)
+        if (transport.getAmtItemRequired() > 0 && !Rs2Inventory.hasItemAmount(transport.getItemRequired(), transport.getAmtItemRequired())) return false;
+        // Check Teleport Item Settings
+        if (transport.getType() == TELEPORTATION_ITEM) return isTeleportationItemUsable(transport);
+        // If the transport has quest requirements & the quest haven't been completed
+        if (transport.isQuestLocked() && !completedQuests(transport)) return false;
+        // If the transport has varbit requirements & the varbits do not match
+        if (!varbitChecks(transport)) return false;
 
         return true;
     }
@@ -460,42 +398,144 @@ public class PathfinderConfig {
         return true;
     }
 
-    /** Checks if the player has all the required equipment and inventory items for the transport */
-    private boolean hasRequiredItems(Transport transport) {
-        if (Rs2Walker.disableTeleports) return false;
-        if ((TeleportationItem.ALL.equals(useTeleportationItems) ||
-                TeleportationItem.ALL_NON_CONSUMABLE.equals(useTeleportationItems)) &&
-                TransportType.TELEPORTATION_ITEM.equals(transport.getType())) {
-            return true;
-        }
-        if (TeleportationItem.NONE.equals(useTeleportationItems) &&
-                TransportType.TELEPORTATION_ITEM.equals(transport.getType())) {
-            return false;
+    private boolean isFeatureEnabled(TransportType type) {
+        if (!client.getWorldType().contains(WorldType.MEMBERS)) {
+            // Transport types that require membership
+            switch (type) {
+                case AGILITY_SHORTCUT:
+                case GRAPPLE_SHORTCUT:
+                case BOAT:
+                case CANOE:
+                case CHARTER_SHIP:
+                case FAIRY_RING:
+                case GNOME_GLIDER:
+                case MINECART:
+                case QUETZAL:
+                case SPIRIT_TREE:
+                    return false; // Not enabled without membership
+            }
         }
 
-        if (transport.getType() == TELEPORTATION_SPELL) {
-            //START microbot variables
-            return Rs2Magic.quickCanCast(transport.getDisplayInfo());
-            //END microbot variables
-        } else {
-            //START microbot variables
-            if (!Microbot.getClient().getWorldType().contains(WorldType.MEMBERS)) return false;
-            //END microbot variables
-            // TODO: this does not check quantity
-            return transport.getItemIdRequirements().stream().flatMap(Collection::stream).anyMatch(x -> Rs2Equipment.isWearing(x) || Rs2Inventory.hasItem(x));
-       /*     List<Integer> inventoryItems = Arrays.stream(new InventoryID[]{InventoryID.INVENTORY, InventoryID.EQUIPMENT})
-                    .map(client::getItemContainer)
-                    .filter(Objects::nonNull)
-                    .map(ItemContainer::getItems)
-                    .flatMap(Arrays::stream)
-                    .map(Item::getId)
-                    .filter(itemId -> itemId != -1)
-                    .collect(Collectors.toList());
-            return transport.getItemIdRequirements().stream().anyMatch(requirements -> requirements.stream().allMatch(inventoryItems::contains));*/
+        switch (type) {
+            case AGILITY_SHORTCUT:
+                return useAgilityShortcuts;
+            case GRAPPLE_SHORTCUT:
+                return useGrappleShortcuts;
+            case BOAT:
+                return useBoats;
+            case CANOE:
+                return useCanoes;
+            case CHARTER_SHIP:
+                return useCharterShips;
+            case SHIP:
+                return useShips;
+            case FAIRY_RING:
+                return useFairyRings;
+            case GNOME_GLIDER:
+                return useGnomeGliders;
+            case MINECART:
+                return useMinecarts;
+            case NPC:
+                return useNpcs;
+            case QUETZAL:
+                return useQuetzals;
+            case SPIRIT_TREE:
+                return useSpiritTrees;
+            case TELEPORTATION_ITEM:
+                return useTeleportationItems != TeleportationItem.NONE;
+            case TELEPORTATION_LEVER:
+                return useTeleportationLevers;
+            case TELEPORTATION_PORTAL:
+                return useTeleportationPortals;
+            case TELEPORTATION_SPELL:
+                return useTeleportationSpells;
+            case WILDERNESS_OBELISK:
+                return useWildernessObelisks;
+            default:
+                return true; // Default to enabled if no specific toggle
         }
     }
 
-    //microbot method
+    /** Checks if a teleportation item is usable */
+    private boolean isTeleportationItemUsable(Transport transport) {
+        if (useTeleportationItems == TeleportationItem.NONE) return false;
+        // Check consumable items configuration
+        if (useTeleportationItems == TeleportationItem.ALL_NON_CONSUMABLE && transport.isConsumable()) return false;
+        
+        return hasRequiredItems(transport);
+    }
+
+    /** Checks if the player has all the required equipment and inventory items for the transport */
+    private boolean hasRequiredItems(Transport transport) {
+        // Global flag to disable teleports
+        if (Rs2Walker.disableTeleports) return false;
+
+        // Handle teleportation items
+        if (TransportType.TELEPORTATION_ITEM.equals(transport.getType())) 
+            return transport.getItemIdRequirements()
+                .stream()
+                .flatMap(Collection::stream)
+                .anyMatch(itemId -> Rs2Equipment.isWearing(itemId) || Rs2Inventory.hasItem(itemId));
+
+        // Handle teleportation spells
+        if (TransportType.TELEPORTATION_SPELL.equals(transport.getType())) return Rs2Magic.quickCanCast(transport.getDisplayInfo());
+
+        // Special case for Chronicle teleport
+        if (requiresChronicle(transport)) return hasChronicleCharges();
+
+        // Check membership restrictions
+        if (!client.getWorldType().contains(WorldType.MEMBERS)) return false;
+
+        // General item requirements
+        return transport.getItemIdRequirements()
+                .stream()
+                .flatMap(Collection::stream)
+                .anyMatch(itemId -> Rs2Equipment.isWearing(itemId) || Rs2Inventory.hasItem(itemId));
+    }
+
+    /** Checks if the transport requires the Chronicle */
+    private boolean requiresChronicle(Transport transport) {
+        return transport.getItemIdRequirements()
+                .stream()
+                .flatMap(Collection::stream)
+                .anyMatch(itemId -> itemId == ItemID.CHRONICLE);
+    }
+
+    /** Checks if the Chronicle has charges */
+    private boolean hasChronicleCharges() {
+        String charges = Microbot.getConfigManager()
+                .getRSProfileConfiguration(ItemChargeConfig.GROUP, ItemChargeConfig.KEY_CHRONICLE);
+
+        // If charges are unknown, attempt to retrieve them
+        if (charges == null || charges.isEmpty()) {
+            if (Rs2Inventory.hasItem(ItemID.CHRONICLE)) {
+                Rs2Inventory.interact(ItemID.CHRONICLE, "Check charges");
+            } else if (Rs2Equipment.hasEquipped(ItemID.CHRONICLE)) {
+                Rs2Equipment.interact(ItemID.CHRONICLE, "Check charges");
+            }
+            charges = Microbot.getConfigManager().getRSProfileConfiguration(ItemChargeConfig.GROUP, ItemChargeConfig.KEY_CHRONICLE);
+        }
+
+        // Validate charges
+        return charges != null && Integer.parseInt(charges) > 0;
+    }
+    
+    /** Checks if a QuestState is further progressed than currentState **/
+    private boolean isMoreProgressed(QuestState newState, QuestState currentState) {
+        if (currentState == null) return false;
+        if (newState == null) return false;
+        
+        // Define the progression order of states
+        List<QuestState> progressionOrder = Arrays.asList(
+                QuestState.NOT_STARTED,
+                QuestState.IN_PROGRESS,
+                QuestState.FINISHED
+        );
+
+        return progressionOrder.indexOf(newState) > progressionOrder.indexOf(currentState);
+    }
+    
+    @Deprecated(since = "1.6.2 - Add Restrictions to restrictions.tsv", forRemoval = true)
     public void setRestrictedTiles(Restriction... restrictions){
         this.customRestrictions = List.of(restrictions);
     }
