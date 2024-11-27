@@ -813,7 +813,7 @@ public final class Varbits
 	 * Number of game ticks remaining is in intervals of 100; for a value X there are 100 * X game ticks remaining.
 	 * A player can eat from the food piles once this reaches 0.
 	 */
-	public static final int SCURRIUS_FOOD_PILE_COOLDOWN = 4099;
+	public static final int SCURRIUS_FOOD_PILE_COOLDOWN = 4098;
 
 	/**
 	 * Farmer's Affinity effect timer
