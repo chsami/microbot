@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
  *     @ObfuscatedName("bd")
  *     @Export("headIconSpriteIndex")
  *     short[] headIconSpriteIndex = null;
+ *
+ *     URL to check new gamepack: https://oldschool42.runescape.com/jav_config.ws
  */
 
 public class Rs2Reflection {
