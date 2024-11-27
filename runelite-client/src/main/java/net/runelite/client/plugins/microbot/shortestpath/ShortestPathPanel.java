@@ -33,6 +33,7 @@ public class ShortestPathPanel extends PluginPanel {
     private JComboBox<Hops> hopsComboBox;
     private JComboBox<Trees> treesComboBox;
     private JComboBox<CompostBins> compostBinsComboBox;
+    private JComboBox<HuntingAreas> hunterCreatureComboBox;
 
     @Inject
     private ShortestPathPanel(ShortestPathPlugin plugin) {
@@ -49,6 +50,8 @@ public class ShortestPathPanel extends PluginPanel {
         add(createSlayerMasterPanel());
         add(Box.createRigidArea(new Dimension(0, 10)));
         add(createFarmingPanel());
+        add(Box.createRigidArea(new Dimension(0, 10)));
+        add(createHunterCreaturePanel());
     }
 
     private Border createCenteredTitledBorder(String title, String iconPath) {
@@ -260,6 +263,34 @@ public class ShortestPathPanel extends PluginPanel {
         return panel;
     }
 
+    private JPanel createHunterCreaturePanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(createCenteredTitledBorder("Travel to Hunter Creature", "/net/runelite/client/plugins/microbot/shortestpath/Hunter_icon.png"));
+
+        hunterCreatureComboBox = new JComboBox<>(HuntingAreas.values());
+        hunterCreatureComboBox.setRenderer(new ComboBoxListRenderer());
+        hunterCreatureComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        hunterCreatureComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, hunterCreatureComboBox.getPreferredSize().height));
+        ((JLabel) hunterCreatureComboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton startButton = new JButton("Start");
+        JButton stopButton = new JButton("Stop");
+
+        startButton.addActionListener(e -> startWalking(getSelectedHunterCreature().getWorldPoint()));
+        stopButton.addActionListener(e -> stopWalking());
+
+        buttonPanel.add(startButton);
+        buttonPanel.add(stopButton);
+
+        panel.add(hunterCreatureComboBox);
+        panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        panel.add(buttonPanel);
+
+        return panel;
+    }
+
     public WorldPoint getCustomLocation() {
         try {
             int x = Integer.parseInt(xField.getText());
@@ -325,6 +356,10 @@ public class ShortestPathPanel extends PluginPanel {
             default:
                 return "Unknown";
         }
+    }
+
+    public HuntingAreas getSelectedHunterCreature() {
+        return (HuntingAreas) hunterCreatureComboBox.getSelectedItem();
     }
     
     private void startWalking(WorldPoint point) {
