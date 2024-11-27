@@ -368,6 +368,7 @@ public class Microbot {
         return isPluginEnabled(c.getName());
     }
 
+    @Deprecated(since = "1.6.2 - Use Rs2Player variant")
     public static QuestState getQuestState(Quest quest) {
         return getClientThread().runOnClientThread(() -> quest.getState(client));
     }
