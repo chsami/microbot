@@ -443,6 +443,9 @@ public class Rs2Walker {
             if (Rs2Player.getWorldLocation().distanceTo(target) <= distance) {
                 setTarget(null);
                 Microbot.log("Arrived");
+                // invoking an interaction immediately after a previous one seems to cause the player to halt.
+                // A small sleep here prevents that from happening.
+                sleep(300);
                 return WalkerState.ARRIVED;
             }
         } catch (Exception ex) {
