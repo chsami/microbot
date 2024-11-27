@@ -1,4 +1,4 @@
-# Origin	Destination	menuOption menuTarget objectID	Skill Requirements	Item Requirements	Quest	Wait	Display Info	Varbits
+# Origin	Destination	menuOption menuTarget objectID	Skills	Items	Quests	Wait	Display Info	Varbits
 # Fishing Platform								
 2720 3301 0	2782 3273 0	Travel;Holgart;7789			Sea Slug	9		
 2782 3273 0	2720 3301 0	Travel;Holgart;5070			Sea Slug	9		
@@ -34,8 +34,8 @@
 2311 3781 0	2644 3710 0	Rellekka;Maria Gunnars;1882			The Fremennik Trials	14		
 								
 # Rellekka, Pirates' Cove								
-2620 3693 0	2213 3794 0	Pirate's Cove;Lokar Searunner;3855			The Fremennik Trials	9		
-2213 3794 0	2620 3693 0	Rellekka;Lokar Searunner;9306			The Fremennik Trials	9		
+2620 3693 0	2213 3794 0	Pirate's Cove;Lokar Searunner;3855			The Fremennik Trials;Lunar Diplomacy	9		
+2213 3794 0	2620 3693 0	Rellekka;Lokar Searunner;9306			The Fremennik Trials;Lunar Diplomacy	9		
 								
 # Rellekka, Iceberg								
 2707 3736 0	2660 3989 1	Iceberg;Boat;21176			Cold War	9		

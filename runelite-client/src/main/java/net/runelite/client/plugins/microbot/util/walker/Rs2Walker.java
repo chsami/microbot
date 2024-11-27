@@ -1059,8 +1059,6 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                     break;
                 if (succesfullAction) break;
 
-                System.out.println(itemId);
-
                 //If an action is succesfully we break out of the loop
                 succesfullAction = handleInventoryTeleports(transport, itemId) || handleWearableTeleports(transport, itemId);
 
@@ -1095,8 +1093,14 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                 .findFirst()
                 .orElse(null);
 
+        //House portal by default outside
+        if (itemId == 8013) {
+            itemAction = "Outside";
+        }
+
         // If no location-based action found, try generic actions
         if (itemAction == null) {
+
             itemAction = Arrays.stream(rs2Item.getInventoryActions())
                     .filter(action -> action != null && genericKeyWords.stream().anyMatch(keyword -> action.toLowerCase().contains(keyword.toLowerCase())))
                     .findFirst()

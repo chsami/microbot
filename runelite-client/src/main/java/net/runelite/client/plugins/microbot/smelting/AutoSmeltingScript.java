@@ -62,6 +62,8 @@ public class AutoSmeltingScript extends Script {
 
                 // walk to the initial position (near furnace)
                 if (initialPlayerLocation.distanceTo(Rs2Player.getWorldLocation()) > 4) {
+                    if (Rs2Bank.isOpen())
+                        Rs2Bank.closeBank();
                     Rs2Walker.walkTo(initialPlayerLocation, 4);
                     return;
                 }
@@ -73,7 +75,7 @@ public class AutoSmeltingScript extends Script {
                     Rs2GameObject.interact(furnace, "smelt");
                     sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694733) != null);
                     if (Rs2Widget.getWidget(17694733) != null) {
-                        Rs2Widget.clickWidget(17694734 + config.SELECTED_BAR_TYPE().ordinal());
+                        Rs2Widget.clickWidget(config.SELECTED_BAR_TYPE().getName());
                         Rs2Player.waitForAnimation();
                         expectingXPDrop = true;
                     }

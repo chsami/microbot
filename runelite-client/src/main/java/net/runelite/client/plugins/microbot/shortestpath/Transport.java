@@ -205,7 +205,7 @@ public class Transport {
         }
         //END microbot variables
 
-        if ((value = fieldMap.get("Skills")) != null) {
+        if ((value = fieldMap.get("Skills")) != null && !value.trim().isEmpty()) {
             String[] skillRequirements = value.split(DELIM_MULTI);
 
             for (String requirement : skillRequirements) {
@@ -228,7 +228,7 @@ public class Transport {
             }
         }
 
-        if ((value = fieldMap.get("Item IDs")) != null) {
+        if ((value = fieldMap.get("Item IDs")) != null && !value.trim().isEmpty()) {
             String[] itemIdsList = value.split(DELIM_MULTI);
             for (String listIds : itemIdsList) {
                 Set<Integer> multiitemList = new HashSet<>();
@@ -241,13 +241,14 @@ public class Transport {
             }
         }
 
-        if ((value = fieldMap.get("Quests")) != null) {
+        if ((value = fieldMap.get("Quests")) != null && !value.trim().isEmpty()) {
             this.quests = findQuests(value);
         }
 
-        if ((value = fieldMap.get("Duration")) != null && !value.isEmpty()) {
+        if ((value = fieldMap.get("Duration")) != null && !value.trim().isEmpty()) {
             this.duration = Integer.parseInt(value);
         }
+
         if (TransportType.TELEPORTATION_ITEM.equals(transportType)
                 || TransportType.TELEPORTATION_SPELL.equals(transportType)) {
             // Teleportation items and spells should always have a non-zero wait,
@@ -265,11 +266,11 @@ public class Transport {
             this.isConsumable = "T".equals(value) || "yes".equals(value.toLowerCase());
         }
 
-        if ((value = fieldMap.get("Wilderness level")) != null && !value.isEmpty()) {
+        if ((value = fieldMap.get("Wilderness level")) != null && !value.trim().isEmpty()) {
             this.maxWildernessLevel = Integer.parseInt(value);
         }
 
-        if ((value = fieldMap.get("Varbits")) != null) {
+        if ((value = fieldMap.get("Varbits")) != null && !value.trim().isEmpty()) {
             for (String varbitCheck : value.split(DELIM_MULTI)) {
                 String[] parts;
                 TransportVarbit.Operator operator;
@@ -319,7 +320,7 @@ public class Transport {
         Set<Quest> quests = new HashSet<>();
         for (String questName : questNames) {
             for (Quest quest : Quest.values()) {
-                if (quest.getName().equals(questName)) {
+                if (quest.getName().equalsIgnoreCase(questName.trim())) {
                     quests.add(quest);
                     break;
                 }

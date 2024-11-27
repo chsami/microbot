@@ -79,7 +79,7 @@ import java.util.regex.Pattern;
         description = "Draws the shortest path to a chosen destination on the map (right click a spot on the world map to use)",
         tags = {"pathfinder", "map", "waypoint", "navigation", "microbot"},
         enabledByDefault = true,
-        alwaysOn = false
+        alwaysOn = true
 )
 public class ShortestPathPlugin extends Plugin implements KeyListener {
     protected static final String CONFIG_GROUP = "shortestpath";
