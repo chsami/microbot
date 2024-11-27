@@ -4511,3 +4511,15 @@
 2371 3620 0	2371 3622 0	Climb-over;Stile;19222				8
 # Taverly dungeon
 2924 9803 0	2923 9803 0	Open;Gate;2623		1590			Taverly gate
+# Fight Caves
+2493 5174 0	2495 5174 0	Pass;Hot vent door;30266				2
+2495 5174 0	2493 5174 0	Pass;Hot vent door;30266				2
+2494 5157 0	2496 5157 0	Pass;Hot vent door;30266				2
+2496 5157 0	2494 5157 0	Pass;Hot vent door;30266				2
+2474 5138 0	2474 5136 0	Pass;Hot vent door;30266				2
+2474 5136 0	2474 5138 0	Pass;Hot vent door;30266				2
+2457 5120 0	2457 5118 0	Pass;Hot vent door;30266				2
+2457 5118 0	2457 5120 0	Pass;Hot vent door;30266				2
+2436 5121 0	2436 5119 0	Pass;Hot vent door;30266				2
+2436 5119 0	2436 5121 0	Pass;Hot vent door;30266				2
+2399 5177 0	2399 5175 0	Pass;Hot vent door;30266				2
