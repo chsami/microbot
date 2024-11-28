@@ -4527,3 +4527,11 @@
 2436 5121 0	2436 5119 0	Pass;Hot vent door;30266				2
 2436 5119 0	2436 5121 0	Pass;Hot vent door;30266				2
 2399 5177 0	2399 5175 0	Pass;Hot vent door;30266				2
+							
+# Sunset Coast							
+1491 2985 1	1495 2985 0	Cross;Gangplank;55335				2	
+1495 2985 0	1491 2985 1	Cross;Gangplank;55334				2	
+
+# Aldarin
+1446 2976 1	1443 2976 0	Cross;Gangplank;55337				2	
+1443 2976 0	1446 2976 1	Cross;Gangplank;55336				2	
