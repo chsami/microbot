@@ -321,7 +321,7 @@ public class ShortestPathPanel extends PluginPanel {
         JPanel hunterGuildPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton hunterGuildButton = new JButton("      Hunter Guild      ");
 
-        hunterGuildButton.addActionListener(e -> startWalking(new WorldPoint(1555, 3420, 0)));
+        hunterGuildButton.addActionListener(e -> startWalking(new WorldPoint(1558, 3046, 0)));
 
         hunterGuildPanel.add(hunterGuildButton);
 
