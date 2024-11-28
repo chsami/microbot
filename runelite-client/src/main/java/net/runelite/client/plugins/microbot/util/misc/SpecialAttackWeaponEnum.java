@@ -36,7 +36,7 @@ public enum SpecialAttackWeaponEnum {
     ABYSSAL_BLUDGEON("abyssal bludgeon", 500, true),
     BARRELCHEST_ANCHOR("barrelchest anchor", 500, true),
     GRANITE_HAMMER("granite hammer", 600, false),
-    GRANITE_MAUL("granite maul", 500, true),
+    GRANITE_MAUL("granite maul", 600, true),
     RUNE_CLAWS("rune claws", 250, true),
     EXCALIBUR("excalibur", 1000, false),
     DARKLIGHT("darklight", 500, false),

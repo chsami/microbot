@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.microbot.zerozero.birdhunter;
 
 import net.runelite.api.GameObject;
+import net.runelite.api.ObjectID;
+import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
@@ -24,25 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BirdHunterScript extends Script {
 
-
-    private static final int SUCCESSFUL_TRAP_1 = 9348;
-    private static final int SUCCESSFUL_TRAP_2 = 9376;
-    private static final int SUCCESSFUL_TRAP_3 = 9378;
-    private static final int SUCCESSFUL_TRAP_4 = 9374;
-    private static final int SUCCESSFUL_TRAP_5 = 9373;
-
-    private static final int CATCHING_TRAP_1 = 9349;
-    private static final int CATCHING_TRAP_2 = 9347;
-    private static final int CATCHING_TRAP_3 = 9377;
-    private static final int CATCHING_TRAP_4 = 9379;
-    private static final int CATCHING_TRAP_5 = 9375;
-
-    private static final int BIRD_SNARE = 10006;
-    private static final int FAILED_TRAP = 9344;
-    private static final int IDLE_TRAP = 9345;
-
-
-    public static String version = "1.0.0";
+    public static String version = "1.0.1";
     private WorldArea dynamicHuntingArea;
     private WorldPoint huntingCenter;
 
@@ -51,7 +35,7 @@ public class BirdHunterScript extends Script {
 
         if (!hasRequiredSnares()) {
             Microbot.log("Not enough bird snares in inventory. Stopping the script.");
-            return false;  // Stop the script if there aren't enough snares
+            return false;
         }
         huntingCenter = Rs2Player.getWorldLocation();
         updateHuntingArea(config);
@@ -85,7 +69,7 @@ public class BirdHunterScript extends Script {
         int hunterLevel = Rs2Player.getRealSkillLevel(Skill.HUNTER);
         int allowedSnares = getAvailableTraps(hunterLevel);  // Calculate the allowed number of snares
 
-        int snaresInInventory = Rs2Inventory.count(BIRD_SNARE);
+        int snaresInInventory = Rs2Inventory.count(ItemID.BIRD_SNARE);
         Microbot.log("Allowed snares: " + allowedSnares + ", Snares in inventory: " + snaresInInventory);
 
         return snaresInInventory >= allowedSnares;  // Return true if enough snares, false otherwise
@@ -126,26 +110,26 @@ public class BirdHunterScript extends Script {
 
     private void handleTraps(BirdHunterConfig config) {
         List<GameObject> successfulTraps = new ArrayList<>();
-        successfulTraps.addAll(Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP_1));
-        successfulTraps.addAll(Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP_2));
-        successfulTraps.addAll(Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP_3));
-        successfulTraps.addAll(Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP_4));
-        successfulTraps.addAll(Rs2GameObject.getGameObjects(SUCCESSFUL_TRAP_5));
+        successfulTraps.addAll(Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE_9349));
+        successfulTraps.addAll(Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE_9347));
+        successfulTraps.addAll(Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE_9377));
+        successfulTraps.addAll(Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE_9379));
+        successfulTraps.addAll(Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE_9375));
 
         List<GameObject> catchingTraps = new ArrayList<>();
-        catchingTraps.addAll(Rs2GameObject.getGameObjects(CATCHING_TRAP_1));
-        catchingTraps.addAll(Rs2GameObject.getGameObjects(CATCHING_TRAP_2));
-        catchingTraps.addAll(Rs2GameObject.getGameObjects(CATCHING_TRAP_3));
-        catchingTraps.addAll(Rs2GameObject.getGameObjects(CATCHING_TRAP_4));
-        catchingTraps.addAll(Rs2GameObject.getGameObjects(CATCHING_TRAP_5));
+        catchingTraps.addAll(Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE_9348));
+        catchingTraps.addAll(Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE_9376));
+        catchingTraps.addAll(Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE_9378));
+        catchingTraps.addAll(Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE_9374));
+        catchingTraps.addAll(Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE_9373));
 
-        List<GameObject> failedTraps = Rs2GameObject.getGameObjects(FAILED_TRAP);
-        List<GameObject> idleTraps = Rs2GameObject.getGameObjects(IDLE_TRAP);
+        List<GameObject> failedTraps = Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE);
+        List<GameObject> idleTraps = Rs2GameObject.getGameObjects(ObjectID.BIRD_SNARE_9345);
 
         int availableTraps = getAvailableTraps(Rs2Player.getRealSkillLevel(Skill.HUNTER));
         int totalTraps = successfulTraps.size() + failedTraps.size() + idleTraps.size() + catchingTraps.size();
 
-        if (Rs2GroundItem.exists(BIRD_SNARE, 20)) {
+        if (Rs2GroundItem.exists(ItemID.BIRD_SNARE, 20)) {
             pickUpBirdSnare();
             return;
         }
@@ -176,7 +160,7 @@ public class BirdHunterScript extends Script {
 
 
     private void setTrap(BirdHunterConfig config) {
-        if (!Rs2Inventory.contains(BIRD_SNARE)) return;
+        if (!Rs2Inventory.contains(ItemID.BIRD_SNARE)) return;
 
         if (Rs2Player.isStandingOnGameObject()) {
             movePlayerOffObject();
@@ -186,7 +170,7 @@ public class BirdHunterScript extends Script {
     }
 
     private void layBirdSnare() {
-        Rs2Item birdSnare = Rs2Inventory.get(BIRD_SNARE);
+        Rs2Item birdSnare = Rs2Inventory.get(ItemID.BIRD_SNARE);
         if (Rs2Inventory.interact(birdSnare, "Lay")) {
             if (sleepUntil(Rs2Player::isAnimating, 2000)) {
                 sleepUntil(() -> !Rs2Player.isAnimating(), 3000);
@@ -263,8 +247,8 @@ public class BirdHunterScript extends Script {
     }
 
     private void pickUpBirdSnare() {
-        if (Rs2GroundItem.exists(BIRD_SNARE, 20)) {
-            Rs2GroundItem.loot(BIRD_SNARE);
+        if (Rs2GroundItem.exists(ItemID.BIRD_SNARE, 20)) {
+            Rs2GroundItem.loot(ItemID.BIRD_SNARE);
             Microbot.log("Picked up bird snare from the ground.");
         }
     }

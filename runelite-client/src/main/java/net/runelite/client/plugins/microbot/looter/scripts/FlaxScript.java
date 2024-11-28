@@ -28,9 +28,6 @@ public class FlaxScript extends Script {
         Microbot.enableAutoRunOn = false;
         initialPlayerLocation = null;
 
-        if (config.hopWhenPlayerDetected()) {
-            Microbot.showMessage("Make sure autologin plugin is enabled and randomWorld checkbox is checked!");
-        }
         Rs2Antiban.resetAntibanSettings();
         applyAntiBanSettings();
         Rs2Antiban.setActivity(Activity.GENERAL_COLLECTING);
@@ -57,15 +54,12 @@ public class FlaxScript extends Script {
                             state = LooterState.BANKING;
                             return;
                         }
-                        if (config.hopWhenPlayerDetected()) {
-                            Rs2Player.logoutIfPlayerDetected(1, 10);
-                            return;
-                        }
+                        if (config.hopWhenPlayerDetected() && Rs2Player.hopIfPlayerDetected(1, 10, 10)) return;
+                        
                         GameObject flaxObject = Rs2GameObject.findObject("flax", false, config.distanceToStray(), true, initialPlayerLocation);
                         if (flaxObject != null) {
                             if(Rs2GameObject.interact(flaxObject, "pick")){
                                 Rs2Antiban.actionCooldown();
-                                Rs2Antiban.takeMicroBreakByChance();
                             }
                         }
                         break;
@@ -132,7 +126,6 @@ public class FlaxScript extends Script {
         Rs2AntibanSettings.dynamicIntensity = true;
         Rs2AntibanSettings.devDebug = false;
         Rs2AntibanSettings.moveMouseRandomly = true;
-        Rs2AntibanSettings.takeMicroBreaks = true;
         Rs2AntibanSettings.microBreakDurationLow = 3;
         Rs2AntibanSettings.microBreakDurationHigh = 15;
         Rs2AntibanSettings.actionCooldownChance = 0.4;
