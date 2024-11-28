@@ -33,19 +33,19 @@
 2792 3414 0	1514 2968 1	Charter;Trader Crewmember;9342	1250 Coins		6	Sunset Coast
 # Civitas illa Fortis						
 1743 3136 0	1458 2968 1	Charter;Trader Crewmember;9366	600 Coins		6	Aldarin
-1743 3136 0	2763 3238 1	Charter;Trader Crewmember;9366			6	Brimhaven
-1743 3136 0	2792 3417 1	Charter;Trader Crewmember;9366			6	Catherby
-1743 3136 0	2592 2851 1	Charter;Trader Crewmember;9366			6	Corsair Cove
-1743 3136 0	1493 3403 1	Charter;Trader Crewmember;9366			6	Land's End
-1743 3136 0	2957 3158 1	Charter;Trader Crewmember;9366			6	Musa Point
-1743 3136 0	3669 2931 1	Charter;Trader Crewmember;9366		Cabin Fever	6	Mos Le'Harmless
-1743 3136 0	2674 3141 1	Charter;Trader Crewmember;9366			6	Port Khazard
-1743 3136 0	3705 3503 1	Charter;Trader Crewmember;9366		Priest in Peril	6	Port Phasmatys
-1743 3136 0	1811 3679 1	Charter;Trader Crewmember;9366			6	Port Piscarilius
-1743 3136 0	3038 3189 1	Charter;Trader Crewmember;9366			6	Port Sarim
-1743 3136 0	2142 3125 1	Charter;Trader Crewmember;9366		Regicide	6	Port Tyras
-1743 3136 0	2156 3331 1	Charter;Trader Crewmember;9366		Song of the Elves	6	Prifddinas
-1743 3136 0	2998 3032 1	Charter;Trader Crewmember;9366		The Grand Tree	6	Shipyard
+1743 3136 0	2763 3238 1	Charter;Trader Crewmember;9366	2400 Coins		6	Brimhaven
+1743 3136 0	2792 3417 1	Charter;Trader Crewmember;9366	2400 Coins		6	Catherby
+1743 3136 0	2592 2851 1	Charter;Trader Crewmember;9366	2000 Coins		6	Corsair Cove
+1743 3136 0	1493 3403 1	Charter;Trader Crewmember;9366	800 Coins		6	Land's End
+1743 3136 0	2957 3158 1	Charter;Trader Crewmember;9366	2900 Coins		6	Musa Point
+1743 3136 0	3669 2931 1	Charter;Trader Crewmember;9366	2300 Coins	Cabin Fever	6	Mos Le'Harmless
+1743 3136 0	2674 3141 1	Charter;Trader Crewmember;9366	2200 Coins		6	Port Khazard
+1743 3136 0	3705 3503 1	Charter;Trader Crewmember;9366	4400 Coins	Priest in Peril	6	Port Phasmatys
+1743 3136 0	1811 3679 1	Charter;Trader Crewmember;9366	1000 Coins		6	Port Piscarilius
+1743 3136 0	3038 3189 1	Charter;Trader Crewmember;9366	3000 Coins		6	Port Sarim
+1743 3136 0	2142 3125 1	Charter;Trader Crewmember;9366	3200 Coins	Regicide	6	Port Tyras
+1743 3136 0	2156 3331 1	Charter;Trader Crewmember;9366	1700 Coins	Song of the Elves	6	Prifddinas
+1743 3136 0	2998 3032 1	Charter;Trader Crewmember;9366	3000 Coins	The Grand Tree	6	Shipyard
 1743 3136 0	1514 2968 1	Charter;Trader Crewmember;9366	250 Coins		6	Sunset Coast
 # Corsair Cove						
 2589 2851 0	1458 2968 1	Charter;Trader Crewmember;9342	2100 Coins		6	Aldarin
@@ -155,6 +155,7 @@
 # Port Sarim						
 3038 3192 0	1458 2968 1	Charter;Trader Crewmember;9342	3100 Coins		6	Aldarin
 3038 3192 0	2763 3238 1	Charter;Trader Crewmember;9342	1600 Coins		6	Brimhaven
+3038 3192 0	1747 3135 1	Charter;Trader Crewmember;9342	3000 Coins		6	Civitas illa Fortis
 3038 3192 0	2792 3417 1	Charter;Trader Crewmember;9342	1000 Coins		6	Catherby
 3038 3192 0	2592 2851 1	Charter;Trader Crewmember;9342	1200 Coins		6	Corsair Cove
 3038 3192 0	3669 2931 1	Charter;Trader Crewmember;9342	650 Coins	Cabin Fever	6	Mos Le'Harmless
