@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.util.security;
 
 import net.runelite.client.config.ConfigProfile;
-import net.runelite.client.plugins.defaultworld.DefaultWorldConfig;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.util.WorldUtil;
