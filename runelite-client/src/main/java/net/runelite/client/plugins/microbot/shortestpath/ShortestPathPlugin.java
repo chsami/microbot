@@ -339,15 +339,6 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
                 Microbot.getClientThread().scheduledFuture.cancel(true);
             }
         }
-
-        if (!startPointSet && !isNearPath(Rs2Player.getWorldLocation())) {
-            if (config.cancelInstead()) {
-                Rs2Walker.setTarget(null);
-                return;
-            }
-            Rs2Walker.restartPathfinding(Rs2Player.getWorldLocation(), pathfinder.getTarget());
-            Rs2Walker.recalculatePath();
-        }
     }
 
     @Subscribe
