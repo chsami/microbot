@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.util.security;
 
 import net.runelite.client.config.ConfigProfile;
+import net.runelite.client.plugins.defaultworld.DefaultWorldConfig;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.util.WorldUtil;
@@ -22,7 +23,7 @@ public class Login {
     private static final int MAX_PLAYER_COUNT = 1950;
 
     public Login() {
-        this(getRandomWorld(activeProfile.isMember()));
+        this(Microbot.getClient().getWorld() > 300 ? Microbot.getClient().getWorld() : getRandomWorld(activeProfile.isMember()));
     }
 
     public Login(int world) {
