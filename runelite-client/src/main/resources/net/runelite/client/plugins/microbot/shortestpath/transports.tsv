@@ -4492,6 +4492,8 @@
 #corsair cove							
 2578 2840 0	2578 2837 1	Cross;Gangplank;31756				1	
 2578 2837 1	2578 2840 0	Cross;Gangplank;31756				1	
+2523 2860 0	2012 9004 1	Enter;Hole;31791				2	
+2012 9004 1	2523 2860 0	Climb;Vine ladder;31790				2	
 #mining guild							
 3021 9739 0	3021 3339 0	Climb-up;Ladder;17385					
 3021 3339 0	3021 9739 0	Climb-down;Ladder;30367					

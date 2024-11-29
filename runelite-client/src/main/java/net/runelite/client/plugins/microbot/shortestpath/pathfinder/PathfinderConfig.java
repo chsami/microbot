@@ -356,14 +356,14 @@ public class PathfinderConfig {
         if (!isFeatureEnabled(transport.getType())) return false;
         // If you don't meet level requirements
         if (!hasRequiredLevels(transport)) return false;
-        // If you don't have the required Items & Amount for transport (used for charters & minecarts)
-        if (transport.getAmtItemRequired() > 0 && !Rs2Inventory.hasItemAmount(transport.getItemRequired(), transport.getAmtItemRequired())) return false;
-        // Check Teleport Item Settings
-        if (transport.getType() == TELEPORTATION_ITEM) return isTeleportationItemUsable(transport);
         // If the transport has quest requirements & the quest haven't been completed
         if (transport.isQuestLocked() && !completedQuests(transport)) return false;
         // If the transport has varbit requirements & the varbits do not match
         if (!varbitChecks(transport)) return false;
+        // If you don't have the required Items & Amount for transport (used for charters & minecarts)
+        if (transport.getAmtItemRequired() > 0 && !Rs2Inventory.hasItemAmount(transport.getItemRequired(), transport.getAmtItemRequired())) return false;
+        // Check Teleport Item Settings
+        if (transport.getType() == TELEPORTATION_ITEM) return isTeleportationItemUsable(transport);
 
         return true;
     }
