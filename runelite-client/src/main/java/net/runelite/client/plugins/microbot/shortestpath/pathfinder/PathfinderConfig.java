@@ -471,17 +471,18 @@ public class PathfinderConfig {
         if (Rs2Walker.disableTeleports) return false;
 
         // Handle teleportation items
-        if (TransportType.TELEPORTATION_ITEM.equals(transport.getType())) 
-            return transport.getItemIdRequirements()
-                .stream()
-                .flatMap(Collection::stream)
-                .anyMatch(itemId -> Rs2Equipment.isWearing(itemId) || Rs2Inventory.hasItem(itemId));
+        if (TransportType.TELEPORTATION_ITEM.equals(transport.getType())) {
+            // Special case for Chronicle teleport
+            if (requiresChronicle(transport)) return hasChronicleCharges();
 
+            return transport.getItemIdRequirements()
+                    .stream()
+                    .flatMap(Collection::stream)
+                    .anyMatch(itemId -> Rs2Equipment.isWearing(itemId) || Rs2Inventory.hasItem(itemId));
+        }
+        
         // Handle teleportation spells
         if (TransportType.TELEPORTATION_SPELL.equals(transport.getType())) return Rs2Magic.quickCanCast(transport.getDisplayInfo());
-
-        // Special case for Chronicle teleport
-        if (requiresChronicle(transport)) return hasChronicleCharges();
 
         // Check membership restrictions
         if (!client.getWorldType().contains(WorldType.MEMBERS)) return false;
