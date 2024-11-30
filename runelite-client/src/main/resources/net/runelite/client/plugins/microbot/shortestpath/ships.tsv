@@ -47,3 +47,7 @@
 # Port Sarim, Void Knights' Outpost							
 3041 3202 0	2662 2677 1	Travel;Squire;1770				11	
 2659 2676 0	3042 3199 1	Travel;Squire;1769				11	
+							
+# Sunset Coast, Aldarin
+1496 2985 0	1446 2976 1	Travel;Antonia;13984		20 Coins		6	Aldarin
+1442 2977 0	1491 2985 1	Travel;Antonia;13985		20 Coins		6	Sunset Coast

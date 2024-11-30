@@ -165,6 +165,8 @@ public enum BankLocation {
             case CORSAIR_COVE:
                 // Requires The Corsair Curse
                 return Rs2Player.getQuestState(Quest.THE_CORSAIR_CURSE) == QuestState.FINISHED;
+            case SOPHANEM:
+                return Rs2Player.getQuestState(Quest.CONTACT) == QuestState.FINISHED;
             default:
                 return true;
         }
