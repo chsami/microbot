@@ -22,7 +22,7 @@ public class Login {
     private static final int MAX_PLAYER_COUNT = 1950;
 
     public Login() {
-        this(getRandomWorld(activeProfile.isMember()));
+        this(Microbot.getClient().getWorld() > 300 ? Microbot.getClient().getWorld() : getRandomWorld(activeProfile.isMember()));
     }
 
     public Login(int world) {

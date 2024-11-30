@@ -7,6 +7,7 @@ import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.GameState;
+import net.runelite.api.WorldType;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -121,6 +122,8 @@ public class ShootingStarPlugin extends Plugin {
 
         ZonedDateTime now = ZonedDateTime.now(utcZoneId);
 
+        boolean inSeasonalWorld = Microbot.getClient().getWorldType().contains(WorldType.SEASONAL);
+
         // Format starData into Star Model
         for (Star star : starData) {
             // Filter out stars that ended longer than three mintues ago to avoid adding really old stars
@@ -141,6 +144,13 @@ public class ShootingStarPlugin extends Plugin {
             star.setWorldObject(findWorld(star.getWorld()));
 
             if (star.isGameModeWorld()) continue;
+
+            // Seasonal world filtering
+            if (inSeasonalWorld && !star.isInSeasonalWorld()) {
+                continue; // Skip non-seasonal worlds if the player is in a seasonal world
+            } else if (!inSeasonalWorld && star.isInSeasonalWorld()) {
+                continue; // Skip seasonal worlds if the player is not in a seasonal world
+            }
 
             addToList(star);
         }
