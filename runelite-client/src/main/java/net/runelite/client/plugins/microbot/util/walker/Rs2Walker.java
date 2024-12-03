@@ -252,7 +252,18 @@ public class Rs2Walker {
                 System.out.println("start loop " + i);
 
                 if (ShortestPathPlugin.getMarker() == null) {
-                    System.out.println("market is null");
+                    System.out.println("marker is null");
+                    break;
+                }
+
+                if (!isNearPath()) {
+                    System.out.println("No longer near path");
+                    if (config.cancelInstead()) {
+                        System.out.println("cancel instead of recalculate");
+                        setTarget(null);
+                    } else {
+                        recalculatePath();
+                    }
                     break;
                 }
 
@@ -1203,6 +1214,22 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
      */
     public static boolean isNear(WorldPoint target) {
         return Rs2Player.getWorldLocation().equals(target);
+    }
+
+    public static boolean isNearPath() {
+        if (ShortestPathPlugin.getPathfinder() == null || ShortestPathPlugin.getPathfinder() .getPath() == null || ShortestPathPlugin.getPathfinder().getPath().isEmpty() ||
+                config.recalculateDistance() < 0 || lastPosition.equals(lastPosition = Rs2Player.getWorldLocation())) {
+            return true;
+        }
+
+        var reachableTiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), config.recalculateDistance() - 1);
+        for (WorldPoint point : ShortestPathPlugin.getPathfinder().getPath()) {
+            if (reachableTiles.containsKey(point)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void checkIfStuck() {
