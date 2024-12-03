@@ -43,7 +43,7 @@ public class Rs2Reflection {
      * sequence maps to an actor animation
      * actor can be an npc/player
      */
-    static int sequence = -1043355907;
+    static int sequence = 1400873349;
 
     /**
      * Credits to EthanApi
@@ -55,41 +55,46 @@ public class Rs2Reflection {
         if (npc == null) {
             return -1;
         }
-        if (animationField == null) {
-            for (Field declaredField : npc.getClass().getSuperclass().getDeclaredFields()) {
-                if (declaredField == null) {
-                    continue;
-                }
-                declaredField.setAccessible(true);
-                if (declaredField.getType() != int.class) {
-                    continue;
-                }
-                if (Modifier.isFinal(declaredField.getModifiers())) {
-                    continue;
-                }
-                if (Modifier.isStatic(declaredField.getModifiers())) {
-                    continue;
-                }
-                int value = declaredField.getInt(npc);
-                declaredField.setInt(npc, 4795789);
-                if (npc.getAnimation() == sequence * 4795789) {
-                    animationField = declaredField.getName();
+        try {
+            if (animationField == null) {
+                for (Field declaredField : npc.getClass().getSuperclass().getDeclaredFields()) {
+                    if (declaredField == null) {
+                        continue;
+                    }
+                    declaredField.setAccessible(true);
+                    if (declaredField.getType() != int.class) {
+                        continue;
+                    }
+                    if (Modifier.isFinal(declaredField.getModifiers())) {
+                        continue;
+                    }
+                    if (Modifier.isStatic(declaredField.getModifiers())) {
+                        continue;
+                    }
+                    int value = declaredField.getInt(npc);
+                    declaredField.setInt(npc, 4795789);
+                    if (npc.getAnimation() == sequence * 4795789) {
+                        animationField = declaredField.getName();
+                        declaredField.setInt(npc, value);
+                        declaredField.setAccessible(false);
+                        break;
+                    }
                     declaredField.setInt(npc, value);
                     declaredField.setAccessible(false);
-                    break;
                 }
-                declaredField.setInt(npc, value);
-                declaredField.setAccessible(false);
             }
+            if (animationField == null) {
+                return -1;
+            }
+            Field animation = npc.getClass().getSuperclass().getDeclaredField(animationField);
+            animation.setAccessible(true);
+            int anim = animation.getInt(npc) * sequence;
+            animation.setAccessible(false);
+            return anim;
+        } catch(Exception ex) {
+            Microbot.log("Failed to get animation : " + ex.getMessage());
         }
-        if (animationField == null) {
-            return -1;
-        }
-        Field animation = npc.getClass().getSuperclass().getDeclaredField(animationField);
-        animation.setAccessible(true);
-        int anim = animation.getInt(npc) * sequence;
-        animation.setAccessible(false);
-        return anim;
+        return -1;
     }
 
     @SneakyThrows
