@@ -15,6 +15,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.LootingParameters;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
@@ -228,6 +229,8 @@ public class TormentedDemonScript extends Script {
                 return;
             }
         }
+
+        evaluateAndConsumePotions(config);
 
         if (config.mode() == MODE.FULL_AUTO && shouldRetreat(config)) {
             currentTarget = null;
@@ -473,6 +476,89 @@ public class TormentedDemonScript extends Script {
         logOnceToChat("No Ring of Dueling found in inventory for teleporting to Ferox Enclave.");
     }
 
+    private void evaluateAndConsumePotions(TormentedDemonConfig config) {
+        int currentStrength = Microbot.getClient().getBoostedSkillLevel(Skill.STRENGTH);
+        int maxStrength = Microbot.getClient().getRealSkillLevel(Skill.STRENGTH);
+        int currentRange = Microbot.getClient().getBoostedSkillLevel(Skill.RANGED);
+        int maxRange = Microbot.getClient().getRealSkillLevel(Skill.RANGED);
+
+        int threshold = config.boostedStatsThreshold();
+
+        List<Integer> combatPotionIds = null;
+        switch (config.combatPotionType()) {
+            case SUPER_COMBAT:
+                combatPotionIds = List.of(
+                        ItemID.SUPER_COMBAT_POTION4,
+                        ItemID.SUPER_COMBAT_POTION3,
+                        ItemID.SUPER_COMBAT_POTION2,
+                        ItemID.SUPER_COMBAT_POTION1
+                );
+                break;
+            case DIVINE_SUPER_COMBAT:
+                combatPotionIds = List.of(
+                        ItemID.DIVINE_SUPER_COMBAT_POTION4,
+                        ItemID.DIVINE_SUPER_COMBAT_POTION3,
+                        ItemID.DIVINE_SUPER_COMBAT_POTION2,
+                        ItemID.DIVINE_SUPER_COMBAT_POTION1
+                );
+                break;
+        }
+
+        List<Integer> rangingPotionIds = null;
+        switch (config.rangingPotionType()) {
+            case RANGING:
+                rangingPotionIds = List.of(
+                        ItemID.RANGING_POTION4,
+                        ItemID.RANGING_POTION3,
+                        ItemID.RANGING_POTION2,
+                        ItemID.RANGING_POTION1
+                );
+                break;
+            case DIVINE_RANGING:
+                rangingPotionIds = List.of(
+                        ItemID.DIVINE_RANGING_POTION4,
+                        ItemID.DIVINE_RANGING_POTION3,
+                        ItemID.DIVINE_RANGING_POTION2,
+                        ItemID.DIVINE_RANGING_POTION1
+                );
+                break;
+        }
+
+        if (combatPotionIds != null && getPercentageDifference(currentStrength, maxStrength) < threshold) {
+            Rs2Item combatPotion = findPotionInInventory(combatPotionIds);
+            if (combatPotion != null) {
+                Rs2Inventory.interact(combatPotion, "Drink");
+                logOnceToChat("Drinking combat potion: " + combatPotion.getName());
+            } else {
+                logOnceToChat("No combat potions left in inventory.");
+            }
+        }
+
+        if (rangingPotionIds != null && getPercentageDifference(currentRange, maxRange) < threshold) {
+            Rs2Item rangingPotion = findPotionInInventory(rangingPotionIds);
+            if (rangingPotion != null) {
+                Rs2Inventory.interact(rangingPotion, "Drink");
+                logOnceToChat("Drinking ranging potion: " + rangingPotion.getName());
+            } else {
+                logOnceToChat("No ranging potions left in inventory.");
+            }
+        }
+    }
+
+    private Rs2Item findPotionInInventory(List<Integer> potionIds) {
+        for (int id : potionIds) {
+            Rs2Item item = Rs2Inventory.get(id);
+            if (item != null) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    private int getPercentageDifference(int currentStat, int maxStat) {
+        if (maxStat == 0) return 0;
+        return (int) ((1 - (double) currentStat / maxStat) * 100);
+    }
 
     void logOnceToChat(String message) {
         if (!message.equals(lastChatMessage)) {
