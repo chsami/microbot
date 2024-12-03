@@ -158,7 +158,7 @@ public class VarrockAnvilScript extends Script {
                     }
 
                     if (!Rs2Player.isRunEnabled()) {
-                        debug("Enabled run for fishing spot");
+                        debug("Enabled run to anvil");
                         Rs2Player.toggleRunEnergy(true);
                     }
 
