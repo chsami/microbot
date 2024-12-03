@@ -285,7 +285,7 @@ public class Rs2Walker {
                 if (!Rs2Tile.isTileReachable(currentWorldPoint) && !Microbot.getClient().getTopLevelWorldView().isInstance()) {
                     continue;
                 }
-                nextWalkingDistance = Random.random(11, 20);
+                nextWalkingDistance = Random.random(7, 11);
                 if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > nextWalkingDistance) {
                     if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
                         if (Rs2Walker.walkMiniMap(currentWorldPoint)) {
