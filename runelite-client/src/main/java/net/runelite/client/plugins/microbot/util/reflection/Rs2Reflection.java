@@ -77,7 +77,7 @@ public class Rs2Reflection {
                     }
                     int value = declaredField.getInt(npc);
                     declaredField.setInt(npc, 4795789);
-                    if (npc.getAnimation() == sequence * 4795789) {
+                    if (npc.getAnimation() == animationMultiplier * 4795789) {
                         animationField = declaredField.getName();
                         declaredField.setInt(npc, value);
                         declaredField.setAccessible(false);
