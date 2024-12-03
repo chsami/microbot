@@ -4,7 +4,7 @@ import lombok.SneakyThrows;
 import net.runelite.api.*;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
-import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
@@ -17,12 +17,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *     @Export("sequence")
- *     int sequence = -1;
- *     @ObfuscatedName("cz")
- *     @ObfuscatedGetter(
- *         intValue = -1043355907
- *     )
+ *  @ObfuscatedName("cr")
+ *  @ObfuscatedGetter(
+ *  intValue = 1400873349 --> animationMultiplier
+ *  )
+ *  @Export("sequence")
+ *  int sequence;
+ *  @ObfuscatedName("cz")
+ *  @ObfuscatedGetter(
+ *  intValue = -1043355907
+ )
  *
  *     @ObfuscatedName("hw")
  * @Implements("NPCComposition")
@@ -43,7 +47,7 @@ public class Rs2Reflection {
      * sequence maps to an actor animation
      * actor can be an npc/player
      */
-    static int sequence = 1400873349;
+    static int animationMultiplier = 1400873349;
 
     /**
      * Credits to EthanApi
@@ -88,7 +92,7 @@ public class Rs2Reflection {
             }
             Field animation = npc.getClass().getSuperclass().getDeclaredField(animationField);
             animation.setAccessible(true);
-            int anim = animation.getInt(npc) * sequence;
+            int anim = animation.getInt(npc) * animationMultiplier;
             animation.setAccessible(false);
             return anim;
         } catch(Exception ex) {
@@ -170,7 +174,7 @@ public class Rs2Reflection {
 
         doAction.setAccessible(true);
         Microbot.getClientThread().runOnClientThread(() -> doAction.invoke(null, param0, param1, opcode, identifier, itemId, option, target, x, y));
-        if (Microbot.getClient().getKeyboardIdleTicks() > Random.random(5000, 10000)) {
+        if (Microbot.getClient().getKeyboardIdleTicks() > Rs2Random.between(5000, 10000)) {
             Rs2Keyboard.keyPress(KeyEvent.VK_BACK_SPACE);
         }
         System.out.println("[INVOKE] => param0: " + param0 + " param1: " + param1 + " opcode: " + opcode + " id: " + identifier + " itemid: " + itemId);
