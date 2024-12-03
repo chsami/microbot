@@ -927,6 +927,8 @@
 3237 9858 0	3236 3458 0	Climb-up;Ladder;11806					
 3236 3458 0	3237 9858 0	Open;Manhole;881					
 3236 3458 0	3237 9858 0	Climb-down;Manhole;882					
+3210 9899 0	3210 9898 0	Slash;Web;733				8	
+3210 9898 0	3210 9899 0	Slash;Web;733				8	
 							
 # Stronghold of Security							
 3081 3421 0	1859 5243 0	Climb-down;Entrance;20790					
