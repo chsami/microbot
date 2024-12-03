@@ -792,6 +792,10 @@
 3131 9918 0	3131 9917 0	Open;Gate;1727					
 3122 3488 0	3122 3487 0	Open;Door;102					
 3122 3487 0	3122 3488 0	Open;Door;102					
+3115 3449 0	3115 3450 0	Open;Door;1804		1 Brass key		2	
+3115 3450 0	3115 3449 0	Open;Door;1804				2	
+3115 3452 0	3115 9852 0	Climb-down;Ladder;17384				2	
+3115 9852 0	3115 3452 0	Climb-up;Ladder;17385				2	
 							
 # Varrock							
 3212 3472 0	3212 3476 1	Climb-up;Staircase;11807					
@@ -923,6 +927,8 @@
 3237 9858 0	3236 3458 0	Climb-up;Ladder;11806					
 3236 3458 0	3237 9858 0	Open;Manhole;881					
 3236 3458 0	3237 9858 0	Climb-down;Manhole;882					
+3210 9899 0	3210 9898 0	Slash;Web;733				8	
+3210 9898 0	3210 9899 0	Slash;Web;733				8	
 							
 # Stronghold of Security							
 3081 3421 0	1859 5243 0	Climb-down;Entrance;20790					
@@ -4488,6 +4494,8 @@
 #corsair cove							
 2578 2840 0	2578 2837 1	Cross;Gangplank;31756				1	
 2578 2837 1	2578 2840 0	Cross;Gangplank;31756				1	
+2523 2860 0	2012 9004 1	Enter;Hole;31791				2	
+2012 9004 1	2523 2860 0	Climb;Vine ladder;31790				2	
 #mining guild							
 3021 9739 0	3021 3339 0	Climb-up;Ladder;17385					
 3021 3339 0	3021 9739 0	Climb-down;Ladder;30367					
@@ -4511,3 +4519,23 @@
 2371 3620 0	2371 3622 0	Climb-over;Stile;19222				8
 # Taverly dungeon
 2924 9803 0	2923 9803 0	Open;Gate;2623		1590			Taverly gate
+# Fight Caves
+2493 5174 0	2495 5174 0	Pass;Hot vent door;30266				2
+2495 5174 0	2493 5174 0	Pass;Hot vent door;30266				2
+2494 5157 0	2496 5157 0	Pass;Hot vent door;30266				2
+2496 5157 0	2494 5157 0	Pass;Hot vent door;30266				2
+2474 5138 0	2474 5136 0	Pass;Hot vent door;30266				2
+2474 5136 0	2474 5138 0	Pass;Hot vent door;30266				2
+2457 5120 0	2457 5118 0	Pass;Hot vent door;30266				2
+2457 5118 0	2457 5120 0	Pass;Hot vent door;30266				2
+2436 5121 0	2436 5119 0	Pass;Hot vent door;30266				2
+2436 5119 0	2436 5121 0	Pass;Hot vent door;30266				2
+2399 5177 0	2399 5175 0	Pass;Hot vent door;30266				2
+							
+# Sunset Coast							
+1491 2985 1	1495 2985 0	Cross;Gangplank;55335				2	
+1495 2985 0	1491 2985 1	Cross;Gangplank;55334				2	
+
+# Aldarin
+1446 2976 1	1443 2976 0	Cross;Gangplank;55337				2	
+1443 2976 0	1446 2976 1	Cross;Gangplank;55336				2	

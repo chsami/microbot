@@ -109,6 +109,10 @@ public class Star {
     public boolean isF2PWorld() {
         return !this.isGameModeWorld() && !this.getWorldObject().getTypes().contains(WorldType.MEMBERS);
     }
+
+    public boolean isInSeasonalWorld() {
+        return this.getWorldObject().getTypes().contains(WorldType.SEASONAL);
+    }
     
     @Override
     public boolean equals(Object obj) {

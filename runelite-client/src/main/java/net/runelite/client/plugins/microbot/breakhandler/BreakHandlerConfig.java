@@ -68,11 +68,21 @@ public interface BreakHandlerConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "useRandomWorld",
+            name = "Use RandomWorld",
+            description = "Change to a random world once break is finished",
+            position = 5
+    )
+    default boolean useRandomWorld() {
+        return false;
+    }
+
+    @ConfigItem(
             keyName = "UsePlaySchedule",
             name = "Use Play Schedule",
             description = "Enable or disable the use of a play schedule",
-            position = 5,
-            section = "UsePlaySchedule"
+            position = 0,
+            section = usePlaySchedule
     )
     default boolean usePlaySchedule() {
         return false;
@@ -82,8 +92,8 @@ public interface BreakHandlerConfig extends Config {
             keyName = "PlaySchedule",
             name = "Play Schedule",
             description = "Select the play schedule",
-            position = 6,
-            section = "UsePlaySchedule"
+            position = 1,
+            section = usePlaySchedule
     )
     default PlaySchedule playSchedule() {
         return PlaySchedule.MEDIUM_DAY;

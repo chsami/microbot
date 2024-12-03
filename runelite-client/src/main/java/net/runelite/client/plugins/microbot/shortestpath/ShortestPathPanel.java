@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.shortestpath;
 
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.nateplugins.skilling.natefishing.enums.Fish;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -33,7 +34,13 @@ public class ShortestPathPanel extends PluginPanel {
     private JComboBox<Hops> hopsComboBox;
     private JComboBox<Trees> treesComboBox;
     private JComboBox<CompostBins> compostBinsComboBox;
-    private JComboBox<HuntingAreas> hunterCreatureComboBox;
+    private JComboBox<HuntingAreas> huntingAreasComboBox;
+    private JComboBox<Birds> birdsComboBox;
+    private JComboBox<Chinchompas> chinchompasComboBox;
+    private JComboBox<Insects> insectsComboBox;
+    private JComboBox<Kebbits> kebbitsJComboBox;
+    private JComboBox<Salamanders> salamandersComboBox;
+    private JComboBox<SpecialHuntingAreas> specialHuntingAreasJComboBox;
 
     @Inject
     private ShortestPathPanel(ShortestPathPlugin plugin) {
@@ -268,25 +275,64 @@ public class ShortestPathPanel extends PluginPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(createCenteredTitledBorder("Travel to Hunter Creature", "/net/runelite/client/plugins/microbot/shortestpath/Hunter_icon.png"));
 
-        hunterCreatureComboBox = new JComboBox<>(HuntingAreas.values());
-        hunterCreatureComboBox.setRenderer(new ComboBoxListRenderer());
-        hunterCreatureComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-        hunterCreatureComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, hunterCreatureComboBox.getPreferredSize().height));
-        ((JLabel) hunterCreatureComboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+        huntingAreasComboBox = new JComboBox<>(HuntingAreas.values());
+        huntingAreasComboBox.setRenderer(new ComboBoxListRenderer());
+        huntingAreasComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        huntingAreasComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, huntingAreasComboBox.getPreferredSize().height));
+        ((JLabel) huntingAreasComboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+        
+        birdsComboBox = new JComboBox<>(Birds.values());
+        chinchompasComboBox = new JComboBox<>(Chinchompas.values());
+        insectsComboBox = new JComboBox<>(Insects.values());
+        kebbitsJComboBox = new JComboBox<>(Kebbits.values());
+        salamandersComboBox = new JComboBox<>(Salamanders.values());
+        specialHuntingAreasJComboBox = new JComboBox<>(SpecialHuntingAreas.values());
+        
+        JComboBox<?>[] subComboBoxes = {birdsComboBox, chinchompasComboBox, insectsComboBox, kebbitsJComboBox, salamandersComboBox, specialHuntingAreasJComboBox};
+
+        for (JComboBox<?> comboBox : subComboBoxes) {
+            comboBox.setRenderer(new ComboBoxListRenderer());
+            comboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+            comboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, comboBox.getPreferredSize().height));
+            ((JLabel)comboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+            comboBox.setVisible(false);
+        }
+        
+        huntingAreasComboBox.addActionListener(e -> {
+            HuntingAreas selectedHuntingArea = (HuntingAreas) huntingAreasComboBox.getSelectedItem();
+            birdsComboBox.setVisible(selectedHuntingArea == HuntingAreas.BIRDS);
+            chinchompasComboBox.setVisible(selectedHuntingArea == HuntingAreas.CHINCHOMPAS);
+            insectsComboBox.setVisible(selectedHuntingArea == HuntingAreas.INSECTS);
+            kebbitsJComboBox.setVisible(selectedHuntingArea == HuntingAreas.KEBBITS);
+            salamandersComboBox.setVisible(selectedHuntingArea == HuntingAreas.SALAMANDERS);
+            specialHuntingAreasJComboBox.setVisible(selectedHuntingArea == HuntingAreas.SPECIAL);
+        });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton startButton = new JButton("Start");
         JButton stopButton = new JButton("Stop");
 
-        startButton.addActionListener(e -> startWalking(getSelectedHunterCreature().getWorldPoint()));
+        startButton.addActionListener(e -> startWalking(getSelectedHuntingArea()));
         stopButton.addActionListener(e -> stopWalking());
 
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
 
-        panel.add(hunterCreatureComboBox);
+        JPanel hunterGuildPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton hunterGuildButton = new JButton("      Hunter Guild      ");
+
+        hunterGuildButton.addActionListener(e -> startWalking(new WorldPoint(1558, 3046, 0)));
+
+        hunterGuildPanel.add(hunterGuildButton);
+
+        panel.add(huntingAreasComboBox);
+        for (JComboBox<?> comboBox : subComboBoxes) {
+            panel.add(comboBox);
+        }
         panel.add(Box.createRigidArea(new Dimension(0, 5)));
         panel.add(buttonPanel);
+        panel.add(Box.createRigidArea(new Dimension(0, 2)));
+        panel.add(hunterGuildPanel);
 
         return panel;
     }
@@ -336,30 +382,28 @@ public class ShortestPathPanel extends PluginPanel {
         }
     }
 
-    public String getSelectedFarmingLocationName() {
-        Farming selectedFarming = getSelectedFarmingCategory();
-        switch (selectedFarming) {
-            case ALLOTMENTS:
-                return ((Allotments) allotmentsComboBox.getSelectedItem()).name();
-            case BUSHES:
-                return ((Bushes) bushesComboBox.getSelectedItem()).name();
-            case FRUIT_TREES:
-                return ((FruitTrees) fruitTreesComboBox.getSelectedItem()).name();
-            case HERBS:
-                return ((Herbs) herbsComboBox.getSelectedItem()).name();
-            case HOPS:
-                return ((Hops) hopsComboBox.getSelectedItem()).name();
-            case TREES:
-                return ((Trees) treesComboBox.getSelectedItem()).name();
-            case COMPOST_BINS:
-                return ((CompostBins) compostBinsComboBox.getSelectedItem()).name();
-            default:
-                return "Unknown";
-        }
+    public HuntingAreas getSelectedHunterArea() {
+        return (HuntingAreas) huntingAreasComboBox.getSelectedItem();
     }
 
-    public HuntingAreas getSelectedHunterCreature() {
-        return (HuntingAreas) hunterCreatureComboBox.getSelectedItem();
+    public WorldPoint getSelectedHuntingArea() {
+        HuntingAreas selectedHunting = getSelectedHunterArea();
+        switch (selectedHunting) {
+            case BIRDS:
+                return ((Birds) birdsComboBox.getSelectedItem()).getWorldPoint();
+            case INSECTS:
+                return ((Insects) insectsComboBox.getSelectedItem()).getWorldPoint();
+            case KEBBITS:
+                return ((Kebbits) kebbitsJComboBox.getSelectedItem()).getWorldPoint();
+            case CHINCHOMPAS:
+                return ((Chinchompas) chinchompasComboBox.getSelectedItem()).getWorldPoint();
+            case SALAMANDERS:
+                return ((Salamanders) salamandersComboBox.getSelectedItem()).getWorldPoint();
+            case SPECIAL:
+                return ((SpecialHuntingAreas) specialHuntingAreasJComboBox.getSelectedItem()).getWorldPoint();
+            default:
+                return null;
+        }
     }
     
     private void startWalking(WorldPoint point) {

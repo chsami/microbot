@@ -356,14 +356,14 @@ public class PathfinderConfig {
         if (!isFeatureEnabled(transport.getType())) return false;
         // If you don't meet level requirements
         if (!hasRequiredLevels(transport)) return false;
-        // If you don't have the required Items & Amount for transport (used for charters & minecarts)
-        if (transport.getAmtItemRequired() > 0 && !Rs2Inventory.hasItemAmount(transport.getItemRequired(), transport.getAmtItemRequired())) return false;
-        // Check Teleport Item Settings
-        if (transport.getType() == TELEPORTATION_ITEM) return isTeleportationItemUsable(transport);
         // If the transport has quest requirements & the quest haven't been completed
         if (transport.isQuestLocked() && !completedQuests(transport)) return false;
         // If the transport has varbit requirements & the varbits do not match
         if (!varbitChecks(transport)) return false;
+        // If you don't have the required Items & Amount for transport (used for charters & minecarts)
+        if (transport.getAmtItemRequired() > 0 && !Rs2Inventory.hasItemAmount(transport.getItemRequired(), transport.getAmtItemRequired())) return false;
+        // Check Teleport Item Settings
+        if (transport.getType() == TELEPORTATION_ITEM) return isTeleportationItemUsable(transport);
 
         return true;
     }
@@ -471,17 +471,18 @@ public class PathfinderConfig {
         if (Rs2Walker.disableTeleports) return false;
 
         // Handle teleportation items
-        if (TransportType.TELEPORTATION_ITEM.equals(transport.getType())) 
-            return transport.getItemIdRequirements()
-                .stream()
-                .flatMap(Collection::stream)
-                .anyMatch(itemId -> Rs2Equipment.isWearing(itemId) || Rs2Inventory.hasItem(itemId));
+        if (TransportType.TELEPORTATION_ITEM.equals(transport.getType())) {
+            // Special case for Chronicle teleport
+            if (requiresChronicle(transport)) return hasChronicleCharges();
 
+            return transport.getItemIdRequirements()
+                    .stream()
+                    .flatMap(Collection::stream)
+                    .anyMatch(itemId -> Rs2Equipment.isWearing(itemId) || Rs2Inventory.hasItem(itemId));
+        }
+        
         // Handle teleportation spells
         if (TransportType.TELEPORTATION_SPELL.equals(transport.getType())) return Rs2Magic.quickCanCast(transport.getDisplayInfo());
-
-        // Special case for Chronicle teleport
-        if (requiresChronicle(transport)) return hasChronicleCharges();
 
         // Check membership restrictions
         if (!client.getWorldType().contains(WorldType.MEMBERS)) return false;
@@ -503,6 +504,8 @@ public class PathfinderConfig {
 
     /** Checks if the Chronicle has charges */
     private boolean hasChronicleCharges() {
+        if (!Rs2Equipment.isWearing(ItemID.CHRONICLE) || !Rs2Inventory.hasItem(ItemID.CHRONICLE)) return false;
+        
         String charges = Microbot.getConfigManager()
                 .getRSProfileConfiguration(ItemChargeConfig.GROUP, ItemChargeConfig.KEY_CHRONICLE);
 
