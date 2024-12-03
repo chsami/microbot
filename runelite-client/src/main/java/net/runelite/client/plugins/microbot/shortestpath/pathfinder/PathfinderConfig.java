@@ -504,6 +504,8 @@ public class PathfinderConfig {
 
     /** Checks if the Chronicle has charges */
     private boolean hasChronicleCharges() {
+        if (!Rs2Equipment.isWearing(ItemID.CHRONICLE) || !Rs2Inventory.hasItem(ItemID.CHRONICLE)) return false;
+        
         String charges = Microbot.getConfigManager()
                 .getRSProfileConfiguration(ItemChargeConfig.GROUP, ItemChargeConfig.KEY_CHRONICLE);
 
