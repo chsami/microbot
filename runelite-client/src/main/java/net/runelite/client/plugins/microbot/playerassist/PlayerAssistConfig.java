@@ -21,61 +21,65 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigSection(
             name = "Combat",
-            description = "Combat",
+            description = "Combat settings",
             position = 1,
             closedByDefault = false
     )
     String combatSection = "Combat";
-    @ConfigSection(
-            name = "Banking",
-            description = "Banking settings",
-            position = 992,
-            closedByDefault = false
-    )
-    String banking = "Banking";
-    //Gear section
-    @ConfigSection(
-            name = "Gear",
-            description = "Gear",
-            position = 55,
-            closedByDefault = true
-    )
-    String gearSection = "Gear";
+
     @ConfigSection(
             name = "Food & Potions",
-            description = "Food & Potions",
+            description = "Food and potion settings",
             position = 2,
             closedByDefault = false
     )
     String foodAndPotionsSection = "Food & Potions";
+
     @ConfigSection(
             name = "Loot",
-            description = "Loot",
+            description = "Looting settings",
             position = 3,
             closedByDefault = false
     )
     String lootSection = "Loot";
-    //Prayer section
+
     @ConfigSection(
             name = "Prayer",
-            description = "Prayer",
+            description = "Prayer settings",
             position = 4,
             closedByDefault = false
     )
     String prayerSection = "Prayer";
-    //Skilling section
+
     @ConfigSection(
-            name = "Skilling",
-            description = "Skilling",
+            name = "Combat skilling",
+            description = "Combat skill training settings",
             position = 5,
             closedByDefault = false
     )
     String skillingSection = "Combat Skilling";
 
+    @ConfigSection(
+            name = "Gear",
+            description = "Equipment settings",
+            position = 6,
+            closedByDefault = true
+    )
+    String gearSection = "Gear";
+
+    @ConfigSection(
+            name = "Banking",
+            description = "Banking settings",
+            position = 7,
+            closedByDefault = false
+    )
+    String banking = "Banking";
+
+
     @ConfigItem(
             keyName = "Combat",
-            name = "Auto attack npc",
-            description = "Attacks npc",
+            name = "Auto attack NPC",
+            description = "Automatically attack NPCs",
             position = 0,
             section = combatSection
     )
@@ -85,8 +89,8 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "monster",
-            name = "Attackable npcs",
-            description = "List of attackable npcs",
+            name = "Attackable NPCs",
+            description = "Comma-separated list of NPCs to attack",
             position = 1,
             section = combatSection
     )
@@ -96,8 +100,8 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "Attack Radius",
-            name = "Attack Radius",
-            description = "The max radius to attack npcs",
+            name = "Attack radius",
+            description = "Maximum radius to attack NPCs",
             position = 2,
             section = combatSection
     )
@@ -106,10 +110,43 @@ public interface PlayerAssistConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "Center Tile",
+            name = "Manual center tile",
+            description = "Shift right-click the ground to select the center tile",
+            position = 3,
+            section = combatSection
+    )
+    default boolean toggleCenterTile() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "Safe Spot",
+            name = "Safe spot",
+            description = "Shift right-click the ground to select the safe spot tile",
+            position = 4,
+            section = combatSection
+    )
+    default boolean toggleSafeSpot() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "PlayStyle",
+            name = "Play style",
+            description = "Select combat play style",
+            position = 5,
+            section = combatSection
+    )
+    default PlayStyle playStyle() {
+        return PlayStyle.AGGRESSIVE;
+    }
+
+    @ConfigItem(
             keyName = "Use special attack",
             name = "Use special attack",
-            description = "Use special attack",
-            position = 3,
+            description = "Enable special attack usage",
+            position = 6,
             section = combatSection
     )
     default boolean useSpecialAttack() {
@@ -119,43 +156,19 @@ public interface PlayerAssistConfig extends Config {
     @ConfigItem(
             keyName = "Cannon",
             name = "Auto reload cannon",
-            description = "Automatically reloads cannon",
-            position = 4,
+            description = "Automatically reload cannon",
+            position = 7,
             section = combatSection
     )
     default boolean toggleCannon() {
         return false;
     }
 
-    //safe spot
-    @ConfigItem(
-            keyName = "Safe Spot",
-            name = "Safe Spot",
-            description = "Shift Right-click the ground to select the safe spot tile",
-            position = 5,
-            section = combatSection
-    )
-    default boolean toggleSafeSpot() {
-        return false;
-    }
-
-    //PlayStyle
-    @ConfigItem(
-            keyName = "PlayStyle",
-            name = "Play Style",
-            description = "Play Style",
-            position = 6,
-            section = combatSection
-    )
-    default PlayStyle playStyle() {
-        return PlayStyle.AGGRESSIVE;
-    }
-
     @ConfigItem(
             keyName = "ReachableNpcs",
-            name = "Only attack reachable npcs",
-            description = "Only attack npcs that we can reach with melee",
-            position = 7,
+            name = "Only attack reachable NPCs",
+            description = "Only attack NPCs that can be reached with melee",
+            position = 8,
             section = combatSection
     )
     default boolean attackReachableNpcs() {
@@ -165,7 +178,7 @@ public interface PlayerAssistConfig extends Config {
     @ConfigItem(
             keyName = "Food",
             name = "Auto eat food",
-            description = "Automatically eats food",
+            description = "Automatically eat food",
             position = 0,
             section = foodAndPotionsSection
     )
@@ -176,7 +189,7 @@ public interface PlayerAssistConfig extends Config {
     @ConfigItem(
             keyName = "Auto Prayer Potion",
             name = "Auto drink prayer potion",
-            description = "Automatically drinks prayer potions",
+            description = "Automatically drink prayer potions",
             position = 1,
             section = foodAndPotionsSection
     )
@@ -186,8 +199,8 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "Combat potion",
-            name = "Auto drink super combat potion",
-            description = "Automatically drinks combat potions",
+            name = "Auto drink combat potion",
+            description = "Automatically drink combat potions",
             position = 2,
             section = foodAndPotionsSection
     )
@@ -197,8 +210,8 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "Ranging/Bastion potion",
-            name = "Auto drink Ranging/Bastion potion",
-            description = "Automatically drinks Ranging/Bastion potions",
+            name = "Auto drink ranging potion",
+            description = "Automatically drink ranging/bastion potions",
             position = 3,
             section = foodAndPotionsSection
     )
@@ -208,13 +221,11 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "Use AntiPoison",
-            name = "Use AntiPoison",
-            description = "Use AntiPoison",
+            name = "Use antipoison",
+            description = "Automatically use antipoison",
             position = 4,
             section = foodAndPotionsSection
     )
-
-
     default boolean useAntiPoison() {
         return false;
     }
@@ -222,7 +233,7 @@ public interface PlayerAssistConfig extends Config {
     @ConfigItem(
             keyName = "Loot items",
             name = "Auto loot items",
-            description = "Enable/disable loot items",
+            description = "Enable/disable auto looting",
             position = 0,
             section = lootSection
     )
@@ -231,10 +242,21 @@ public interface PlayerAssistConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "Min Price of items to loot",
-            name = "Min. Price of items to loot",
-            description = "Min. Price of items to loot",
+            keyName = "listItemsToLoot",
+            name = "Items to loot",
+            description = "Comma-separated list of items to loot (e.g., 'bread, coins' or 'bread,coins')",
             position = 1,
+            section = lootSection
+    )
+    default String listItemsToLoot() {
+        return "";
+    }
+
+    @ConfigItem(
+            keyName = "Min Price of items to loot",
+            name = "Min price to loot",
+            description = "Minimum price of items to loot",
+            position = 2,
             section = lootSection
     )
     default int minPriceOfItemsToLoot() {
@@ -243,57 +265,53 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "Max Price of items to loot",
-            name = "Max. Price of items to loot",
-            description = "Max. Price of items to loot default is set to 10M",
-            position = 1,
+            name = "Max price to loot",
+            description = "Maximum price of items to loot (default: 10M)",
+            position = 3,
             section = lootSection
     )
     default int maxPriceOfItemsToLoot() {
         return 10000000;
     }
-    // toggle scatter
 
     @ConfigItem(
             keyName = "Loot arrows",
-            name = "Auto loot arrows",
-            description = "Enable/disable loot arrows",
-            position = 2,
+            name = "Loot arrows",
+            description = "Enable arrow looting",
+            position = 4,
             section = lootSection
     )
     default boolean toggleLootArrows() {
         return false;
     }
 
-    // toggle loot runes
     @ConfigItem(
             keyName = "Loot runes",
             name = "Loot runes",
-            description = "Enable/disable loot runes",
-            position = 3,
+            description = "Enable rune looting",
+            position = 5,
             section = lootSection
     )
     default boolean toggleLootRunes() {
         return false;
     }
 
-    // toggle loot coins
     @ConfigItem(
             keyName = "Loot coins",
             name = "Loot coins",
-            description = "Enable/disable loot coins",
-            position = 4,
+            description = "Enable coin looting",
+            position = 6,
             section = lootSection
     )
     default boolean toggleLootCoins() {
         return false;
     }
 
-    // toggle loot untreadables
     @ConfigItem(
             keyName = "Loot untradables",
             name = "Loot untradables",
-            description = "Enable/disable loot untradables",
-            position = 5,
+            description = "Enable untradable item looting",
+            position = 7,
             section = lootSection
     )
     default boolean toggleLootUntradables() {
@@ -302,9 +320,9 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "Bury Bones",
-            name = "Bury Bones",
-            description = "Picks up and Bury Bones",
-            position = 96,
+            name = "Bury bones",
+            description = "Pick up and bury bones",
+            position = 8,
             section = lootSection
     )
     default boolean toggleBuryBones() {
@@ -313,105 +331,53 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "Scatter",
-            name = "Scatter",
-            description = "Picks up and Scatter ashes",
-            position = 97,
+            name = "Scatter ashes",
+            description = "Pick up and scatter ashes",
+            position = 9,
             section = lootSection
     )
     default boolean toggleScatter() {
         return false;
     }
 
-    // delayed looting
     @ConfigItem(
             keyName = "delayedLooting",
-            name = "Delayed Looting",
-            description = "Lets the loot stay on the ground for a while before picking it up",
-            position = 98,
+            name = "Delayed looting",
+            description = "Let loot stay on ground before picking up",
+            position = 10,
             section = lootSection
     )
     default boolean toggleDelayedLooting() {
         return false;
     }
 
-    // only loot my items
     @ConfigItem(
             keyName = "onlyLootMyItems",
-            name = "Only Loot My Items",
-            description = "Only loot items that are dropped for/by you",
-            position = 99,
+            name = "Only loot my items",
+            description = "Only loot items that you dropped or were dropped for you",
+            position = 11,
             section = lootSection
     )
     default boolean toggleOnlyLootMyItems() {
         return false;
     }
 
-    //Force loot regardless if we are in combat or not
     @ConfigItem(
             keyName = "forceLoot",
-            name = "Force Loot",
-            description = "Force loot regardless if we are in combat or not",
-            position = 100,
+            name = "Force loot",
+            description = "Force looting even while in combat",
+            position = 12,
             section = lootSection
     )
     default boolean toggleForceLoot() {
         return false;
     }
 
-    //set center tile manually
-    @ConfigItem(
-            keyName = "Center Tile",
-            name = "Manual Center Tile",
-            description = "Shift Right-click the ground to select the center tile",
-            position = 6,
-            section = combatSection
-    )
-    default boolean toggleCenterTile() {
-        return false;
-    }
-
-    //Use quick prayer
-    @ConfigItem(
-            keyName = "Use prayer",
-            name = "Use prayer",
-            description = "Use prayer",
-            position = 0,
-            section = prayerSection
-    )
-    default boolean togglePrayer() {
-        return false;
-    }
-
-    //Flick quick prayer
-    @ConfigItem(
-            keyName = "quickPrayer",
-            name = "Quick prayer",
-            description = "Use quick prayer",
-            position = 1,
-            section = prayerSection
-    )
-    default boolean toggleQuickPray() {
-        return false;
-    }
-
-    //Lazy flick
-    @ConfigItem(
-            keyName = "prayerStyle",
-            name = "Prayer Style",
-            description = "Select type of prayer style to use",
-            position = 2,
-            section = prayerSection
-    )
-    default PrayerStyle prayerStyle() {
-        return PrayerStyle.LAZY_FLICK;
-    }
-
-    //Prayer style guide
     @ConfigItem(
             keyName = "prayerStyleGuide",
-            name = "Prayer Style Guide",
-            description = "Prayer Style Guide",
-            position = 3,
+            name = "Prayer style guide",
+            description = "Prayer style explanations",
+            position = 0,
             section = prayerSection
     )
     default String prayerStyleGuide() {
@@ -421,119 +387,143 @@ public interface PlayerAssistConfig extends Config {
                 "Always On: Quick prayer is always on";
     }
 
-    // Enable skilling
+    @ConfigItem(
+            keyName = "Use prayer",
+            name = "Use prayer",
+            description = "Enable prayer usage",
+            position = 1,
+            section = prayerSection
+    )
+    default boolean togglePrayer() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "quickPrayer",
+            name = "Quick prayer",
+            description = "Use quick prayers",
+            position = 2,
+            section = prayerSection
+    )
+    default boolean toggleQuickPray() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "prayerStyle",
+            name = "Prayer style",
+            description = "Select prayer activation style",
+            position = 3,
+            section = prayerSection
+    )
+    default PrayerStyle prayerStyle() {
+        return PrayerStyle.LAZY_FLICK;
+    }
+
     @ConfigItem(
             keyName = "enableSkilling",
-            name = "Enable Skilling",
-            description = "Enable Skilling",
+            name = "Enable skilling",
+            description = "Enable combat skill training",
             position = 0,
             section = skillingSection
     )
     default boolean toggleEnableSkilling() {
         return false;
     }
-    //Balance combat skills
+
     @ConfigItem(
             keyName = "balanceCombatSkills",
             name = "Balance combat skills",
-            description = "Balance combat skills",
-            position = 0,
+            description = "Balance combat skill training",
+            position = 1,
             section = skillingSection
     )
     default boolean toggleBalanceCombatSkills() {
         return false;
     }
 
-    //Avoid Controlled attack style
     @ConfigItem(
             keyName = "avoidControlled",
-            name = "No Controlled Attack",
-            description = "Avoid Controlled attack style so you won't accidentally train unwanted combat skills",
-            position = 1,
+            name = "No controlled attack",
+            description = "Avoid controlled attack style",
+            position = 2,
             section = skillingSection
     )
     default boolean toggleAvoidControlled() {
         return true;
     }
 
-
-    //Attack style change delay (Seconds)
     @ConfigItem(
             keyName = "attackStyleChangeDelay",
-            name = "Change Delay",
-            description = "Attack Style Change Delay In Seconds",
-            position = 2,
+            name = "Change delay",
+            description = "Attack style change delay in seconds",
+            position = 3,
             section = skillingSection
     )
     default int attackStyleChangeDelay() {
         return 60 * 15;
     }
-    // Disable on Max combat
+
     @ConfigItem(
             keyName = "disableOnMaxCombat",
-            name = "Disable on Max Combat",
-            description = "Disable on Max Combat",
-            position = 3,
+            name = "Disable on max combat",
+            description = "Disable when combat skills are maxed",
+            position = 4,
             section = skillingSection
     )
     default boolean toggleDisableOnMaxCombat() {
         return true;
     }
-    //Attack skill target
+
     @ConfigItem(
             keyName = "attackSkillTarget",
-            name = "Attack Level Target",
-            description = "Attack level target",
-            position = 97,
+            name = "Attack level target",
+            description = "Target level for Attack",
+            position = 5,
             section = skillingSection
     )
     default int attackSkillTarget() {
         return 99;
     }
 
-    //Strength skill target
     @ConfigItem(
             keyName = "strengthSkillTarget",
-            name = "Strength Level Target",
-            description = "Strength level target",
-            position = 98,
+            name = "Strength level target",
+            description = "Target level for Strength",
+            position = 6,
             section = skillingSection
     )
     default int strengthSkillTarget() {
         return 99;
     }
 
-    //Defence skill target
     @ConfigItem(
             keyName = "defenceSkillTarget",
-            name = "Defence Level Target",
-            description = "Defence level target",
-            position = 99,
+            name = "Defence level target",
+            description = "Target level for Defence",
+            position = 7,
             section = skillingSection
     )
     default int defenceSkillTarget() {
         return 99;
     }
 
-
-    // Use Inventory Setup
     @ConfigItem(
             keyName = "useInventorySetup",
-            name = "Use Inventory Setup",
-            description = "Use Inventory Setup, make sure to select consumables used in the bank section",
-            position = 1,
+            name = "Use inventory setup",
+            description = "Use inventory setup from Inventory Setup plugin",
+            position = 0,
             section = gearSection
     )
     default boolean useInventorySetup() {
         return false;
     }
 
-    // Inventory setup selection TODO: Add inventory setup selection
     @ConfigItem(
             keyName = "InventorySetupName",
-            name = "Inventory setup name",
-            description = "Create an inventory setup in the inventory setup plugin and enter the name here",
-            position = 99,
+            name = "Setup name",
+            description = "Name of the inventory setup to use",
+            position = 1,
             section = gearSection
     )
     default String inventorySetup() {
@@ -542,8 +532,8 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "bank",
-            name = "Bank",
-            description = "If enabled, will bank items when inventory is full. If disabled, will just stop looting",
+            name = "Enable banking",
+            description = "Bank items when inventory is full",
             position = 0,
             section = banking
     )
@@ -551,12 +541,11 @@ public interface PlayerAssistConfig extends Config {
         return false;
     }
 
-    //Minimum free inventory slots to bank
     @Range(max = 28)
     @ConfigItem(
             keyName = "minFreeSlots",
-            name = "Min. free slots",
-            description = "Minimum free inventory slots to bank, if less than this, will bank items",
+            name = "Min free slots",
+            description = "Minimum free inventory slots before banking",
             position = 1,
             section = banking
     )
@@ -564,11 +553,10 @@ public interface PlayerAssistConfig extends Config {
         return 5;
     }
 
-    // checkbox to use stamina potions when banking
     @ConfigItem(
             keyName = "useStamina",
             name = "Use stamina potions",
-            description = "Use stamina potions when banking",
+            description = "Withdraw stamina potions when banking",
             position = 2,
             section = banking
     )
@@ -578,43 +566,19 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "staminaValue",
-            name = "Stamina Potions",
+            name = "Stamina amount",
             description = "Amount of stamina potions to withdraw",
-            position = 2,
+            position = 3,
             section = banking
     )
     default int staminaValue() {
         return 0;
     }
 
-    // checkbox to use food when banking
-    @ConfigItem(
-            keyName = "useFood",
-            name = "Use food",
-            description = "Use food when banking",
-            position = 3,
-            section = banking
-    )
-    default boolean useFood() {
-        return false;
-    }
-
-    @ConfigItem(
-            keyName = "foodValue",
-            name = "Food",
-            description = "Amount of food to withdraw",
-            position = 3,
-            section = banking
-    )
-    default int foodValue() {
-        return 0;
-    }
-
-    // checkbox to use restore potions when banking
     @ConfigItem(
             keyName = "useRestore",
             name = "Use restore potions",
-            description = "Use restore potions when banking",
+            description = "Withdraw restore potions when banking",
             position = 4,
             section = banking
     )
@@ -624,21 +588,20 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "restoreValue",
-            name = "Restore Potions",
+            name = "Restore amount",
             description = "Amount of restore potions to withdraw",
-            position = 4,
+            position = 5,
             section = banking
     )
     default int restoreValue() {
         return 0;
     }
 
-    // checkbox to use prayer potions when banking
     @ConfigItem(
             keyName = "usePrayer",
             name = "Use prayer potions",
-            description = "Use prayer potions when banking",
-            position = 5,
+            description = "Withdraw prayer potions when banking",
+            position = 6,
             section = banking
     )
     default boolean usePrayer() {
@@ -647,21 +610,20 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "prayerValue",
-            name = "Prayer Potions",
+            name = "Prayer amount",
             description = "Amount of prayer potions to withdraw",
-            position = 5,
+            position = 7,
             section = banking
     )
     default int prayerValue() {
         return 0;
     }
 
-    // checkbox to use antipoison potions when banking
     @ConfigItem(
             keyName = "useAntipoison",
-            name = "Use antipoison potions",
-            description = "Use antipoison potions when banking",
-            position = 6,
+            name = "Use antipoison",
+            description = "Withdraw antipoison when banking",
+            position = 8,
             section = banking
     )
     default boolean useAntipoison() {
@@ -670,21 +632,20 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "antipoisonValue",
-            name = "Antipoison Potions",
-            description = "Amount of antipoison potions to withdraw",
-            position = 6,
+            name = "Antipoison amount",
+            description = "Amount of antipoison to withdraw",
+            position = 9,
             section = banking
     )
     default int antipoisonValue() {
         return 0;
     }
 
-    // checkbox to use antifire potions when banking
     @ConfigItem(
             keyName = "useAntifire",
-            name = "Use antifire potions",
-            description = "Use antifire potions when banking",
-            position = 7,
+            name = "Use antifire",
+            description = "Withdraw antifire when banking",
+            position = 10,
             section = banking
     )
     default boolean useAntifire() {
@@ -693,21 +654,20 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "antifireValue",
-            name = "Antifire Potions",
-            description = "Amount of antifire potions to withdraw",
-            position = 7,
+            name = "Antifire amount",
+            description = "Amount of antifire to withdraw",
+            position = 11,
             section = banking
     )
     default int antifireValue() {
         return 0;
     }
 
-    // checkbox to use combat potions when banking
     @ConfigItem(
             keyName = "useCombat",
             name = "Use combat potions",
-            description = "Use combat potions when banking",
-            position = 8,
+            description = "Withdraw combat potions when banking",
+            position = 12,
             section = banking
     )
     default boolean useCombat() {
@@ -716,30 +676,49 @@ public interface PlayerAssistConfig extends Config {
 
     @ConfigItem(
             keyName = "combatValue",
-            name = "Combat Potions",
+            name = "Combat amount",
             description = "Amount of combat potions to withdraw",
-            position = 8,
+            position = 13,
             section = banking
     )
     default int combatValue() {
         return 0;
     }
 
+    @ConfigItem(
+            keyName = "useFood",
+            name = "Use food",
+            description = "Withdraw food when banking",
+            position = 14,
+            section = banking
+    )
+    default boolean useFood() {
+        return false;
+    }
 
-    // checkbox to use teleportation items when banking
+    @ConfigItem(
+            keyName = "foodValue",
+            name = "Food amount",
+            description = "Amount of food to withdraw",
+            position = 15,
+            section = banking
+    )
+    default int foodValue() {
+        return 0;
+    }
+
     @ConfigItem(
             keyName = "ignoreTeleport",
-            name = "Ignore Teleport Items",
-            description = "ignore teleport items when banking",
-            position = 9,
+            name = "Ignore teleport items",
+            description = "Don't bank teleport items",
+            position = 16,
             section = banking
     )
     default boolean ignoreTeleport() {
         return true;
     }
 
-
-    // Hidden config item for inventory setup
+    // Hidden config items
     @ConfigItem(
             keyName = "inventorySetupHidden",
             name = "inventorySetupHidden",
@@ -750,22 +729,20 @@ public interface PlayerAssistConfig extends Config {
         return null;
     }
 
-    //hidden config item for center location
     @ConfigItem(
             keyName = "centerLocation",
-            name = "Center Location",
-            description = "Center Location",
+            name = "Center location",
+            description = "Center location",
             hidden = true
     )
     default WorldPoint centerLocation() {
         return new WorldPoint(0, 0, 0);
     }
 
-    //hidden config item for safe spot location
     @ConfigItem(
             keyName = "safeSpotLocation",
-            name = "Safe Spot Location",
-            description = "Safe Spot Location",
+            name = "Safe spot location",
+            description = "Safe spot location",
             hidden = true
     )
     default WorldPoint safeSpot() {

@@ -14,6 +14,7 @@ import net.runelite.api.worldmap.WorldMap;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.inventorysetups.InventorySetup;
@@ -52,12 +53,12 @@ public class PlayerAssistPlugin extends Plugin {
     public static final String version = "1.2.4";
     private static final String SET = "Set";
     private static final String CENTER_TILE = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
-    // SAFE_SPOT = "Safe Spot";
     private static final String SAFE_SPOT = ColorUtil.wrapWithColorTag("Safe Spot", JagexColors.CHAT_PRIVATE_MESSAGE_TEXT_TRANSPARENT_BACKGROUND);
     private static final String ADD_TO = "Start Fighting:";
     private static final String REMOVE_FROM = "Stop Fighting:";
     private static final String WALK_HERE = "Walk here";
     private static final String ATTACK = "Attack";
+    private static final String ADD_TO_LOOT = ColorUtil.wrapWithColorTag("Add to loot list", Color.GREEN);
     @Getter
     @Setter
     public static int cooldown = 0;
@@ -88,6 +89,10 @@ public class PlayerAssistPlugin extends Plugin {
     private MenuEntry lastClick;
     private Point lastMenuOpenedPoint;
     private WorldPoint trueTile;
+    @Inject
+    private Client client;
+    @Inject
+    private ItemManager itemManager;
 
     @Provides
     PlayerAssistConfig provideConfig(ConfigManager configManager) {
@@ -270,10 +275,27 @@ public class PlayerAssistPlugin extends Plugin {
     }
     @Subscribe
     private void onMenuEntryAdded(MenuEntryAdded event) {
-        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty() && config.toggleCenterTile()) {
+        MenuAction type = MenuAction.of(event.getType());
+        if (type == MenuAction.EXAMINE_ITEM_GROUND) {
+            final int itemId = event.getIdentifier();
+            final ItemComposition itemComposition = itemManager.getItemComposition(itemId);
+            final String itemName = itemComposition.getName();
+            
+            client.createMenuEntry(1)
+                .setOption(ADD_TO_LOOT)
+                .setTarget(event.getTarget())
+                .setType(MenuAction.RUNELITE)
+                .setDeprioritized(true)
+                .onClick(e -> {
+                    String name = Text.removeTags(e.getTarget());
+                    addItemToLootList(name);
+                });
+        }
+
+        if (client.isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty() && config.toggleCenterTile()) {
             addMenuEntry(event, SET, CENTER_TILE, 1);
         }
-        if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty()) {
+        if (client.isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty()) {
             addMenuEntry(event, SET, SAFE_SPOT, 1);
         }
         if (event.getOption().equals(ATTACK) && config.attackableNpcs().contains(getNpcNameFromMenuEntry(Text.removeTags(event.getTarget())))) {
@@ -372,6 +394,10 @@ public class PlayerAssistPlugin extends Plugin {
         if (event.getMenuOption().equals(REMOVE_FROM)) {
             removeNpcFromList(getNpcNameFromMenuEntry(event.getMenuTarget()));
         }
+        if (Text.removeTags(event.getMenuOption()).equals(Text.removeTags(ADD_TO_LOOT))) {
+            String itemName = Text.removeTags(event.getMenuTarget());
+            addItemToLootList(itemName);
+        }
     }
     private void addMenuEntry(MenuEntryAdded event, String option, String target, int position) {
         List<MenuEntry> entries = new LinkedList<>(Arrays.asList(Microbot.getClient().getMenuEntries()));
@@ -388,5 +414,24 @@ public class PlayerAssistPlugin extends Plugin {
                 .setIdentifier(event.getIdentifier())
                 .setType(MenuAction.RUNELITE)
                 .onClick(this::onMenuOptionClicked);
+    }
+
+    private void addItemToLootList(String itemName) {
+        String currentItems = config.listItemsToLoot();
+        String newItem = Text.removeTags(itemName).trim();
+
+        if (currentItems == null || currentItems.trim().isEmpty()) {
+            configManager.setConfiguration("PlayerAssistant", "listItemsToLoot", newItem);
+            configManager.setConfiguration("PlayerAssistant", "listItemsToLoot", newItem, true);
+            return;
+        }
+
+        List<String> items = new LinkedList<>(Arrays.asList(currentItems.split("\\s*,\\s*")));
+        if (!items.contains(newItem)) {
+            items.add(newItem);
+            String newList = String.join(", ", items);
+            configManager.setConfiguration("PlayerAssistant", "listItemsToLoot", newList);
+            configManager.setConfiguration("PlayerAssistant", "listItemsToLoot", newList, true);
+        }
     }
 }
