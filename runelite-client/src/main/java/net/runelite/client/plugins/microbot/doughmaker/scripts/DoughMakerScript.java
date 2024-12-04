@@ -40,6 +40,8 @@ public class DoughMakerScript extends Script {
     private final WorldPoint CGFirstFloorPoint = new WorldPoint(3143, 3446, 0);
     private final WorldPoint wheatFieldOutsidePoint = new WorldPoint(3142, 3456, 0);
     private final WorldPoint wheatFieldInsidePoint = new WorldPoint(3141, 3461, 0);
+    private int grainRecollected = 0;
+    private int processedGrain = 0;
     private boolean init = true;
 
     public boolean run(DoughMakerConfig config) {
@@ -64,6 +66,7 @@ public class DoughMakerScript extends Script {
 //                if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
 
                 log.info("Running");
+                log.info(String.valueOf(grainRecollected));
                 switch (playerState) {
                     case RECOLLECTING:
                         log.info("Is Recollecting");
@@ -84,6 +87,7 @@ public class DoughMakerScript extends Script {
                         }
 
                         Rs2GameObject.interact(wheatItem, "Pick");
+                        grainRecollected = grainRecollected + 1;
                         break;
                     case PROCESSING:
                         log.info("Is Processing");
@@ -108,7 +112,7 @@ public class DoughMakerScript extends Script {
                             sleepUntil(Rs2Player::isInteracting);
                             sleepUntil(() -> !Rs2Player.isInteracting());
                         }
-
+                        processedGrain = processedGrain + 1;
                         break;
                     case COMBINING:
                         log.info("Is Combining");
@@ -144,7 +148,7 @@ public class DoughMakerScript extends Script {
                             sleepUntil(() -> Rs2Widget.findWidget("What sort of dough do you wish to make?", null, false) != null);
                             Rs2Keyboard.keyPress(config.doughItem().getKeyEvent());
                         }
-
+                        processedGrain = processedGrain - 1;
                         break;
                     case BANKING:
                         log.info("Is Banking");
@@ -167,6 +171,7 @@ public class DoughMakerScript extends Script {
 //                        Rs2Bank.withdrawAll(cookingItem.getRawItemName(), true);
 //                        Rs2Random.wait(800, 1600);
                         Rs2Bank.closeBank();
+                        grainRecollected = 0;
                         break;
                     case WALKING:
                         log.info("Is Walking");
@@ -295,11 +300,6 @@ public class DoughMakerScript extends Script {
     }
 
     private void getPlayerState(DoughMakerConfig config) {
-        if (needsToRecollect(config.doughItem())) {
-            playerState = CookingState.RECOLLECTING;
-            return;
-        }
-
         if (hasGrainRemaining()) {
             playerState = CookingState.PROCESSING;
             return;
@@ -315,11 +315,8 @@ public class DoughMakerScript extends Script {
             return;
         }
 
+        // Recollect grain until grainRecollected equals 26
         playerState = CookingState.RECOLLECTING;
-    }
-
-    private boolean needsToRecollect(DoughItem doughItem) {
-        return Rs2Inventory.hasItemAmount(doughItem.getItemId(), 0);
     }
 
     private boolean isNearCookingGuild() {
@@ -327,7 +324,7 @@ public class DoughMakerScript extends Script {
     }
 
     private boolean hasGrainRemaining() {
-        return Rs2Inventory.hasItem("Grain");
+        return (Rs2Inventory.hasItem("Grain") && grainRecollected > 26);
     }
 
     private boolean isReadyToBank(DoughItem doughItem) {
@@ -335,6 +332,6 @@ public class DoughMakerScript extends Script {
     }
 
     private boolean isReadyToCombine(DoughItem doughItem) {
-        return !hasGrainRemaining() && !isReadyToBank(doughItem) && playerIsInProvidedArea(CGThirdFloorPoint);
+        return processedGrain > 0;
     }
 }
