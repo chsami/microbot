@@ -18,7 +18,8 @@ public enum Fish {
     MONKFISH("monkfish", FishingSpot.MONKFISH.getIds(),"net"),
     KARAMBWANJI("karambwanji", FishingSpot.KARAMBWANJI.getIds(), "net"),
     LAVA_EEL("lava eel", FishingSpot.LAVA_EEL.getIds(), "lure"),
-    SHARK("shark", FishingSpot.SHARK.getIds(),"harpoon");
+    SHARK("shark", FishingSpot.SHARK.getIds(),"harpoon"),
+    ANGLERFISH("anglerfish", FishingSpot.ANGLERFISH.getIds(),"bait");
 
     private final String name;
     private final int[] fishingSpot;
