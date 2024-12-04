@@ -128,8 +128,8 @@
 1761 3872 0	1761 3874 0	Climb;Rocks;34741	69 Agility			2	
 3295 3157 0	3295 3159 0	Climb;Broken wall;33344	70 Agility		Prince Ali Rescue		
 3295 3159 0	3295 3157 0	Enter;Big window;33348	70 Agility		Prince Ali Rescue		
-2886 9799 0	2892 9799 0	Squeeze-through;Obstacle pipe;16509	70 Agility				
-2892 9799 0	2886 9799 0	Squeeze-through;Obstacle pipe;16509	70 Agility				
+2886 9799 0	2892 9799 0	Squeeze-through;Obstacle pipe;16509	70 Agility
+2892 9799 0	2886 9799 0	Squeeze-through;Obstacle pipe;16509	70 Agility
 2886 9823 0	2888 9823 1	Jump-up;Rocks;154	70 Agility				
 2888 9823 1	2886 9823 0	Jump-down;Rocks;14106	70 Agility				
 3447 3575 1	3447 3575 2	Climb-up;Spikey chain;16537	71 Agility				
@@ -172,4 +172,9 @@
 2925 2949 0	2925 2948 0	Cross;Stepping stones;23647	30 Agility			2	
 2925 2947 0	2925 2948 0	Cross;Stepping stones;23647	30 Agility			2	
 3713 3830 0	3715 3815 0	Climb through;Hole;31482	70 Agility				
-3715 3815 0	3713 3830 0	Climb through;Hole;31481	70 Agility				
+3715 3815 0	3713 3830 0	Climb through;Hole;31481	70 Agility
+2946 3439 0	2943 3439 0	Climb-up;Climbing rocks;53255	66 Agility
+1324 3777 0	1324 3784 0	Climb;Rocks;34397	29 Agility			4
+1324 3787 0	1324 3795 0	Climb;Rocks;34396	62 Agility			4
+1324 3784 0	1324 3777 0	Climb;Rocks;34397	29 Agility			4
+1324 3795 0	1324 3787 0	Climb;Rocks;34396	62 Agility			4

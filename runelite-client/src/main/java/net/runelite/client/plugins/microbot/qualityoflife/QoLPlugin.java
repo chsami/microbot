@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.qualityoflife;
 
 import com.google.inject.Provides;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
@@ -14,6 +15,7 @@ import net.runelite.client.plugins.config.ConfigPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.qualityoflife.enums.*;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.*;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.pvp.PvpScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtOverlay;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtScript;
 import net.runelite.client.plugins.microbot.util.antiban.FieldUtil;
@@ -98,6 +100,9 @@ public class QoLPlugin extends Plugin {
     private WintertodtOverlay wintertodtOverlay;
     @Inject
     private CannonScript cannonScript;
+    @Inject
+    @Getter
+    private PvpScript pvpScript;
 
     @Provides
     QoLConfig provideConfig(ConfigManager configManager) {
@@ -149,6 +154,7 @@ public class QoLPlugin extends Plugin {
         qoLScript.run(config);
         wintertodtScript.run(config);
         cannonScript.run(config);
+        // pvpScript.run(config);
         awaitExecutionUntil(() ->Microbot.getClientThread().invokeLater(this::updateUiElements), () -> !SplashScreen.isOpen(), 600);
     }
 

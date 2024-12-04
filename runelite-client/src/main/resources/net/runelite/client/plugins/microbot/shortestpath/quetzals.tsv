@@ -1,23 +1,23 @@
-# Origin	Destination	Skills	Items	Quests	Duration	Display info
-1389 2901 0				Twilight's Promise	30
-1697 3140 0				Twilight's Promise	30
-1585 3053 0				Twilight's Promise	30
-1510 3221 0				Twilight's Promise	30
-1548 2995 0				Twilight's Promise	30
-1437 3171 0				Twilight's Promise	30
-1779 3111 0				Twilight's Promise	30
-1700 3037 0				Twilight's Promise	30
-1670 2933 0				Twilight's Promise	30
-1446 3108 0				Twilight's Promise	30
-1613 3300 0				Twilight's Promise	30
-	1389 2901 0			Twilight's Promise	30	Aldarin
-	1697 3140 0			Twilight's Promise	30	Civitas illa Fortis
-	1585 3053 0			Twilight's Promise	30	Hunter Guild
-	1510 3221 0			Twilight's Promise	30	Quetzacalli Gorge
-	1548 2995 0			Twilight's Promise	30	Sunset Coast
-	1437 3171 0			Twilight's Promise	30	The Teomat
-	1779 3111 0			Twilight's Promise	30	Fortis Colosseum
-	1700 3037 0			Twilight's Promise	30	Outer Fortis
-	1670 2933 0			Twilight's Promise	30	Colossal Wyrm Remains
-	1446 3108 0			Twilight's Promise	30	Cam Torum Entrance
-	1613 3300 0			Twilight's Promise	30	Salvager Overlook
+# Origin	Destination	Skills	Items	Quests	Varbits	Duration	Display info
+1389 2901 0				Twilight's Promise		30	
+1697 3140 0				Twilight's Promise	9958=1	30	
+1585 3053 0				Twilight's Promise		30	
+1510 3221 0				Twilight's Promise		30	
+1548 2995 0				Twilight's Promise		30	
+1437 3171 0				Twilight's Promise		30	
+1779 3111 0				Twilight's Promise		30	
+1700 3037 0				Twilight's Promise	9957=1	30	
+1670 2933 0				Twilight's Promise	9956=1	30	
+1446 3108 0				Twilight's Promise	9955=1	30	
+1613 3300 0				Twilight's Promise	11379=1	30	
+	1389 2901 0			Twilight's Promise		30	Aldarin
+	1697 3140 0			Twilight's Promise	9958=1	30	Civitas illa Fortis
+	1585 3053 0			Twilight's Promise		30	Hunter Guild
+	1510 3221 0			Twilight's Promise		30	Quetzacalli Gorge
+	1548 2995 0			Twilight's Promise		30	Sunset Coast
+	1437 3171 0			Twilight's Promise		30	The Teomat
+	1779 3111 0			Twilight's Promise		30	Fortis Colosseum
+	1700 3037 0			Twilight's Promise	9957=1	30	Outer Fortis
+	1670 2933 0			Twilight's Promise	9956=1	30	Colossal Wyrm Remains
+	1446 3108 0			Twilight's Promise	9955=1	30	Cam Torum Entrance
+	1613 3300 0			Twilight's Promise	11379=1	30	Salvager Overlook

@@ -34,6 +34,7 @@ import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import com.google.inject.Module;
 import com.google.inject.*;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.RuneLite;
@@ -79,12 +80,12 @@ public class PluginManager
 
 	private final boolean developerMode;
 	private final boolean safeMode;
-	private final boolean disableWalkerUpdate;
 	private final EventBus eventBus;
 	private final Scheduler scheduler;
 	private final ConfigManager configManager;
 	private final Provider<GameEventManager> sceneTileManager;
 	private final List<Plugin> plugins = new CopyOnWriteArrayList<>();
+	@Getter
 	private final List<Plugin> activePlugins = new CopyOnWriteArrayList<>();
 
 	@Setter
@@ -107,7 +108,6 @@ public class PluginManager
 	{
 		this.developerMode = developerMode;
 		this.safeMode = safeMode;
-		this.disableWalkerUpdate = disableWalkerUpdate;
 		this.eventBus = eventBus;
 		this.scheduler = scheduler;
 		this.configManager = configManager;

@@ -1,4 +1,4 @@
-# Origin	Destination	menuOption menuTarget objectID	Skill requirements	Item requirements	Quest	Duration	Display info
+# Origin	Destination	menuOption menuTarget objectID	Skills	Item IDs	Quests	Duration	Display info
 # Lumbridge cellar							
 3319 9615 0	3232 9610 0	Cellar;Mistag;7299			Death to the Dorgeshuun		
 3319 9615 0	3245 9648 0	Watermill;Mistag;7299			Death to the Dorgeshuun		

@@ -49,7 +49,6 @@ import net.runelite.client.plugins.microbot.shortestpath.pathfinder.CollisionMap
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.PathfinderConfig;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.SplitFlagMap;
-import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -80,7 +79,7 @@ import java.util.regex.Pattern;
         description = "Draws the shortest path to a chosen destination on the map (right click a spot on the world map to use)",
         tags = {"pathfinder", "map", "waypoint", "navigation", "microbot"},
         enabledByDefault = true,
-        alwaysOn = false
+        alwaysOn = true
 )
 public class ShortestPathPlugin extends Plugin implements KeyListener {
     protected static final String CONFIG_GROUP = "shortestpath";
@@ -339,14 +338,6 @@ public class ShortestPathPlugin extends Plugin implements KeyListener {
             if (Microbot.getClientThread().scheduledFuture != null) {
                 Microbot.getClientThread().scheduledFuture.cancel(true);
             }
-            return;
-        }
-
-        if (!startPointSet && !isNearPath(Rs2Player.getWorldLocation())) {
-            if (config.cancelInstead()) {
-                return;
-            }
-            restartPathfinding(Rs2Player.getWorldLocation(), pathfinder.getTarget());
         }
     }
 

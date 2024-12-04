@@ -21,6 +21,7 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -40,7 +41,7 @@ public class SandCrabScript extends Script {
 
     public int timesHopped = 0;
 
-    List<ScanLocation> sandCrabLocations = Arrays.asList(new ScanLocation(new WorldPoint(1843, 3462, 0)),
+    List<ScanLocation> initSandCrabLocations = Arrays.asList(new ScanLocation(new WorldPoint(1843, 3462, 0)),
             new ScanLocation(new WorldPoint(1833, 3458, 0)),
             new ScanLocation(new WorldPoint(1790, 3468, 0)),
             new ScanLocation(new WorldPoint(1776, 3468, 0), true),
@@ -49,10 +50,14 @@ public class SandCrabScript extends Script {
             new ScanLocation(new WorldPoint(1749, 3469, 0)),
             new ScanLocation(new WorldPoint(1738, 3468, 0)));
 
+    List<ScanLocation> sandCrabLocations = new ArrayList<>();
+
     public boolean run(SandCrabConfig config) {
         initialPlayerLocation = null;
         if (config.threeNpcs()) {
-            sandCrabLocations = sandCrabLocations.stream().filter(x -> x.hasThreeNpcs).collect(Collectors.toList());
+            sandCrabLocations = initSandCrabLocations.stream().filter(x -> x.hasThreeNpcs).collect(Collectors.toList());
+        } else {
+            sandCrabLocations = initSandCrabLocations.stream().collect(Collectors.toList());
         }
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
@@ -142,20 +147,22 @@ public class SandCrabScript extends Script {
                     case HOP_WORLD:
                         int world = Login.getRandomWorld(true, null);
                         boolean isHopped = Microbot.hopToWorld(world);
-                        if (!isHopped) return;
-                        boolean result = sleepUntil(() -> Rs2Widget.findWidget("Switch World") != null);
-                        if (result) {
-                            Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-                            sleepUntil(() -> Microbot.getClient().getGameState() == GameState.HOPPING);
-                            sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
+                        if (isHopped) {
+                            boolean result = sleepUntil(() -> Rs2Widget.findWidget("Switch World") != null);
+                            if (result) {
+                                Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+                                sleepUntil(() -> Microbot.getClient().getGameState() == GameState.HOPPING);
+                                sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
+                            }
                         }
+
                         if (timesHopped > 10) {
                             timesHopped = 0;
                             state = State.SCAN_LOCATIONS;
                         } else {
                             timesHopped++;
                             hijackTimer = 0;
-                            state = State.FIGHT;
+                            resetAfkTimer();
                         }
                         resetScanLocations();
                         break;

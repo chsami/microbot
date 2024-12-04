@@ -18,7 +18,6 @@ import net.runelite.client.util.ColorUtil;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.*;
 
@@ -47,7 +46,6 @@ public class MixologyPlugin extends Plugin {
     private PotionType alembicPotionType;
     private PotionType agitatorPotionType;
     private PotionType retortPotionType;
-    public LocalTime startTime;
 
     @Inject
     MixologyScript mixologyScript;
@@ -59,17 +57,12 @@ public class MixologyPlugin extends Plugin {
         return this.highlightedObjects;
     }
 
-    public boolean isInLab() {
-        return this.inLab;
-    }
-
     @Provides
     MixologyConfig provideConfig(ConfigManager configManager) {
         return (MixologyConfig) configManager.getConfig(MixologyConfig.class);
     }
 
     protected void startUp() {
-        startTime = LocalTime.now();
         mixologyScript.run(config);
         this.overlayManager.add(this.overlay);
         this.overlayManager.add(this.potionOverlay);

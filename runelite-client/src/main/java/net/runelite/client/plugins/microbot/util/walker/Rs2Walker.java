@@ -21,7 +21,6 @@ import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.coords.Rs2LocalPoint;
 import net.runelite.client.plugins.microbot.util.coords.Rs2WorldArea;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
-import net.runelite.client.plugins.microbot.util.equipment.JewelleryLocationEnum;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -256,7 +255,18 @@ public class Rs2Walker {
                 log.info("Walker loop: {}", i);
 
                 if (ShortestPathPlugin.getMarker() == null) {
-                    System.out.println("market is null");
+                    System.out.println("marker is null");
+                    break;
+                }
+
+                if (!isNearPath()) {
+                    System.out.println("No longer near path");
+                    if (config.cancelInstead()) {
+                        System.out.println("cancel instead of recalculate");
+                        setTarget(null);
+                    } else {
+                        recalculatePath();
+                    }
                     break;
                 }
 
@@ -1017,6 +1027,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
             if (handleObjectExceptions(tileObject)) return;
             if (transport.getType() == TransportType.AGILITY_SHORTCUT) {
                 Rs2Player.waitForAnimation();
+                sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) <= 2, 10000);
             } else if (transport.getType() == TransportType.MINECART) {
                 if (interactWithAdventureLog(transport)) {
                     sleep(600 * 2); // wait extra 2 game ticks before moving
@@ -1061,8 +1072,6 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                     break;
                 if (succesfullAction) break;
 
-                System.out.println(itemId);
-
                 //If an action is succesfully we break out of the loop
                 succesfullAction = handleInventoryTeleports(transport, itemId) || handleWearableTeleports(transport, itemId);
 
@@ -1078,7 +1087,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
         List<String> locationKeyWords = Arrays.asList("farm", "monastery", "lletya", "prifddinas", "rellekka", "waterbirth island", "neitiznot", "jatiszo",
                 "ver sinhaza", "darkmeyer", "slepe", "troll stronghold", "weiss", "ecto", "burgh", "duradel", "gem mine", "nardah", "kalphite cave",
                 "kourend woodland", "mount karuulm");
-        List<String> genericKeyWords = Arrays.asList("invoke", "empty", "consume", "rub", "break", "teleport", "reminisce", "signal");
+        List<String> genericKeyWords = Arrays.asList("invoke", "empty", "consume", "rub", "break", "teleport", "reminisce", "signal", "play");
 
         boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
         String destination = hasMultipleDestination
@@ -1097,8 +1106,14 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                 .findFirst()
                 .orElse(null);
 
+        //House portal by default outside
+        if (itemId == 8013) {
+            itemAction = "Outside";
+        }
+
         // If no location-based action found, try generic actions
         if (itemAction == null) {
+
             itemAction = Arrays.stream(rs2Item.getInventoryActions())
                     .filter(action -> action != null && genericKeyWords.stream().anyMatch(keyword -> action.toLowerCase().contains(keyword.toLowerCase())))
                     .findFirst()
@@ -1135,19 +1150,6 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                 Microbot.log("Traveling to " + transport.getDisplayInfo());
                 return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
             }
-        }
-        return false;
-    }
-
-    private static boolean interactWithJewellery(Transport transport, JewelleryLocationEnum jewelleryTransport) {
-        boolean action;
-        if (jewelleryTransport.getTooltip().toLowerCase().contains("ring")) {
-            action = Rs2Equipment.useRingAction(jewelleryTransport);
-        } else {
-            action = Rs2Equipment.useAmuletAction(jewelleryTransport);
-        }
-        if (action) {
-            return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
         }
         return false;
     }
@@ -1214,6 +1216,22 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
      */
     public static boolean isNear(WorldPoint target) {
         return Rs2Player.getWorldLocation().equals(target);
+    }
+
+    public static boolean isNearPath() {
+        if (ShortestPathPlugin.getPathfinder() == null || ShortestPathPlugin.getPathfinder() .getPath() == null || ShortestPathPlugin.getPathfinder().getPath().isEmpty() ||
+                config.recalculateDistance() < 0 || lastPosition.equals(lastPosition = Rs2Player.getWorldLocation())) {
+            return true;
+        }
+
+        var reachableTiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), config.recalculateDistance() - 1);
+        for (WorldPoint point : ShortestPathPlugin.getPathfinder().getPath()) {
+            if (reachableTiles.containsKey(point)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void checkIfStuck() {

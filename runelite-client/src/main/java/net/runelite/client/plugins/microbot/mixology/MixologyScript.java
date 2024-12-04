@@ -27,7 +27,7 @@ import static net.runelite.client.plugins.microbot.util.Global.sleepGaussian;
 
 public class MixologyScript extends Script {
 
-    public final static String version = "1.0.1-beta";
+    public final static String version = "1.0.2-beta";
 
     public java.util.List<PotionOrder> potionOrders = Collections.emptyList();
 
@@ -194,10 +194,8 @@ public class MixologyScript extends Script {
                     case DEPOSIT_HOPPER:
                         if (Rs2GameObject.interact(ObjectID.HOPPER_54903)) {
                             Rs2Player.waitForWalking();
-                            boolean success = Rs2Inventory.waitForInventoryChanges(10000);
-                            if (success) {
-                                mixologyState = MixologyState.MIX_POTION_STAGE_1;
-                            }
+                            Rs2Inventory.waitForInventoryChanges(10000);
+                            mixologyState = MixologyState.MIX_POTION_STAGE_1;
                         }
                         break;
                     case MIX_POTION_STAGE_1:

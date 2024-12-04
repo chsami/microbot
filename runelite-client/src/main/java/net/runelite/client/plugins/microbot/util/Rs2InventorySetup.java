@@ -257,9 +257,13 @@ public class Rs2InventorySetup {
         for (InventorySetupsItem inventorySetupsItem : inventorySetup.getEquipment()) {
             if (inventorySetupsItem.getId() == -1) continue;
             if (inventorySetupsItem.isFuzzy()) {
-                return Rs2Equipment.isWearing(inventorySetupsItem.getName(), false);
+                if (!Rs2Equipment.isWearing(inventorySetupsItem.getName(), false)) {
+                    return false;
+                }
             } else {
-                return Rs2Equipment.isWearing(inventorySetupsItem.getName(), true);
+                if (!Rs2Equipment.isWearing(inventorySetupsItem.getName(), true)) {
+                    return false;
+                }
             }
         }
         return true;
