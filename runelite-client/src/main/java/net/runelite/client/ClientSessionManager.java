@@ -95,6 +95,7 @@ public class ClientSessionManager
 	@Subscribe
 	private void onClientShutdown(ClientShutdown e)
 	{
+		if (disableTelemetry) return;
 		scheduledFuture.cancel(true);
 		scheduledFutureMicroBot.cancel(true);
 		e.waitFor(executorService.submit(() ->
