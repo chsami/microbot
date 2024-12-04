@@ -211,8 +211,6 @@ public class PlayerAssistPlugin extends Plugin {
     // on setting change
     @Subscribe
     public void onConfigChanged(ConfigChanged event) {
-
-
         if (event.getKey().equals("Safe Spot")) {
 
             if (!config.toggleSafeSpot()) {

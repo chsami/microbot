@@ -42,7 +42,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @PluginDescriptor(
-        name = "PVM Fighter",
+        name = PluginDescriptor.Mocrosoft + "PVM Fighter",
         description = "Microbot Fighter plugin",
         tags = {"fight", "microbot", "misc", "combat", "playerassistant"},
         enabledByDefault = false

@@ -32,7 +32,6 @@ public class AutoWoodcuttingOverlay extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         try {
-
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
                     .text("Micro Woodcutting V" + AutoWoodcuttingScript.version)
