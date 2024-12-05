@@ -111,7 +111,9 @@ public class AutoFishingScript extends Script {
                 return Rs2Inventory.hasItem("oily fishing rod") && Rs2Inventory.hasItem("fishing bait");
             case CAVE_EEL:
                 return Rs2Inventory.hasItem("fishing rod") && Rs2Inventory.hasItem("fishing bait");
-            default:
+            case ANGLERFISH:
+                return Rs2Inventory.hasItem("fishing rod") && Rs2Inventory.hasItem("sandworms");
+                default:
                 return false;
         }
     }

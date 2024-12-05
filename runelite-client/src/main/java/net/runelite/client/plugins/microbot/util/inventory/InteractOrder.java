@@ -5,6 +5,7 @@ public enum InteractOrder {
     EFFICIENT_ROW,
     COLUMN,
     EFFICIENT_COLUMN,
+    ZIGZAG,
     RANDOM;
 
     // return a random DropOrder
