@@ -37,16 +37,10 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Stream;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -127,9 +121,19 @@ class WidgetInspector extends DevToolsFrame
 
 		eventBus.register(this);
 
-		setTitle("RuneLite Widget Inspector");
-
+		setTitle("Widget Inspector");
 		setLayout(new BorderLayout());
+
+		JPanel searchPanel = new JPanel();
+		searchPanel.setLayout(new BorderLayout());
+		JTextField searchBar = new JTextField();
+			searchBar.setToolTipText("Search widgets by text content");
+		JButton searchButton = new JButton("Search");
+		searchButton.addActionListener(e -> searchWidgets(searchBar.getText()));
+		searchBar.addActionListener(e -> searchWidgets(searchBar.getText()));
+		searchPanel.add(searchBar, BorderLayout.CENTER);
+			searchPanel.add(searchButton, BorderLayout.EAST);
+		add(searchPanel, BorderLayout.NORTH);
 
 		widgetTree = new JTree(new DefaultMutableTreeNode());
 		widgetTree.setRootVisible(false);
@@ -148,12 +152,9 @@ class WidgetInspector extends DevToolsFrame
 		final JScrollPane treeScrollPane = new JScrollPane(widgetTree);
 		treeScrollPane.setPreferredSize(new Dimension(200, 400));
 
-
 		final JTable widgetInfo = new JTable(infoTableModel);
-
 		final JScrollPane infoScrollPane = new JScrollPane(widgetInfo);
 		infoScrollPane.setPreferredSize(new Dimension(400, 400));
-
 
 		final JPanel bottomPanel = new JPanel();
 		add(bottomPanel, BorderLayout.SOUTH);
@@ -179,7 +180,6 @@ class WidgetInspector extends DevToolsFrame
 			{
 				return;
 			}
-
 			selectedWidget.revalidate();
 		}));
 		bottomPanel.add(revalidateWidget);
@@ -396,22 +396,30 @@ class WidgetInspector extends DevToolsFrame
 		if (parent == null)
 		{
 			Widget[] roots = client.getWidgetRoots();
+			if (roots == null || roots.length == 0)
+			{
+				return;
+			}
 
-			parent = Stream.of(roots)
-				.filter(w -> w.getType() == WidgetType.LAYER && w.getContentType() == 0 && !w.isSelfHidden())
+			Optional<Widget> parentWidget = Stream.of(roots)
+				.filter(w -> w != null && w.getType() == WidgetType.LAYER && w.getContentType() == 0 && !w.isSelfHidden())
 				.sorted(Comparator.comparingInt((Widget w) -> w.getRelativeX() + w.getRelativeY())
 					.reversed()
 					.thenComparingInt(Widget::getId)
 					.reversed())
-				.findFirst().get();
+				.findFirst();
+
+			if (!parentWidget.isPresent())
+			{
+				return;
+			}
+
+			parent = parentWidget.get();
 			x = 4;
 			y = 4;
 		}
 
 		picker = parent.createChild(-1, WidgetType.GRAPHIC);
-
-		log.info("Picker is {}.{} [{}]", WidgetUtil.componentToInterface(picker.getId()), WidgetUtil.componentToId(picker.getId()), picker.getIndex());
-
 		picker.setSpriteId(SpriteID.MOBILE_FINGER_ON_INTERFACE);
 		picker.setOriginalWidth(15);
 		picker.setOriginalHeight(17);
@@ -529,5 +537,140 @@ class WidgetInspector extends DevToolsFrame
 		}
 
 		return str;
+	}
+
+	private void searchWidgets(String searchText)
+	{
+		if (searchText == null || searchText.trim().isEmpty())
+		{
+			return;
+		}
+
+		clientThread.invokeLater(() ->
+		{
+			Widget[] rootWidgets = client.getWidgetRoots();
+			if (rootWidgets == null)
+			{
+				return;
+			}
+
+			for (Widget root : rootWidgets)
+			{
+				if (root == null)
+				{
+					continue;
+				}
+
+				Widget foundWidget = searchWidgetRecursively(root, searchText.toLowerCase());
+				if (foundWidget != null)
+				{
+					final Widget widget = foundWidget;
+					refreshWidgets();
+					SwingUtilities.invokeLater(() -> 
+					{
+						setSelectedWidget(widget, true);
+						Stack<Widget> path = new Stack<>();
+						for (Widget w = widget; w != null; w = w.getParent())
+						{
+							path.push(w);
+						}
+						expandTreeToWidget(path);
+					});
+					return;
+				}
+			}
+		});
+	}
+
+	private Widget searchWidgetRecursively(Widget widget, String searchText)
+	{
+		if (widget == null)
+		{
+			return null;
+		}
+
+		String text = widget.getText();
+		if (text != null && text.toLowerCase().contains(searchText))
+		{
+			return widget;
+		}
+
+		Widget[] dynamicChildren = widget.getDynamicChildren();
+		if (dynamicChildren != null)
+		{
+			for (Widget child : dynamicChildren)
+			{
+				Widget found = searchWidgetRecursively(child, searchText);
+				if (found != null)
+				{
+					return found;
+				}
+			}
+		}
+
+		Widget[] staticChildren = widget.getStaticChildren();
+		if (staticChildren != null)
+		{
+			for (Widget child : staticChildren)
+			{
+				Widget found = searchWidgetRecursively(child, searchText);
+				if (found != null)
+				{
+					return found;
+				}
+			}
+		}
+
+		Widget[] nestedChildren = widget.getNestedChildren();
+		if (nestedChildren != null)
+		{
+			for (Widget child : nestedChildren)
+			{
+				Widget found = searchWidgetRecursively(child, searchText);
+				if (found != null)
+				{
+					return found;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private void expandTreeToWidget(Stack<Widget> path)
+	{
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) widgetTree.getModel().getRoot();
+		TreePath treePath = new TreePath(node);
+
+		while (!path.empty())
+		{
+			Widget w = path.pop();
+			boolean found = false;
+
+			for (int i = 0; i < node.getChildCount(); i++)
+			{
+				DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+				if (child instanceof WidgetTreeNode)
+				{
+					WidgetTreeNode widgetNode = (WidgetTreeNode) child;
+					if (widgetNode.getWidget().getId() == w.getId() && widgetNode.getWidget().getIndex() == w.getIndex())
+					{
+						node = widgetNode;
+						treePath = treePath.pathByAddingChild(widgetNode);
+						widgetTree.expandPath(treePath);
+						found = true;
+						break;
+					}
+				}
+			}
+
+			if (!found)
+			{
+				break;
+			}
+		}
+
+		widgetTree.setSelectionPath(treePath);
+		widgetTree.scrollPathToVisible(treePath);
 	}
 }
