@@ -8,6 +8,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class DiscordPanel extends PluginPanel {
     private final DiscordPlugin plugin;
@@ -101,6 +103,102 @@ public class DiscordPanel extends PluginPanel {
         levelUpCheckbox.addActionListener(e ->
             plugin.updateConfig("notifyLevelUp", levelUpCheckbox.isSelected()));
         eventPanel.add(levelUpCheckbox, ec);
+
+        ec.gridy++;
+        JPanel valuableItemPanel = new JPanel(new GridBagLayout());
+        valuableItemPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        GridBagConstraints vic = new GridBagConstraints();
+        vic.fill = GridBagConstraints.HORIZONTAL;
+        vic.weightx = 1;
+        vic.gridx = 0;
+        vic.gridy = 0;
+        vic.insets = new Insets(0, 0, 5, 0);
+
+        JPanel thresholdPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        thresholdPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        
+        JLabel thresholdLabel = new JLabel("Min Value:");
+        thresholdLabel.setForeground(Color.WHITE);
+        thresholdPanel.add(thresholdLabel);
+
+        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(100000, 1, Integer.MAX_VALUE, 1000);
+        JSpinner thresholdSpinner = new JSpinner(spinnerModel);
+        thresholdSpinner.setPreferredSize(new Dimension(100, 25));
+        thresholdSpinner.addChangeListener(e -> 
+            plugin.updateConfig("valuableItemThreshold", (Integer) thresholdSpinner.getValue()));
+        thresholdPanel.add(thresholdSpinner);
+
+        JLabel gpLabel = new JLabel("gp");
+        gpLabel.setForeground(Color.WHITE);
+        thresholdPanel.add(gpLabel);
+
+        JCheckBox valuableItemCheckbox = new JCheckBox("Valuable Items");
+        valuableItemCheckbox.setForeground(Color.WHITE);
+        valuableItemCheckbox.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        valuableItemCheckbox.addActionListener(e -> {
+            plugin.updateConfig("notifyValuableItems", valuableItemCheckbox.isSelected());
+            thresholdPanel.setVisible(valuableItemCheckbox.isSelected());
+        });
+        
+        thresholdPanel.setVisible(valuableItemCheckbox.isSelected());
+
+        valuableItemPanel.add(valuableItemCheckbox, vic);
+        vic.gridy++;
+        valuableItemPanel.add(thresholdPanel, vic);
+        eventPanel.add(valuableItemPanel, ec);
+
+        ec.gridy++;
+
+        JPanel chatMonitorPanel = new JPanel(new GridBagLayout());
+        chatMonitorPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        GridBagConstraints cmc = new GridBagConstraints();
+        cmc.fill = GridBagConstraints.HORIZONTAL;
+        cmc.weightx = 1;
+        cmc.gridx = 0;
+        cmc.gridy = 0;
+        cmc.insets = new Insets(0, 0, 5, 0);
+
+        JCheckBox chatMonitorCheckbox = new JCheckBox("Player Chat Monitor");
+        chatMonitorCheckbox.setForeground(Color.WHITE);
+        chatMonitorCheckbox.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        chatMonitorPanel.add(chatMonitorCheckbox, cmc);
+
+        cmc.gridy++;
+        JTextField phraseInput = new JTextField(20);
+        phraseInput.setToolTipText("Enter exact phrases to monitor, separated by commas (e.g., Bot, \"You're botting\", REPORTED)");
+        phraseInput.setVisible(false);
+
+        chatMonitorCheckbox.addActionListener(e -> {
+            phraseInput.setVisible(chatMonitorCheckbox.isSelected());
+            plugin.updateConfig("notifyChatMonitor", chatMonitorCheckbox.isSelected());
+        });
+
+        phraseInput.getDocument().addDocumentListener(new DocumentListener() {
+            private void updatePhrases() {
+                if (chatMonitorCheckbox.isSelected()) {
+                    plugin.updateConfig("chatMonitorPhrases", phraseInput.getText());
+                }
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updatePhrases();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updatePhrases();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updatePhrases();
+            }
+        });
+
+        chatMonitorPanel.add(phraseInput, cmc);
+        eventPanel.add(chatMonitorPanel, ec);
+        ec.gridy++;
 
         add(eventPanel, c);
     }
