@@ -263,6 +263,8 @@ public class AirOrbScript extends Script {
                 } else if ((shouldBank() && !hasRequiredItems()) || (!dangerousPlayers.isEmpty() || hasDied)) {
                     if (hasDied) {
                         dangerousPlayers.clear();
+                        Rs2Walker.setTarget(null);
+                        hasDied = false;
                     }
                     if (Rs2Player.isInCombat() || Rs2Player.isTeleBlocked()) {
                         Rs2Walker.walkTo(outsideOfWilderness, 2);
