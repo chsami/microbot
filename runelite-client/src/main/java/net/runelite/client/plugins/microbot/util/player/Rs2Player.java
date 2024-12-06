@@ -47,7 +47,10 @@ public class Rs2Player {
     public static int antiVenomTime = -1;
     public static int staminaBuffTime = -1;
     public static int antiPoisonTime = -1;
+    public static int teleBlockTime = -1;
     public static Instant lastAnimationTime = null;
+    private static final long COMBAT_TIMEOUT_MS = 10000;
+    private static long lastCombatTime = 0;
     @Getter
     public static int lastAnimationID = AnimationID.IDLE;
 
@@ -84,6 +87,10 @@ public class Rs2Player {
     public static boolean hasStaminaBuffActive() {
         return staminaBuffTime > 0;
     }
+    
+    public static boolean isTeleBlocked() {
+        return teleBlockTime > 0;
+    }
 
     private static final Map<Player, Long> playerDetectionTimes = new ConcurrentHashMap<>();
 
@@ -115,6 +122,18 @@ public class Rs2Player {
                 antiPoisonTime = -1;
             } else {
                 antiPoisonTime = poisonVarp;
+            }
+        }
+    }
+    
+    public static void handleTeleblockTimer(VarbitChanged event){
+        if (event.getVarbitId() == Varbits.TELEBLOCK) {
+            int time = event.getValue();
+            
+            if (time == 0) {
+                teleBlockTime = -1;
+            } else {
+                teleBlockTime = time;
             }
         }
     }
@@ -568,6 +587,115 @@ public class Rs2Player {
         return list;
     }
 
+    /**
+     * Checks if a player has a specific item equipped by ID.
+     *
+     * @param player The player to check.
+     * @param itemId The ID of the item to look for.
+     * @return True if the player has the specified item equipped, false otherwise.
+     */
+    public static boolean hasPlayerEquippedItem(Player player, int itemId) {
+        Map<KitType, Integer> equipment = getPlayerEquipmentIds(player);
+
+        return equipment.values().stream()
+                .anyMatch(equippedItemId -> equippedItemId == itemId);
+    }
+
+    /**
+     * Checks if a player has any of the specified items equipped by their IDs.
+     *
+     * @param player The player to check.
+     * @param itemIds An array of item IDs to look for.
+     * @return True if the player has any of the specified items equipped, false otherwise.
+     */
+    public static boolean hasPlayerEquippedItem(Player player, int[] itemIds) {
+        Map<KitType, Integer> equipment = getPlayerEquipmentIds(player);
+
+        return equipment.values().stream()
+                .anyMatch(equippedItemId -> Arrays.stream(itemIds).anyMatch(id -> id == equippedItemId));
+    }
+
+    /**
+     * Checks if a player has a specific item equipped.
+     *
+     * @param player The player to check.
+     * @param itemName The name of the item to look for.
+     * @return True if the player has the specified item equipped, false otherwise.
+     */
+    public static boolean hasPlayerEquippedItem(Player player, String itemName) {
+        Map<KitType, String> equipment = getPlayerEquipmentNames(player);
+
+        return equipment.values().stream()
+                .anyMatch(equippedItem -> equippedItem.equalsIgnoreCase(itemName));
+    }
+
+    /**
+     * Checks if a player has any of the specified items equipped by their names.
+     *
+     * @param player The player to check.
+     * @param itemNames A list of item names to look for.
+     * @return True if the player has any of the specified items equipped, false otherwise.
+     */
+    public static boolean hasPlayerEquippedItem(Player player, List<String> itemNames) {
+        Map<KitType, String> equipment = getPlayerEquipmentNames(player);
+
+        return equipment.values().stream()
+                .anyMatch(equippedItem -> itemNames.stream().anyMatch(equippedItem::equalsIgnoreCase));
+    }
+
+    /**
+     * Gets the local players current combat level
+     *
+     * @return
+     */
+    public static int getCombatLevel() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getCombatLevel());
+    }
+
+    /**
+     * Updates the last combat time when the player engages in or is hit during combat.
+     */
+    public static void updateCombatTime() {
+        Microbot.getClientThread().runOnClientThread(() -> {
+            Player localPlayer = Microbot.getClient().getLocalPlayer();
+            if (localPlayer != null && localPlayer.getInteracting() != null) {
+                lastCombatTime = System.currentTimeMillis();
+            }
+            return null;
+        });
+    }
+
+    /**
+     * Checks if the player is in combat based on recent activity.
+     *
+     * @return True if the player is in combat, false otherwise.
+     */
+    public static boolean isInCombat() {
+        return System.currentTimeMillis() - lastCombatTime < COMBAT_TIMEOUT_MS;
+    }
+
+    /**
+     * Gets a list of players around the local player within the combat level range based on wilderness level.
+     *
+     * @return A list of players within the combat range.
+     */
+    public static List<Player> getPlayersInCombatLevelRange() {
+        int localCombatLevel = getCombatLevel();
+
+        int wildernessLevel = Rs2Pvp.getWildernessLevelFrom(Rs2Player.getWorldLocation());
+
+        // Calculate the combat level range
+        int minCombatLevel = Math.max(3, localCombatLevel - wildernessLevel);
+        int maxCombatLevel = Math.min(126, localCombatLevel + wildernessLevel);
+
+        // Filter players based on the combat level range
+        return getPlayers().stream()
+                .filter(player -> {
+                    int playerCombatLevel = player.getCombatLevel();
+                    return playerCombatLevel >= minCombatLevel && playerCombatLevel <= maxCombatLevel;
+                })
+                .collect(Collectors.toList());
+    }
 
     /**
      * Gets the players current world location

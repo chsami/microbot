@@ -12,8 +12,9 @@ import java.util.List;
 
 public class Rs2Item {
     @Getter
-    public  int id;
-    public  int quantity;
+    public int id;
+    @Getter
+    public int quantity;
     @Getter
     public int slot = -1;
     @Getter
@@ -27,7 +28,7 @@ public class Rs2Item {
     boolean isNoted;
     @Getter
     boolean isTradeable;
-    int[] wearableActionIndexes = new int[] {
+    int[] wearableActionIndexes = new int[]{
             ParamID.OC_ITEM_OP1,
             ParamID.OC_ITEM_OP2,
             ParamID.OC_ITEM_OP3,
@@ -61,7 +62,7 @@ public class Rs2Item {
             try {
                 String value = itemComposition.getStringValue(wearableActionIndexes[i]);
                 this.equipmentActions.add(value);
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 this.equipmentActions.add("");
             }
         }
@@ -89,8 +90,6 @@ public class Rs2Item {
         if (getClass() != obj.getClass())
             return false;
         Rs2Item other = (Rs2Item) obj;
-        if (id != other.id)
-            return false;
-        return true;
+        return id == other.id;
     }
 }

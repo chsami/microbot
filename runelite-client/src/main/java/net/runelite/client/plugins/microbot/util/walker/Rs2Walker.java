@@ -31,6 +31,7 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.player.Rs2Pvp;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -1052,6 +1053,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
     }
 
     private static boolean handleTeleportSpell(Transport transport) {
+        if (Rs2Pvp.isInWilderness() && (Rs2Pvp.getWildernessLevelFrom(Rs2Player.getWorldLocation()) > (transport.getMaxWildernessLevel() + 1))) return false;
         MagicAction magicSpell = Arrays.stream(MagicAction.values()).filter(x -> x.getName().toLowerCase().contains(transport.getDisplayInfo().toLowerCase())).findFirst().orElse(null);
         if (magicSpell != null) {
             return Rs2Magic.cast(magicSpell);
@@ -1060,6 +1062,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
     }
 
     private static boolean handleTeleportItem(Transport transport) {
+        if (Rs2Pvp.isInWilderness() && (Rs2Pvp.getWildernessLevelFrom(Rs2Player.getWorldLocation()) > (transport.getMaxWildernessLevel() + 1))) return false;
         boolean succesfullAction = false;
         for (Set<Integer> itemIds : transport.getItemIdRequirements()) {
             if (succesfullAction)

@@ -779,17 +779,19 @@
 3083 3512 1	3083 3512 0	Climb-down;Ladder;16679					
 3082 3513 0	3082 3513 1	Climb-up;Ladder;16683					
 3082 3513 1	3082 3513 0	Climb-down;Ladder;16679					
-3096 3468 0	3096 9867 0	Climb-down;Trapdoor;1581					
-3096 9867 0	3096 3468 0	Climb-up;Ladder;17385					
-3097 9868 0	3096 3468 0	Climb-up;Ladder;17385					
+3096 3468 0	3096 9867 0	Climb-down;Trapdoor;1581				1	
+3096 9867 0	3096 3468 0	Climb-up;Ladder;17385				1	
+3097 9868 0	3096 3468 0	Climb-up;Ladder;17385				1	
+3089 9971 0	3089 3571 0	Climb-up;Ladder;17385				1	
+3089 3571 0	3089 9971 0	Climb-down;Ladder;16680				1	
 3094 9895 0	3093 9895 0	Push;Odd looking wall;1736					
 3093 9895 0	3094 9895 0	Push;Odd looking wall;1736					
 3094 9896 0	3093 9896 0	Push;Odd looking wall;1734					
 3093 9896 0	3094 9896 0	Push;Odd looking wall;1734					
-3132 9917 0	3132 9918 0	Open;Gate;1728					
-3132 9918 0	3132 9917 0	Open;Gate;1728					
-3131 9917 0	3131 9918 0	Open;Gate;1727					
-3131 9918 0	3131 9917 0	Open;Gate;1727					
+3132 9917 0	3132 9918 0	Open;Gate;1728				1	
+3132 9918 0	3132 9917 0	Open;Gate;1728				1	
+3131 9917 0	3131 9918 0	Open;Gate;1727				1	
+3131 9918 0	3131 9917 0	Open;Gate;1727				1	
 3122 3488 0	3122 3487 0	Open;Door;102					
 3122 3487 0	3122 3488 0	Open;Door;102					
 3115 3449 0	3115 3450 0	Open;Door;1804		1 Brass key		2	
