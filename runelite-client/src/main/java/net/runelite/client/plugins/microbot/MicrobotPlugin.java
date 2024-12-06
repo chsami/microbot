@@ -40,6 +40,7 @@ import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @PluginDescriptor(
         name = PluginDescriptor.Default + "Microbot",
@@ -90,6 +91,7 @@ public class MicrobotPlugin extends Plugin {
     private PouchScript pouchScript;
     @Inject
     private PouchOverlay pouchOverlay;
+    private volatile AtomicInteger ticks = new AtomicInteger(0);
 
     @Override
     protected void startUp() throws AWTException {
@@ -157,6 +159,7 @@ public class MicrobotPlugin extends Plugin {
     @Subscribe
     public void onVarbitChanged(VarbitChanged event) {
         Rs2Player.handlePotionTimers(event);
+        Rs2Player.handleTeleblockTimer(event);
     }
     
     @Subscribe
@@ -242,6 +245,21 @@ public class MicrobotPlugin extends Plugin {
                 Microbot.getPouchScript().startUp();
             } else {
                 Microbot.getPouchScript().shutdown();
+            }
+        }
+    }
+    
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        if (client.getLocalPlayer().isInteracting()) {
+            if (client.getLocalPlayer().getInteracting() instanceof Player 
+                    || client.getLocalPlayer().getInteracting() instanceof NPC) {
+                if (ticks.get() == 2) {
+                    ticks.set(0);
+                    Rs2Player.updateCombatTime();
+                } else {
+                    ticks.incrementAndGet();
+                }
             }
         }
     }
