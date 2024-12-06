@@ -138,11 +138,11 @@ public abstract class Script implements IScript {
 
 
     public void shutdown() {
+        if (scheduledFuture != null && !scheduledFuture.isDone()) {
+            scheduledFuture.cancel(true);
+        }
         if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
             mainScheduledFuture.cancel(true);
-            if (scheduledFuture != null && !scheduledFuture.isDone()) {
-                scheduledFuture.cancel(true);
-            }
             ShortestPathPlugin.exit();
             if (Microbot.getClientThread().scheduledFuture != null)
                 Microbot.getClientThread().scheduledFuture.cancel(true);
