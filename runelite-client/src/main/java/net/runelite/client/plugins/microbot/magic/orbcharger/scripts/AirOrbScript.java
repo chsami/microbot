@@ -164,6 +164,26 @@ public class AirOrbScript extends Script {
                             }
                         }
                         
+                        if (Rs2Player.getHealthPercentage() <= plugin.getEatAtPercent()) {
+                            while (Rs2Player.getHealthPercentage() < 100 && isRunning()) {
+                                if (!Rs2Bank.hasItem(plugin.getRs2Food().getId())) {
+                                    Microbot.showMessage("Missing Food in Bank!");
+                                    shutdown();
+                                    break;
+                                }
+
+                                Rs2Bank.withdrawOne(plugin.getRs2Food().getId());
+                                Rs2Inventory.waitForInventoryChanges(1200);
+                                Rs2Player.useFood();
+                                sleep(1000);
+                            }
+                            
+                            if (Rs2Inventory.hasItem(ItemID.JUG)) {
+                                Rs2Bank.depositAll(ItemID.JUG);
+                                Rs2Inventory.waitForInventoryChanges(1200);
+                            }
+                        }
+                        
                         if (plugin.isUseEnergyPotions()) {
                             if (!Rs2Inventory.hasItem(Rs2Potion.getRestoreEnergyPotionsVariants())){
                                 if (!Rs2Bank.hasItem(Rs2Potion.getRestoreEnergyPotionsVariants())) {

@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.magic.orbcharger;
 
 import net.runelite.client.config.*;
+import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 
 @ConfigGroup(OrbChargerConfig.configGroup)
 @ConfigInformation(
@@ -14,6 +15,8 @@ public interface OrbChargerConfig extends Config {
     String configGroup = "orb-charger";
     String useEnergyPotions = "useEnergyPotions";
     String useStaminaPotions = "useStaminaPotions";
+    String food = "food";
+    String eatAtPercent = "eatAtPercent";
 
     @ConfigSection(
             name = "General Settings",
@@ -23,10 +26,32 @@ public interface OrbChargerConfig extends Config {
     String generalSection = "general";
 
     @ConfigItem(
+            keyName = food,
+            name = "Food",
+            description = "Select food that should be used when low HP (eats when at bank)",
+            position = 0,
+            section = generalSection
+    )
+    default Rs2Food food() {
+        return Rs2Food.JUG_OF_WINE;
+    }
+
+    @ConfigItem(
+            keyName = eatAtPercent,
+            name = "Eat At",
+            description = "Percent health player should eat at the bank",
+            position = 1,
+            section = generalSection
+    )
+    default int eatAtPercent() {
+        return 65;
+    }
+
+    @ConfigItem(
             keyName = useEnergyPotions,
             name = "Use Energy Potions",
             description = "Should withdraw & use energy potions",
-            position = 0,
+            position = 2,
             section = generalSection
     )
     default boolean useEnergyPotions() {
@@ -37,7 +62,7 @@ public interface OrbChargerConfig extends Config {
             keyName = useStaminaPotions,
             name = "Use Stamina Potions",
             description = "Should withdraw & use stamina potions",
-            position = 0,
+            position = 3,
             section = generalSection
     )
     default boolean useStaminaPotions() {
