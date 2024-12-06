@@ -63,4 +63,14 @@ public interface DiscordConfig extends Config {
             hidden = true
     )
     void setTestWebhook(boolean test);
+
+    @ConfigItem(
+            keyName = "valuableItemThreshold",
+            name = "Valuable Item Threshold",
+            description = "The minimum value in GP for an item to trigger a notification",
+            hidden = true
+    )
+    default int valuableItemThreshold() {
+        return 100000;
+    }
 } 

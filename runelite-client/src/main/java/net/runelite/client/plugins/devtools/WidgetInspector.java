@@ -29,9 +29,8 @@ package net.runelite.client.plugins.devtools;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -62,6 +61,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
 
@@ -91,6 +91,7 @@ class WidgetInspector extends DevToolsFrame
 	private final WidgetInfoTableModel infoTableModel;
 	private final JCheckBox alwaysOnTop;
 	private final JCheckBox hideHidden;
+	private boolean searchByText = true;
 
 	private DefaultMutableTreeNode root;
 
@@ -126,28 +127,48 @@ class WidgetInspector extends DevToolsFrame
 
 		JPanel searchPanel = new JPanel();
 		searchPanel.setLayout(new BorderLayout());
+		
+		JPanel searchInputPanel = new JPanel(new BorderLayout());
 		JTextField searchBar = new JTextField();
-			searchBar.setToolTipText("Search widgets by text content");
+		searchBar.setToolTipText("Search widgets by text content");
+		searchInputPanel.add(searchBar, BorderLayout.CENTER);
+
+		JPanel searchControlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JButton searchButton = new JButton("Search");
 		searchButton.addActionListener(e -> searchWidgets(searchBar.getText()));
 		searchBar.addActionListener(e -> searchWidgets(searchBar.getText()));
-		searchPanel.add(searchBar, BorderLayout.CENTER);
-			searchPanel.add(searchButton, BorderLayout.EAST);
+
+		ButtonGroup searchTypeGroup = new ButtonGroup();
+		JRadioButton textSearchButton = new JRadioButton("Text");
+		JRadioButton nameSearchButton = new JRadioButton("Name");
+		textSearchButton.setSelected(true);
+		searchTypeGroup.add(textSearchButton);
+		searchTypeGroup.add(nameSearchButton);
+
+		textSearchButton.addActionListener(e -> searchByText = true);
+		nameSearchButton.addActionListener(e -> searchByText = false);
+
+		searchControlPanel.add(searchButton);
+		searchControlPanel.add(textSearchButton);
+		searchControlPanel.add(nameSearchButton);
+
+		searchInputPanel.add(searchControlPanel, BorderLayout.EAST);
+		searchPanel.add(searchInputPanel, BorderLayout.CENTER);
 		add(searchPanel, BorderLayout.NORTH);
 
 		widgetTree = new JTree(new DefaultMutableTreeNode());
-		widgetTree.setRootVisible(false);
-		widgetTree.setShowsRootHandles(true);
-		widgetTree.getSelectionModel().addTreeSelectionListener(e ->
-		{
-			Object selected = widgetTree.getLastSelectedPathComponent();
-			if (selected instanceof WidgetTreeNode)
+			widgetTree.setRootVisible(false);
+			widgetTree.setShowsRootHandles(true);
+			widgetTree.getSelectionModel().addTreeSelectionListener(e ->
 			{
-				WidgetTreeNode node = (WidgetTreeNode) selected;
-				Widget widget = node.getWidget();
-				setSelectedWidget(widget, false);
-			}
-		});
+				Object selected = widgetTree.getLastSelectedPathComponent();
+				if (selected instanceof WidgetTreeNode)
+				{
+					WidgetTreeNode node = (WidgetTreeNode) selected;
+					Widget widget = node.getWidget();
+					setSelectedWidget(widget, false);
+				}
+			});
 
 		final JScrollPane treeScrollPane = new JScrollPane(widgetTree);
 		treeScrollPane.setPreferredSize(new Dimension(200, 400));
@@ -565,16 +586,17 @@ class WidgetInspector extends DevToolsFrame
 				if (foundWidget != null)
 				{
 					final Widget widget = foundWidget;
+					Stack<Widget> path = new Stack<>();
+					for (Widget w = widget; w != null; w = w.getParent())
+					{
+						path.push(w);
+					}
 					refreshWidgets();
+					final Stack<Widget> finalPath = path;
 					SwingUtilities.invokeLater(() -> 
 					{
 						setSelectedWidget(widget, true);
-						Stack<Widget> path = new Stack<>();
-						for (Widget w = widget; w != null; w = w.getParent())
-						{
-							path.push(w);
-						}
-						expandTreeToWidget(path);
+						expandTreeToWidget(finalPath);
 					});
 					return;
 				}
@@ -589,10 +611,14 @@ class WidgetInspector extends DevToolsFrame
 			return null;
 		}
 
-		String text = widget.getText();
-		if (text != null && text.toLowerCase().contains(searchText))
+		String textToSearch = searchByText ? widget.getText() : widget.getName();
+		if (textToSearch != null)
 		{
-			return widget;
+			String strippedText = Rs2UiHelper.stripColTags(textToSearch);
+			if (strippedText.toLowerCase().contains(searchText))
+			{
+				return widget;
+			}
 		}
 
 		Widget[] dynamicChildren = widget.getDynamicChildren();
