@@ -1228,7 +1228,7 @@ public class Rs2Inventory {
      */
     public static String getSelectedItemName() {
         if (Microbot.getClient().getSelectedWidget() == null) return null;
-        return Microbot.getClient().getSelectedWidget().getName();
+        return Rs2UiHelper.stripColTags(Microbot.getClient().getSelectedWidget().getName());
     }
 
     /**
