@@ -126,11 +126,16 @@ public class Rs2Player {
         }
     }
     
+    /**
+     * Handles updates to the teleblock timer based on changes to the {@link Varbits#TELEBLOCK} varbit.
+     *
+     * @see Varbits#TELEBLOCK
+     */
     public static void handleTeleblockTimer(VarbitChanged event){
         if (event.getVarbitId() == Varbits.TELEBLOCK) {
             int time = event.getValue();
             
-            if (time == 0) {
+            if (time < 101) {
                 teleBlockTime = -1;
             } else {
                 teleBlockTime = time;
