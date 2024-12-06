@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.magic.orbcharger.OrbChargerPlugin;
 import net.runelite.client.plugins.microbot.magic.orbcharger.enums.OrbChargerState;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
@@ -89,6 +90,8 @@ public class AirOrbScript extends Script {
                         return;
                     }
                 }
+                
+                if (Rs2AntibanSettings.actionCooldownActive) return;
                 
                 switch(state) {
                     case BANKING:
@@ -237,6 +240,7 @@ public class AirOrbScript extends Script {
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         sleepUntil(() -> Rs2Player.isAnimating(1200));
                         Rs2Tab.switchToInventoryTab();
+                        Rs2Antiban.actionCooldown();
                         sleepUntil(() -> !Rs2Player.isAnimating(5000) || !Rs2Inventory.hasItem(ItemID.UNPOWERED_ORB), 96000);
                         break;
                     default:
@@ -257,6 +261,7 @@ public class AirOrbScript extends Script {
     public boolean handleWalk() {
         scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
+                if (Rs2AntibanSettings.actionCooldownActive) return;
                 if (!shouldBank() && !shouldCharge() && hasRequiredItems() && dangerousPlayers.isEmpty()) {
                     Rs2Walker.walkTo(airObelisk, 2);
                 } else if ((shouldBank() && !hasRequiredItems()) || (!dangerousPlayers.isEmpty() || hasDied)) {
