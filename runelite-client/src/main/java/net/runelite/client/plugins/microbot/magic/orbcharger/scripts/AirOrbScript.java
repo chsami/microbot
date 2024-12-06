@@ -91,8 +91,6 @@ public class AirOrbScript extends Script {
                     }
                 }
                 
-                if (Rs2AntibanSettings.actionCooldownActive) return;
-                
                 switch(state) {
                     case BANKING:
                         if (!Rs2Bank.isOpen()) return;
@@ -240,7 +238,6 @@ public class AirOrbScript extends Script {
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         sleepUntil(() -> Rs2Player.isAnimating(1200));
                         Rs2Tab.switchToInventoryTab();
-                        Rs2Antiban.actionCooldown();
                         sleepUntil(() -> !Rs2Player.isAnimating(5000) || !Rs2Inventory.hasItem(ItemID.UNPOWERED_ORB), 96000);
                         break;
                     default:
@@ -261,7 +258,6 @@ public class AirOrbScript extends Script {
     public boolean handleWalk() {
         scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (Rs2AntibanSettings.actionCooldownActive) return;
                 if (!shouldBank() && !shouldCharge() && hasRequiredItems() && dangerousPlayers.isEmpty()) {
                     Rs2Walker.walkTo(airObelisk, 2);
                 } else if ((shouldBank() && !hasRequiredItems()) || (!dangerousPlayers.isEmpty() || hasDied)) {
