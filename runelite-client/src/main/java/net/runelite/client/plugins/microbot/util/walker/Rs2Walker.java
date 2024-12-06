@@ -1127,6 +1127,13 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
             if (itemAction.equalsIgnoreCase("rub") && (itemId == ItemID.XERICS_TALISMAN || transport.getDisplayInfo().toLowerCase().contains("skills necklace"))) {
                 return interactWithAdventureLog(transport);
             }
+            
+            if (itemAction.equalsIgnoreCase("rub") && transport.getDisplayInfo().toLowerCase().contains("burning amulet")) {
+                Rs2Dialogue.sleepUntilInDialogue();
+                Rs2Dialogue.clickOption(destination);
+                Rs2Dialogue.sleepUntilHasDialogueOption("Okay, teleport to level");
+                Rs2Dialogue.clickOption("Okay, teleport to level");
+            }
 
             if (itemAction.equalsIgnoreCase("rub") || itemAction.equalsIgnoreCase("reminisce")) {
                 sleepUntil(() -> Rs2Widget.getWidget(219, 1) != null);
@@ -1148,6 +1155,10 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                 String destination = values[1].trim().toLowerCase();
                 Rs2Item rs2Item = Rs2Equipment.get(itemId);
                 Rs2Equipment.invokeMenu(rs2Item, destination);
+                if (transport.getDisplayInfo().toLowerCase().contains("burning amulet")) {
+                    Rs2Dialogue.sleepUntilInDialogue();
+                    Rs2Dialogue.clickOption("Okay, teleport to level");
+                }
                 Microbot.log("Traveling to " + transport.getDisplayInfo());
                 return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
             }
