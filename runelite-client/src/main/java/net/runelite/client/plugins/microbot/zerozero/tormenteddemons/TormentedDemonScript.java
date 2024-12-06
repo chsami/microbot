@@ -23,6 +23,8 @@ import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.plugins.microbot.util.reflection.Rs2Reflection;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.zerozero.tormenteddemons.TormentedDemonConfig.MODE;
+import net.runelite.client.plugins.microbot.zerozero.tormenteddemons.TormentedDemonConfig.CombatPotionType;
+import net.runelite.client.plugins.microbot.zerozero.tormenteddemons.TormentedDemonConfig.RangingPotionType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -477,87 +479,82 @@ public class TormentedDemonScript extends Script {
     }
 
     private void evaluateAndConsumePotions(TormentedDemonConfig config) {
-        int currentStrength = Microbot.getClient().getBoostedSkillLevel(Skill.STRENGTH);
-        int maxStrength = Microbot.getClient().getRealSkillLevel(Skill.STRENGTH);
-        int currentRange = Microbot.getClient().getBoostedSkillLevel(Skill.RANGED);
-        int maxRange = Microbot.getClient().getRealSkillLevel(Skill.RANGED);
-
         int threshold = config.boostedStatsThreshold();
 
-        List<Integer> combatPotionIds = null;
-        switch (config.combatPotionType()) {
+        if (!isCombatPotionActive(config.combatPotionType(), threshold)) {
+            consumeCombatPotion(config.combatPotionType());
+        }
+
+        if (!isRangingPotionActive(config.rangingPotionType(), threshold)) {
+            consumeRangingPotion(config.rangingPotionType());
+        }
+    }
+
+    private boolean isCombatPotionActive(CombatPotionType combatPotionType, int threshold) {
+        switch (combatPotionType) {
             case SUPER_COMBAT:
-                combatPotionIds = List.of(
-                        ItemID.SUPER_COMBAT_POTION4,
-                        ItemID.SUPER_COMBAT_POTION3,
-                        ItemID.SUPER_COMBAT_POTION2,
-                        ItemID.SUPER_COMBAT_POTION1
-                );
+                return Rs2Player.hasAttackActive(threshold) && Rs2Player.hasStrengthActive(threshold);
+            case DIVINE_SUPER_COMBAT:
+                return Rs2Player.hasDivineCombatActive();
+            default:
+                return true;
+        }
+    }
+
+    private boolean isRangingPotionActive(RangingPotionType rangingPotionType, int threshold) {
+        switch (rangingPotionType) {
+            case RANGING:
+                return Rs2Player.hasRangingPotionActive(threshold);
+            case DIVINE_RANGING:
+                return Rs2Player.hasDivineRangedActive();
+            case BASTION:
+                return Rs2Player.hasDivineBastionActive();
+            default:
+                return true;
+        }
+    }
+
+    private void consumeCombatPotion(CombatPotionType combatPotionType) {
+        String potion = null;
+        switch (combatPotionType) {
+            case SUPER_COMBAT:
+                potion = "super combat";
                 break;
             case DIVINE_SUPER_COMBAT:
-                combatPotionIds = List.of(
-                        ItemID.DIVINE_SUPER_COMBAT_POTION4,
-                        ItemID.DIVINE_SUPER_COMBAT_POTION3,
-                        ItemID.DIVINE_SUPER_COMBAT_POTION2,
-                        ItemID.DIVINE_SUPER_COMBAT_POTION1
-                );
+                potion = "divine super combat";
                 break;
+            default:
+                return;
         }
+        consumePotion(potion);
+    }
 
-        List<Integer> rangingPotionIds = null;
-        switch (config.rangingPotionType()) {
+    private void consumeRangingPotion(RangingPotionType rangingPotionType) {
+        String potion = null;
+        switch (rangingPotionType) {
             case RANGING:
-                rangingPotionIds = List.of(
-                        ItemID.RANGING_POTION4,
-                        ItemID.RANGING_POTION3,
-                        ItemID.RANGING_POTION2,
-                        ItemID.RANGING_POTION1
-                );
+                potion = "ranging potion";
                 break;
             case DIVINE_RANGING:
-                rangingPotionIds = List.of(
-                        ItemID.DIVINE_RANGING_POTION4,
-                        ItemID.DIVINE_RANGING_POTION3,
-                        ItemID.DIVINE_RANGING_POTION2,
-                        ItemID.DIVINE_RANGING_POTION1
-                );
+                potion = "divine ranging potion";
                 break;
+            case BASTION:
+                potion = "bastion potion";
+                break;
+            default:
+                return;
         }
-
-        if (combatPotionIds != null && getPercentageDifference(currentStrength, maxStrength) < threshold) {
-            Rs2Item combatPotion = findPotionInInventory(combatPotionIds);
-            if (combatPotion != null) {
-                Rs2Inventory.interact(combatPotion, "Drink");
-                logOnceToChat("Drinking combat potion: " + combatPotion.getName());
-            } else {
-                logOnceToChat("No combat potions left in inventory.");
-            }
-        }
-
-        if (rangingPotionIds != null && getPercentageDifference(currentRange, maxRange) < threshold) {
-            Rs2Item rangingPotion = findPotionInInventory(rangingPotionIds);
-            if (rangingPotion != null) {
-                Rs2Inventory.interact(rangingPotion, "Drink");
-                logOnceToChat("Drinking ranging potion: " + rangingPotion.getName());
-            } else {
-                logOnceToChat("No ranging potions left in inventory.");
-            }
-        }
+        consumePotion(potion);
     }
 
-    private Rs2Item findPotionInInventory(List<Integer> potionIds) {
-        for (int id : potionIds) {
-            Rs2Item item = Rs2Inventory.get(id);
-            if (item != null) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    private int getPercentageDifference(int currentStat, int maxStat) {
-        if (maxStat == 0) return 0;
-        return (int) ((1 - (double) currentStat / maxStat) * 100);
+    private void consumePotion(String keyword) {
+        Rs2Inventory.getPotions().stream()
+                .filter(potion -> potion.getName().toLowerCase().contains(keyword))
+                .findFirst()
+                .ifPresent(potion -> {
+                    Rs2Inventory.interact(potion, "Drink");
+                    logOnceToChat("Drinking potion: " + potion.getName());
+                });
     }
 
     void logOnceToChat(String message) {

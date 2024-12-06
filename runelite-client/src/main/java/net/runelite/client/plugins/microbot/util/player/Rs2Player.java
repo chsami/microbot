@@ -45,6 +45,7 @@ public class Rs2Player {
     private static int superAntiFireTime = -1;
     private static int divineRangedTime = -1;
     private static int divineBastionTime = -1;
+    private static int divineCombatTime = -1;
     public static int antiVenomTime = -1;
     public static int staminaBuffTime = -1;
     public static int antiPoisonTime = -1;
@@ -64,13 +65,30 @@ public class Rs2Player {
         return divineRangedTime > 0 || hasDivineBastionActive();
     }
 
-    public static boolean hasRangingPotionActive() {
-        return Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) - 5 > Microbot.getClient().getRealSkillLevel(Skill.RANGED);
+    public static boolean hasRangingPotionActive(int threshold) {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) - threshold > Microbot.getClient().getRealSkillLevel(Skill.RANGED);
     }
 
     public static boolean hasDivineBastionActive() {
         return divineBastionTime > 0;
     }
+
+    public static boolean hasDivineCombatActive() {
+        return divineCombatTime > 0;
+    }
+
+    public static boolean hasAttackActive(int threshold) {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) - threshold > Microbot.getClient().getRealSkillLevel(Skill.ATTACK);
+    }
+
+    public static boolean hasStrengthActive(int threshold) {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.STRENGTH) - threshold > Microbot.getClient().getRealSkillLevel(Skill.STRENGTH);
+    }
+
+    public static boolean hasDefenseActive(int threshold) {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.DEFENCE) - threshold > Microbot.getClient().getRealSkillLevel(Skill.DEFENCE);
+    }
+
 
     public static boolean hasAntiVenomActive() {
         if (Rs2Equipment.isWearing("serpentine helm")) {
@@ -100,6 +118,9 @@ public class Rs2Player {
         }
         if (event.getVarbitId() == Varbits.DIVINE_BASTION) {
             divineBastionTime = event.getValue();
+        }
+        if (event.getVarbitId() == Varbits.DIVINE_SUPER_COMBAT) {
+            divineCombatTime = event.getValue();
         }
         if (event.getVarbitId() == Varbits.STAMINA_EFFECT) {
             staminaBuffTime = event.getValue();

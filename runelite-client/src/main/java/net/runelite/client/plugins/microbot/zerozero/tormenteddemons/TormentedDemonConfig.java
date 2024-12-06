@@ -289,7 +289,8 @@ public interface TormentedDemonConfig extends Config {
     @Getter
     enum RangingPotionType {
         RANGING,
-        DIVINE_RANGING
+        DIVINE_RANGING,
+        BASTION
     }
 
 }
