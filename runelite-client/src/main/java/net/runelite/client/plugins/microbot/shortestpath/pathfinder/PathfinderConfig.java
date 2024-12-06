@@ -411,6 +411,7 @@ public class PathfinderConfig {
                 case GNOME_GLIDER:
                 case MINECART:
                 case QUETZAL:
+                case WILDERNESS_OBELISK:
                 case SPIRIT_TREE:
                     return false; // Not enabled without membership
             }

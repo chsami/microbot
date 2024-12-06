@@ -12,6 +12,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.magic.orbcharger.enums.OrbChargerState;
 import net.runelite.client.plugins.microbot.magic.orbcharger.scripts.AirOrbScript;
+import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -38,6 +39,10 @@ public class OrbChargerPlugin extends Plugin {
     private boolean useEnergyPotions;
     @Getter
     private boolean useStaminaPotions;
+    @Getter
+    private Rs2Food rs2Food;
+    @Getter
+    private int eatAtPercent;
 
     @Inject
     private OverlayManager overlayManager;
@@ -51,6 +56,8 @@ public class OrbChargerPlugin extends Plugin {
     protected void startUp() throws AWTException {
         useEnergyPotions = config.useEnergyPotions();
         useStaminaPotions = config.useStaminaPotions();
+        rs2Food = config.food();
+        eatAtPercent = config.eatAtPercent();
         if (overlayManager != null) {
             overlayManager.add(orbOverlay);
         }
@@ -73,6 +80,12 @@ public class OrbChargerPlugin extends Plugin {
         
         if (event.getKey().equals(OrbChargerConfig.useStaminaPotions)){
             useStaminaPotions = config.useStaminaPotions();
+        }
+        if (event.getKey().equals(OrbChargerConfig.food)){
+            rs2Food = config.food();
+        }
+        if (event.getKey().equals(OrbChargerConfig.eatAtPercent)) {
+            eatAtPercent = config.eatAtPercent();
         }
     }
 

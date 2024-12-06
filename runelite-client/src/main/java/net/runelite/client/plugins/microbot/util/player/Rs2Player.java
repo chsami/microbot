@@ -126,11 +126,16 @@ public class Rs2Player {
         }
     }
     
+    /**
+     * Handles updates to the teleblock timer based on changes to the {@link Varbits#TELEBLOCK} varbit.
+     *
+     * @see Varbits#TELEBLOCK
+     */
     public static void handleTeleblockTimer(VarbitChanged event){
         if (event.getVarbitId() == Varbits.TELEBLOCK) {
             int time = event.getValue();
             
-            if (time == 0) {
+            if (time < 101) {
                 teleBlockTime = -1;
             } else {
                 teleBlockTime = time;
@@ -482,7 +487,7 @@ public class Rs2Player {
      * @return
      */
     public static boolean eatAt(int percentage) {
-        double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
+        double treshHold = getHealthPercentage();
         if (treshHold <= percentage) {
             return useFood();
         }
@@ -501,6 +506,16 @@ public class Rs2Player {
             }
         }
         return false;
+    }
+
+    /**
+     * Calculates the player's current health as a percentage of their real (base) health.
+     *
+     * @return the health percentage as a double. For example:
+     *         150.0 if boosted, 80.0 if drained, or 100.0 if unchanged.
+     */
+    public static double getHealthPercentage() {
+        return (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
     }
 
     /**
