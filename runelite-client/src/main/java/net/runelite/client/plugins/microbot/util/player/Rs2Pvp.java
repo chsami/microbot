@@ -101,6 +101,15 @@ public class Rs2Pvp {
     }
 
     /**
+     * Checks if the player is in the wilderness
+     * 
+     * @return True if the player is in the wilderness
+     */
+    public static boolean isInWilderness() {
+        return Microbot.getVarbitValue(Varbits.IN_WILDERNESS) == 1;
+    }
+
+    /**
      * Determines if another player is attackable based off of wilderness level and combat levels
      *
      * @param player the player to determine attackability
