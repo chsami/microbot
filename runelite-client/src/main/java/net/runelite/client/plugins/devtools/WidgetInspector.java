@@ -92,6 +92,8 @@ class WidgetInspector extends DevToolsFrame
 	private final JCheckBox alwaysOnTop;
 	private final JCheckBox hideHidden;
 	private boolean searchByText = true;
+	private boolean searchByName = false;
+	private boolean searchByActions = false;
 
 	private DefaultMutableTreeNode root;
 
@@ -141,16 +143,32 @@ class WidgetInspector extends DevToolsFrame
 		ButtonGroup searchTypeGroup = new ButtonGroup();
 		JRadioButton textSearchButton = new JRadioButton("Text");
 		JRadioButton nameSearchButton = new JRadioButton("Name");
+		JRadioButton actionsSearchButton = new JRadioButton("Actions");
 		textSearchButton.setSelected(true);
 		searchTypeGroup.add(textSearchButton);
 		searchTypeGroup.add(nameSearchButton);
+		searchTypeGroup.add(actionsSearchButton);
 
-		textSearchButton.addActionListener(e -> searchByText = true);
-		nameSearchButton.addActionListener(e -> searchByText = false);
+		textSearchButton.addActionListener(e -> {
+			searchByText = true;
+			searchByName = false;
+			searchByActions = false;
+		});
+		nameSearchButton.addActionListener(e -> {
+			searchByText = false;
+			searchByName = true;
+			searchByActions = false;
+		});
+		actionsSearchButton.addActionListener(e -> {
+			searchByText = false;
+			searchByName = false;
+			searchByActions = true;
+		});
 
 		searchControlPanel.add(searchButton);
 		searchControlPanel.add(textSearchButton);
 		searchControlPanel.add(nameSearchButton);
+		searchControlPanel.add(actionsSearchButton);
 
 		searchInputPanel.add(searchControlPanel, BorderLayout.EAST);
 		searchPanel.add(searchInputPanel, BorderLayout.CENTER);
@@ -611,13 +629,34 @@ class WidgetInspector extends DevToolsFrame
 			return null;
 		}
 
-		String textToSearch = searchByText ? widget.getText() : widget.getName();
-		if (textToSearch != null)
+		if (searchByText)
 		{
-			String strippedText = Rs2UiHelper.stripColTags(textToSearch);
-			if (strippedText.toLowerCase().contains(searchText))
+			String text = widget.getText();
+			if (text != null && Rs2UiHelper.stripColTags(text).toLowerCase().contains(searchText))
 			{
 				return widget;
+			}
+		}
+		else if (searchByName)
+		{
+			String name = widget.getName();
+			if (name != null && Rs2UiHelper.stripColTags(name).toLowerCase().contains(searchText))
+			{
+				return widget;
+			}
+		}
+		else if (searchByActions)
+		{
+			String[] actions = widget.getActions();
+			if (actions != null)
+			{
+				for (String action : actions)
+				{
+					if (action != null && Rs2UiHelper.stripColTags(action).toLowerCase().contains(searchText))
+					{
+						return widget;
+					}
+				}
 			}
 		}
 
