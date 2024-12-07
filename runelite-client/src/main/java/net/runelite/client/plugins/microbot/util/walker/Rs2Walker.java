@@ -27,6 +27,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -190,7 +191,7 @@ public class Rs2Walker {
             if (Rs2Npc.getNpcsAttackingPlayer(Microbot.getClient().getLocalPlayer()) != null
                     && Rs2Npc.getNpcsAttackingPlayer(Microbot.getClient().getLocalPlayer()).stream().anyMatch(x -> x.getId() == 4417)) { //dead tree in draynor
                 var moveableTiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet().toArray(new WorldPoint[0]);
-                walkMiniMap(moveableTiles[Random.random(0, moveableTiles.length)]);
+                walkMiniMap(moveableTiles[Rs2Random.between(0, moveableTiles.length)]);
                 sleepGaussian(1000, 300);
             }
 
@@ -199,7 +200,7 @@ public class Rs2Walker {
             if (stuckCount > 10) {
                 var moveableTiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet().toArray(new WorldPoint[0]);
                 if (moveableTiles.length > 0) {
-                    walkMiniMap(moveableTiles[Random.random(0, moveableTiles.length)]);
+                    walkMiniMap(moveableTiles[Rs2Random.between(0, moveableTiles.length)]);
                     sleepGaussian(1000, 300);
                     stuckCount = 0;
                 }
@@ -286,7 +287,7 @@ public class Rs2Walker {
                 if (!Rs2Tile.isTileReachable(currentWorldPoint) && !Microbot.getClient().getTopLevelWorldView().isInstance()) {
                     continue;
                 }
-                nextWalkingDistance = Random.random(7, 11);
+                nextWalkingDistance = Rs2Random.between(7, 11);
                 if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > nextWalkingDistance) {
                     if (Microbot.getClient().getTopLevelWorldView().isInstance()) {
                         if (Rs2Walker.walkMiniMap(currentWorldPoint)) {
@@ -308,7 +309,7 @@ public class Rs2Walker {
             if (!doorOrTransportResult) {
                 if (!path.isEmpty()) {
                     var moveableTiles = Rs2Tile.getReachableTilesFromTile(path.get(path.size() - 1), Math.min(3, distance)).keySet().toArray(new WorldPoint[0]);
-                    var finalTile = moveableTiles.length > 0 ? moveableTiles[Random.random(0, moveableTiles.length)] : path.get(path.size() - 1);
+                    var finalTile = moveableTiles.length > 0 ? moveableTiles[Rs2Random.between(0, moveableTiles.length)] : path.get(path.size() - 1);
 
                     if (Rs2Tile.isTileReachable(finalTile)) {
                         if (Rs2Walker.walkFastCanvas(finalTile)) {
@@ -1031,6 +1032,12 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                 if (interactWithAdventureLog(transport)) {
                     sleep(600 * 2); // wait extra 2 game ticks before moving
                 }
+            } else if (transport.getType() == TransportType.TELEPORTATION_PORTAL) {
+                if (interactWithSoulWarsPortal(transport)) {
+                    sleep(600 * 2); // wait extra 2 game ticks before moving
+                } else {
+                    Rs2Player.waitForWalking();
+                }
             } else {
                 Rs2Player.waitForWalking();
                 Rs2Dialogue.clickOption("Yes please"); //shillo village cart
@@ -1038,7 +1045,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
         } else {
             int z = Rs2Player.getWorldLocation().getPlane();
             sleepUntil(() -> Rs2Player.getWorldLocation().getPlane() != z);
-            sleep(Random.randomGaussian(1000, 300));
+            sleep((int) Rs2Random.gaussRand(1000.0, 300.0));
         }
     }
 
@@ -1362,6 +1369,27 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
         Microbot.log("Traveling to " + transport.getDisplayInfo());
         return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
     }
+    
+    private static boolean interactWithSoulWarsPortal(Transport transport) {
+        if (transport.getDisplayInfo() == null || transport.getDisplayInfo().isEmpty()) return false;
+        
+        boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
+        String destination = hasMultipleDestination
+                ? transport.getDisplayInfo().split(":")[1].trim() :
+                null;
+        
+        if (destination == null || destination.isEmpty()) return false;
+        
+        boolean isPortalDialogueVisible = Rs2Dialogue.sleepUntilHasQuestion("Where would you like to go?");
+        if (!isPortalDialogueVisible) {
+            Microbot.log("Widget did not become visible within the timeout.");
+            return false;
+        }
+        
+        Rs2Dialogue.clickOption(destination);
+        Microbot.log("Traveling to " + destination);
+        return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
+    }
 
     public static boolean handleGlider(Transport transport) {
         int TA_QUIR_PRIW = 9043972;
@@ -1450,7 +1478,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
             rotateSlotToDesiredRotation(SLOT_THREE, Rs2Widget.getWidget(SLOT_THREE).getRotationY(), getDesiredRotation(fairyRingCode.charAt(2)), SLOT_THREE_ACW_ROTATION, SLOT_THREE_CW_ROTATION);
             Rs2Widget.clickWidget(TELEPORT_BUTTON);
             
-            Rs2Player.waitForAnimation(Random.random(4200, 4800)); // Required due to long animation time
+            Rs2Player.waitForAnimation(Rs2Random.between(4200, 4800)); // Required due to long animation time
             
             // Re-equip the starting weapon if it was unequipped
             if (startingWeapon != null & !Rs2Equipment.isWearing(startingWeaponId)) {

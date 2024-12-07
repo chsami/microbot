@@ -48,22 +48,22 @@
 2591 3083 2	2907 3333 0	Enter;Magic Portal;2157				1	
 2586 3087 2	2703 3406 0	Enter;Magic Portal;2158				1	
 2586 3088 2	2703 3406 0	Enter;Magic Portal;2158				1	
-2206 2858 0	3158 10027 0	Enter;Portal;40476				1	2: Ferox Enclave
-2206 2857 0	3158 10027 0	Enter;Portal;40476				1	2: Ferox Enclave
-2206 2859 0	3158 10027 0	Enter;Portal;40476				1	2: Ferox Enclave
-2204 2859 0	3158 10027 0	Enter;Portal;40476				1	2: Ferox Enclave
-2204 2858 0	3158 10027 0	Enter;Portal;40476				1	2: Ferox Enclave
-2204 2857 0	3158 10027 0	Enter;Portal;40476				1	2: Ferox Enclave
-2205 2856 0	3158 10027 0	Enter;Portal;40476				1	2: Ferox Enclave
-2205 2860 0	3158 10027 0	Enter;Portal;40476				1	2: Ferox Enclave
-2206 2858 0	3081 3475 0	Enter;Portal;40476				1	1: Edgeville
-2206 2859 0	3081 3475 0	Enter;Portal;40476				1	1: Edgeville
-2206 2857 0	3081 3475 0	Enter;Portal;40476				1	1: Edgeville
-2205 2856 0	3081 3475 0	Enter;Portal;40476				1	1: Edgeville
-2205 2860 0	3081 3475 0	Enter;Portal;40476				1	1: Edgeville
-2204 2859 0	3081 3475 0	Enter;Portal;40476				1	1: Edgeville
-2204 2858 0	3081 3475 0	Enter;Portal;40476				1	1: Edgeville
-2204 2857 0	3081 3475 0	Enter;Portal;40476				1	1: Edgeville
+2206 2858 0	3158 10027 0	Enter;Portal;40476				1	Soul Wars: Ferox Enclave
+2206 2857 0	3158 10027 0	Enter;Portal;40476				1	Soul Wars: Ferox Enclave
+2206 2859 0	3158 10027 0	Enter;Portal;40476				1	Soul Wars: Ferox Enclave
+2204 2859 0	3158 10027 0	Enter;Portal;40476				1	Soul Wars: Ferox Enclave
+2204 2858 0	3158 10027 0	Enter;Portal;40476				1	Soul Wars: Ferox Enclave
+2204 2857 0	3158 10027 0	Enter;Portal;40476				1	Soul Wars: Ferox Enclave
+2205 2856 0	3158 10027 0	Enter;Portal;40476				1	Soul Wars: Ferox Enclave
+2205 2860 0	3158 10027 0	Enter;Portal;40476				1	Soul Wars: Ferox Enclave
+2206 2858 0	3081 3475 0	Enter;Portal;40476				1	Soul Wars: Edgeville
+2206 2859 0	3081 3475 0	Enter;Portal;40476				1	Soul Wars: Edgeville
+2206 2857 0	3081 3475 0	Enter;Portal;40476				1	Soul Wars: Edgeville
+2205 2856 0	3081 3475 0	Enter;Portal;40476				1	Soul Wars: Edgeville
+2205 2860 0	3081 3475 0	Enter;Portal;40476				1	Soul Wars: Edgeville
+2204 2859 0	3081 3475 0	Enter;Portal;40476				1	Soul Wars: Edgeville
+2204 2858 0	3081 3475 0	Enter;Portal;40476				1	Soul Wars: Edgeville
+2204 2857 0	3081 3475 0	Enter;Portal;40476				1	Soul Wars: Edgeville
 2720 4884 2	2721 4911 0	Enter;Portal;6282				1	
 2719 4884 2	2721 4911 0	Enter;Portal;6282				1	
 2721 4884 2	2721 4911 0	Enter;Portal;6282				1	
@@ -75,15 +75,15 @@
 2677 5214 2	3110 3363 2	Enter;Portal Home;11356				1	
 2677 5215 2	3110 3363 2	Enter;Portal Home;11356				1	
 2678 5213 2	3110 3363 2	Enter;Portal Home;11356				1	
-3084 3476 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	
-3083 3476 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	
-3082 3476 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	
-3081 3475 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	
-3081 3474 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	
-3081 3473 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	
-3158 10028 0	2206 2858 0	Enter;Soul Wars Portal;40475				1	
-3158 10027 0	2206 2858 0	Enter;Soul Wars Portal;40475				1	
-3158 10026 0	2206 2858 0	Enter;Soul Wars Portal;40475				1	
+3084 3476 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	Soul Wars
+3083 3476 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	Soul Wars
+3082 3476 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	Soul Wars
+3081 3475 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	Soul Wars
+3081 3474 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	Soul Wars
+3081 3473 0	2206 2858 0	Enter;Soul Wars Portal;40474				1	Soul Wars
+3158 10028 0	2206 2858 0	Enter;Soul Wars Portal;40475				1	Soul Wars
+3158 10027 0	2206 2858 0	Enter;Soul Wars Portal;40475				1	Soul Wars
+3158 10026 0	2206 2858 0	Enter;Soul Wars Portal;40475				1	Soul Wars
 3327 4751 0	3128 3628 0	Exit;Portal;26646				1	
 3328 4751 0	3128 3629 0	Exit;Portal;26646				1	
 3097 3508 1	3157 9818 0	Use;Clan Cup portal;27094				1	

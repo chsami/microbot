@@ -1,4 +1,4 @@
-# Origin	Destination	menuOption menuTarget objectID	Skills	Items	Quests	Duration	Info
+# Origin	Destination	menuOption menuTarget objectID	Skills	Items	Quests	Duration	Display Info
 # Tutorial Island							
 3097 3107 0	3098 3107 0	Open;Door;9398				1	
 3098 3107 0	3097 3107 0	Open;Door;9398				1	
@@ -369,27 +369,27 @@
 3142 3618 2	3142 3618 1	Climb-down;Ladder;14746				2	
 3142 3625 1	3142 3625 2	Climb-up;Ladder;14745				2	
 3142 3625 2	3142 3625 1	Climb-down;Ladder;14746				2	
-3152 3644 0	3164 10043 0	Walk-down;Stairs;39647					
-3164 10044 0	3152 3644 0	Exit;Opening;39648					
-3152 3643 0	3164 10043 0	Walk-down;Stairs;39647					
-3164 10043 0	3152 3644 0	Exit;Opening;39648					
-3164 10042 0	3152 3644 0	Exit;Opening;39648					
-3154 3635 0	3155 3635 0	Pass-Through;Barrier;39653				2	
-3155 3635 0	3154 3635 0	Pass-Through;Barrier;39653				2	
-3154 3634 0	3155 3634 0	Pass-Through;Barrier;39652				2	
-3155 3634 0	3154 3634 0	Pass-Through;Barrier;39652				2	
-3135 3617 0	3135 3616 0	Pass-Through;Barrier;39653				2	
-3135 3616 0	3135 3617 0	Pass-Through;Barrier;39653				2	
-3134 3616 0	3134 3617 0	Pass-Through;Barrier;39652				2	
-3134 3617 0	3134 3616 0	Pass-Through;Barrier;39652				2	
-3123 3629 0	3122 3629 0	Pass-Through;Barrier;39652				2	
-3122 3629 0	3123 3629 0	Pass-Through;Barrier;39652				2	
-3123 3628 0	3122 3628 0	Pass-Through;Barrier;39653				2	
-3122 3628 0	3123 3628 0	Pass-Through;Barrier;39653				2	
-3135 3639 0	3135 3640 0	Pass-Through;Barrier;39652				2	
-3135 3640 0	3135 3639 0	Pass-Through;Barrier;39652				2	
-3134 3639 0	3134 3640 0	Pass-Through;Barrier;39653				2	
-3134 3640 0	3134 3639 0	Pass-Through;Barrier;39653				2	
+3152 3644 0	3164 10043 0	Walk-down;Stairs;39647				1	
+3164 10044 0	3152 3644 0	Exit;Opening;39648				1	
+3152 3643 0	3164 10043 0	Walk-down;Stairs;39647				1	
+3164 10043 0	3152 3644 0	Exit;Opening;39648				1	
+3164 10042 0	3152 3644 0	Exit;Opening;39648				1	
+3154 3635 0	3155 3635 0	Pass-Through;Barrier;39653				6	
+3155 3635 0	3154 3635 0	Pass-Through;Barrier;39653				6	
+3154 3634 0	3155 3634 0	Pass-Through;Barrier;39652				6	
+3155 3634 0	3154 3634 0	Pass-Through;Barrier;39652				6	
+3135 3617 0	3135 3616 0	Pass-Through;Barrier;39653				6	
+3135 3616 0	3135 3617 0	Pass-Through;Barrier;39653				6	
+3134 3616 0	3134 3617 0	Pass-Through;Barrier;39652				6	
+3134 3617 0	3134 3616 0	Pass-Through;Barrier;39652				6	
+3123 3629 0	3122 3629 0	Pass-Through;Barrier;39652				6	
+3122 3629 0	3123 3629 0	Pass-Through;Barrier;39652				6	
+3123 3628 0	3122 3628 0	Pass-Through;Barrier;39653				6	
+3122 3628 0	3123 3628 0	Pass-Through;Barrier;39653				6	
+3135 3639 0	3135 3640 0	Pass-Through;Barrier;39652				6	
+3135 3640 0	3135 3639 0	Pass-Through;Barrier;39652				6	
+3134 3639 0	3134 3640 0	Pass-Through;Barrier;39653				6	
+3134 3640 0	3134 3639 0	Pass-Through;Barrier;39653				6	
 							
 # Clan Wars (Free-for-all)							
 3371 4810 0	3371 4810 1	Climb-up;Ladder;16683				2	

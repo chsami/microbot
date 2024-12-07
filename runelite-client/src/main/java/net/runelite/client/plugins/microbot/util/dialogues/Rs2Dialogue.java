@@ -134,6 +134,29 @@ public class Rs2Dialogue {
     }
 
     /**
+     * Checks if the current dialogue contains a question that matches the specified text.
+     *
+     * @param text  the text to search for in the dialogue question.
+     * @param exact if true, requires an exact match; if false, allows partial matches.
+     * @return true if a matching dialogue question is found, otherwise false.
+     */
+    public static boolean hasQuestion(String text, boolean exact) {
+        String question = getQuestion();
+        if (question == null) return false;
+        return exact ? question.equalsIgnoreCase(text) : question.toLowerCase().contains(text.toLowerCase());
+    }
+
+    /**
+     * Checks if the current dialogue contains a question that partially matches the specified text.
+     *
+     * @param text the text to search for in the dialogue question.
+     * @return true if a partially matching dialogue question is found, otherwise false.
+     */
+    public static boolean hasQuestion(String text) {
+        return hasQuestion(text, false);
+    }
+
+    /**
      * Retrieves a list of dialogue option widgets currently visible to the player.
      * It skips the first dynamic child widget, as it is typically not an option.
      *
@@ -286,8 +309,19 @@ public class Rs2Dialogue {
      * @return true if the specified dialogue option appears within the timeout period, otherwise false
      */
     public static boolean sleepUntilHasDialogueOption(String text) {
-        return sleepUntilTrue(() -> hasDialogueOption(text));
+        return sleepUntilHasDialogueOption(text, false);
     }
+
+    /**
+     * Pauses the current thread until a specified dialogue option becomes available.
+     *
+     * @param text the text of the dialogue option to wait for
+     * @return true if the specified dialogue option appears within the timeout period, otherwise false
+     */
+    public static boolean sleepUntilHasDialogueOption(String text, boolean exact) {
+        return sleepUntilTrue(() -> hasDialogueOption(text, exact));
+    }
+
 
     /**
      * Pauses the current thread until the player is in a dialogue.
@@ -314,6 +348,28 @@ public class Rs2Dialogue {
      */
     public static boolean sleepUntilHasContinue() {
         return sleepUntilTrue(Rs2Dialogue::hasContinue);
+    }
+
+    /**
+     * Pauses the current thread until a dialogue question containing the specified text becomes available.
+     *
+     * @param text  the text to search for in the dialogue question.
+     * @param exact if true, requires an exact match; if false, allows partial matches.
+     * @return true if the dialogue question appears within the timeout period, otherwise false.
+     */
+    public static boolean sleepUntilHasQuestion(String text, boolean exact) {
+        return sleepUntilTrue(() -> hasQuestion(text, exact));
+    }
+
+    /**
+     * Pauses the current thread until a dialogue question containing the specified text becomes available,
+     * allowing partial matches.
+     *
+     * @param text the text to search for in the dialogue question.
+     * @return true if the dialogue question appears within the timeout period, otherwise false.
+     */
+    public static boolean sleepUntilHasQuestion(String text) {
+        return sleepUntilHasQuestion(text, false);
     }
     
     /**
