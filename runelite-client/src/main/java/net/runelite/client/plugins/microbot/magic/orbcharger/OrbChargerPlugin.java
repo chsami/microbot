@@ -11,6 +11,7 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.magic.orbcharger.enums.OrbChargerState;
+import net.runelite.client.plugins.microbot.magic.orbcharger.enums.Teleport;
 import net.runelite.client.plugins.microbot.magic.orbcharger.scripts.AirOrbScript;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -43,6 +44,8 @@ public class OrbChargerPlugin extends Plugin {
     private Rs2Food rs2Food;
     @Getter
     private int eatAtPercent;
+    @Getter
+    private Teleport teleport;
 
     @Inject
     private OverlayManager overlayManager;
@@ -58,6 +61,7 @@ public class OrbChargerPlugin extends Plugin {
         useStaminaPotions = config.useStaminaPotions();
         rs2Food = config.food();
         eatAtPercent = config.eatAtPercent();
+        teleport = config.teleport();
         if (overlayManager != null) {
             overlayManager.add(orbOverlay);
         }
@@ -86,6 +90,9 @@ public class OrbChargerPlugin extends Plugin {
         }
         if (event.getKey().equals(OrbChargerConfig.eatAtPercent)) {
             eatAtPercent = config.eatAtPercent();
+        }
+        if (event.getKey().equals(OrbChargerConfig.teleport)) {
+            teleport = config.teleport();
         }
     }
 

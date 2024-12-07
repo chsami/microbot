@@ -4,4 +4,5 @@ public enum OrbChargerState {
     WALKING,
     BANKING,
     CHARGING,
+    DRINKING,
 }
