@@ -2,12 +2,12 @@ package net.runelite.client.plugins.microbot.util.keyboard;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.Global;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
 import static java.awt.event.KeyEvent.CHAR_UNDEFINED;
-import static net.runelite.client.plugins.microbot.util.math.Random.random;
 
 public class Rs2Keyboard {
 
@@ -22,7 +22,7 @@ public class Rs2Keyboard {
         }
 
         for (int i = 0; i < word.length(); i++) {
-            final int randomizer = random(20, 200);
+            final int randomizer = Rs2Random.between(20, 200);
 
             KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_TYPED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_UNDEFINED, word.charAt(i));
 
@@ -43,7 +43,7 @@ public class Rs2Keyboard {
             Microbot.getClient().getCanvas().setFocusable(!originalFocusValue);
         }
 
-        final int randomizer = random(20, 200);
+        final int randomizer = Rs2Random.between(20, 200);
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_TYPED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_UNDEFINED, key);
 
@@ -61,7 +61,7 @@ public class Rs2Keyboard {
             Microbot.getClient().getCanvas().setFocusable(!originalFocusValue);
         }
 
-        final int randomizer = random(20, 200);
+        final int randomizer = Rs2Random.between(20, 200);
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_PRESSED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_SHIFT, CHAR_UNDEFINED);
 
@@ -79,7 +79,7 @@ public class Rs2Keyboard {
             Microbot.getClient().getCanvas().setFocusable(!originalFocusValue);
         }
 
-        final int randomizer = random(20, 200);
+        final int randomizer = Rs2Random.between(20, 200);
 
         KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis() + randomizer, 0, KeyEvent.VK_SHIFT);
 
@@ -91,13 +91,14 @@ public class Rs2Keyboard {
 
     }
 
-    public static void keyHold(int key) {
+    public static void keyHold(int keyCode) {
         boolean originalFocusValue = Microbot.getClient().getCanvas().isFocusable();
         if (!originalFocusValue) {
             Microbot.getClient().getCanvas().setFocusable(!originalFocusValue);
         }
 
-        KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, key);
+        final int randomizer = Rs2Random.between(20, 200);
+        KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_PRESSED, System.currentTimeMillis() + randomizer, 0, keyCode);
 
         getCanvas().dispatchEvent(keyEvent);
 
@@ -107,15 +108,15 @@ public class Rs2Keyboard {
 
     }
 
-    public static void keyRelease(int key) {
+    public static void keyRelease(int keyCode) {
         boolean originalFocusValue = Microbot.getClient().getCanvas().isFocusable();
         if (!originalFocusValue) {
             Microbot.getClient().getCanvas().setFocusable(!originalFocusValue);
         }
 
-        final int randomizer = random(20, 200);
+        final int randomizer = Rs2Random.between(20, 200);
 
-        KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis() + randomizer, 0, key);
+        KeyEvent keyEvent = new KeyEvent(getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis() + randomizer, 0, keyCode);
 
         getCanvas().dispatchEvent(keyEvent);
 
@@ -125,9 +126,9 @@ public class Rs2Keyboard {
 
     }
 
-    public static void keyPress(int key) {
-        keyHold(key);
-        keyRelease(key);
+    public static void keyPress(int keyCode) {
+        keyHold(keyCode);
+        keyRelease(keyCode);
     }
 
     public static void enter() {

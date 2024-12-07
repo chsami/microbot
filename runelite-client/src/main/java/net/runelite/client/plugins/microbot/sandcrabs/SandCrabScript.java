@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static java.awt.event.KeyEvent.CHAR_UNDEFINED;
+
 public class SandCrabScript extends Script {
 
     public static String version = "1.4.1";

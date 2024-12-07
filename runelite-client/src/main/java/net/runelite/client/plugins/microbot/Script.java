@@ -26,6 +26,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
+import static java.awt.event.KeyEvent.CHAR_UNDEFINED;
+
 @Slf4j
 public abstract class Script implements IScript {
 

@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Runelite" type="Application" factoryName="Application" singleton="false">
-    <option name="ALTERNATIVE_JRE_PATH" value="jbr-21" />
+    <option name="ALTERNATIVE_JRE_PATH" value="$USER_HOME$/Downloads/jbr_jcef-21.0.5-linux-x64-b509.30" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="net.runelite.client.RuneLite" />
     <module name="client" />
