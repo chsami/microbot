@@ -1032,12 +1032,6 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                 if (interactWithAdventureLog(transport)) {
                     sleep(600 * 2); // wait extra 2 game ticks before moving
                 }
-            } else if (transport.getType() == TransportType.TELEPORTATION_PORTAL) {
-                if (interactWithSoulWarsPortal(transport)) {
-                    sleep(600 * 2); // wait extra 2 game ticks before moving
-                } else {
-                    Rs2Player.waitForWalking();
-                }
             } else {
                 Rs2Player.waitForWalking();
                 Rs2Dialogue.clickOption("Yes please"); //shillo village cart
@@ -1367,27 +1361,6 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
         char key = transport.getDisplayInfo().charAt(0);
         Rs2Keyboard.keyPress(key);
         Microbot.log("Traveling to " + transport.getDisplayInfo());
-        return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
-    }
-    
-    private static boolean interactWithSoulWarsPortal(Transport transport) {
-        if (transport.getDisplayInfo() == null || transport.getDisplayInfo().isEmpty()) return false;
-        
-        boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
-        String destination = hasMultipleDestination
-                ? transport.getDisplayInfo().split(":")[1].trim() :
-                null;
-        
-        if (destination == null || destination.isEmpty()) return false;
-        
-        boolean isPortalDialogueVisible = Rs2Dialogue.sleepUntilHasQuestion("Where would you like to go?");
-        if (!isPortalDialogueVisible) {
-            Microbot.log("Widget did not become visible within the timeout.");
-            return false;
-        }
-        
-        Rs2Dialogue.clickOption(destination);
-        Microbot.log("Traveling to " + destination);
         return sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 100, 5000);
     }
 
