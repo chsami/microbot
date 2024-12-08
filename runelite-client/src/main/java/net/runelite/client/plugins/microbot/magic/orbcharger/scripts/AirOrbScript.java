@@ -40,10 +40,11 @@ public class AirOrbScript extends Script {
 
     private final OrbChargerPlugin plugin;
     public OrbChargerState state;
-    List<Player> dangerousPlayers = new ArrayList<>();
+    
     public boolean hasDied = false;
     private int unpoweredOrbAmount = 0;
     private int cosmicRuneAmount = 0;
+    private boolean shouldFlee = false;
 
     @Inject
     public AirOrbScript(OrbChargerPlugin plugin) {
@@ -57,9 +58,6 @@ public class AirOrbScript extends Script {
             ItemID.AIR_BATTLESTAFF,
             ItemID.MYSTIC_AIR_STAFF,
     };
-
-    private final String gloryRegex = "^Amulet of glory\\(\\d\\)$";
-
 
     public boolean run() {
         Microbot.enableAutoRunOn = false;
@@ -81,23 +79,11 @@ public class AirOrbScript extends Script {
                     shutdown();
                     return;
                 }
-
-                if (state != OrbChargerState.BANKING && Rs2Pvp.isInWilderness() && dangerousPlayers.isEmpty()) {
-                    dangerousPlayers = Rs2Player.getPlayersInCombatLevelRange().stream()
-                            .filter(player -> !Rs2Player.hasPlayerEquippedItem(player, airStaves))
-                            .collect(Collectors.toList());
-
-                    if (!dangerousPlayers.isEmpty()) {
-                        Rs2Walker.setTarget(null);
-                        return;
-                    }
-                }
+                
+                if (shouldFlee) return;
 
                 switch (state) {
                     case BANKING:
-                        if (Rs2Bank.isNearBank(plugin.getTeleport().getBankLocation(), 15) && !dangerousPlayers.isEmpty()) {
-                            dangerousPlayers.clear();
-                        }
                         if (!Rs2Bank.isOpen()) return;
 
                         if (!Rs2Equipment.isWearing("air")) {
@@ -228,13 +214,16 @@ public class AirOrbScript extends Script {
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         sleepUntil(() -> Rs2Player.isAnimating(1200));
                         Rs2Tab.switchToInventoryTab();
-                        sleepUntil(() -> !Rs2Player.isAnimating(5000) || !Rs2Inventory.hasItem(ItemID.UNPOWERED_ORB), 96000);
+                        sleepUntil(() -> !Rs2Player.isAnimating(5000) || !Rs2Inventory.hasItem(ItemID.UNPOWERED_ORB) || shouldFlee, () -> {
+                            shouldFlee = !plugin.getDangerousPlayers().isEmpty();
+                        }, 96000, 1000);
                         break;
                     case DRINKING:
                         Rs2GameObject.interact(ObjectID.POOL_OF_REFRESHMENT);
                         sleepUntil(() -> Rs2Player.getRunEnergy() == 100 && !Rs2Player.isAnimating(2000));
                         break;
-                    default:
+                    case WALKING:
+                        shouldFlee = !plugin.getDangerousPlayers().isEmpty();
                         break;
                 }
 
@@ -252,11 +241,11 @@ public class AirOrbScript extends Script {
     public boolean handleWalk() {
         scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!shouldBank() && !shouldCharge() && !shouldDrinkFromPool() && hasRequiredItems() && dangerousPlayers.isEmpty()) {
+                if (!Microbot.isLoggedIn()) return;
+                if (!shouldBank() && !shouldCharge() && !shouldDrinkFromPool() && hasRequiredItems()) {
                     Rs2Walker.walkTo(airObelisk, 2);
-                } else if ((shouldBank() && !hasRequiredItems()) || (!dangerousPlayers.isEmpty() || hasDied)) {
+                } else if ((shouldBank() && !hasRequiredItems()) || (hasDied || shouldFlee)) {
                     if (hasDied) {
-                        dangerousPlayers.clear();
                         Rs2Walker.setTarget(null);
                         hasDied = false;
                     }
@@ -268,7 +257,7 @@ public class AirOrbScript extends Script {
                             }
                             Rs2Player.logout();
                             sleepUntil(() -> Microbot.getClient().getGameState() != GameState.LOGGED_IN);
-                            dangerousPlayers.clear();
+                            shouldFlee = false;
                             new Login(Login.getRandomWorld(Login.activeProfile.isMember()));
                             sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
                         }
@@ -291,6 +280,7 @@ public class AirOrbScript extends Script {
 
     private boolean hasStateChanged() {
         if (shouldBank()) return true;
+        if (shouldDrinkFromPool()) return true;
         if (shouldCharge()) return true;
         if (hasRequiredItems()) return true;
         return false;

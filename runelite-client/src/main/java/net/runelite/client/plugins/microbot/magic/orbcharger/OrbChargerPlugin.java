@@ -2,8 +2,10 @@ package net.runelite.client.plugins.microbot.magic.orbcharger;
 
 import com.google.inject.Provides;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
+import net.runelite.api.Player;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -13,11 +15,14 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.magic.orbcharger.enums.OrbChargerState;
 import net.runelite.client.plugins.microbot.magic.orbcharger.enums.Teleport;
 import net.runelite.client.plugins.microbot.magic.orbcharger.scripts.AirOrbScript;
+import net.runelite.client.plugins.microbot.magic.orbcharger.scripts.PlayerDetectionScript;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @PluginDescriptor(
         name = PluginDescriptor.GMason + "Orb Charger",
@@ -46,6 +51,10 @@ public class OrbChargerPlugin extends Plugin {
     private int eatAtPercent;
     @Getter
     private Teleport teleport;
+    
+    @Getter
+    @Setter
+    public List<Player> dangerousPlayers = new ArrayList<>();
 
     @Inject
     private OverlayManager overlayManager;
@@ -54,6 +63,8 @@ public class OrbChargerPlugin extends Plugin {
     
     @Inject
     private AirOrbScript airOrbScript;
+    @Inject
+    private PlayerDetectionScript playerDetectionScript;
     
     @Override
     protected void startUp() throws AWTException {
@@ -66,6 +77,7 @@ public class OrbChargerPlugin extends Plugin {
             overlayManager.add(orbOverlay);
         }
         airOrbScript.run();
+        playerDetectionScript.run();
         airOrbScript.handleWalk();
     }
     
