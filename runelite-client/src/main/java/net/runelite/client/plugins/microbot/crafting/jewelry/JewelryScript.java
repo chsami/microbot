@@ -192,7 +192,7 @@ public class JewelryScript extends Script {
                             case ALCH:
                                 // Find the required staff
                                 if (staffItemID == -1 || staffItemID == 0) {
-                                    staffItemID = findSuitableFireStaff();
+                                    staffItemID = plugin.getStaff() != Staff.NONE ? plugin.getStaff().getItemID() : findSuitableFireStaff();
                                     
                                     if (staffItemID == -1) {
                                         Microbot.showMessage("No staff of fire-type found!");
@@ -434,7 +434,7 @@ public class JewelryScript extends Script {
         if (!plugin.getCompletionAction().equals(CompletionAction.ALCH)) return false;
         if (!Rs2Equipment.hasEquippedSlot(EquipmentInventorySlot.WEAPON)) return false;
 
-        staffItemID = findSuitableFireStaff();
+        staffItemID = plugin.getStaff() != Staff.NONE ? plugin.getStaff().getItemID() : findSuitableFireStaff();
 
         if (staffItemID == -1) return false; // No Fire Rune Staff equipped
         
