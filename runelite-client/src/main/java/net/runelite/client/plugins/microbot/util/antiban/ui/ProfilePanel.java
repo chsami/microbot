@@ -13,6 +13,11 @@ public class ProfilePanel extends JPanel {
     private final JCheckBox simulatePlaySchedule = new JCheckBox("Simulate Play Schedule");
 
     public ProfilePanel() {
+
+        enableProfileSwitching.setToolTipText("Enables profile(Play style) switching for the antiban system");
+        adjustForTimeOfDay.setToolTipText("Adjusts the antiban behavior based on the time of day. (Not fully implemented)");
+        simulatePlaySchedule.setToolTipText("(Not implemented!) Simulates a play schedule by switching between different activities at different times of the day and only during certain days of the week.");
+
         // Set the layout manager for the panel to GridBagLayout
         setLayout(new GridBagLayout());
         setBackground(ColorScheme.DARK_GRAY_HOVER_COLOR);

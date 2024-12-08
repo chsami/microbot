@@ -11,4 +11,12 @@ public class UiHelper {
         slider.setMinimum(0);
         slider.setMaximum(max);
     }
+    public static void setupSlider(JSlider slider, int majorTickSpacing, int min, int max, int minorTickSpacing) {
+        slider.setMajorTickSpacing(majorTickSpacing);
+        slider.setMinorTickSpacing(minorTickSpacing);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        slider.setMinimum(min);
+        slider.setMaximum(max);
+    }
 }

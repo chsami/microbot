@@ -17,6 +17,16 @@ public class ActivityPanel extends JPanel {
     private final JCheckBox dynamicActivity = new JCheckBox("Dynamic Activity");
 
     public ActivityPanel() {
+
+        usePlayStyle.setToolTipText("Main component of the activity system. Play styles is to simulate different types of play styles/attention spans.");
+        useRandomIntervals.setToolTipText("Randomizes the action cooldown intervals. (Not recommended for human-like behavior)");
+        simulateFatigue.setToolTipText("Simulates fatigue by slowing down the mouse movements the longer the player is logged in. (This is barely noticeable to the naked eye)");
+        simulateAttentionSpan.setToolTipText("Simulates attention span by switching between different play styles. (Profile switching must be enabled for this to work)");
+        useBehavioralVariability.setToolTipText("Randomizes the action cooldown intervals based on the current play style. (This is recommended for human-like behavior)");
+        useNonLinearIntervals.setToolTipText("Anti-fingerprinting feature. Slightly drifts the action cooldown intervals in the current play style to avoid pattern profiling.");
+        dynamicActivityIntensity.setToolTipText("Simulates dynamic intensity based on the current activity by adjusting the mouse speed and accuracy.");
+        dynamicActivity.setToolTipText("Detects activity changes and adjusts settings accordingly. (Required for contextual variability to work)");
+
         setLayout(new GridBagLayout());
         setBackground(ColorScheme.DARK_GRAY_HOVER_COLOR);
         GridBagConstraints gbc = new GridBagConstraints();
