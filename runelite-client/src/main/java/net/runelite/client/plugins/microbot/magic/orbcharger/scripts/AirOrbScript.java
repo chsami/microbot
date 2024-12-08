@@ -28,6 +28,7 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.skillcalculator.skills.MagicAction;
 
 import javax.inject.Inject;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +41,7 @@ public class AirOrbScript extends Script {
 
     private final OrbChargerPlugin plugin;
     public OrbChargerState state;
-    
+
     public boolean hasDied = false;
     private int unpoweredOrbAmount = 0;
     private int cosmicRuneAmount = 0;
@@ -79,7 +80,7 @@ public class AirOrbScript extends Script {
                     shutdown();
                     return;
                 }
-                
+
                 if (shouldFlee) return;
 
                 switch (state) {
@@ -208,12 +209,19 @@ public class AirOrbScript extends Script {
                         break;
                     case CHARGING:
                         Rs2Walker.setTarget(null);
+
+                        shouldFlee = !plugin.getDangerousPlayers().isEmpty();
+                        if (shouldFlee) {
+                            break;
+                        }
+
                         Rs2Magic.cast(MagicAction.CHARGE_AIR_ORB);
                         Rs2GameObject.interact(ObjectID.OBELISK_OF_AIR);
                         Rs2Dialogue.sleepUntilHasCombinationDialogue();
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-                        sleepUntil(() -> Rs2Player.isAnimating(1200));
+                        sleepUntil(() -> Rs2Player.isAnimating(1200), 5000);
                         Rs2Tab.switchToInventoryTab();
+
                         sleepUntil(() -> !Rs2Player.isAnimating(5000) || !Rs2Inventory.hasItem(ItemID.UNPOWERED_ORB) || shouldFlee, () -> {
                             shouldFlee = !plugin.getDangerousPlayers().isEmpty();
                         }, 96000, 1000);
@@ -232,7 +240,7 @@ public class AirOrbScript extends Script {
                 System.out.println("Total time for loop " + totalTime);
 
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                System.out.println("Error in AirOrbScript: " + ex.getMessage());
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
@@ -242,31 +250,14 @@ public class AirOrbScript extends Script {
         scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
-                if (!shouldBank() && !shouldCharge() && !shouldDrinkFromPool() && hasRequiredItems()) {
+
+                if (shouldContinueWalking()) {
                     Rs2Walker.walkTo(airObelisk, 2);
-                } else if ((shouldBank() && !hasRequiredItems()) || (hasDied || shouldFlee)) {
-                    if (hasDied) {
-                        Rs2Walker.setTarget(null);
-                        hasDied = false;
-                    }
-                    if (Rs2Player.isInCombat() || Rs2Player.isTeleBlocked()) {
-                        Rs2Walker.walkTo(outsideOfWilderness, 2);
-                        if (Rs2Player.distanceTo(outsideOfWilderness) <= 2 && !Rs2Player.isMoving()) {
-                            if (Rs2Player.isInCombat()) {
-                                sleepUntil(() -> !Rs2Player.isInCombat(), 12000);
-                            }
-                            Rs2Player.logout();
-                            sleepUntil(() -> Microbot.getClient().getGameState() != GameState.LOGGED_IN);
-                            shouldFlee = false;
-                            new Login(Login.getRandomWorld(Login.activeProfile.isMember()));
-                            sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN);
-                        }
-                    } else {
-                        Rs2Bank.walkToBankAndUseBank(plugin.getTeleport().getBankLocation());
-                    }
+                } else if (shouldHandleBankingOrFleeing()) {
+                    handleBankingOrFleeing();
                 }
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                System.out.println("Error in handleWalk: " + ex.getMessage());
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
@@ -294,12 +285,106 @@ public class AirOrbScript extends Script {
         return null;
     }
 
+    private boolean shouldContinueWalking() {
+        return !shouldBank() && !shouldCharge() && !shouldDrinkFromPool() && hasRequiredItems();
+    }
+
+    private boolean shouldHandleBankingOrFleeing() {
+        if (hasDied || shouldFlee) {
+            return true;
+        }
+        
+        if (shouldBank() && !isTeleportItemEquipped()) {
+            Microbot.log("Banking needed due to missing teleport item.");
+            return true;
+        }
+        
+        if (shouldBank() && !hasRequiredItems()) {
+            Microbot.log("Banking needed due to missing required items.");
+            return true;
+        }
+
+        return false;
+    }
+
+    private void handleBankingOrFleeing() {
+        if (hasDied) {
+            handleDeathReset();
+        }
+
+        if (shouldFlee) {
+            handleFleeing();
+        } else {
+            Rs2Bank.walkToBankAndUseBank(plugin.getTeleport().getBankLocation());
+        }
+    }
+
+    private void handleDeathReset() {
+        Rs2Walker.setTarget(null);
+        hasDied = false;
+    }
+
+    private void handleFleeing() {
+        if (!Rs2Player.isInCombat() && !Rs2Player.isTeleBlocked()) {
+            if (!Rs2Bank.isNearBank(plugin.getTeleport().getBankLocation(), 8)) {
+                Rs2Bank.walkToBank(plugin.getTeleport().getBankLocation());
+            } else {
+                handleLogout();
+            }
+        } else {
+            Rs2Walker.walkTo(outsideOfWilderness, 2);
+            if (Rs2Player.getWorldLocation().distanceTo(outsideOfWilderness) <= 2 && !Rs2Player.isMoving()) {
+                if (Rs2Player.isInCombat()) {
+                    sleepUntil(() -> !Rs2Player.isInCombat(), 12000);
+                }
+                handleLogout();
+            }
+        }
+    }
+
+    private void handleLogout() {
+        if (Rs2Player.isInCombat() || Rs2Player.isTeleBlocked()) return;
+        Rs2Player.logout();
+        sleepUntil(() -> Microbot.getClient().getGameState() != GameState.LOGGED_IN, 5000);
+
+        if (Microbot.getClient().getGameState() == GameState.LOGGED_IN) {
+            Microbot.log("Logout unsuccessful, retrying logout.");
+            System.out.println("Logout unsuccessful, retrying logout.");
+            return;
+        }
+        new Login(Login.getRandomWorld(Login.activeProfile.isMember()));
+        sleepUntil(() -> Microbot.getClient().getGameState() == GameState.LOGGED_IN, 10000);
+        shouldFlee = false;
+    }
+
     private boolean shouldBank() {
-        return (Rs2Inventory.hasItem(ItemID.AIR_ORB) && !Rs2Inventory.hasItem(ItemID.COSMIC_RUNE)) || !Rs2Inventory.hasItem(ItemID.UNPOWERED_ORB);
+        return !hasRequiredItems() || !isTeleportItemEquipped();
+    }
+
+    private boolean isTeleportItemEquipped() {
+        final Pattern regexPattern = Pattern.compile(plugin.getTeleport().getRegexPattern());
+        switch (plugin.getTeleport()) {
+            case AMULET_OF_GLORY:
+                Rs2Item equippedAmulet = Rs2Equipment.get(EquipmentInventorySlot.AMULET);
+                if (equippedAmulet == null) return false;
+                return regexPattern.matcher(equippedAmulet.getName()).matches();
+            case RING_OF_DUELING:
+                Rs2Item equippedRing = Rs2Equipment.get(EquipmentInventorySlot.RING);
+                if (equippedRing == null) return false;
+                return regexPattern.matcher(equippedRing.getName()).matches();
+            default:
+                return false;
+        }
     }
 
     private boolean hasRequiredItems() {
-        return Rs2Inventory.hasItemAmount(ItemID.COSMIC_RUNE, cosmicRuneAmount) && Rs2Inventory.hasItemAmount(ItemID.UNPOWERED_ORB, unpoweredOrbAmount);
+        boolean hasOrbs = Rs2Inventory.hasItemAmount(ItemID.UNPOWERED_ORB, unpoweredOrbAmount);
+        boolean hasRunes = Rs2Inventory.hasItemAmount(ItemID.COSMIC_RUNE, cosmicRuneAmount);
+
+        if (!hasOrbs) Microbot.log("Missing required unpowered orbs.");
+        if (!hasRunes) Microbot.log("Missing required cosmic runes.");
+
+        return hasOrbs && hasRunes;
     }
 
     private boolean shouldCharge() {
@@ -311,67 +396,42 @@ public class AirOrbScript extends Script {
     }
 
     private void handleReplaceTeleportItem() {
+        if (isTeleportItemEquipped()) return;
+
         final Pattern regexPattern = Pattern.compile(plugin.getTeleport().getRegexPattern());
-        switch (plugin.getTeleport()) {
-            case AMULET_OF_GLORY:
-                Rs2Item equippedAmulet = Rs2Equipment.get(EquipmentInventorySlot.AMULET);
+        Rs2Item teleportItem = Rs2Bank.bankItems().stream()
+                .filter(item -> regexPattern.matcher(item.getName()).matches())
+                .findFirst()
+                .orElse(null);
 
-                boolean needsAmulet = equippedAmulet == null
-                        || !regexPattern.matcher(equippedAmulet.getName()).matches()
-                        || Rs2Equipment.hasEquipped(ItemID.AMULET_OF_GLORY);
-                
-                if (needsAmulet) {
-                    Rs2Item amuletOfGlory = Rs2Bank.bankItems()
-                            .stream()
-                            .filter(item -> regexPattern.matcher(item.name).matches())
-                            .findFirst()
-                            .orElse(null);
+        if (teleportItem == null) {
+            Microbot.showMessage("Missing required teleport item in bank!");
+            shutdown();
+            return;
+        }
 
-                    if (amuletOfGlory == null) {
-                        Microbot.showMessage("Unable to find Amulet of Glory");
-                        shutdown();
-                        return;
-                    }
-
-                    Rs2Bank.withdrawOne(amuletOfGlory.getId());
-                    Rs2Inventory.waitForInventoryChanges(1200);
-                    Rs2Inventory.equip(amuletOfGlory.getId());
-                    Rs2Inventory.waitForInventoryChanges(1200);
-
-                    if (equippedAmulet != null) {
-                        Rs2Bank.depositOne(equippedAmulet.getId());
-                        Rs2Inventory.waitForInventoryChanges(1200);
-                    }
-                }
-                break;
-            case RING_OF_DUELING:
-                Rs2Item equippedRing = Rs2Equipment.get(EquipmentInventorySlot.RING);
-                boolean needsRing = equippedRing == null
-                        || !regexPattern.matcher(equippedRing.getName()).matches();
-
-                if (needsRing) {
-                    Rs2Item ringOfDueling = Rs2Bank.bankItems()
-                            .stream()
-                            .filter(item -> regexPattern.matcher(item.name).matches())
-                            .findFirst()
-                            .orElse(null);
-
-                    if (ringOfDueling == null) {
-                        Microbot.showMessage("Unable to find Ring of Dueling");
-                        shutdown();
-                        return;
-                    }
-
-                    Rs2Bank.withdrawOne(ringOfDueling.getId());
-                    Rs2Inventory.waitForInventoryChanges(1200);
-                    Rs2Inventory.equip(ringOfDueling.getId());
-                    Rs2Inventory.waitForInventoryChanges(1200);
-                    if (equippedRing != null) {
-                        Rs2Bank.depositOne(equippedRing.getId());
-                        Rs2Inventory.waitForInventoryChanges(1200);
-                    }
-                }
-                break;
+        if (Rs2Inventory.isFull()) {
+            // Deposit one unpowered orb if inventory is full
+            if (Rs2Inventory.hasItem(ItemID.UNPOWERED_ORB)) {
+                Rs2Bank.depositOne(ItemID.UNPOWERED_ORB);
+                Rs2Inventory.waitForInventoryChanges(1200);
+            } else {
+                Microbot.showMessage("Inventory full, but no unpowered orbs to deposit!");
+                shutdown();
+                return;
+            }
+        }
+        
+        Rs2Bank.withdrawOne(teleportItem.getId());
+        Rs2Inventory.waitForInventoryChanges(1200);
+        Rs2Inventory.equip(teleportItem.getId());
+        Rs2Inventory.waitForInventoryChanges(1200);
+        if (plugin.getTeleport() == Teleport.AMULET_OF_GLORY) {
+            Rs2Item equippedAmulet = Rs2Equipment.get(EquipmentInventorySlot.AMULET);
+            if (equippedAmulet != null && equippedAmulet.getId() == ItemID.AMULET_OF_GLORY) {
+                Rs2Bank.depositOne(equippedAmulet.getId());
+                Rs2Inventory.waitForInventoryChanges(1200);
+            }
         }
     }
 }

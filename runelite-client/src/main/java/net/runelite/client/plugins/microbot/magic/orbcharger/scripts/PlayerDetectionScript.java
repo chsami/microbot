@@ -9,20 +9,21 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.player.Rs2Pvp;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class PlayerDetectionScript extends Script {
 
     private final OrbChargerPlugin plugin;
-
     private final int[] airStaves = {
             ItemID.STAFF_OF_AIR,
             ItemID.AIR_BATTLESTAFF,
             ItemID.MYSTIC_AIR_STAFF,
     };
+
+    private final List<Player> detectedDangerousPlayers = new CopyOnWriteArrayList<>();
 
     @Inject
     public PlayerDetectionScript(OrbChargerPlugin plugin) {
@@ -32,33 +33,35 @@ public class PlayerDetectionScript extends Script {
     public boolean run() {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!super.run()) return;
-                if (Rs2Pvp.isInWilderness() && Microbot.isLoggedIn()) {
-                    List<Player> currentDangerousPlayers = plugin.getDangerousPlayers();
-                    
+                if (!super.run() || !Microbot.isLoggedIn()) return;
+
+                if (Rs2Pvp.isInWilderness()) {
                     List<Player> newDangerousPlayers = Rs2Player.getPlayersInCombatLevelRange().stream()
                             .filter(player -> !Rs2Player.hasPlayerEquippedItem(player, airStaves))
-                            .filter(player -> !currentDangerousPlayers.contains(player))
+                            .filter(player -> !detectedDangerousPlayers.contains(player))
                             .collect(Collectors.toList());
 
                     if (!newDangerousPlayers.isEmpty()) {
-                        currentDangerousPlayers.addAll(newDangerousPlayers);
-                        plugin.setDangerousPlayers(currentDangerousPlayers);
+                        Microbot.log("Detected " + newDangerousPlayers.size() + " dangerous players.");
+                        System.out.println("Detected " + newDangerousPlayers.size() + " dangerous players.");
+                        detectedDangerousPlayers.addAll(newDangerousPlayers);
+                        plugin.setDangerousPlayers(List.copyOf(detectedDangerousPlayers));
                     }
-                } else {
-                    if (!plugin.getDangerousPlayers().isEmpty()) {
-                        plugin.setDangerousPlayers(Collections.emptyList());
-                    }
+                } else if (!detectedDangerousPlayers.isEmpty()) {
+                    detectedDangerousPlayers.clear();
+                    plugin.setDangerousPlayers(List.of());
                 }
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                System.out.println("Error in PlayerDetectionScript: " + ex.getMessage());
             }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+        }, 0, 100, TimeUnit.MILLISECONDS);
         return true;
     }
 
     @Override
     public void shutdown() {
+        detectedDangerousPlayers.clear();
+        plugin.setDangerousPlayers(List.of());
         super.shutdown();
     }
 }

@@ -40,7 +40,7 @@ public class OrbChargerPlugin extends Plugin {
         return configManager.getConfig(OrbChargerConfig.class);
     }
     
-    public static String version = "1.0.0";
+    public static String version = "1.1.0";
     @Getter
     private boolean useEnergyPotions;
     @Getter
@@ -85,6 +85,7 @@ public class OrbChargerPlugin extends Plugin {
     protected void shutDown() {
         overlayManager.remove(orbOverlay);
         airOrbScript.shutdown();
+        playerDetectionScript.shutdown();
     }
     
     public void onConfigChanged(ConfigChanged event) {
