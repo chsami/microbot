@@ -1032,6 +1032,8 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                 if (interactWithAdventureLog(transport)) {
                     sleep(600 * 2); // wait extra 2 game ticks before moving
                 }
+            } else if (transport.getType() == TransportType.TELEPORTATION_PORTAL) {
+                    sleep(600 * 2); // wait extra 2 game ticks before moving
             } else {
                 Rs2Player.waitForWalking();
                 Rs2Dialogue.clickOption("Yes please"); //shillo village cart
