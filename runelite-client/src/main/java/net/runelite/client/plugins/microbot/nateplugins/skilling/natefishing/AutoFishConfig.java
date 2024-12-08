@@ -61,4 +61,17 @@ public interface AutoFishConfig extends Config {
         return "swordfish,lobster,tuna,trout,salmon,shrimp,anchovies,shark,crab,monkfish,angler,eel,clue,casket";
     }
 
+    // boolean if to use Echo harpoon
+    @ConfigItem(
+            keyName = "UseEchoHarpoon",
+            name = "Echo Harpoon",
+            description = "Use Echo Harpoon",
+            position = 4,
+            section = generalSection
+    )
+    default boolean useEchoHarpoon()
+    {
+        return false;
+    }
+
 }

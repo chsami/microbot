@@ -594,7 +594,36 @@ public class AntibanSetupTemplates {
         Rs2AntibanSettings.actionCooldownChance = 1.00;
         Rs2AntibanSettings.microBreakChance = 0.05;
     }
-
+    /**
+     * Applies the basic antiban setup.
+     * This setup configures settings to simulate human-like mouse movement and reduce detection risk.
+     * This setup does not include advanced features such as action cooldown, attention span or micro breaks.
+     */
+    public void applyUniversalAntibanSetup() {
+        // Implementation for General Basic setup
+        Rs2AntibanSettings.antibanEnabled = true;
+        Rs2AntibanSettings.usePlayStyle = true;
+        Rs2AntibanSettings.randomIntervals = false;
+        Rs2AntibanSettings.simulateFatigue = true;
+        Rs2AntibanSettings.simulateAttentionSpan = true;
+        Rs2AntibanSettings.behavioralVariability = true;
+        Rs2AntibanSettings.nonLinearIntervals = true;
+        Rs2AntibanSettings.profileSwitching = true;
+        Rs2AntibanSettings.timeOfDayAdjust = false;
+        Rs2AntibanSettings.simulateMistakes = true;
+        Rs2AntibanSettings.naturalMouse = true;
+        Rs2AntibanSettings.contextualVariability = true;
+        Rs2AntibanSettings.dynamicIntensity = true;
+        Rs2AntibanSettings.dynamicActivity = true;
+        Rs2AntibanSettings.devDebug = false;
+        Rs2AntibanSettings.takeMicroBreaks = false;
+        Rs2AntibanSettings.playSchedule = false;
+        Rs2AntibanSettings.universalAntiban = true;
+        Rs2AntibanSettings.microBreakDurationLow = 3;
+        Rs2AntibanSettings.microBreakDurationHigh = 8;
+        Rs2AntibanSettings.actionCooldownChance = 1.00;
+        Rs2AntibanSettings.microBreakChance = 0.05;
+    }
 
 }
 

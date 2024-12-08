@@ -19,6 +19,14 @@ public class MousePanel extends JPanel {
     private final JLabel moveMouseRandomlyChanceLabel = new JLabel("Random Mouse Movement (%): " + (int) (Rs2AntibanSettings.moveMouseRandomlyChance * 100));
 
     public MousePanel() {
+
+        useNaturalMouse.setToolTipText("Simulate human-like mouse movements");
+        simulateMistakes.setToolTipText("Simulate mistakes in mouse movements");
+        moveMouseOffScreen.setToolTipText("Move the mouse off screen if activity cooldown is active");
+        moveMouseOffScreenChance.setToolTipText("Chance to move the mouse off screen when activity cooldown is active");
+        moveMouseRandomly.setToolTipText("Move the mouse randomly when activity cooldown is active");
+        moveMouseRandomlyChance.setToolTipText("Chance to move the mouse randomly when activity cooldown is active");
+
         // Set the layout manager for the panel to GridBagLayout
         setLayout(new GridBagLayout());
         setBackground(ColorScheme.DARK_GRAY_HOVER_COLOR);

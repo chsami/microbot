@@ -17,6 +17,11 @@ public class CooldownPanel extends JPanel {
     private final JLabel timeoutLabel = new JLabel("Timeout (ticks): " + Rs2Antiban.getTIMEOUT());
 
     public CooldownPanel() {
+
+        isActionCooldownActive.setToolTipText("Displays if the action cooldown is active");
+        actionCooldownChance.setToolTipText("Chance to activate the action cooldown in percent");
+        timeout.setToolTipText("The amount of ticks left before the action cooldown is deactivated");
+
         // Set the layout manager for the panel to GridBagLayout
         setLayout(new GridBagLayout());
         setBackground(ColorScheme.DARK_GRAY_HOVER_COLOR);

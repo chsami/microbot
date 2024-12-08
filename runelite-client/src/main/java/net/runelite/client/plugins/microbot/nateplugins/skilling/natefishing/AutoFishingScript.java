@@ -48,7 +48,7 @@ public class AutoFishingScript extends Script {
                     initialPlayerLocation = Rs2Player.getWorldLocation();
                 }
 
-                if (!hasRequiredItems(fish)) {
+                if (!hasRequiredItems(fish,config.useEchoHarpoon())) {
                     Microbot.showMessage("You are missing the required tools to catch this fish");
                     shutdown();
                     return;
@@ -89,7 +89,10 @@ public class AutoFishingScript extends Script {
         return true;
     }
 
-    private boolean hasRequiredItems(Fish fish) {
+    private boolean hasRequiredItems(Fish fish, boolean echoHarpoon) {
+        if(echoHarpoon){
+            return Rs2Inventory.hasItem("Echo harpoon") || Rs2Equipment.hasEquipped(ItemID.ECHO_HARPOON);
+        }
         switch (fish) {
             case MONKFISH:
             case KARAMBWANJI:

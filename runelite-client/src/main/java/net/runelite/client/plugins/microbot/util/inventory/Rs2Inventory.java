@@ -13,7 +13,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
-import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Potion;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
@@ -25,8 +25,8 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -2163,7 +2163,7 @@ public class Rs2Inventory {
         final int currentInventoryStackableSize = stackableSize();
         sleepUntil(() ->  {
             actionWhileWaiting.run();
-            sleepUntil(() -> currentInventorySize != size() || currentInventoryStackableSize != stackableSize(), Random.random(600, 2100));
+            sleepUntil(() -> currentInventorySize != size() || currentInventoryStackableSize != stackableSize(), Rs2Random.between(600, 2100));
             return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
         });
         return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();

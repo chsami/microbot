@@ -780,21 +780,45 @@ public class Rs2Player {
      * @return
      */
     public static boolean drinkPrayerPotionAt(int prayerPoints) {
-        if (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) <= prayerPoints) {
-            // Check and use prayer potion first
-            if (Rs2Inventory.contains(ItemID.PRAYER_POTION1, ItemID.PRAYER_POTION2, ItemID.PRAYER_POTION3, ItemID.PRAYER_POTION4)) {
-                return Rs2Inventory.interact("prayer potion", "drink");
-            }
-            // If no prayer potion, try to use super restore
-            if (Rs2Inventory.contains(ItemID.SUPER_RESTORE1, ItemID.SUPER_RESTORE2, ItemID.SUPER_RESTORE3, ItemID.SUPER_RESTORE4)) {
-                return Rs2Inventory.interact("super restore", "drink");
-            }
-            if (Rs2Inventory.contains(ItemID.BLIGHTED_SUPER_RESTORE1, ItemID.BLIGHTED_SUPER_RESTORE2, ItemID.BLIGHTED_SUPER_RESTORE3, ItemID.BLIGHTED_SUPER_RESTORE4) && Microbot.getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
-                return Rs2Inventory.interact("super restore", "drink");
+        // Check if current prayer level is below or equal to the threshold
+        if (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) > prayerPoints) {
+            return false;
+        }
+
+        // Attempt to drink a prayer potion
+        if (usePotion(ItemID.PRAYER_POTION1, ItemID.PRAYER_POTION2, ItemID.PRAYER_POTION3, ItemID.PRAYER_POTION4)) {
+            return true;
+        }
+
+        // Attempt to drink a super restore potion
+        if (usePotion(ItemID.SUPER_RESTORE1, ItemID.SUPER_RESTORE2, ItemID.SUPER_RESTORE3, ItemID.SUPER_RESTORE4)) {
+            return true;
+        }
+
+        // If in wilderness, attempt to drink a blighted super restore potion
+        if (Microbot.getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
+            return usePotion(ItemID.BLIGHTED_SUPER_RESTORE1, ItemID.BLIGHTED_SUPER_RESTORE2, ItemID.BLIGHTED_SUPER_RESTORE3, ItemID.BLIGHTED_SUPER_RESTORE4);
+        }
+
+        return false;
+    }
+
+    /**
+     * Helper method to check for the presence of any item in the provided IDs and interact with it.
+     *
+     * @param itemIds Array of item IDs to check in the inventory.
+     * @return true if an item was found and interacted with; false otherwise.
+     */
+    private static boolean usePotion(Integer ...itemIds) {
+        if (Rs2Inventory.contains(itemIds)) {
+            Rs2Item potion = Rs2Inventory.get(itemIds);
+            if (potion != null) {
+                return Rs2Inventory.interact(potion, "drink");
             }
         }
         return false;
     }
+
 
     /**
      * Checks if the player has prayer points remaining
@@ -948,9 +972,9 @@ public class Rs2Player {
      * @return
      */
     public static boolean checkIdleLogout(long randomDelay) {
-        int idleClientTicks = Microbot.getClient().getKeyboardIdleTicks();
+        int idleClientTicks = Math.min(Microbot.getClient().getKeyboardIdleTicks(), Microbot.getClient().getMouseIdleTicks());
 
-        return (long) idleClientTicks >= randomDelay;
+        return (long) idleClientTicks >= Microbot.getClient().getIdleTimeout() - randomDelay;
     }
 
     /**

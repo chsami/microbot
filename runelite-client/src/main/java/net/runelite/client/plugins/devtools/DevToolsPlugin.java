@@ -672,4 +672,42 @@ public class DevToolsPlugin extends Plugin
 			}
 		}
 	}
+
+	TileObject findTileObject(int x, int y, int id)
+	{
+		x += (Constants.EXTENDED_SCENE_SIZE - Constants.SCENE_SIZE) / 2;
+		y += (Constants.EXTENDED_SCENE_SIZE - Constants.SCENE_SIZE) / 2;
+		Scene scene = client.getScene();
+		Tile[][][] tiles = scene.getExtendedTiles();
+		Tile tile = tiles[client.getPlane()][x][y];
+		if (tile != null)
+		{
+			for (GameObject gameObject : tile.getGameObjects())
+			{
+				if (gameObject != null && gameObject.getId() == id)
+				{
+					return gameObject;
+				}
+			}
+
+			WallObject wallObject = tile.getWallObject();
+			if (wallObject != null && wallObject.getId() == id)
+			{
+				return wallObject;
+			}
+
+			DecorativeObject decorativeObject = tile.getDecorativeObject();
+			if (decorativeObject != null && decorativeObject.getId() == id)
+			{
+				return decorativeObject;
+			}
+
+			GroundObject groundObject = tile.getGroundObject();
+			if (groundObject != null && groundObject.getId() == id)
+			{
+				return groundObject;
+			}
+		}
+		return null;
+	}
 }
