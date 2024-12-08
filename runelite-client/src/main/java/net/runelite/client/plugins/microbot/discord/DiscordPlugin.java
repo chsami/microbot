@@ -276,10 +276,7 @@ public class DiscordPlugin extends Plugin {
             return;
         }
 
-        int threshold = configManager.getConfiguration("discordnotifier", "valuableItemThreshold", int.class);
-        if (threshold <= 0) {
-            threshold = 100000;
-        }
+        int threshold = config.valuableItemThreshold();
 
         Item[] currentItems = container.getItems();
         
