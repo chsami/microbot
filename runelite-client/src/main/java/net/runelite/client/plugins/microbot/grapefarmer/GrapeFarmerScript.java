@@ -29,14 +29,6 @@ public class GrapeFarmerScript extends Script {
         NONE
     }
 
-    // State varbits
-    private static final int ADD_SALTPETRE = 0;
-    private static final int PLANT_GRAPE_SEED = 1;
-    private static final int CHECK_HEALTH = 9;
-    private static final int PICK_GRAPES = 10; // it changes from 10 - 14 during the picking
-    private static final int CLEAR_VINE = 15;
-
-    // HashMap for patches
     private static final Map<Integer, Integer> patchMap = new LinkedHashMap<>() {{
         put(Varbits.GRAPES_4959, 11816); // a1
         put(Varbits.GRAPES_4960, 11817); // a2
@@ -70,7 +62,6 @@ public class GrapeFarmerScript extends Script {
                     int varbitKey = entry.getKey();
                     int gameObjectId = entry.getValue();
 
-                    // Process the current patch until its state transitions to DEFAULT
                     while (true) {
 
                         if (!this.isRunning()) return;
@@ -79,17 +70,14 @@ public class GrapeFarmerScript extends Script {
                             continue; // Wait for the player to be idle
                         }
 
-                        // Get the current state of the patch
                         int currentVarbitValue = Microbot.getVarbitValue(varbitKey);
                         State currentState = getStateForVarbit(currentVarbitValue);
 
-                        // If the state is DEFAULT, break out of the inner loop and move to the next patch
                         if (currentState == State.NONE) {
                             System.out.println("State is DEFAULT for GameObject ID: " + gameObjectId + ". Moving to the next patch.");
                             break;
                         }
 
-                        // Perform actions based on the current state
                         switch (currentState) {
                             case CHECK_HEALTH:
                                 System.out.println("Checking health of GameObject ID: " + gameObjectId);
@@ -193,10 +181,7 @@ public class GrapeFarmerScript extends Script {
             // Growing grape
             return State.NONE;
         }
-        if (varbitValue == 9) {
-            return State.CHECK_HEALTH;
-        }
-        if (varbitValue == 10) {
+        if (varbitValue == 9 || varbitValue == 10) {
             return State.CHECK_HEALTH;
         }
         if (varbitValue >= 11 && varbitValue < 15) {
@@ -211,7 +196,6 @@ public class GrapeFarmerScript extends Script {
 
     // Simulates interaction with a game object
     private static void checkHealth(int gameObjectId) {
-        // Replace this with actual game interaction logic
         System.out.println("Interacting with GameObject ID: " + gameObjectId + " using action: Check-health");
         Rs2GameObject.interact(gameObjectId);
         Rs2Player.waitForXpDrop(Skill.FARMING);
