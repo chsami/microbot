@@ -39,6 +39,7 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
+import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 import net.runelite.client.ui.overlay.tooltip.Tooltip;
 import net.runelite.client.ui.overlay.tooltip.TooltipManager;
 
@@ -68,11 +69,14 @@ class DevToolsOverlay extends Overlay {
     private final DevToolsPlugin plugin;
     private final TooltipManager toolTipManager;
 
+    private final ModelOutlineRenderer modelOutlineRenderer;
+
     @Inject
-    private DevToolsOverlay(Client client, DevToolsPlugin plugin, TooltipManager toolTipManager) {
+    private DevToolsOverlay(Client client, DevToolsPlugin plugin, TooltipManager toolTipManager, ModelOutlineRenderer modelOutlineRenderer) {
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
         setPriority(PRIORITY_HIGHEST);
+        this.modelOutlineRenderer = modelOutlineRenderer;
         this.client = client;
         this.plugin = plugin;
         this.toolTipManager = toolTipManager;
@@ -244,28 +248,27 @@ class DevToolsOverlay extends Overlay {
         OverlayUtil.renderTextLocation(graphics, new Point(xPosition, yPosition), memoryText, Color.YELLOW, 12);
     }
 
-    private void renderTileObjects(Graphics2D graphics)
-    {
+    private void renderTileObjects(Graphics2D graphics) {
         Scene scene = client.getScene();
         Tile[][][] tiles = scene.getTiles();
 
         int z = client.getPlane();
 
-        for (int x = 0; x < Constants.SCENE_SIZE; ++x)
-        {
-            for (int y = 0; y < Constants.SCENE_SIZE; ++y)
-            {
+        for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+            for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
                 Tile tile = tiles[z][x][y];
 
-                if (tile == null)
-                {
+                if (tile == null) {
                     continue;
                 }
 
                 Player player = client.getLocalPlayer();
-                if (player == null)
-                {
+                if (player == null) {
                     continue;
+                }
+
+                if (plugin.getGroundItems().isActive()) {
+                    renderGroundItems(graphics, tile, player);
                 }
 
                 if (plugin.getTileObjects().isActive())
@@ -295,119 +298,35 @@ class DevToolsOverlay extends Overlay {
                     }
                 }
 
-                if (plugin.getTileLocation().isActive())
-                {
+                if (plugin.getTileLocation().isActive()) {
                     renderTileTooltip(graphics, tile);
                 }
 
-                if (plugin.getMovementFlags().isActive())
-                {
+                if (plugin.getMovementFlags().isActive()) {
                     renderMovementInfo(graphics, tile);
                 }
             }
         }
     }
 
-    private void renderTileObject(Graphics2D graphics, TileObject tileObject, Player player, Color color)
-    {
-        if (tileObject == null)
-        {
-            return;
-        }
-
-        // Skip objects without a name/target text
-        ObjectComposition objComposition = client.getObjectDefinition(tileObject.getId());
-        if (objComposition == null || objComposition.getName().equals("null"))
-        {
-            return;
-        }
-
-        if (player.getLocalLocation().distanceTo(tileObject.getLocalLocation()) <= MAX_DISTANCE)
-        {
-            Point mousePosition = client.getMouseCanvasPosition();
-            Shape objectClickbox = tileObject.getClickbox();
-            boolean isHovered = false;
-
-            if (objectClickbox != null)
-            {
-                isHovered = objectClickbox.contains(mousePosition.getX(), mousePosition.getY());
-                Color objectColor = color;
-                if (isHovered)
-                {
-                    graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 150));
-                }
-                else
-                {
-                    graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 50));
-                }
-                graphics.draw(objectClickbox);
-                graphics.setColor(objectColor);
-            }
-
-            Point minimapLocation = tileObject.getMinimapLocation();
-            if (minimapLocation != null)
-            {
-                graphics.setColor(color);
-                graphics.fillOval(minimapLocation.getX() - 2, minimapLocation.getY() - 2, 4, 4);
-            }
-
-            // Only show text information if the object is being hovered over
-            if (isHovered)
-            {
-                String objectType = "Unknown";
-                if (tileObject instanceof WallObject)
-                {
-                    objectType = "Wall";
-                }
-                else if (tileObject instanceof DecorativeObject)
-                {
-                    objectType = "Decorative";
-                }
-                else if (tileObject instanceof GroundObject)
-                {
-                    objectType = "Ground";
-                }
-                else if (tileObject instanceof GameObject)
-                {
-                    objectType = "Game";
-                }
-
-                Point textLocation = tileObject.getCanvasTextLocation(graphics, 
-                    String.format("ID: %d", tileObject.getId()), 0);
-
-                if (textLocation != null)
-                {
-                    WorldPoint worldLocation = tileObject.getWorldLocation();
-                    String text = String.format("%s (ID: %d X: %d Y: %d)", 
-                        objComposition.getName(), tileObject.getId(), worldLocation.getX(), worldLocation.getY());
-                    String typeText = "Type: " + objectType;
-
-                    OverlayUtil.renderTextLocation(graphics, textLocation, text, color);
-                    Point typeTextLocation = new Point(textLocation.getX(), textLocation.getY() + 15);
-                    OverlayUtil.renderTextLocation(graphics, typeTextLocation, typeText, color);
-                }
-            }
-        }
-    }
-
-    private void renderTileTooltip(Graphics2D graphics, Tile tile)
-    {
-        final LocalPoint tileLocalLocation = tile.getLocalLocation();
-        Polygon poly = Perspective.getCanvasTilePoly(client, tileLocalLocation);
-        if (poly != null && poly.contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY()))
-        {
-            WorldPoint worldLocation = WorldPoint.fromLocalInstance(client, tileLocalLocation);
-            byte flags = client.getTileSettings()[tile.getRenderLevel()][tile.getSceneLocation().getX()][tile.getSceneLocation().getY()];
-            String tooltip = String.format("World location: %d, %d, %d<br>" +
-                    "Region ID: %d location: %d, %d<br>" +
-                    "Flags: %d",
-                worldLocation.getX(), worldLocation.getY(), worldLocation.getPlane(),
-                worldLocation.getRegionID(), worldLocation.getRegionX(), worldLocation.getRegionY(),
-                flags);
-            toolTipManager.add(new Tooltip(tooltip));
-            OverlayUtil.renderPolygon(graphics, poly, GREEN);
-        }
-    }
+	private void renderTileTooltip(Graphics2D graphics, Tile tile)
+	{
+		final LocalPoint tileLocalLocation = tile.getLocalLocation();
+		Polygon poly = Perspective.getCanvasTilePoly(client, tileLocalLocation);
+		if (poly != null && poly.contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY()))
+		{
+			WorldPoint worldLocation = WorldPoint.fromLocalInstance(client, tileLocalLocation);
+			byte flags = client.getTileSettings()[tile.getRenderLevel()][tile.getSceneLocation().getX()][tile.getSceneLocation().getY()];
+			String tooltip = String.format("World location: %d, %d, %d<br>" +
+					"Region ID: %d location: %d, %d<br>" +
+					"Flags: %d",
+				worldLocation.getX(), worldLocation.getY(), worldLocation.getPlane(),
+				worldLocation.getRegionID(), worldLocation.getRegionX(), worldLocation.getRegionY(),
+				flags);
+			toolTipManager.add(new Tooltip(tooltip));
+			OverlayUtil.renderPolygon(graphics, poly, GREEN);
+		}
+	}
 
     private void renderMovementInfo(Graphics2D graphics, Tile tile) {
         Polygon poly = Perspective.getCanvasTilePoly(client, tile.getLocalLocation());
@@ -446,22 +365,98 @@ class DevToolsOverlay extends Overlay {
         }
     }
 
-    private void renderGameObjects(Graphics2D graphics, Tile tile, Player player)
-    {
+    private void renderGameObjects(Graphics2D graphics, Tile tile, Player player) {
         GameObject[] gameObjects = tile.getGameObjects();
-        if (gameObjects == null)
-        {
-            return;
-        }
+        if (gameObjects != null) {
+            for (GameObject gameObject : gameObjects) {
+                if (gameObject != null && gameObject.getSceneMinLocation().equals(tile.getSceneLocation())) {
+                    ObjectComposition objComposition = client.getObjectDefinition(gameObject.getId());
+                    if (objComposition == null )
+                    {
+                        return;
+                    }
+                    if (player.getLocalLocation().distanceTo(gameObject.getLocalLocation()) <= MAX_DISTANCE) {
+                        modelOutlineRenderer.drawOutline(gameObject, 1, Color.RED, 50);
+                        MenuEntry[] menuEntries = client.getMenuEntries();
+                        MenuEntry hovered = Arrays.stream(menuEntries).filter(e -> e.getType().equals(MenuAction.GAME_OBJECT_FIRST_OPTION) ||
+                                e.getType().equals(MenuAction.GAME_OBJECT_SECOND_OPTION) ||
+                                e.getType().equals(MenuAction.GAME_OBJECT_THIRD_OPTION) ||
+                                e.getType().equals(MenuAction.GAME_OBJECT_FOURTH_OPTION) ||
+                                e.getType().equals(MenuAction.GAME_OBJECT_FIFTH_OPTION) ||
+                                e.getType().equals(MenuAction.EXAMINE_OBJECT) ||
+                                e.getType().equals(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT))
+                                .findFirst().orElse(null);
+                        MenuAction action = hovered != null ? hovered.getType() : MenuAction.CANCEL;
 
-        for (GameObject gameObject : gameObjects)
-        {
-            if (gameObject == null)
-            {
-                continue;
+                        switch (action)
+                        {
+                            case WIDGET_TARGET_ON_GAME_OBJECT:
+                            case GAME_OBJECT_FIRST_OPTION:
+                            case GAME_OBJECT_SECOND_OPTION:
+                            case GAME_OBJECT_THIRD_OPTION:
+                            case GAME_OBJECT_FOURTH_OPTION:
+                            case GAME_OBJECT_FIFTH_OPTION:
+                            case EXAMINE_OBJECT:
+                            {
+                                int x = hovered.getParam0();
+                                int y = hovered.getParam1();
+                                int id = hovered.getIdentifier();
+
+                                TileObject hoveredObject = plugin.findTileObject(x, y, id);
+                                if (hoveredObject instanceof GameObject && gameObject.equals(hoveredObject))
+                                {
+                                    modelOutlineRenderer.drawOutline(gameObject, 5, new Color(0,255,0,150), 5);
+                                    String objectType = "Unknown";
+                                    if (gameObject instanceof WallObject)
+                                    {
+                                        objectType = "Wall";
+                                    }
+                                    else if (gameObject instanceof DecorativeObject)
+                                    {
+                                        objectType = "Decorative";
+                                    }
+                                    else if (gameObject instanceof GroundObject)
+                                    {
+                                        objectType = "Ground";
+                                    }
+                                    else {
+                                        objectType = "Game";
+                                    }
+
+                                    Point textLocation = gameObject.getCanvasTextLocation(graphics,
+                                            String.format("ID: %d", gameObject.getId()), 0);
+
+                                    if (textLocation != null)
+                                    {
+                                        WorldPoint worldLocation = gameObject.getWorldLocation();
+                                        String text = String.format("%s (ID: %d X: %d Y: %d)",
+                                                objComposition.getName(), gameObject.getId(), worldLocation.getX(), worldLocation.getY());
+                                        String typeText = "Type: " + objectType;
+
+                                        OverlayUtil.renderTextLocation(graphics, textLocation, text, Color.GREEN);
+                                        Point typeTextLocation = new Point(textLocation.getX(), textLocation.getY() + 15);
+                                        OverlayUtil.renderTextLocation(graphics, typeTextLocation, typeText, Color.GREEN);
+                                    }
+                                }
+
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+
+
+                    }
+                }
             }
+        }
+    }
 
-            renderTileObject(graphics, gameObject, player, Color.GREEN);
+    private void renderTileObject(Graphics2D graphics, TileObject tileObject, Player player, Color color) {
+        if (tileObject != null) {
+            if (player.getLocalLocation().distanceTo(tileObject.getLocalLocation()) <= MAX_DISTANCE) {
+                OverlayUtil.renderTileOverlay(graphics, tileObject, "ID: " + tileObject.getId(), color);
+            }
         }
     }
 
