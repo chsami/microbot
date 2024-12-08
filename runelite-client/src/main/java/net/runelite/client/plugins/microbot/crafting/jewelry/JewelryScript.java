@@ -394,14 +394,20 @@ public class JewelryScript extends Script {
     }
     
     private boolean hasFinishedCutting() {
+        if (plugin.getJewelry().getGem() == null) return false;
         if(!Rs2Inventory.hasItem(ItemID.CHISEL)) return false;
         return Rs2Inventory.hasItem(plugin.getJewelry().getGem().getCutItemID()) && !Rs2Inventory.hasItem(plugin.getJewelry().getGem().getUncutItemID());
     }
     
     private boolean hasFinishedCrafting() {
         if (!Rs2Inventory.hasItem(plugin.getJewelry().getToolItemID())) return false;
+
+        boolean hasCraftingItem = Rs2Inventory.hasItem(plugin.getJewelry().getJewelryType().getItemID());
+        boolean hasNoGem = plugin.getJewelry().getGem() == null;
+        boolean hasCutGem = Rs2Inventory.hasItem(plugin.getJewelry().getGem().getCutItemID());
+
         return Rs2Inventory.hasItem(plugin.getJewelry().getItemID()) 
-                && (!Rs2Inventory.hasItem(plugin.getJewelry().getJewelryType().getItemID()) && !Rs2Inventory.hasItem(plugin.getJewelry().getGem().getCutItemID()));
+                && hasNoGem ? !hasCraftingItem : !hasCraftingItem && !hasCutGem;
     }
     
     private boolean hasFinishedEnchanting() {
@@ -409,14 +415,19 @@ public class JewelryScript extends Script {
     }
     
     private boolean isCutting() {
+        if (plugin.getJewelry().getGem() == null) return false;
         if (!Rs2Inventory.hasItem(ItemID.CHISEL)) return false;
         return Rs2Inventory.hasItem(plugin.getJewelry().getGem().getUncutItemID());
     }
     
     private boolean isCrafting() {
         if(!Rs2Inventory.hasItem(plugin.getJewelry().getToolItemID())) return false;
-        return Rs2Inventory.hasItem(plugin.getJewelry().getJewelryType().getItemID()) 
-                && Rs2Inventory.hasItem(plugin.getJewelry().getGem().getCutItemID());
+        
+        boolean hasCraftingItem = Rs2Inventory.hasItem(plugin.getJewelry().getJewelryType().getItemID());
+        boolean hasNoGem = plugin.getJewelry().getGem() == null;
+        boolean hasCutGem = Rs2Inventory.hasItem(plugin.getJewelry().getGem().getCutItemID());
+        
+        return hasNoGem ? hasCraftingItem : hasCraftingItem && hasCutGem;
     }
     
     private boolean isAlching() {
