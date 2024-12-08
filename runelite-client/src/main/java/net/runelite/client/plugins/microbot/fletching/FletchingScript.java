@@ -31,7 +31,7 @@ class ProgressiveFletchingModel {
 
 public class FletchingScript extends Script {
 
-    public static String version = "1.6.1";
+    public static String version = "1.6.2";
     ProgressiveFletchingModel model = new ProgressiveFletchingModel();
 
     String primaryItemToFletch = "";
@@ -109,6 +109,7 @@ public class FletchingScript extends Script {
                 break;
             default:
                 Rs2Bank.depositAll(config.fletchingItem().getContainsInventoryName());
+                Rs2Inventory.waitForInventoryChanges(5000);
                 break;
         }
 
@@ -122,7 +123,7 @@ public class FletchingScript extends Script {
         }
 
         // Ensure the inventory isn't full without the primary item
-        if (!Rs2Inventory.hasItem(primaryItemToFletch) && Rs2Inventory.isFull()) {
+        if (!Rs2Inventory.hasItem(primaryItemToFletch)) {
             Rs2Bank.depositAll();
         }
 
