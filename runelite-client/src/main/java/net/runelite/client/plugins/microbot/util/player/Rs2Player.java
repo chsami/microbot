@@ -711,24 +711,35 @@ public class Rs2Player {
     }
 
     /**
-     * Gets a list of players around the local player within the combat level range based on wilderness level.
+     * Gets a list of players around the local player within the combat level range 
+     * and wilderness level where they can attack and be attacked.
      *
-     * @return A list of players within the combat range.
+     * @return A list of players within the combat range and attackable wilderness levels.
      */
     public static List<Player> getPlayersInCombatLevelRange() {
         int localCombatLevel = getCombatLevel();
+        int localWildernessLevel = Rs2Pvp.getWildernessLevelFrom(Rs2Player.getWorldLocation());
+        
+        if (localWildernessLevel == 0) return Collections.emptyList();
+        
+        int localMinCombatLevel = Math.max(3, localCombatLevel - localWildernessLevel);
+        int localMaxCombatLevel = Math.min(126, localCombatLevel + localWildernessLevel);
 
-        int wildernessLevel = Rs2Pvp.getWildernessLevelFrom(Rs2Player.getWorldLocation());
-
-        // Calculate the combat level range
-        int minCombatLevel = Math.max(3, localCombatLevel - wildernessLevel);
-        int maxCombatLevel = Math.min(126, localCombatLevel + wildernessLevel);
-
-        // Filter players based on the combat level range
+        // Filter players based on both combat level and wilderness level constraints
         return getPlayers().stream()
                 .filter(player -> {
                     int playerCombatLevel = player.getCombatLevel();
-                    return playerCombatLevel >= minCombatLevel && playerCombatLevel <= maxCombatLevel;
+                    int playerWildernessLevel = Rs2Pvp.getWildernessLevelFrom(player.getWorldLocation());
+                    
+                    if (playerWildernessLevel == 0) return false;
+                    
+                    int playerMinCombatLevel = Math.max(3, playerCombatLevel - playerWildernessLevel);
+                    int playerMaxCombatLevel = Math.min(126, playerCombatLevel + playerWildernessLevel);
+                    
+                    boolean localCanAttackPlayer = playerCombatLevel >= localMinCombatLevel && playerCombatLevel <= localMaxCombatLevel;
+                    boolean playerCanAttackLocal = localCombatLevel >= playerMinCombatLevel && localCombatLevel <= playerMaxCombatLevel;
+
+                    return localCanAttackPlayer && playerCanAttackLocal;
                 })
                 .collect(Collectors.toList());
     }
