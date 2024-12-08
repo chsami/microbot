@@ -353,7 +353,7 @@ public class PathfinderConfig {
 
     private boolean useTransport(Transport transport) {
         // Check if the feature flag is disabled
-        if (!isFeatureEnabled(transport.getType())) return false;
+        if (!isFeatureEnabled(transport)) return false;
         // If you don't meet level requirements
         if (!hasRequiredLevels(transport)) return false;
         // If the transport has quest requirements & the quest haven't been completed
@@ -398,7 +398,9 @@ public class PathfinderConfig {
         return true;
     }
 
-    private boolean isFeatureEnabled(TransportType type) {
+    private boolean isFeatureEnabled(Transport transport) {
+        TransportType type = transport.getType();
+        
         if (!client.getWorldType().contains(WorldType.MEMBERS)) {
             // Transport types that require membership
             switch (type) {
@@ -413,7 +415,7 @@ public class PathfinderConfig {
                 case QUETZAL:
                 case WILDERNESS_OBELISK:
                 case SPIRIT_TREE:
-                    return false; // Not enabled without membership
+                    return false;
             }
         }
 
@@ -447,6 +449,10 @@ public class PathfinderConfig {
             case TELEPORTATION_LEVER:
                 return useTeleportationLevers;
             case TELEPORTATION_PORTAL:
+                if (transport.getDisplayInfo() != null) {
+                    if (transport.getDisplayInfo().toLowerCase().contains("soul wars") 
+                            && !client.getWorldType().contains(WorldType.MEMBERS)) return false;
+                }
                 return useTeleportationPortals;
             case TELEPORTATION_SPELL:
                 return useTeleportationSpells;

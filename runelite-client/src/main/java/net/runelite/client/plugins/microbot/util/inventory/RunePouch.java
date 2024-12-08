@@ -6,6 +6,8 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.magic.Runes;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Use this class to check your rune pouch
@@ -25,12 +27,8 @@ public class RunePouch {
     private static final int[] runeIds = new int[NUM_SLOTS];
     private static final int[] amounts = new int[NUM_SLOTS];
 
-    /**
-     *
-     */
     private static void load() {
-        for (int i = 0; i < NUM_SLOTS; i++)
-        {
+        for (int i = 0; i < NUM_SLOTS; i++) {
             @Varbit int amountVarbit = AMOUNT_VARBITS[i];
             int amount = Microbot.getClient().getVarbitValue(amountVarbit);
             amounts[i] = amount;
@@ -41,15 +39,10 @@ public class RunePouch {
         }
     }
 
-    /**
-     *
-     * @param itemId
-     * @return
-     */
     public static boolean contains(int itemId) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             load();
-            for (int runeId: runeIds) {
+            for (int runeId : runeIds) {
                 Runes rune = Arrays.stream(Runes.values()).filter(x -> x.getId() == runeId).findFirst().orElse(null);
 
                 if (rune == null) continue;
@@ -61,12 +54,6 @@ public class RunePouch {
         });
     }
 
-    /**
-     *
-     * @param itemId
-     * @param amt
-     * @return
-     */
     public static boolean contains(int itemId, int amt) {
         return Microbot.getClientThread().runOnClientThread(() -> {
             load();
@@ -98,6 +85,35 @@ public class RunePouch {
                 }
             }
             return 0;
+        });
+    }
+
+    /**
+     * Gets a map of all runes in the rune pouch and their quantities.
+     *
+     * @return A map where the key is the rune item ID and the value is the quantity.
+     */
+    public static Map<Integer, Integer> getRunes() {
+        return Microbot.getClientThread().runOnClientThread(() -> {
+            load();
+            Map<Integer, Integer> runes = new HashMap<>();
+
+            for (int i = 0; i < runeIds.length; i++) {
+                int runeId = runeIds[i];
+                int amount = amounts[i];
+                if (runeId > 0 && amount > 0) {
+                    Runes rune = Arrays.stream(Runes.values())
+                            .filter(x -> x.getId() == runeId)
+                            .findFirst()
+                            .orElse(null);
+
+                    if (rune != null) {
+                        runes.put(rune.getItemId(), amount);
+                    }
+                }
+            }
+
+            return runes;
         });
     }
 }

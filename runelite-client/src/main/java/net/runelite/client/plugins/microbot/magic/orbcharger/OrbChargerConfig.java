@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.magic.orbcharger;
 
 import net.runelite.client.config.*;
+import net.runelite.client.plugins.microbot.magic.orbcharger.enums.Teleport;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Food;
 
 @ConfigGroup(OrbChargerConfig.configGroup)
@@ -17,6 +18,7 @@ public interface OrbChargerConfig extends Config {
     String useStaminaPotions = "useStaminaPotions";
     String food = "food";
     String eatAtPercent = "eatAtPercent";
+    String teleport = "teleport";
 
     @ConfigSection(
             name = "General Settings",
@@ -48,10 +50,21 @@ public interface OrbChargerConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = teleport,
+            name = "Teleport to use",
+            description = "Choose which teleport to use (when using ring of dueling, will drink from refreshment pool)",
+            position = 2,
+            section = generalSection
+    )
+    default Teleport teleport() {
+        return Teleport.AMULET_OF_GLORY;
+    }
+
+    @ConfigItem(
             keyName = useEnergyPotions,
             name = "Use Energy Potions",
             description = "Should withdraw & use energy potions",
-            position = 2,
+            position = 3,
             section = generalSection
     )
     default boolean useEnergyPotions() {
@@ -62,7 +75,7 @@ public interface OrbChargerConfig extends Config {
             keyName = useStaminaPotions,
             name = "Use Stamina Potions",
             description = "Should withdraw & use stamina potions",
-            position = 3,
+            position = 4,
             section = generalSection
     )
     default boolean useStaminaPotions() {
