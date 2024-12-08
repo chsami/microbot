@@ -104,22 +104,31 @@ public class AirOrbScript extends Script {
                             Rs2Inventory.waitForInventoryChanges(1200);
                         }
 
-                        if (!Rs2Inventory.isEmpty()) {
+                        handleReplaceTeleportItem();
+
+                        if (!hasRequiredItems()) {
                             List<String> importantPotionNames = new ArrayList<>(Rs2Potion.getRestoreEnergyPotionsVariants());
                             importantPotionNames.add(Rs2Potion.getStaminaPotion());
 
                             List<Rs2Item> filteredPotions = Rs2Inventory.getFilteredPotionItemsInInventory(importantPotionNames);
-
                             List<String> importantItemNames = filteredPotions.stream()
                                     .map(Rs2Item::getName)
                                     .collect(Collectors.toList());
+                            
+                            Rs2Item cosmicRune = Rs2Inventory.get(ItemID.COSMIC_RUNE);
+                            Rs2Item unpoweredOrb = Rs2Inventory.get(ItemID.UNPOWERED_ORB);
+
+                            if (cosmicRune != null) {
+                                importantItemNames.add(cosmicRune.getName());
+                            }
+                            if (unpoweredOrb != null) {
+                                importantItemNames.add(unpoweredOrb.getName());
+                            }
 
                             if (Rs2Bank.depositAllExcept(importantItemNames)) {
                                 Rs2Inventory.waitForInventoryChanges(1200);
                             }
                         }
-
-                        handleReplaceTeleportItem();
 
                         if (Rs2Player.getHealthPercentage() <= plugin.getEatAtPercent()) {
                             while (Rs2Player.getHealthPercentage() < 100 && isRunning()) {
@@ -127,6 +136,11 @@ public class AirOrbScript extends Script {
                                     Microbot.showMessage("Missing Food in Bank!");
                                     shutdown();
                                     break;
+                                }
+                                
+                                if (Rs2Inventory.isFull()) {
+                                    Rs2Bank.depositOne(ItemID.UNPOWERED_ORB);
+                                    Rs2Inventory.waitForInventoryChanges(1200);
                                 }
 
                                 Rs2Bank.withdrawOne(plugin.getRs2Food().getId());
@@ -182,26 +196,32 @@ public class AirOrbScript extends Script {
                         }
 
                         unpoweredOrbAmount = Rs2Inventory.getEmptySlots() - 1;
-                        int cosmicRuneAmount = unpoweredOrbAmount * 3;
+                        cosmicRuneAmount = unpoweredOrbAmount * 3;
 
-                        if (!Rs2Inventory.hasItemAmount(ItemID.COSMIC_RUNE, cosmicRuneAmount)) {
-                            if (!Rs2Bank.hasBankItem(ItemID.COSMIC_RUNE, cosmicRuneAmount)) {
-                                Microbot.showMessage("Missing Cosmic Runes");
+                        int currentCosmicRunes = Rs2Inventory.itemQuantity(ItemID.COSMIC_RUNE);
+                        int currentUnpoweredOrbs = Rs2Inventory.itemQuantity(ItemID.UNPOWERED_ORB);
+
+                        int neededCosmicRunes = Math.max(0, cosmicRuneAmount - currentCosmicRunes);
+                        int neededUnpoweredOrbs = Math.max(0, unpoweredOrbAmount - currentUnpoweredOrbs);
+
+                        if (neededCosmicRunes > 0) {
+                            if (!Rs2Bank.hasBankItem(ItemID.COSMIC_RUNE, neededCosmicRunes)) {
+                                Microbot.showMessage("Missing required cosmic runes in bank.");
                                 shutdown();
                                 return;
                             }
-
-                            Rs2Bank.withdrawX(ItemID.COSMIC_RUNE, cosmicRuneAmount);
+                            Rs2Bank.withdrawX(ItemID.COSMIC_RUNE, neededCosmicRunes);
+                            Rs2Inventory.waitForInventoryChanges(1200);
                         }
 
-                        if (!Rs2Inventory.hasItemAmount(ItemID.UNPOWERED_ORB, unpoweredOrbAmount)) {
-                            if (!Rs2Bank.hasBankItem(ItemID.UNPOWERED_ORB, unpoweredOrbAmount)) {
-                                Microbot.showMessage("Missing Unpowered Orbs");
+                        if (neededUnpoweredOrbs > 0) {
+                            if (!Rs2Bank.hasBankItem(ItemID.UNPOWERED_ORB, neededUnpoweredOrbs)) {
+                                Microbot.showMessage("Missing required unpowered orbs in bank.");
                                 shutdown();
                                 return;
                             }
-
-                            Rs2Bank.withdrawX(ItemID.UNPOWERED_ORB, unpoweredOrbAmount);
+                            Rs2Bank.withdrawX(ItemID.UNPOWERED_ORB, neededUnpoweredOrbs);
+                            Rs2Inventory.waitForInventoryChanges(1200);
                         }
 
                         Rs2Bank.closeBank();
@@ -293,12 +313,12 @@ public class AirOrbScript extends Script {
         if (hasDied || shouldFlee) {
             return true;
         }
-        
+
         if (shouldBank() && !isTeleportItemEquipped()) {
             Microbot.log("Banking needed due to missing teleport item.");
             return true;
         }
-        
+
         if (shouldBank() && !hasRequiredItems()) {
             Microbot.log("Banking needed due to missing required items.");
             return true;
@@ -378,11 +398,8 @@ public class AirOrbScript extends Script {
     }
 
     private boolean hasRequiredItems() {
-        boolean hasOrbs = Rs2Inventory.hasItemAmount(ItemID.UNPOWERED_ORB, unpoweredOrbAmount);
-        boolean hasRunes = Rs2Inventory.hasItemAmount(ItemID.COSMIC_RUNE, cosmicRuneAmount);
-
-        if (!hasOrbs) Microbot.log("Missing required unpowered orbs.");
-        if (!hasRunes) Microbot.log("Missing required cosmic runes.");
+        boolean hasOrbs = Rs2Inventory.hasItem(ItemID.UNPOWERED_ORB);
+        boolean hasRunes = Rs2Inventory.hasItem(ItemID.COSMIC_RUNE);
 
         return hasOrbs && hasRunes;
     }
@@ -421,7 +438,7 @@ public class AirOrbScript extends Script {
                 return;
             }
         }
-        
+
         Rs2Bank.withdrawOne(teleportItem.getId());
         Rs2Inventory.waitForInventoryChanges(1200);
         Rs2Inventory.equip(teleportItem.getId());
