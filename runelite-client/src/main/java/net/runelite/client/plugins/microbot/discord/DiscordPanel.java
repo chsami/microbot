@@ -10,12 +10,14 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.plaf.basic.BasicSpinnerUI;
 
 public class DiscordPanel extends PluginPanel {
     private final DiscordPlugin plugin;
     private final DiscordConfig config;
     private final JCheckBox enableNotificationsCheckbox = new JCheckBox("Enable Notifications");
     private final JButton testButton = new JButton("Test Webhook");
+    private final JPanel proximitySettingsPanel = new JPanel();
 
     @Inject
     private DiscordPanel(DiscordPlugin plugin, DiscordConfig config) {
@@ -50,13 +52,6 @@ public class DiscordPanel extends PluginPanel {
         enableNotificationsCheckbox.addActionListener(e -> 
             plugin.updateConfig("enableNotifications", enableNotificationsCheckbox.isSelected()));
         add(enableNotificationsCheckbox, c);
-
-        c.gridy++;
-        testButton.setBackground(ColorScheme.BRAND_ORANGE);
-        testButton.setForeground(Color.WHITE);
-        testButton.setFocusPainted(false);
-        testButton.addActionListener(e -> plugin.testWebhook());
-        add(testButton, c);
 
         c.gridy++;
         c.insets = new Insets(10, 0, 5, 0);
@@ -105,50 +100,77 @@ public class DiscordPanel extends PluginPanel {
         eventPanel.add(levelUpCheckbox, ec);
 
         ec.gridy++;
-        JPanel valuableItemPanel = new JPanel(new GridBagLayout());
-        valuableItemPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        GridBagConstraints vic = new GridBagConstraints();
-        vic.fill = GridBagConstraints.HORIZONTAL;
-        vic.weightx = 1;
-        vic.gridx = 0;
-        vic.gridy = 0;
-        vic.insets = new Insets(0, 0, 5, 0);
-
-        JPanel thresholdPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        thresholdPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        
-        JLabel thresholdLabel = new JLabel("Min Value:");
-        thresholdLabel.setForeground(Color.WHITE);
-        thresholdPanel.add(thresholdLabel);
-
-        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(100000, 1, Integer.MAX_VALUE, 1000);
-        JSpinner thresholdSpinner = new JSpinner(spinnerModel);
-        thresholdSpinner.setPreferredSize(new Dimension(100, 25));
-        thresholdSpinner.addChangeListener(e -> 
-            plugin.updateConfig("valuableItemThreshold", (Integer) thresholdSpinner.getValue()));
-        thresholdPanel.add(thresholdSpinner);
-
-        JLabel gpLabel = new JLabel("gp");
-        gpLabel.setForeground(Color.WHITE);
-        thresholdPanel.add(gpLabel);
-
-        JCheckBox valuableItemCheckbox = new JCheckBox("Valuable Items");
-        valuableItemCheckbox.setForeground(Color.WHITE);
-        valuableItemCheckbox.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        valuableItemCheckbox.addActionListener(e -> {
-            plugin.updateConfig("notifyValuableItems", valuableItemCheckbox.isSelected());
-            thresholdPanel.setVisible(valuableItemCheckbox.isSelected());
+        JCheckBox proximityAlertsCheckbox = new JCheckBox("Proximity Alerts");
+        proximityAlertsCheckbox.setSelected(config.enableProximityAlerts());
+        proximityAlertsCheckbox.setForeground(Color.WHITE);
+        proximityAlertsCheckbox.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        proximityAlertsCheckbox.addActionListener(e -> {
+            boolean enabled = proximityAlertsCheckbox.isSelected();
+            plugin.updateConfig("enableProximityAlerts", enabled);
+            updateProximitySettingsVisibility(enabled);
         });
-        
-        thresholdPanel.setVisible(valuableItemCheckbox.isSelected());
+        eventPanel.add(proximityAlertsCheckbox, ec);
 
-        valuableItemPanel.add(valuableItemCheckbox, vic);
-        vic.gridy++;
-        valuableItemPanel.add(thresholdPanel, vic);
-        eventPanel.add(valuableItemPanel, ec);
+        proximitySettingsPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        proximitySettingsPanel.setLayout(new GridBagLayout());
+        GridBagConstraints psc = new GridBagConstraints();
+        psc.fill = GridBagConstraints.HORIZONTAL;
+        psc.weightx = 1;
+        psc.gridx = 0;
+        psc.gridy = 0;
+        psc.insets = new Insets(0, 20, 5, 5);
+
+        JPanel settingsRow = new JPanel(new GridLayout(2, 1, 0, 5));
+        settingsRow.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+
+        JPanel radiusPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        radiusPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        JLabel radiusLabel = new JLabel("Alert Radius (in tiles):");
+        radiusLabel.setForeground(Color.WHITE);
+        radiusPanel.add(radiusLabel);
+
+        JSpinner radiusSpinner = new JSpinner(new SpinnerNumberModel(5, 1, 100, 1));
+        radiusSpinner.setValue(config.proximityRadius());
+        radiusSpinner.addChangeListener(e ->
+            plugin.updateConfig("proximityRadius", radiusSpinner.getValue()));
+        
+        ((JSpinner.DefaultEditor) radiusSpinner.getEditor()).getTextField().setColumns(3);
+        radiusSpinner.setUI(new BasicSpinnerUI() {
+            protected Component createNextButton() {
+                return null;
+            }
+            protected Component createPreviousButton() {
+                return null;
+            }
+        });
+
+        JTextField spinnerTextField = ((JSpinner.DefaultEditor) radiusSpinner.getEditor()).getTextField();
+        spinnerTextField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        spinnerTextField.setForeground(Color.WHITE);
+        spinnerTextField.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+        spinnerTextField.setPreferredSize(new Dimension(35, spinnerTextField.getPreferredSize().height));
+        
+        radiusPanel.add(radiusSpinner);
+        settingsRow.add(radiusPanel);
+
+        JPanel trackNewPlayersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        trackNewPlayersPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        JCheckBox onlyTrackNewPlayersCheckbox = new JCheckBox("Only Track New Players");
+        onlyTrackNewPlayersCheckbox.setSelected(config.onlyTrackNewPlayers());
+        onlyTrackNewPlayersCheckbox.setForeground(Color.WHITE);
+        onlyTrackNewPlayersCheckbox.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        onlyTrackNewPlayersCheckbox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        onlyTrackNewPlayersCheckbox.addActionListener(e ->
+            plugin.updateConfig("onlyTrackNewPlayers", onlyTrackNewPlayersCheckbox.isSelected()));
+        trackNewPlayersPanel.add(onlyTrackNewPlayersCheckbox);
+        settingsRow.add(trackNewPlayersPanel);
+
+        proximitySettingsPanel.add(settingsRow, psc);
+        ec.gridy++;
+        eventPanel.add(proximitySettingsPanel, ec);
+        updateProximitySettingsVisibility(config.enableProximityAlerts());
 
         ec.gridy++;
-
         JPanel chatMonitorPanel = new JPanel(new GridBagLayout());
         chatMonitorPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         GridBagConstraints cmc = new GridBagConstraints();
@@ -198,8 +220,20 @@ public class DiscordPanel extends PluginPanel {
 
         chatMonitorPanel.add(phraseInput, cmc);
         eventPanel.add(chatMonitorPanel, ec);
-        ec.gridy++;
 
         add(eventPanel, c);
+
+        c.gridy++;
+        testButton.setBackground(ColorScheme.BRAND_ORANGE);
+        testButton.setForeground(Color.WHITE);
+        testButton.setFocusPainted(false);
+        testButton.addActionListener(e -> plugin.testWebhook());
+        add(testButton, c);
+    }
+
+    private void updateProximitySettingsVisibility(boolean visible) {
+        proximitySettingsPanel.setVisible(visible);
+        revalidate();
+        repaint();
     }
 } 

@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.discord;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -55,6 +56,8 @@ public class DiscordPlugin extends Plugin {
     private Set<Integer> notifiedItems = new HashSet<>();
     private Item[] lastInventoryItems = null;
     private Set<String> monitoredPhrases = new HashSet<>();
+    private Set<String> nearbyPlayers = new HashSet<>();
+    private Set<String> alreadyAlertedPlayers = new HashSet<>();
 
     @Provides
     DiscordConfig provideConfig(ConfigManager configManager) {
@@ -193,6 +196,8 @@ public class DiscordPlugin extends Plugin {
             seenLoginScreen = true;
             skillsInitialized = false;
             skillLevels.clear();
+            alreadyAlertedPlayers.clear();
+            nearbyPlayers.clear();
         }
         
         if (newState == GameState.LOGGED_IN && seenLoginScreen) {
@@ -211,22 +216,7 @@ public class DiscordPlugin extends Plugin {
             }).start();
         }
         else if (lastGameState == GameState.LOGGED_IN && newState == GameState.LOGIN_SCREEN) {
-            if (!config.enableNotifications() || !config.notifyLoginLogout()) {
-                return;
-            }
-
-            try {
-                DiscordEmbed embed = new DiscordEmbed();
-                embed.setTitle("Logout Notification");
-                String logoutMessage = (lastUsername != null) ? 
-                    lastUsername + " has logged out" : 
-                    "Your player has logged out";
-                embed.setDescription(logoutMessage);
-                embed.setColor(Rs2Discord.convertColorToInt(Color.YELLOW));
-
-                Rs2Discord.sendWebhookMessage("Logout Notification", Collections.singletonList(embed));
-            } catch (Exception e) {
-            }
+            sendLogoutNotification();
         }
 
         lastGameState = newState;
@@ -398,6 +388,87 @@ public class DiscordPlugin extends Plugin {
                 }
                 break;
             }
+        }
+    }
+
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        if (!config.enableNotifications() || !config.enableProximityAlerts()) {
+            return;
+        }
+
+        Player localPlayer = client.getLocalPlayer();
+        if (localPlayer == null) {
+            return;
+        }
+
+        WorldPoint playerLocation = localPlayer.getWorldLocation();
+        Set<String> currentNearbyPlayers = new HashSet<>();
+        int proximityRadius = config.proximityRadius();
+
+
+        for (Player player : client.getPlayers()) {
+            if (player == localPlayer || player.getName() == null) {
+                continue;
+            }
+
+            WorldPoint otherLocation = player.getWorldLocation();
+            if (otherLocation.distanceTo(playerLocation) <= proximityRadius) {
+                currentNearbyPlayers.add(player.getName());
+            }
+        }
+
+        Set<String> playersToAlert = new HashSet<>();
+
+        if (config.onlyTrackNewPlayers()) {
+            for (String playerName : currentNearbyPlayers) {
+                if (!alreadyAlertedPlayers.contains(playerName)) {
+                    playersToAlert.add(playerName);
+                    alreadyAlertedPlayers.add(playerName);
+                } else {
+                }
+            }
+        } else {
+            playersToAlert.addAll(currentNearbyPlayers);
+            playersToAlert.removeAll(nearbyPlayers);
+            if (!playersToAlert.isEmpty()) {
+            }
+        }
+
+        if (!playersToAlert.isEmpty()) {
+            StringBuilder description = new StringBuilder();
+            description.append("Players detected within ").append(proximityRadius).append(" tiles:\n");
+            for (String playerName : playersToAlert) {
+                description.append("- ").append(playerName).append("\n");
+            }
+
+            DiscordEmbed embed = new DiscordEmbed();
+            embed.setTitle("Player Proximity Alert");
+            embed.setDescription(description.toString());
+            embed.setColor(Rs2Discord.convertHexToInt("#FF0000"));
+
+            Rs2Discord.sendWebhookMessage("Proximity Alert", Collections.singletonList(embed));
+        }
+
+        nearbyPlayers = currentNearbyPlayers;
+    }
+
+    private void sendLogoutNotification() {
+        if (!config.enableNotifications() || !config.notifyLoginLogout()) {
+            return;
+        }
+
+        try {
+            DiscordEmbed embed = new DiscordEmbed();
+            embed.setTitle("Logout Notification");
+            String logoutMessage = (lastUsername != null) ? 
+                lastUsername + " has logged out" : 
+                "Your player has logged out";
+            embed.setDescription(logoutMessage);
+            embed.setColor(Rs2Discord.convertHexToInt("#FFFF00"));
+
+            Rs2Discord.sendWebhookMessage("Logout Notification", Collections.singletonList(embed));
+        } catch (Exception e) {
         }
     }
 } 

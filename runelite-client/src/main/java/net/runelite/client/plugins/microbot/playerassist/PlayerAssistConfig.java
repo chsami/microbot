@@ -772,6 +772,17 @@ public interface PlayerAssistConfig extends Config {
         return new WorldPoint(0, 0, 0);
     }
 
+    @ConfigItem(
+            keyName = "customItemsToLoot",
+            name = "Custom Items to Loot",
+            description = "Comma-separated list of items to loot (e.g. \"dragon bones, \"blue partyhat\", \"abyssal whip\")",
+            position = 6,
+            section = lootSection
+    )
+    default String customItemsToLoot() {
+        return "";
+    }
+
 }
 
 
