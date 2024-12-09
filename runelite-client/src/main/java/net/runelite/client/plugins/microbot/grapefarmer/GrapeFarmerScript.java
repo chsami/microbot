@@ -225,19 +225,6 @@ public class GrapeFarmerScript extends Script {
         sleepUntil(() -> !Rs2Player.isMoving() && !Rs2Player.isAnimating() && !Rs2Player.isInteracting());
     }
 
-//    public void gearing() {
-//        if (!Rs2Bank.isOpen()) {
-//            Rs2Bank.useBank();
-//            Rs2Bank.depositAll();
-//            Rs2Bank.withdrawX(ItemID.GRAPE_SEED, 12);
-//            Rs2Bank.withdrawOne(ItemID.GARDENING_TROWEL);
-//            Rs2Bank.withdrawOne(ItemID.SEED_DIBBER);
-//            Rs2Bank.withdrawOne(ItemID.SPADE);
-//            Rs2Bank.withdrawAllButOne(ItemID.BOLOGAS_BLESSING);
-//            Rs2Bank.withdrawX(ItemID.SALTPETRE, 12);
-//            Rs2Bank.closeBank();
-//        }
-//    }
 
     @Override
     public void shutdown() {
