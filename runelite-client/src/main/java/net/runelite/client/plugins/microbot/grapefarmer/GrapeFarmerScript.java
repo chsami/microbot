@@ -1,14 +1,11 @@
 package net.runelite.client.plugins.microbot.grapefarmer;
 
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
@@ -55,7 +52,29 @@ public class GrapeFarmerScript extends Script {
 
                 if (config.GEARING()) {
                     if (!this.isRunning()) return;
-                    gearing();
+                    if (!Rs2Inventory.contains(ItemID.GARDENING_TROWEL)) {
+                        Rs2Bank.useBank();
+                        Rs2Bank.depositAll();
+                        Rs2Bank.withdrawAllButOne(ItemID.GRAPE_SEED);
+                        Rs2Bank.withdrawOne(ItemID.GARDENING_TROWEL);
+                        Rs2Bank.withdrawOne(ItemID.SEED_DIBBER);
+                        Rs2Bank.withdrawOne(ItemID.SPADE);
+                        Rs2Bank.withdrawAllButOne(ItemID.BOLOGAS_BLESSING);
+                        Rs2Bank.withdrawX(ItemID.SALTPETRE, 12);
+                        if (config.FARMING_OUTFIT()) {
+                            Rs2Bank.withdrawAndEquip(ItemID.FARMERS_STRAWHAT_13647);
+                            Rs2Bank.withdrawAndEquip(ItemID.FARMERS_SHIRT);
+                            Rs2Bank.withdrawAndEquip(ItemID.FARMERS_BORO_TROUSERS_13641);
+                            Rs2Bank.withdrawAndEquip(ItemID.FARMERS_BOOTS_13645);
+                        }
+                        Rs2Bank.closeBank();
+                    }
+                    if (Rs2Inventory.contains(ItemID.GARDENING_TROWEL)  && Rs2Inventory.count(ItemID.SALTPETRE) < 12) {
+                        Rs2Bank.useBank();
+                        Rs2Bank.depositAll(ItemID.ZAMORAKS_GRAPES);
+                        Rs2Bank.withdrawX(ItemID.SALTPETRE, 12);
+                        Rs2Bank.closeBank();
+                    }
                 }
 
                 for (Map.Entry<Integer, Integer> entry : patchMap.entrySet()) {
@@ -74,42 +93,42 @@ public class GrapeFarmerScript extends Script {
                         State currentState = getStateForVarbit(currentVarbitValue);
 
                         if (currentState == State.NONE) {
-                            System.out.println("State is DEFAULT for GameObject ID: " + gameObjectId + ". Moving to the next patch.");
+                            System.out.println("State is DEFAULT for GroundObject ID: " + gameObjectId + ". Moving to the next patch.");
                             break;
                         }
 
                         switch (currentState) {
                             case CHECK_HEALTH:
-                                System.out.println("Checking health of GameObject ID: " + gameObjectId);
+                                System.out.println("Checking health of GroundObject ID: " + gameObjectId);
                                 checkHealth(gameObjectId);
                                 break;
 
                             case PICK_GRAPES:
-                                System.out.println("Picking grapes at GameObject ID: " + gameObjectId);
+                                System.out.println("Picking grapes at GroundObject ID: " + gameObjectId);
                                 pickGrapes(gameObjectId);
                                 waitForCompletion();
                                 break;
 
                             case CLEAR_VINE:
-                                System.out.println("Clearing vine at GameObject ID: " + gameObjectId);
+                                System.out.println("Clearing vine at GroundObject ID: " + gameObjectId);
                                 clearVine(gameObjectId);
                                 waitForCompletion();
                                 break;
 
                             case ADD_SALTPETRE:
-                                System.out.println("Adding salt petre to GameObject ID: " + gameObjectId);
+                                System.out.println("Adding salt petre to GroundObject ID: " + gameObjectId);
                                 addSaltpetre(gameObjectId);
                                 waitForCompletion();
                                 break;
 
                             case PLANT_GRAPE_SEED:
-                                System.out.println("Planting grape seed at GameObject ID: " + gameObjectId);
+                                System.out.println("Planting grape seed at GroundObject ID: " + gameObjectId);
                                 plantSeed(gameObjectId);
                                 waitForCompletion();
                                 break;
 
                             default:
-                                System.out.println("Unhandled state for GameObject ID: " + gameObjectId);
+                                System.out.println("Unhandled state for GroundObject ID: " + gameObjectId);
                                 break;
                         }
                     }
@@ -196,7 +215,7 @@ public class GrapeFarmerScript extends Script {
 
     // Simulates interaction with a game object
     private static void checkHealth(int gameObjectId) {
-        System.out.println("Interacting with GameObject ID: " + gameObjectId + " using action: Check-health");
+        System.out.println("Interacting with GroundObject ID: " + gameObjectId + " using action: Check-health");
         Rs2GameObject.interact(gameObjectId);
         Rs2Player.waitForXpDrop(Skill.FARMING);
     }
@@ -206,18 +225,19 @@ public class GrapeFarmerScript extends Script {
         sleepUntil(() -> !Rs2Player.isMoving() && !Rs2Player.isAnimating() && !Rs2Player.isInteracting());
     }
 
-    public void gearing() {
-        if (!Rs2Bank.isOpen()) {
-            Rs2Bank.useBank();
-            Rs2Bank.depositAll();
-            Rs2Bank.withdrawX(ItemID.GRAPE_SEED, 12);
-            Rs2Bank.withdrawOne(ItemID.GARDENING_TROWEL);
-            Rs2Bank.withdrawOne(ItemID.SEED_DIBBER);
-            Rs2Bank.withdrawOne(ItemID.SPADE);
-            Rs2Bank.withdrawAllButOne(ItemID.BOLOGAS_BLESSING);
-            Rs2Bank.withdrawX(ItemID.SALTPETRE, 12);
-        }
-    }
+//    public void gearing() {
+//        if (!Rs2Bank.isOpen()) {
+//            Rs2Bank.useBank();
+//            Rs2Bank.depositAll();
+//            Rs2Bank.withdrawX(ItemID.GRAPE_SEED, 12);
+//            Rs2Bank.withdrawOne(ItemID.GARDENING_TROWEL);
+//            Rs2Bank.withdrawOne(ItemID.SEED_DIBBER);
+//            Rs2Bank.withdrawOne(ItemID.SPADE);
+//            Rs2Bank.withdrawAllButOne(ItemID.BOLOGAS_BLESSING);
+//            Rs2Bank.withdrawX(ItemID.SALTPETRE, 12);
+//            Rs2Bank.closeBank();
+//        }
+//    }
 
     @Override
     public void shutdown() {
