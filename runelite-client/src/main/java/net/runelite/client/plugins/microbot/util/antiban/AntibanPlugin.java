@@ -341,7 +341,7 @@ public class AntibanPlugin extends Plugin {
      * <p>This method should be called during plugin initialization or whenever the settings
      * are loaded or modified to ensure the durations remain consistent and valid.</p>
      */
-    private void validateAndSetBreakDurations() {
+    public static void validateAndSetBreakDurations() {
         // Validate and correct microBreakDurationLow
         if (Rs2AntibanSettings.microBreakDurationLow < MICRO_BREAK_DURATION_LOW_MIN
                 || Rs2AntibanSettings.microBreakDurationLow > MICRO_BREAK_DURATION_LOW_MAX) {

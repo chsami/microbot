@@ -173,8 +173,8 @@ public class MicroAgilityPlugin extends Plugin {
         //Wyrm Basic
         agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(LADDER_55178));
         agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(TIGHTROPE_55180, -1, 2926, Operation.GREATER, Operation.GREATER_EQUAL));
-        agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(TIGHTROPE_55184));
-        agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(ROPE_55186));
+        agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(TIGHTROPE_55184, 1647, -1, Operation.GREATER_EQUAL, Operation.GREATER_EQUAL));
+        agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(ROPE_55186, 1635, -1, Operation.LESS_EQUAL, Operation.GREATER_EQUAL));
         agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(LADDER_55190, 1628, -1, Operation.LESS_EQUAL, Operation.GREATER));
         agilityScript.wyrmbasicCourse.add(new AgilityObstacleModel(ZIPLINE_55179));
 
@@ -182,7 +182,7 @@ public class MicroAgilityPlugin extends Plugin {
         agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(LADDER_55178));
         agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(TIGHTROPE_55180, -1, 2926, Operation.GREATER, Operation.GREATER_EQUAL));
         agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(LADDER_55191, -1, 2911, Operation.GREATER, Operation.LESS_EQUAL));
-        agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(EDGE_55192));
+        agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(EDGE_55192, 1647, -1, Operation.GREATER_EQUAL, Operation.GREATER_EQUAL));
         agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(TIGHTROPE_55194));
         agilityScript.wyrmadvancedCourse.add(new AgilityObstacleModel(ZIPLINE_55179));
 

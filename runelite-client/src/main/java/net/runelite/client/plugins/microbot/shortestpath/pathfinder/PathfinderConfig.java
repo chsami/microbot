@@ -24,11 +24,11 @@ import static net.runelite.client.plugins.microbot.shortestpath.TransportType.*;
 
 public class PathfinderConfig {
     private static final WorldArea WILDERNESS_ABOVE_GROUND = new WorldArea(2944, 3523, 448, 448, 0);
-    private static final WorldArea WILDERNESS_ABOVE_GROUND_LEVEL_20 = new WorldArea(2944, 3680, 448, 448, 0);
-    private static final WorldArea WILDERNESS_ABOVE_GROUND_LEVEL_30 = new WorldArea(2944, 3760, 448, 448, 0);
+    private static final WorldArea WILDERNESS_ABOVE_GROUND_LEVEL_19 = new WorldArea(2944, 3672, 448, 448, 0);
+    private static final WorldArea WILDERNESS_ABOVE_GROUND_LEVEL_29 = new WorldArea(2944, 3752, 448, 448, 0);
     private static final WorldArea WILDERNESS_UNDERGROUND = new WorldArea(2944, 9918, 320, 442, 0);
-    private static final WorldArea WILDERNESS_UNDERGROUND_LEVEL_20 = new WorldArea(2944, 10075, 320, 442, 0);
-    private static final WorldArea WILDERNESS_UNDERGROUND_LEVEL_30 = new WorldArea(2944, 10155, 320, 442, 0);
+    private static final WorldArea WILDERNESS_UNDERGROUND_LEVEL_19 = new WorldArea(2944, 10067, 320, 442, 0);
+    private static final WorldArea WILDERNESS_UNDERGROUND_LEVEL_29 = new WorldArea(2944, 10147, 320, 442, 0);
 
     private final SplitFlagMap mapData;
     private final ThreadLocal<CollisionMap> map;
@@ -319,14 +319,14 @@ public class PathfinderConfig {
                 && !isInWilderness(packedPosition) && isInWilderness(packedNeightborPosition);
     }
 
-    public boolean isInLevel20Wilderness(int packedPoint) {
-        return WorldPointUtil.distanceToArea(packedPoint, WILDERNESS_ABOVE_GROUND_LEVEL_20) == 0
-                || WorldPointUtil.distanceToArea(packedPoint, WILDERNESS_UNDERGROUND_LEVEL_20) == 0;
+    public boolean isInLevel19Wilderness(int packedPoint) {
+        return WorldPointUtil.distanceToArea(packedPoint, WILDERNESS_ABOVE_GROUND_LEVEL_19) == 0
+                || WorldPointUtil.distanceToArea(packedPoint, WILDERNESS_UNDERGROUND_LEVEL_19) == 0;
     }
 
-    public boolean isInLevel30Wilderness(int packedPoint){
-        return WorldPointUtil.distanceToArea(packedPoint, WILDERNESS_ABOVE_GROUND_LEVEL_30) == 0
-                || WorldPointUtil.distanceToArea(packedPoint, WILDERNESS_UNDERGROUND_LEVEL_30) == 0;
+    public boolean isInLevel29Wilderness(int packedPoint){
+        return WorldPointUtil.distanceToArea(packedPoint, WILDERNESS_ABOVE_GROUND_LEVEL_29) == 0
+                || WorldPointUtil.distanceToArea(packedPoint, WILDERNESS_UNDERGROUND_LEVEL_29) == 0;
 
     }
 
@@ -353,7 +353,7 @@ public class PathfinderConfig {
 
     private boolean useTransport(Transport transport) {
         // Check if the feature flag is disabled
-        if (!isFeatureEnabled(transport.getType())) return false;
+        if (!isFeatureEnabled(transport)) return false;
         // If you don't meet level requirements
         if (!hasRequiredLevels(transport)) return false;
         // If the transport has quest requirements & the quest haven't been completed
@@ -398,7 +398,9 @@ public class PathfinderConfig {
         return true;
     }
 
-    private boolean isFeatureEnabled(TransportType type) {
+    private boolean isFeatureEnabled(Transport transport) {
+        TransportType type = transport.getType();
+        
         if (!client.getWorldType().contains(WorldType.MEMBERS)) {
             // Transport types that require membership
             switch (type) {
@@ -411,8 +413,9 @@ public class PathfinderConfig {
                 case GNOME_GLIDER:
                 case MINECART:
                 case QUETZAL:
+                case WILDERNESS_OBELISK:
                 case SPIRIT_TREE:
-                    return false; // Not enabled without membership
+                    return false;
             }
         }
 
@@ -446,6 +449,10 @@ public class PathfinderConfig {
             case TELEPORTATION_LEVER:
                 return useTeleportationLevers;
             case TELEPORTATION_PORTAL:
+                if (transport.getDisplayInfo() != null) {
+                    if (transport.getDisplayInfo().toLowerCase().contains("soul wars") 
+                            && !client.getWorldType().contains(WorldType.MEMBERS)) return false;
+                }
                 return useTeleportationPortals;
             case TELEPORTATION_SPELL:
                 return useTeleportationSpells;
@@ -504,7 +511,10 @@ public class PathfinderConfig {
 
     /** Checks if the Chronicle has charges */
     private boolean hasChronicleCharges() {
-        if (!Rs2Equipment.isWearing(ItemID.CHRONICLE) || !Rs2Inventory.hasItem(ItemID.CHRONICLE)) return false;
+        if (!Rs2Equipment.hasEquipped(ItemID.CHRONICLE)) {
+            if (!Rs2Inventory.hasItem(ItemID.CHRONICLE))
+                return false;
+        }
         
         String charges = Microbot.getConfigManager()
                 .getRSProfileConfiguration(ItemChargeConfig.GROUP, ItemChargeConfig.KEY_CHRONICLE);
