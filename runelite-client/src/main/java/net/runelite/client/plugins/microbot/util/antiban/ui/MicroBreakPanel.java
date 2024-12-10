@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util.antiban.ui;
 
+import net.runelite.client.plugins.microbot.util.antiban.AntibanPlugin;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.ui.ColorScheme;
 
@@ -19,11 +20,18 @@ public class MicroBreakPanel extends JPanel {
     private final JLabel microBreakChanceLabel = new JLabel("Micro Break Chance (%): " + (int) (Rs2AntibanSettings.microBreakChance * 100));
 
     public MicroBreakPanel() {
+
+        isMicroBreakActive.setToolTipText("Indicator if a micro break is active");
+        takeMicroBreaks.setToolTipText("Micro breaks are short breaks that are taken at random intervals to simulate afk behavior");
+        microBreakDurationLow.setToolTipText("The minimum duration of a micro break");
+        microBreakDurationHigh.setToolTipText("The maximum duration of a micro break");
+        microBreakChance.setToolTipText("The chance of taking a micro break");
+
         // Set the layout manager for the panel to GridBagLayout
         setLayout(new GridBagLayout());
         setBackground(ColorScheme.DARK_GRAY_HOVER_COLOR);
-        setupSlider(microBreakDurationLow, 1, 5, 1);
-        setupSlider(microBreakDurationHigh, 5, 15, 1);
+        setupSlider(microBreakDurationLow, 1, 1, 5, 1);
+        setupSlider(microBreakDurationHigh, 5, 0, 15, 1);
         setupSlider(microBreakChance, 20, 100, 10);
 
         // Create a GridBagConstraints object to define the layout settings for each component
@@ -83,6 +91,7 @@ public class MicroBreakPanel extends JPanel {
     }
 
     public void updateValues() {
+        AntibanPlugin.validateAndSetBreakDurations();
         isMicroBreakActive.setSelected(Rs2AntibanSettings.microBreakActive);
         isMicroBreakActive.setEnabled(false);
         takeMicroBreaks.setSelected(Rs2AntibanSettings.takeMicroBreaks);

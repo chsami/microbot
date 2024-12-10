@@ -1,13 +1,15 @@
 package net.runelite.client.plugins.microbot.agility;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
 import net.runelite.client.plugins.microbot.agility.enums.AgilityCourseName;
-import net.runelite.client.plugins.worldmap.AgilityCourseLocation;
 
 @ConfigGroup("MicroAgility")
+@ConfigInformation("Enable the plugin near the start of your selected agility course. <br />" +
+        "<b>Course requirements:</b>" +
+        "<ul>" +
+        "<li> Ape Atoll - Kruk or Ninja greegree equipped. Stamina pots recommended. </li>" +
+        "<li>Shayzien Advanced - Crossbow and Mith Grapple equipped.</li>" +
+        "</ul>")
 public interface MicroAgilityConfig extends Config {
     @ConfigSection(
             name = "General",
@@ -16,20 +18,6 @@ public interface MicroAgilityConfig extends Config {
             closedByDefault = false
     )
     String generalSection = "general";
-
-    @ConfigItem(
-            keyName = "guide",
-            name = "How to use",
-            description = "How to use this plugin",
-            position = 0,
-            section = generalSection
-    )
-    default String GUIDE() {
-        return "Enable the plugin near the start of your selected agility course. \n\n" +
-                "Course requirements: \n" +
-                "Ape Atoll - Kruk or Ninja greegree equipped. Stamina pots recommended. \n" +
-                "Shayzien Advanced - Crossbow and Mith Grapple equipped.";
-    }
     @ConfigItem(
             keyName = "Course",
             name = "Course",

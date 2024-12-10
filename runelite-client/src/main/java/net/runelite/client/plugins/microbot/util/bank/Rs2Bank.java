@@ -189,6 +189,117 @@ public class Rs2Bank {
     public static boolean hasItem(String name, boolean exact) {
         return findBankItem(name, exact) != null;
     }
+    
+    /**
+     * Checks if the bank contains any of the specified item names.
+     *
+     * @param names A list of item names to check for.
+     * @return True if any of the items are found, false otherwise.
+     */
+    public static boolean hasItem(List<String> names) {
+        return hasItem(names, false, 1);
+    }
+
+    /**
+     * Checks if the bank contains any of the specified item names.
+     *
+     * @param names A list of item names to check for.
+     * @param exact If true, requires an exact name match.
+     * @return True if any of the items are found, false otherwise.
+     */
+    public static boolean hasItem(List<String> names, boolean exact) {
+        return hasItem(names, exact, 1);
+    }
+
+    /**
+     * Checks if the bank contains any of the specified item names.
+     *
+     * @param names A list of item names to check for.
+     * @param amount The minimum quantity required for each item.
+     * @return True if any of the items are found, false otherwise.
+     */
+    public static boolean hasItem(List<String> names, int amount) {
+        return hasItem(names, false, amount);
+    }
+    
+    /**
+     * Checks if the bank contains all items from a list of names with a minimum quantity.
+     *
+     * @param names  A list of item names to check for.
+     * @param exact  If true, requires an exact name match.
+     * @param amount The minimum quantity required for each item.
+     * @return True if all items from the list exist in the bank with the required quantity, false otherwise.
+     */
+    public static boolean hasAllItems(List<String> names, boolean exact, int amount) {
+        return names.stream().allMatch(name -> {
+            Rs2Item item = findBankItem(name, exact, amount);
+            return item != null;
+        });
+    }
+    
+    /**
+     * Checks if the bank contains any items from a list of names with a minimum quantity.
+     *
+     * @param names  A list of item names to check for.
+     * @param exact  If true, requires an exact name match.
+     * @param amount The minimum quantity required for the items.
+     * @return True if the bank contains at least one of the items with the specified quantity, false otherwise.
+     */
+    public static boolean hasItem(List<String> names, boolean exact, int amount) {
+        return findBankItem(names, exact, amount) != null;
+    }
+
+    /**
+     * Checks if the bank contains any item from the given array of IDs.
+     *
+     * @param ids The array of item IDs to check.
+     * @return True if the bank contains at least one of the specified items, false otherwise.
+     */
+    public static boolean hasItem(int[] ids) {
+        return Arrays.stream(ids)
+                .anyMatch(id -> findBankItem(id) != null);
+    }
+
+    /**
+     * Checks if the bank contains all items from the given array of IDs.
+     *
+     * @param ids The array of item IDs to check.
+     * @return True if the bank contains all the specified items, false otherwise.
+     */
+    public static boolean hasAllItems(int[] ids) {
+        return Arrays.stream(ids)
+                .allMatch(id -> findBankItem(id) != null);
+    }
+
+    /**
+     * Checks if the bank contains any item from the given array of IDs with the specified quantity.
+     *
+     * @param ids The array of item IDs to check.
+     * @param amount The minimum quantity required for each item.
+     * @return True if the bank contains at least one of the specified items with the required quantity, false otherwise.
+     */
+    public static boolean hasItem(int[] ids, int amount) {
+        return Arrays.stream(ids)
+                .anyMatch(id -> {
+                    Rs2Item item = findBankItem(id);
+                    return item != null && item.quantity >= amount;
+                });
+    }
+
+    /**
+     * Checks if the bank contains all items from the given array of IDs with the specified quantity.
+     *
+     * @param ids The array of item IDs to check.
+     * @param amount The minimum quantity required for each item.
+     * @return True if the bank contains all the specified items with the required quantity, false otherwise.
+     */
+    public static boolean hasAllItems(int[] ids, int amount) {
+        return Arrays.stream(ids)
+                .allMatch(id -> {
+                    Rs2Item item = findBankItem(id);
+                    return item != null && item.quantity >= amount;
+                });
+    }
 
     /**
      * check if the player has a bank item identified by exact name.
@@ -1121,6 +1232,26 @@ public class Rs2Bank {
             return null;
 
         return bankItem;
+    }
+
+    /**
+     * Finds an item in the bank based on a list of names.
+     *
+     * @param names  A list of potential item names.
+     * @param exact  If true, requires an exact name match.
+     * @param amount The minimum amount needed to find in the bank.
+     * @return The first matching item widget, or null if no matching item is found.
+     */
+    private static Rs2Item findBankItem(List<String> names, boolean exact, int amount) {
+        if (bankItems == null || bankItems.isEmpty()) return null;
+
+        return bankItems.stream()
+                .filter(item -> names.stream().anyMatch(name -> exact
+                        ? item.name.equalsIgnoreCase(name)
+                        : item.name.toLowerCase().contains(name.toLowerCase())))
+                .filter(item -> item.quantity >= amount)
+                .findFirst()
+                .orElse(null);
     }
 
     /**

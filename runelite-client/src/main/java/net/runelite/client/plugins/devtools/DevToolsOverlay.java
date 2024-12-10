@@ -39,6 +39,7 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
+import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 import net.runelite.client.ui.overlay.tooltip.Tooltip;
 import net.runelite.client.ui.overlay.tooltip.TooltipManager;
 
@@ -68,11 +69,14 @@ class DevToolsOverlay extends Overlay {
     private final DevToolsPlugin plugin;
     private final TooltipManager toolTipManager;
 
+    private final ModelOutlineRenderer modelOutlineRenderer;
+
     @Inject
-    private DevToolsOverlay(Client client, DevToolsPlugin plugin, TooltipManager toolTipManager) {
+    private DevToolsOverlay(Client client, DevToolsPlugin plugin, TooltipManager toolTipManager, ModelOutlineRenderer modelOutlineRenderer) {
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
         setPriority(PRIORITY_HIGHEST);
+        this.modelOutlineRenderer = modelOutlineRenderer;
         this.client = client;
         this.plugin = plugin;
         this.toolTipManager = toolTipManager;
@@ -98,7 +102,9 @@ class DevToolsOverlay extends Overlay {
             renderMemory(graphics);
         }
 
-        if (plugin.getGroundItems().isActive() || plugin.getGroundObjects().isActive() || plugin.getGameObjects().isActive() || plugin.getWalls().isActive() || plugin.getDecorations().isActive() || plugin.getTileLocation().isActive() || plugin.getMovementFlags().isActive()) {
+        if (plugin.getGroundItems().isActive() || plugin.getGroundObjects().isActive() || plugin.getTileObjects().isActive()
+            || plugin.getGameObjects().isActive() || plugin.getWalls().isActive() || plugin.getDecorations().isActive()
+            || plugin.getTileLocation().isActive() || plugin.getMovementFlags().isActive()) {
             renderTileObjects(graphics);
         }
 
@@ -265,20 +271,31 @@ class DevToolsOverlay extends Overlay {
                     renderGroundItems(graphics, tile, player);
                 }
 
-                if (plugin.getGroundObjects().isActive()) {
-                    renderTileObject(graphics, tile.getGroundObject(), player, PURPLE);
-                }
-
-                if (plugin.getGameObjects().isActive()) {
+                if (plugin.getTileObjects().isActive())
+                {
                     renderGameObjects(graphics, tile, player);
+                    renderTileObject(graphics, tile.getWallObject(), player, Color.GRAY);
+                    renderTileObject(graphics, tile.getDecorativeObject(), player, Color.LIGHT_GRAY);
+                    renderTileObject(graphics, tile.getGroundObject(), player, Color.PINK);
                 }
-
-                if (plugin.getWalls().isActive()) {
-                    renderTileObject(graphics, tile.getWallObject(), player, GRAY);
-                }
-
-                if (plugin.getDecorations().isActive()) {
-                    renderDecorObject(graphics, tile, player);
+                else
+                {
+                    if (plugin.getGameObjects().isActive())
+                    {
+                        renderGameObjects(graphics, tile, player);
+                    }
+                    if (plugin.getWalls().isActive())
+                    {
+                        renderTileObject(graphics, tile.getWallObject(), player, Color.GRAY);
+                    }
+                    if (plugin.getDecorations().isActive())
+                    {
+                        renderTileObject(graphics, tile.getDecorativeObject(), player, Color.LIGHT_GRAY);
+                    }
+                    if (plugin.getGroundObjects().isActive())
+                    {
+                        renderTileObject(graphics, tile.getGroundObject(), player, Color.PINK);
+                    }
                 }
 
                 if (plugin.getTileLocation().isActive()) {
@@ -353,19 +370,82 @@ class DevToolsOverlay extends Overlay {
         if (gameObjects != null) {
             for (GameObject gameObject : gameObjects) {
                 if (gameObject != null && gameObject.getSceneMinLocation().equals(tile.getSceneLocation())) {
+                    ObjectComposition objComposition = client.getObjectDefinition(gameObject.getId());
+                    if (objComposition == null )
+                    {
+                        return;
+                    }
                     if (player.getLocalLocation().distanceTo(gameObject.getLocalLocation()) <= MAX_DISTANCE) {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.append("ID: ").append(gameObject.getId());
-                        stringBuilder.append(" X: ").append(gameObject.getWorldLocation().getX());
-                        stringBuilder.append(" Y: ").append(gameObject.getWorldLocation().getY());
-                        if (gameObject.getRenderable() instanceof DynamicObject) {
-                            Animation animation = ((DynamicObject) gameObject.getRenderable()).getAnimation();
-                            if (animation != null) {
-                                stringBuilder.append(" A: ").append(animation.getId());
+                        modelOutlineRenderer.drawOutline(gameObject, 1, Color.RED, 50);
+                        MenuEntry[] menuEntries = client.getMenuEntries();
+                        MenuEntry hovered = Arrays.stream(menuEntries).filter(e -> e.getType().equals(MenuAction.GAME_OBJECT_FIRST_OPTION) ||
+                                e.getType().equals(MenuAction.GAME_OBJECT_SECOND_OPTION) ||
+                                e.getType().equals(MenuAction.GAME_OBJECT_THIRD_OPTION) ||
+                                e.getType().equals(MenuAction.GAME_OBJECT_FOURTH_OPTION) ||
+                                e.getType().equals(MenuAction.GAME_OBJECT_FIFTH_OPTION) ||
+                                e.getType().equals(MenuAction.EXAMINE_OBJECT) ||
+                                e.getType().equals(MenuAction.WIDGET_TARGET_ON_GAME_OBJECT))
+                                .findFirst().orElse(null);
+                        MenuAction action = hovered != null ? hovered.getType() : MenuAction.CANCEL;
+
+                        switch (action)
+                        {
+                            case WIDGET_TARGET_ON_GAME_OBJECT:
+                            case GAME_OBJECT_FIRST_OPTION:
+                            case GAME_OBJECT_SECOND_OPTION:
+                            case GAME_OBJECT_THIRD_OPTION:
+                            case GAME_OBJECT_FOURTH_OPTION:
+                            case GAME_OBJECT_FIFTH_OPTION:
+                            case EXAMINE_OBJECT:
+                            {
+                                int x = hovered.getParam0();
+                                int y = hovered.getParam1();
+                                int id = hovered.getIdentifier();
+
+                                TileObject hoveredObject = plugin.findTileObject(x, y, id);
+                                if (hoveredObject instanceof GameObject && gameObject.equals(hoveredObject))
+                                {
+                                    modelOutlineRenderer.drawOutline(gameObject, 5, new Color(0,255,0,150), 5);
+                                    String objectType = "Unknown";
+                                    if (gameObject instanceof WallObject)
+                                    {
+                                        objectType = "Wall";
+                                    }
+                                    else if (gameObject instanceof DecorativeObject)
+                                    {
+                                        objectType = "Decorative";
+                                    }
+                                    else if (gameObject instanceof GroundObject)
+                                    {
+                                        objectType = "Ground";
+                                    }
+                                    else {
+                                        objectType = "Game";
+                                    }
+
+                                    Point textLocation = gameObject.getCanvasTextLocation(graphics,
+                                            String.format("ID: %d", gameObject.getId()), 0);
+
+                                    if (textLocation != null)
+                                    {
+                                        WorldPoint worldLocation = gameObject.getWorldLocation();
+                                        String text = String.format("%s (ID: %d X: %d Y: %d)",
+                                                objComposition.getName(), gameObject.getId(), worldLocation.getX(), worldLocation.getY());
+                                        String typeText = "Type: " + objectType;
+
+                                        OverlayUtil.renderTextLocation(graphics, textLocation, text, Color.GREEN);
+                                        Point typeTextLocation = new Point(textLocation.getX(), textLocation.getY() + 15);
+                                        OverlayUtil.renderTextLocation(graphics, typeTextLocation, typeText, Color.GREEN);
+                                    }
+                                }
+
+                                break;
                             }
+                            default:
+                                break;
                         }
 
-                        OverlayUtil.renderTileOverlay(graphics, gameObject, stringBuilder.toString(), GREEN);
+
                     }
                 }
             }
@@ -376,25 +456,6 @@ class DevToolsOverlay extends Overlay {
         if (tileObject != null) {
             if (player.getLocalLocation().distanceTo(tileObject.getLocalLocation()) <= MAX_DISTANCE) {
                 OverlayUtil.renderTileOverlay(graphics, tileObject, "ID: " + tileObject.getId(), color);
-            }
-        }
-    }
-
-    private void renderDecorObject(Graphics2D graphics, Tile tile, Player player) {
-        DecorativeObject decorObject = tile.getDecorativeObject();
-        if (decorObject != null) {
-            if (player.getLocalLocation().distanceTo(decorObject.getLocalLocation()) <= MAX_DISTANCE) {
-                OverlayUtil.renderTileOverlay(graphics, decorObject, "ID: " + decorObject.getId(), DEEP_PURPLE);
-            }
-
-            Shape p = decorObject.getConvexHull();
-            if (p != null) {
-                graphics.draw(p);
-            }
-
-            p = decorObject.getConvexHull2();
-            if (p != null) {
-                graphics.draw(p);
             }
         }
     }

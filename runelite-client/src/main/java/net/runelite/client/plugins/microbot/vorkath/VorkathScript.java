@@ -471,7 +471,7 @@ public class VorkathScript extends Script {
 
     private boolean drinkPotions() {
         if (Rs2Player.isAnimating()) return false;
-        boolean drinkRangePotion = !Rs2Player.hasDivineBastionActive() && !Rs2Player.hasDivineRangedActive() && !Rs2Player.hasRangingPotionActive();
+        boolean drinkRangePotion = !Rs2Player.hasDivineBastionActive() && !Rs2Player.hasDivineRangedActive() && !Rs2Player.hasRangingPotionActive(5);
         boolean drinkAntiFire = !Rs2Player.hasAntiFireActive() && !Rs2Player.hasSuperAntiFireActive();
         boolean drinkAntiVenom = !Rs2Player.hasAntiVenomActive();
 

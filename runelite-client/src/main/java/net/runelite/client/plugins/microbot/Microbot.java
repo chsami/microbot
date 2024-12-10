@@ -282,7 +282,7 @@ public class Microbot {
     public static void doInvoke(NewMenuEntry entry, Rectangle rectangle) {
 
         try {
-            if (Rs2UiHelper.isRectangleWithinViewport(rectangle)) {
+            if (Rs2UiHelper.isRectangleWithinCanvas(rectangle)) {
                 click(rectangle, entry);
             } else {
                 click(new Rectangle(1, 1), entry);
@@ -295,7 +295,7 @@ public class Microbot {
 
     public static void drag(Rectangle start, Rectangle end) {
         if (start == null || end == null) return;
-        if (!Rs2UiHelper.isRectangleWithinViewport(start) || !Rs2UiHelper.isRectangleWithinViewport(end)) return;
+        if (!Rs2UiHelper.isRectangleWithinCanvas(start) || !Rs2UiHelper.isRectangleWithinCanvas(end)) return;
         Point startPoint = Rs2UiHelper.getClickingPoint(start, true);
         Point endPoint = Rs2UiHelper.getClickingPoint(end, true);
         mouse.drag(startPoint, endPoint);
