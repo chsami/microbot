@@ -48,7 +48,7 @@ public class AttackNpcScript extends Script {
                     return;
 
                 List<String> npcsToAttack = Arrays.stream(config.attackableNpcs().split(","))
-                        .map(String::trim)
+                        .map(x -> x.trim().toLowerCase())
                         .collect(Collectors.toList());
 
                 double healthPercentage = (double) Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100
@@ -68,7 +68,7 @@ public class AttackNpcScript extends Script {
 
                 attackableNpcs = Rs2Npc.getAttackableNpcs(config.attackReachableNpcs())
                         .filter(npc -> npc.getWorldLocation().distanceTo(config.centerLocation()) <= config.attackRadius()
-                                && npcsToAttack.contains(npc.getName()))
+                                && npcsToAttack.contains(npc.getName().toLowerCase()))
                         .sorted(Comparator
                                 .comparing((NPC npc) -> npc.getInteracting() == Microbot.getClient().getLocalPlayer() ? 0 : 1).thenComparingInt(npc -> Rs2Player.getRs2WorldPoint().distanceToPath(npc.getWorldLocation())))
                         .collect(Collectors.toList());
