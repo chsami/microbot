@@ -1310,7 +1310,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
         }
 
         // Interact with the spirit tree
-        if (Rs2GameObject.interact(spiritTree)) {
+        if (Rs2GameObject.interact(spiritTree, "travel")) {
             return interactWithAdventureLog(transport);
         }
 
