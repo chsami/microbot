@@ -26,6 +26,17 @@ public interface GrapeFarmerConfig extends Config {
         return true;
     }
 
+    @ConfigItem(
+            keyName = "farmingOutfit",
+            name = "Equip Farmer's outfit?",
+            description = "Equip Farmer's outfit?",
+            position = 1,
+            section = settingsSection
+    )
+    default boolean FARMING_OUTFIT() {
+        return true;
+    }
+
     @ConfigSection(
             name = "Settings",
             description = "Settings",
