@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 @Getter
 public enum Location {
     INSIDE_WHEAT_FIELD(new WorldArea(3138, 3458, 7, 7, 0), new WorldPoint(3141, 3461, 0)),
-    OUTSIDE_WHEAT_FIELD(new WorldArea(3145, 3455, 4, 3, 0), new WorldPoint(3141, 3456, 0)),
+    OUTSIDE_WHEAT_FIELD(new WorldArea(3145, 3455, 4, 3, 0), new WorldPoint(3147, 3456, 0)),
     NEAR_COOKING_GUILD_DOOR(new WorldArea(3141, 3439, 5, 3, 0), new WorldPoint(3143, 3441, 0)),
     COOKING_GUILD_FIRST_FLOOR(new WorldArea(3137, 3444, 12, 10, 0), new WorldPoint(3143, 3446, 0)),
     COOKING_GUILD_SECOND_FLOOR(new WorldArea(3138, 3446, 11, 8, 1), new WorldPoint(3143, 3450, 1)),

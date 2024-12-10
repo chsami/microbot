@@ -10,7 +10,6 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.doughmaker.DoughMakerConfig;
 import net.runelite.client.plugins.microbot.doughmaker.enums.DoughItem;
 import net.runelite.client.plugins.microbot.doughmaker.enums.Location;
-import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -21,13 +20,12 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-enum CookingState {
+enum PlayerState {
     RECOLLECTING(Location.INSIDE_WHEAT_FIELD),
     PROCESSING(Location.COOKING_GUILD_THIRD_FLOOR),
     COMBINING(Location.COOKING_GUILD_FIRST_FLOOR),
@@ -35,7 +33,7 @@ enum CookingState {
 
     private final Location location;
 
-    CookingState(Location location) {
+    PlayerState(Location location) {
         this.location = location;
     }
 }
@@ -43,10 +41,10 @@ enum CookingState {
 @Slf4j
 public class DoughMakerScript extends Script {
 
-    private CookingState playerState;
+    private PlayerState playerState;
     private Location currentLocation;
     private final int RADIUS = 3;
-    private int grainRecollected = 0;
+    private int recollectedGrain = 0;
     private int processedGrain = 0;
     private boolean init = true;
 
@@ -57,7 +55,7 @@ public class DoughMakerScript extends Script {
 //        Rs2Antiban.setActivity(Activity.GENERAL_COOKING);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!Microbot.isLoggedIn() || !super.run()) return;
+                if (!fulfillConditionsToRun()) return;
 //                if (Rs2AntibanSettings.actionCooldownActive) return;
 
                 if (init) {
@@ -68,66 +66,66 @@ public class DoughMakerScript extends Script {
                     getPlayerState(config);
                     init = false;
                 }
-//
-//                if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
+                log.info("Current Location: {}", currentLocation);
+                log.info("Player State: {}", playerState);
 
                 // check if player is in desired location
                 checkCurrentPlayerLocation();
                 if (!checkIfInDesiredLocation()) walkToDesiredLocation();
 
-                log.info("Current Location: {}", currentLocation);
-
+                Microbot.log(String.format("Recollected Grain: %d", recollectedGrain));
+                Microbot.log(String.format("Processed Grain: %d", processedGrain));
                 switch (playerState) {
                     case RECOLLECTING:
-                        log.info("Is Recollecting");
-                        if (currentLocation != Location.INSIDE_WHEAT_FIELD) {
+                        if (currentLocation != playerState.getLocation()) {
                             log.info("Player is not inside Wheat Field");
                         }
 
-                        while(!Rs2Inventory.isFull()) {
+                        while(!Rs2Inventory.isFull() && fulfillConditionsToRun()) {
+                            // if wheat field door is closed open
+                            openWheatFieldDoor();
+
                             // Recollect wheat
-                            GameObject wheatItem = Rs2GameObject.findReachableObject("Wheat", true, 8, Location.INSIDE_WHEAT_FIELD.getPoint());
-
-//                            if (!Rs2Camera.isTileOnScreen(wheatItem.getLocalLocation())) {
-//                                Rs2Camera.turnTo(wheatItem.getLocalLocation());
-//                                return;
-//                            }
-
-                            Rs2GameObject.interact(wheatItem, "Pick");
+                            GameObject wheatItem = Rs2GameObject.findReachableObject("Wheat", true, 8, Rs2Player.getWorldLocation());
+                            if (wheatItem != null) {
+                                Rs2GameObject.interact(wheatItem, "Pick");
+                            }
                             Rs2Random.wait(800, 1600);
+                            checkPlayerInventory();
                         }
-
-                        checkPlayerInventory();
                         break;
                     case PROCESSING:
-                        log.info("Is Processing");
-                        if (currentLocation != Location.COOKING_GUILD_THIRD_FLOOR) {
+                        if (currentLocation != playerState.getLocation()) {
                             log.info("Player is not in Cooking Guild third floor");
                             break;
                         }
 
-                        GameObject hopper = Rs2GameObject.findObject(2586, new WorldPoint(3142, 3452, 2));
-                        if (hopper != null) {
-                            log.info("Putting grain in hopper");
-                            Rs2GameObject.interact(hopper, "Fill");
-                            Rs2Random.wait(800, 1600);
+                        while(recollectedGrain > 0 && fulfillConditionsToRun()) {
+                            log.info("Recollected grain {}", recollectedGrain);
+                            GameObject hopper = Rs2GameObject.findObject(2586, new WorldPoint(3142, 3452, 2));
+                            if (hopper != null) {
+                                log.info("Putting grain in hopper");
+                                Rs2GameObject.interact(hopper, "Fill");
+                                Rs2Random.wait(800, 1600);
+                            }
+
+                            GameObject hopperControls = Rs2GameObject.findObject(2607, new WorldPoint(3141, 3453, 2));
+                            if (hopperControls != null) {
+                                log.info("Move hopper controls");
+                                Rs2GameObject.interact(hopperControls, "Operate");
+                                Rs2Random.wait(800, 1600);
+                            }
+                            Rs2Random.wait(800, 1200);
+                            checkPlayerInventory();
                         }
 
-                        GameObject hopperControls = Rs2GameObject.findObject(2607, new WorldPoint(3141, 3453, 2));
-                        if (hopperControls != null) {
-                            log.info("Move hopper controls");
-                            Rs2GameObject.interact(hopperControls, "Operate");
-                            Rs2Random.wait(800, 1600);
-                        }
-                        processedGrain = processedGrain + 1;
                         break;
                     case COMBINING:
-                        log.info("Is Combining");
-                        if (currentLocation != Location.COOKING_GUILD_FIRST_FLOOR) {
+                        if (currentLocation != playerState.getLocation()) {
                             log.info("Player is not in Cooking Guild first floor");
                         }
 
-                        while (!Rs2Inventory.isFull()) {
+                        while (processedGrain > 0 && fulfillConditionsToRun()) {
                             GameObject basePlantMill = Rs2GameObject.findObject(14960, new WorldPoint(3140, 3449, 0));
                             Rs2Item pot = Rs2Inventory.get(ItemID.POT);
                             if (basePlantMill != null && pot != null) {
@@ -148,11 +146,11 @@ public class DoughMakerScript extends Script {
                             Rs2Random.wait(800, 1200);
 
                             // combine items
-                            Rs2Item filledBucket = Rs2Inventory.get(ItemID.BUCKET_OF_WATER);
+                            Rs2Item bucketOfWater = Rs2Inventory.get(ItemID.BUCKET_OF_WATER);
                             Rs2Item potOfFlour = Rs2Inventory.get(ItemID.POT_OF_FLOUR);
-                            if (potOfFlour != null && filledBucket != null) {
+                            if (potOfFlour != null && bucketOfWater != null) {
                                 log.info("Combining bucket of water and pot of flour");
-                                Rs2Inventory.combine(filledBucket, potOfFlour);
+                                Rs2Inventory.combine(bucketOfWater, potOfFlour);
                                 boolean makeDoughWidget = Rs2Widget.hasWidget("What sort of dough do you wish to make?");
                                 if (makeDoughWidget) {
                                     log.info("keyPress: {}", config.doughItem().getKeyEvent());
@@ -162,34 +160,22 @@ public class DoughMakerScript extends Script {
                             } else break;
 
                             Rs2Random.wait(800, 1200);
-                            processedGrain = processedGrain - 1;
+                            checkPlayerInventory();
                         }
                         break;
                     case BANKING:
-                        log.info("Is Banking");
-                        if (currentLocation != Location.NEAREST_BANK) {
+                        if (currentLocation != playerState.getLocation()) {
                             log.info("Player is not in nearest bank location");
                         }
-
-                        // Go to nearest bank
-//                        WorldPoint nearestBank = Rs2Bank.getNearestBank().getWorldPoint();
-//                        if (!playerIsInProvidedArea(nearestBank)) {
-//                            log.info("Walking to nearest bank");
-//                            boolean isInArea = walkToBank(nearestBank);
-//                            if (!isInArea) break;
-//                        }
 
                         // deposit all dough
                         int doughItem = config.doughItem().getItemId();
                         if (Rs2Inventory.hasItem(doughItem)) {
                             Rs2Bank.openBank();
                             Rs2Bank.depositAll(doughItem);
-//                            Rs2Random.wait(800, 1600);
                         }
-//                        Rs2Bank.withdrawAll(cookingItem.getRawItemName(), true);
-//                        Rs2Random.wait(800, 1600);
+                        Rs2Random.wait(800, 1200);
                         Rs2Bank.closeBank();
-                        grainRecollected = 0;
                         break;
                 }
 
@@ -199,6 +185,10 @@ public class DoughMakerScript extends Script {
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);
         return true;
+    }
+
+    public boolean fulfillConditionsToRun() {
+        return Microbot.isLoggedIn() && !Microbot.pauseAllScripts && super.isRunning();
     }
 
     private void checkCurrentPlayerLocation() {
@@ -211,17 +201,21 @@ public class DoughMakerScript extends Script {
 
     // check player inventory and update grainRecollected and processedGrain
     private void checkPlayerInventory() {
-        if (Rs2Inventory.hasItem("Grain")) {
-            Rs2Item grainItem = Rs2Inventory.get("Grain");
-            List<Rs2Item> grainItemList = Rs2Inventory.all((rs2Item) -> rs2Item.id == grainItem.id);
-            grainRecollected = grainItemList.size();
+        List<Rs2Item> grainItemList = Rs2Inventory.all((rs2Item) -> rs2Item.id == ItemID.GRAIN);
+        int newSize = grainItemList.size();
+        if (newSize < recollectedGrain) {
+            recollectedGrain = newSize;
+            processedGrain++;
+        } else {
+            recollectedGrain = newSize;
+            if (processedGrain > 0) processedGrain--;
         }
     }
 
     @Override
     public void shutdown() {
         super.shutdown();
-        grainRecollected = 0;
+        recollectedGrain = 0;
         processedGrain = 0;
         init = true;
 //        Rs2Antiban.resetAntibanSettings();
@@ -234,6 +228,9 @@ public class DoughMakerScript extends Script {
     private void walkToDesiredLocation() {
         switch (playerState) {
             case RECOLLECTING:
+                if (currentLocation == Location.COOKING_GUILD_FIRST_FLOOR) {
+                    exitCookingGuild();
+                }
                 walkToWheatFieldOutsidePoint();
                 openWheatFieldDoor();
                 break;
@@ -244,6 +241,7 @@ public class DoughMakerScript extends Script {
                     enterCookingGuild();
                     walkToCGThirdFloor();
                 } else if (currentLocation == Location.OUTSIDE_WHEAT_FIELD) {
+                    exitWheatField();
                     walkNearCookingGuildDoor();
                     enterCookingGuild();
                     walkToCGThirdFloor();
@@ -283,10 +281,19 @@ public class DoughMakerScript extends Script {
         Microbot.pauseAllScripts = false;
     }
 
+    private void walkToWheatFieldInsidePoint() {
+        WorldPoint point = Location.INSIDE_WHEAT_FIELD.getPoint();
+        WorldArea area = Location.INSIDE_WHEAT_FIELD.getArea();
+        Rs2Walker.walkTo(point, 0);
+        Microbot.pauseAllScripts = true;
+        sleepUntil(() -> area.contains(Rs2Player.getWorldLocation()));
+        Microbot.pauseAllScripts = false;
+    }
+
     private void walkToWheatFieldOutsidePoint() {
         WorldPoint point = Location.OUTSIDE_WHEAT_FIELD.getPoint();
         WorldArea area = Location.OUTSIDE_WHEAT_FIELD.getArea();
-        Rs2Walker.walkTo(point, 1);
+        Rs2Walker.walkTo(point, 0);
         Microbot.pauseAllScripts = true;
         sleepUntil(() -> area.contains(Rs2Player.getWorldLocation()));
         Microbot.pauseAllScripts = false;
@@ -383,30 +390,31 @@ public class DoughMakerScript extends Script {
 
     private void getPlayerState(DoughMakerConfig config) {
         if (hasGrainRemaining()) {
-            playerState = CookingState.PROCESSING;
+            playerState = PlayerState.PROCESSING;
             return;
         }
 
-        if (isReadyToCombine(config.doughItem())) {
-            playerState = CookingState.COMBINING;
+        if (isReadyToCombine()) {
+            playerState = PlayerState.COMBINING;
             return;
         }
 
         if (isReadyToBank(config.doughItem())) {
-            playerState = CookingState.BANKING;
+            playerState = PlayerState.BANKING;
             return;
         }
 
         // Recollect grain until grainRecollected equals 26
-        playerState =  CookingState.RECOLLECTING;
+        playerState =  PlayerState.RECOLLECTING;
     }
 
     private boolean hasGrainRemaining() {
         if (currentLocation == Location.INSIDE_WHEAT_FIELD || currentLocation == Location.OUTSIDE_WHEAT_FIELD) {
-            return (Rs2Inventory.hasItem("Grain") && grainRecollected >= 26);
-        } else {
+            return (Rs2Inventory.hasItem("Grain") && recollectedGrain >= 26);
+        } else if (currentLocation == Location.COOKING_GUILD_THIRD_FLOOR) {
             return Rs2Inventory.hasItem("Grain");
         }
+        return false;
     }
 
     private boolean checkFlourBin() {
@@ -414,21 +422,35 @@ public class DoughMakerScript extends Script {
         GameObject basePlantMill = Rs2GameObject.findObject(14960, new WorldPoint(3140, 3449, 0));
         if (basePlantMill != null) {
             ObjectComposition obj = Rs2GameObject.convertGameObjectToObjectComposition(basePlantMill);
-            return Rs2GameObject.hasAction(obj, "Empty");
+            if (Rs2GameObject.hasAction(obj, "Empty")) {
+                processedGrain++;
+                return true;
+            }
+        }
+
+        // check if bucket of water and pot flour is available in inventory
+        Rs2Item bucketOfWater = Rs2Inventory.get(ItemID.BUCKET_OF_WATER);
+        Rs2Item potOfFlour = Rs2Inventory.get(ItemID.POT_OF_FLOUR);
+        if (bucketOfWater != null && potOfFlour != null) {
+            processedGrain++;
+            return true;
         }
 
         return false;
     }
 
-    private boolean isReadyToCombine(DoughItem doughItem) {
+    private boolean isReadyToCombine() {
         if (processedGrain > 0) {
             return true;
-        } else {
+        } else if (!Rs2Inventory.isFull()) {
             return checkFlourBin();
         }
+
+        return false;
     }
 
     private boolean isReadyToBank(DoughItem doughItem) {
-        return Rs2Inventory.hasItemAmount(doughItem.getItemId(), 26);
+//        return Rs2Inventory.hasItemAmount(doughItem.getItemId(), 26);
+        return Rs2Inventory.hasItem(doughItem.getItemId()) && recollectedGrain == 0 && processedGrain == 0;
     }
 }
