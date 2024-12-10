@@ -26,6 +26,7 @@ public class Random {
      * @param stddev
      * @return
      */
+    @Deprecated(since="1.6.5 - please use Rs2Random", forRemoval = true)
     public static int randomGaussian(double mean, double stddev) {
         double u, v, s;
         do {

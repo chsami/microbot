@@ -17,7 +17,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
-import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -33,12 +33,11 @@ import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.Microbot.log;
 import static net.runelite.client.plugins.microbot.util.Global.sleepGaussian;
-import static net.runelite.client.plugins.microbot.util.math.Random.randomGaussian;
 
 
 public class GotrScript extends Script {
 
-    public static String version = "1.1.3";
+    public static String version = "1.1.4";
     public static long totalTime = 0;
     public static boolean shouldMineGuardianRemains = true;
     public static final String rewardPointRegex = "Total elemental energy:[^>]+>([\\d,]+).*Total catalytic energy:[^>]+>([\\d,]+).";
@@ -182,7 +181,7 @@ public class GotrScript extends Script {
                         }
                     } else {
                         if (getGuardiansPower() > 70) {
-                            if (Rs2Inventory.hasItemAmount(GUARDIAN_FRAGMENTS, Random.random(25, 35))) {
+                            if (Rs2Inventory.hasItemAmount(GUARDIAN_FRAGMENTS, Rs2Random.between(25, 35))) {
                                 shouldMineGuardianRemains = false;
                             }
                         } else {
@@ -219,7 +218,7 @@ public class GotrScript extends Script {
 
     private boolean waitingForGameToStart(int timeToStart) {
         if (isInHugeMine()) return false;
-        if (getStartTimer() > randomGaussian(Random.random(20, 30), Random.random(1, 5)) || getStartTimer() == -1 || timeToStart > 10) {
+        if (getStartTimer() > Rs2Random.randomGaussian(Rs2Random.between(20, 30), Rs2Random.between(1, 5)) || getStartTimer() == -1 || timeToStart > 10) {
 
             takeUnchargedCells();
             repairPouches();
@@ -254,7 +253,7 @@ public class GotrScript extends Script {
             int interactedObjectId = Rs2GameObject.interact(shieldCellIds);
             if (interactedObjectId != -1) {
                 log("Using cell with id " + interactedObjectId);
-                sleep(randomGaussian(1000, 300));
+                sleep(Rs2Random.randomGaussian(1000, 300));
                 sleepUntil(() -> !Rs2Player.isWalking());
             }
             return true;
@@ -268,7 +267,7 @@ public class GotrScript extends Script {
             Rs2Npc.interact("The great guardian", "power-up");
             log("Powering up the great guardian...");
             sleepUntil(Rs2Player::isAnimating);
-            sleep(randomGaussian(Random.random(1000, 2000), Random.random(100, 300)));
+            sleep(Rs2Random.randomGaussian(Rs2Random.between(1000, 2000), Rs2Random.between(100, 300)));
             return true;
         }
         return false;
@@ -301,7 +300,8 @@ public class GotrScript extends Script {
             Rs2GameObject.interact(Microbot.getClient().getHintArrowPoint());
             log("Found a portal spawn...interacting with it...");
             Rs2Player.waitForWalking();
-            sleepUntil(this::isInHugeMine);
+            sleepUntil(() -> isInHugeMine());
+            sleepUntil(() -> getGuardiansPower() > 0);
             return true;
         }
         return false;
@@ -325,7 +325,7 @@ public class GotrScript extends Script {
             log("Entering with altar " + availableAltar.getId());
             Rs2GameObject.interact(availableAltar);
             sleepUntil(() -> !isInMainRegion(), 5000);
-            sleep(Random.randomGaussian(1000, 300));
+            sleep(Rs2Random.randomGaussian(1000, 300));
             state = GotrState.ENTER_ALTAR;
             return true;
         }
@@ -335,7 +335,7 @@ public class GotrScript extends Script {
     private boolean craftGuardianEssences() {
         if (Rs2GameObject.interact(ObjectID.WORKBENCH_43754)) {
             state = GotrState.CRAFT_GUARDIAN_ESSENCE;
-            sleep(Random.randomGaussian(Random.random(600, 900), Random.random(150, 300)));
+            sleep(Rs2Random.randomGaussian(Rs2Random.between(600, 900), Rs2Random.between(150, 300)));
             log("Crafting guardian essences...");
             return true;
         }
@@ -356,7 +356,7 @@ public class GotrScript extends Script {
     private boolean fillPouches() {
         if (Rs2Inventory.isFull() && Rs2Inventory.anyPouchEmpty() && getGuardiansPower() < 90) {
             Rs2Inventory.fillPouches();
-            sleep(Random.randomGaussian(Random.random(600, 900), Random.random(150, 300)));
+            sleep(Rs2Random.randomGaussian(Rs2Random.between(600, 900), Rs2Random.between(150, 300)));
             return true;
         }
         return false;
@@ -379,13 +379,13 @@ public class GotrScript extends Script {
                 if (Rs2Player.isWalking()) return true;
                 if (Rs2Inventory.anyPouchFull() && !Rs2Inventory.isFull()) {
                     Rs2Inventory.emptyPouches();
-                    sleep(Random.randomGaussian(600, 150));
+                    sleep(Rs2Random.randomGaussian(600, 150));
                 }
                 if (Rs2Inventory.hasItem(GUARDIAN_ESSENCE)) {
                     state = GotrState.CRAFTING_RUNES;
                     Rs2GameObject.interact(rcAltar.getId());
                     log("Crafting runes on altar " + rcAltar.getId());
-                    sleep(Random.randomGaussian(Random.random(1000, 1500), 300));
+                    sleep(Rs2Random.randomGaussian(Rs2Random.between(1000, 1500), 300));
                 } else if (!Rs2Player.isWalking()) {
                     state = GotrState.LEAVING_ALTAR;
                     TileObject rcPortal = findPortalToLeaveAltar();
@@ -432,13 +432,13 @@ public class GotrScript extends Script {
     private void checkPouches(boolean anyPouchUnknown, int mean, int stddev) {
         if (anyPouchUnknown) {
             Rs2Inventory.checkPouches();
-            sleep(randomGaussian(mean, stddev));
+            sleep(Rs2Random.randomGaussian(mean, stddev));
         }
     }
 
     private boolean mineHugeGuardianRemain() {
         if (isInHugeMine()) {
-            if (getStartTimer() == -1) {
+            if (getGuardiansPower() == 0) {
                 repairPouches();
                 leaveHugeMine();
                 return false;
@@ -455,7 +455,7 @@ public class GotrScript extends Script {
                     Rs2Player.waitForWalking();
                 } else {
                     Rs2Inventory.fillPouches();
-                    sleep(randomGaussian(Random.random(1000, 1500), Random.random(100, 300)));
+                    sleep(Rs2Random.randomGaussian(Rs2Random.between(1000, 1500), Rs2Random.between(100, 300)));
                     if (!Rs2Inventory.isFull()) {
                         Rs2GameObject.interact(ObjectID.HUGE_GUARDIAN_REMAINS);
                     }
@@ -486,7 +486,7 @@ public class GotrScript extends Script {
                     if (sleepUntil(Rs2Player::isAnimating)) {
                         sleepUntil(this::isInLargeMine);
                         if (isInLargeMine()) {
-                            sleep(randomGaussian(Random.random(1200, 1400), Random.random(100, 300)));
+                            sleep(Rs2Random.randomGaussian(Rs2Random.between(1200, 1400), Rs2Random.between(100, 300)));
                             log("Interacting with large guardian remains...");
                             Rs2GameObject.interact(ObjectID.LARGE_GUARDIAN_REMAINS);
                             sleepGaussian(1200, 150);
@@ -499,7 +499,7 @@ public class GotrScript extends Script {
                     if (Rs2Equipment.isWearing("dragon pickaxe")) {
                         Rs2Combat.setSpecState(true, 1000);
                     }
-                    checkPouches(Random.random(1, 20) == 2, Random.random(100, 600), Random.random(100, 300));
+                    checkPouches(Rs2Random.between(1, 20) == 2, Rs2Random.between(100, 600), Rs2Random.between(100, 300));
 
                     repairPouches();
                     Rs2GameObject.interact(ObjectID.LARGE_GUARDIAN_REMAINS);
