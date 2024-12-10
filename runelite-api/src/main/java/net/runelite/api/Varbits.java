@@ -496,6 +496,11 @@ public final class Varbits
 	public static final int QUEST_THE_HAND_IN_THE_SAND = 1527;
 
 	/**
+	 * Dragon slayer 2 quest status
+	 */
+	public static final int QUEST_DS2 = 6104;
+
+	/**
 	 * Daily Tasks =Collection availability)
 	 */
 	public static final int DAILY_HERB_BOXES_COLLECTED = 3961;
@@ -813,7 +818,7 @@ public final class Varbits
 	 * Number of game ticks remaining is in intervals of 100; for a value X there are 100 * X game ticks remaining.
 	 * A player can eat from the food piles once this reaches 0.
 	 */
-	public static final int SCURRIUS_FOOD_PILE_COOLDOWN = 4098;
+	public static final int SCURRIUS_FOOD_PILE_COOLDOWN = 9581;
 
 	/**
 	 * Farmer's Affinity effect timer
