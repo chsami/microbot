@@ -24,7 +24,6 @@ public class BlueDragonsScript extends Script {
     public static BlueDragonState currentState;
 
     private static final WorldPoint SAFE_SPOT = new WorldPoint(2918, 9781, 0);
-    private final int[] dragonIds = {265, 266};
     private Integer currentTargetId = null;
 
     public boolean run(BlueDragonsConfig config) {
@@ -149,6 +148,11 @@ public class BlueDragonsScript extends Script {
         Microbot.log("Traveling to dragons...");
         Rs2Walker.walkTo(SAFE_SPOT);
         sleepUntil(this::isPlayerAtSafeSpot);
+
+        if (hopIfPlayerAtSafeSpot()) {
+            return;
+        }
+
         currentState = BlueDragonState.FIGHTING;
     }
 
@@ -252,8 +256,26 @@ public class BlueDragonsScript extends Script {
         Microbot.pauseAllScripts = true;
         Rs2Walker.walkFastCanvas(SAFE_SPOT);
         sleepUntil(this::isPlayerAtSafeSpot);
+
+        if (hopIfPlayerAtSafeSpot()) {
+            return;
+        }
+
         Microbot.pauseAllScripts = false;
     }
+
+    private boolean hopIfPlayerAtSafeSpot() {
+        if (Rs2Player.hopIfPlayerDetected(1, 5000, 3)) {
+            Microbot.log("Player detected at safe spot. Pausing script and hopping worlds.");
+            Microbot.pauseAllScripts = true;
+            sleep(1000);
+            Microbot.pauseAllScripts = false;
+            return true;
+        }
+        return false;
+    }
+
+
 
     public void updateConfig(BlueDragonsConfig config) {
         Microbot.log("Applying new configuration to Blue Dragons script.");
