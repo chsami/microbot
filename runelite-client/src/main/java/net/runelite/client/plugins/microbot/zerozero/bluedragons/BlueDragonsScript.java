@@ -17,6 +17,8 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class BlueDragonsScript extends Script {
@@ -229,15 +231,10 @@ public class BlueDragonsScript extends Script {
         }
     }
 
-
     private NPC getAvailableDragon() {
-        NPC dragon = Rs2Npc.getNpc("Blue dragon");
-        if (dragon != null && (dragon.getId() == 265 || dragon.getId() == 266)) {
-            return dragon;
-        }
-        return null;
+        List<Integer> dragonIds = Arrays.asList(265, 266, 267);
+        return Rs2Npc.getClosestNpc(npc -> dragonIds.contains(npc.getId()));
     }
-
 
     private boolean attackDragon(NPC dragon) {
         final int dragonId = dragon.getId();

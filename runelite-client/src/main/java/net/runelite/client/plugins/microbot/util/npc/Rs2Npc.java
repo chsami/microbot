@@ -19,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -418,6 +419,27 @@ public class Rs2Npc {
     public static List<NPC> getNpcsInLineOfSight(String name) {
         return getNpcs().filter(npc -> hasLineOfSight(npc) && npc.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
     }
+
+
+    /**
+     * Finds the closest NPC to the player based on a given condition.
+     *
+     * @param condition a {@link Predicate} specifying the condition the NPC must meet
+     * @return the closest NPC that satisfies the condition, or {@code null} if none match
+     * <p> Example Usage:
+     * NPC closestBanker = getClosestNpc(npc -> Arrays.asList(npc.getComposition().getActions()).contains("Bank"));
+     * NPC closestGoblin = getClosestNpc(npc -> "Goblin".equalsIgnoreCase(npc.getName()));
+     * NPC closestAttackable = getClosestNpc(npc -> npc.getCombatLevel() > 0 && !npc.isDead());
+     */
+
+    public static NPC getClosestNpc(Predicate<NPC> condition) {
+        Rs2WorldPoint playerLocation = new Rs2WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation());
+        return getNpcs()
+                .filter(condition)
+                .min(Comparator.comparingInt(npc -> playerLocation.distanceToPath(npc.getWorldLocation())))
+                .orElse(null);
+    }
+
 
     /**
      * gets the npc within line of sight for a player by name
