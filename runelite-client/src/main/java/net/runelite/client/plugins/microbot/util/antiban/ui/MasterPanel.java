@@ -91,7 +91,7 @@ public class MasterPanel extends PluginPanel {
         layeredPane.setPreferredSize(new Dimension(250, 32));
 
         // Create and position the GIF JLabel
-        ImageIcon icon = new ImageIcon(Rs2Antiban.class.getResource("walkingduckdark.gif"));
+        ImageIcon icon = new ImageIcon(Rs2Antiban.class.getResource("walkingduckxmas.gif"));
         label = new FlippableLabel(icon);
         label.setBounds(xPosition, 0, icon.getIconWidth(), icon.getIconHeight()); // Initial position
         layeredPane.add(label, JLayeredPane.DEFAULT_LAYER); // Add label to the default layer

@@ -167,6 +167,7 @@ public class DevToolsPlugin extends Plugin
 	private DevToolsButton graphicsObjects;
 	private DevToolsButton walls;
 	private DevToolsButton decorations;
+	private DevToolsButton tileObjects;
 	private DevToolsButton projectiles;
 	private DevToolsButton location;
 	private DevToolsButton zoneBorders;
@@ -217,6 +218,7 @@ public class DevToolsPlugin extends Plugin
 		graphicsObjects = new DevToolsButton("Graphics Objects");
 		walls = new DevToolsButton("Walls");
 		decorations = new DevToolsButton("Decorations");
+		tileObjects = new DevToolsButton("Tile Objects");
 
 		projectiles = new DevToolsButton("Projectiles");
 
@@ -560,29 +562,69 @@ public class DevToolsPlugin extends Plugin
 		if (EXAMINE_MENU_ACTIONS.contains(action))
 		{
 			MenuEntry entry = event.getMenuEntry();
-
 			final int identifier = event.getIdentifier();
-			String info = "ID: ";
+			String info = "";
 
 			if (action == MenuAction.EXAMINE_NPC)
 			{
 				NPC npc = entry.getNpc();
 				assert npc != null;
-				info += npc.getId();
+				info = "NPC ID: " + npc.getId();
 			}
-			else
+			else if (action == MenuAction.EXAMINE_OBJECT)
 			{
-				info += identifier;
-
-				if (action == MenuAction.EXAMINE_OBJECT)
-				{
-					WorldPoint point = WorldPoint.fromScene(client, entry.getParam0(), entry.getParam1(), client.getPlane());
-					info += " X: " + point.getX() + " Y: " + point.getY();
-				}
+				WorldPoint point = WorldPoint.fromScene(client, entry.getParam0(), entry.getParam1(), client.getPlane());
+				String objectType = getObjectType(event);
+				info = objectType + " ID: " + identifier + " X: " + point.getX() + " Y: " + point.getY();
+			}
+			else if (action == MenuAction.EXAMINE_ITEM || action == MenuAction.EXAMINE_ITEM_GROUND)
+			{
+				info = "Item ID: " + identifier;
 			}
 
 			entry.setTarget(entry.getTarget() + " " + ColorUtil.prependColorTag("(" + info + ")", JagexColors.MENU_TARGET));
 		}
+	}
+
+	private String getObjectType(MenuEntryAdded event)
+	{
+		Scene scene = client.getScene();
+		Tile[][][] tiles = scene.getTiles();
+		int z = client.getPlane();
+		MenuEntry entry = event.getMenuEntry();
+		int x = entry.getParam0();
+		int y = entry.getParam1();
+
+		if (x >= 0 && y >= 0 && z >= 0 && x < Constants.SCENE_SIZE && y < Constants.SCENE_SIZE)
+		{
+			Tile tile = tiles[z][x][y];
+			if (tile != null)
+			{
+				if (tile.getWallObject() != null && tile.getWallObject().getId() == event.getIdentifier())
+				{
+					return "Wall";
+				}
+				if (tile.getDecorativeObject() != null && tile.getDecorativeObject().getId() == event.getIdentifier())
+				{
+					return "Decorative";
+				}
+				if (tile.getGroundObject() != null && tile.getGroundObject().getId() == event.getIdentifier())
+				{
+					return "Ground";
+				}
+				if (tile.getGameObjects() != null)
+				{
+					for (GameObject gameObject : tile.getGameObjects())
+					{
+						if (gameObject != null && gameObject.getId() == event.getIdentifier())
+						{
+							return "Game";
+						}
+					}
+				}
+			}
+		}
+		return "Unknown";
 	}
 
 	@Subscribe
@@ -629,5 +671,43 @@ public class DevToolsPlugin extends Plugin
 					.onClick(c -> client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "menu " + i_, null));
 			}
 		}
+	}
+
+	TileObject findTileObject(int x, int y, int id)
+	{
+		x += (Constants.EXTENDED_SCENE_SIZE - Constants.SCENE_SIZE) / 2;
+		y += (Constants.EXTENDED_SCENE_SIZE - Constants.SCENE_SIZE) / 2;
+		Scene scene = client.getScene();
+		Tile[][][] tiles = scene.getExtendedTiles();
+		Tile tile = tiles[client.getPlane()][x][y];
+		if (tile != null)
+		{
+			for (GameObject gameObject : tile.getGameObjects())
+			{
+				if (gameObject != null && gameObject.getId() == id)
+				{
+					return gameObject;
+				}
+			}
+
+			WallObject wallObject = tile.getWallObject();
+			if (wallObject != null && wallObject.getId() == id)
+			{
+				return wallObject;
+			}
+
+			DecorativeObject decorativeObject = tile.getDecorativeObject();
+			if (decorativeObject != null && decorativeObject.getId() == id)
+			{
+				return decorativeObject;
+			}
+
+			GroundObject groundObject = tile.getGroundObject();
+			if (groundObject != null && groundObject.getId() == id)
+			{
+				return groundObject;
+			}
+		}
+		return null;
 	}
 }

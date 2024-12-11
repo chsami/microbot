@@ -13,7 +13,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
-import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2Potion;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
@@ -25,10 +25,8 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1230,7 +1228,7 @@ public class Rs2Inventory {
      */
     public static String getSelectedItemName() {
         if (Microbot.getClient().getSelectedWidget() == null) return null;
-        return Microbot.getClient().getSelectedWidget().getName();
+        return Rs2UiHelper.stripColTags(Microbot.getClient().getSelectedWidget().getName());
     }
 
     /**
@@ -2165,7 +2163,7 @@ public class Rs2Inventory {
         final int currentInventoryStackableSize = stackableSize();
         sleepUntil(() ->  {
             actionWhileWaiting.run();
-            sleepUntil(() -> currentInventorySize != size() || currentInventoryStackableSize != stackableSize(), Random.random(600, 2100));
+            sleepUntil(() -> currentInventorySize != size() || currentInventoryStackableSize != stackableSize(), Rs2Random.between(600, 2100));
             return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
         });
         return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
@@ -2364,7 +2362,27 @@ public class Rs2Inventory {
                     }
                 });
                 return rs2Items;
+                
+            case ZIGZAG:
+                int[] customOrder = {
+                        0, 4, 1, 5, 2, 6, 3, 7,
+                        11, 15, 10, 14, 9, 13, 8, 12,
+                        16, 20, 17, 21, 18, 22, 19, 23,
+                        27, 26, 25, 24
+                };
+                
+                Map<Integer, Integer> orderMap = new HashMap<>();
+                for (int i = 0; i < customOrder.length; i++) {
+                    orderMap.put(customOrder[i], i);
+                }
 
+                rs2Items.sort((item1, item2) -> {
+                    int index1 = item1.getSlot();
+                    int index2 = item2.getSlot();
+                    return Integer.compare(orderMap.getOrDefault(index1, Integer.MAX_VALUE),
+                            orderMap.getOrDefault(index2, Integer.MAX_VALUE));
+                });
+                return rs2Items;
             case STANDARD:
                 return rs2Items;
 

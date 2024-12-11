@@ -49,6 +49,13 @@ public class Rs2Pvp {
                     3531, 3530, 3529, 3528, 3527, 3526, 3526, 3525},
             43
     );
+    private static final Polygon FEROX_ENCLAVE = new Polygon(
+            new int[]{3128, 3128, 3123, 3123, 3120, 3120, 3117, 3117, 3119, 3119, 3120, 3120, 3125, 3125, 3127, 3127, 3129, 
+                    3129, 3137, 3137, 3147, 3147, 3156, 3156, 3161, 3161, 3153, 3153, 3152, 3151, 3150, 3149, 3145, 3145, 3141, 3141},
+            new int[]{3609, 3615, 3615, 3620, 3620, 3622, 3622, 3635, 3635, 3640, 3640, 3645, 3645, 3644, 3644, 3645, 3645, 
+                    3644, 3644, 3646, 3646, 3647, 3647, 3642, 3642, 3626, 3626, 3623, 3623, 3622, 3621, 3620, 3620, 3615, 3615, 3609},
+            36
+    );
     private static final Cuboid MAIN_WILDERNESS_CUBOID = new Cuboid(2944, 3525, 0, 3391, 4351, 3);
     private static final Cuboid GOD_WARS_WILDERNESS_CUBOID = new Cuboid(3008, 10112, 0, 3071, 10175, 3);
     private static final Cuboid WILDERNESS_UNDERGROUND_CUBOID = new Cuboid(2944, 9920, 0, 3455, 10879, 3);
@@ -71,7 +78,7 @@ public class Rs2Pvp {
      */
     public static int getWildernessLevelFrom(WorldPoint point) {
         int regionID = point.getRegionID();
-        if (regionID != 12700 && regionID != 12187) {
+        if (regionID != 12700 && regionID != 12187 && !FEROX_ENCLAVE.contains(point.getX(), point.getY())) {
             if (WILDERNESS_BH_CRATER.contains(point) && !WILDERNESS_BH_CRATER_TWO.contains(point)) {
                 return 5;
             } else if (MAIN_WILDERNESS_CUBOID.contains(point)) {
@@ -98,6 +105,15 @@ public class Rs2Pvp {
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Checks if the player is in the wilderness
+     * 
+     * @return True if the player is in the wilderness
+     */
+    public static boolean isInWilderness() {
+        return Microbot.getVarbitValue(Varbits.IN_WILDERNESS) == 1;
     }
 
     /**

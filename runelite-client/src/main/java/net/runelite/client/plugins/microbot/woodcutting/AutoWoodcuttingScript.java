@@ -207,8 +207,9 @@ public class AutoWoodcuttingScript extends Script {
     
     private void fletchArrowShaft(AutoWoodcuttingConfig config) {
         Rs2Inventory.combineClosest("knife", config.TREE().getLog());
-        Rs2Random.waitEx(1200, 300);
+        sleepUntil(Rs2Widget::isProductionWidgetOpen, 5000);
         Rs2Widget.clickWidget("arrow shafts");
+        Rs2Player.waitForAnimation();
         sleepUntil(() -> !isFlectching(), 5000);
     }
     

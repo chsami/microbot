@@ -18,7 +18,6 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.security.Login;
@@ -45,10 +44,14 @@ public class Rs2Player {
     private static int superAntiFireTime = -1;
     private static int divineRangedTime = -1;
     private static int divineBastionTime = -1;
+    private static int divineCombatTime = -1;
     public static int antiVenomTime = -1;
     public static int staminaBuffTime = -1;
     public static int antiPoisonTime = -1;
+    public static int teleBlockTime = -1;
     public static Instant lastAnimationTime = null;
+    private static final long COMBAT_TIMEOUT_MS = 10000;
+    private static long lastCombatTime = 0;
     @Getter
     public static int lastAnimationID = AnimationID.IDLE;
 
@@ -64,13 +67,30 @@ public class Rs2Player {
         return divineRangedTime > 0 || hasDivineBastionActive();
     }
 
-    public static boolean hasRangingPotionActive() {
-        return Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) - 5 > Microbot.getClient().getRealSkillLevel(Skill.RANGED);
+    public static boolean hasRangingPotionActive(int threshold) {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.RANGED) - threshold > Microbot.getClient().getRealSkillLevel(Skill.RANGED);
     }
 
     public static boolean hasDivineBastionActive() {
         return divineBastionTime > 0;
     }
+
+    public static boolean hasDivineCombatActive() {
+        return divineCombatTime > 0;
+    }
+
+    public static boolean hasAttackActive(int threshold) {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.ATTACK) - threshold > Microbot.getClient().getRealSkillLevel(Skill.ATTACK);
+    }
+
+    public static boolean hasStrengthActive(int threshold) {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.STRENGTH) - threshold > Microbot.getClient().getRealSkillLevel(Skill.STRENGTH);
+    }
+
+    public static boolean hasDefenseActive(int threshold) {
+        return Microbot.getClient().getBoostedSkillLevel(Skill.DEFENCE) - threshold > Microbot.getClient().getRealSkillLevel(Skill.DEFENCE);
+    }
+
 
     public static boolean hasAntiVenomActive() {
         if (Rs2Equipment.isWearing("serpentine helm")) {
@@ -84,6 +104,10 @@ public class Rs2Player {
 
     public static boolean hasStaminaBuffActive() {
         return staminaBuffTime > 0;
+    }
+    
+    public static boolean isTeleBlocked() {
+        return teleBlockTime > 0;
     }
 
     private static final Map<Player, Long> playerDetectionTimes = new ConcurrentHashMap<>();
@@ -101,6 +125,9 @@ public class Rs2Player {
         if (event.getVarbitId() == Varbits.DIVINE_BASTION) {
             divineBastionTime = event.getValue();
         }
+        if (event.getVarbitId() == Varbits.DIVINE_SUPER_COMBAT) {
+            divineCombatTime = event.getValue();
+        }
         if (event.getVarbitId() == Varbits.STAMINA_EFFECT) {
             staminaBuffTime = event.getValue();
         }
@@ -116,6 +143,23 @@ public class Rs2Player {
                 antiPoisonTime = -1;
             } else {
                 antiPoisonTime = poisonVarp;
+            }
+        }
+    }
+    
+    /**
+     * Handles updates to the teleblock timer based on changes to the {@link Varbits#TELEBLOCK} varbit.
+     *
+     * @see Varbits#TELEBLOCK
+     */
+    public static void handleTeleblockTimer(VarbitChanged event){
+        if (event.getVarbitId() == Varbits.TELEBLOCK) {
+            int time = event.getValue();
+            
+            if (time < 101) {
+                teleBlockTime = -1;
+            } else {
+                teleBlockTime = time;
             }
         }
     }
@@ -464,7 +508,7 @@ public class Rs2Player {
      * @return
      */
     public static boolean eatAt(int percentage) {
-        double treshHold = (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
+        double treshHold = getHealthPercentage();
         if (treshHold <= percentage) {
             return useFood();
         }
@@ -483,6 +527,16 @@ public class Rs2Player {
             }
         }
         return false;
+    }
+
+    /**
+     * Calculates the player's current health as a percentage of their real (base) health.
+     *
+     * @return the health percentage as a double. For example:
+     *         150.0 if boosted, 80.0 if drained, or 100.0 if unchanged.
+     */
+    public static double getHealthPercentage() {
+        return (double) (Microbot.getClient().getBoostedSkillLevel(Skill.HITPOINTS) * 100) / Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS);
     }
 
     /**
@@ -569,6 +623,126 @@ public class Rs2Player {
         return list;
     }
 
+    /**
+     * Checks if a player has a specific item equipped by ID.
+     *
+     * @param player The player to check.
+     * @param itemId The ID of the item to look for.
+     * @return True if the player has the specified item equipped, false otherwise.
+     */
+    public static boolean hasPlayerEquippedItem(Player player, int itemId) {
+        Map<KitType, Integer> equipment = getPlayerEquipmentIds(player);
+
+        return equipment.values().stream()
+                .anyMatch(equippedItemId -> equippedItemId == itemId);
+    }
+
+    /**
+     * Checks if a player has any of the specified items equipped by their IDs.
+     *
+     * @param player The player to check.
+     * @param itemIds An array of item IDs to look for.
+     * @return True if the player has any of the specified items equipped, false otherwise.
+     */
+    public static boolean hasPlayerEquippedItem(Player player, int[] itemIds) {
+        Map<KitType, Integer> equipment = getPlayerEquipmentIds(player);
+
+        return equipment.values().stream()
+                .anyMatch(equippedItemId -> Arrays.stream(itemIds).anyMatch(id -> id == equippedItemId));
+    }
+
+    /**
+     * Checks if a player has a specific item equipped.
+     *
+     * @param player The player to check.
+     * @param itemName The name of the item to look for.
+     * @return True if the player has the specified item equipped, false otherwise.
+     */
+    public static boolean hasPlayerEquippedItem(Player player, String itemName) {
+        Map<KitType, String> equipment = getPlayerEquipmentNames(player);
+
+        return equipment.values().stream()
+                .anyMatch(equippedItem -> equippedItem.equalsIgnoreCase(itemName));
+    }
+
+    /**
+     * Checks if a player has any of the specified items equipped by their names.
+     *
+     * @param player The player to check.
+     * @param itemNames A list of item names to look for.
+     * @return True if the player has any of the specified items equipped, false otherwise.
+     */
+    public static boolean hasPlayerEquippedItem(Player player, List<String> itemNames) {
+        Map<KitType, String> equipment = getPlayerEquipmentNames(player);
+
+        return equipment.values().stream()
+                .anyMatch(equippedItem -> itemNames.stream().anyMatch(equippedItem::equalsIgnoreCase));
+    }
+
+    /**
+     * Gets the local players current combat level
+     *
+     * @return
+     */
+    public static int getCombatLevel() {
+        return Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getLocalPlayer().getCombatLevel());
+    }
+
+    /**
+     * Updates the last combat time when the player engages in or is hit during combat.
+     */
+    public static void updateCombatTime() {
+        Microbot.getClientThread().runOnClientThread(() -> {
+            Player localPlayer = Microbot.getClient().getLocalPlayer();
+            if (localPlayer != null && localPlayer.getInteracting() != null) {
+                lastCombatTime = System.currentTimeMillis();
+            }
+            return null;
+        });
+    }
+
+    /**
+     * Checks if the player is in combat based on recent activity.
+     *
+     * @return True if the player is in combat, false otherwise.
+     */
+    public static boolean isInCombat() {
+        return System.currentTimeMillis() - lastCombatTime < COMBAT_TIMEOUT_MS;
+    }
+
+    /**
+     * Gets a list of players around the local player within the combat level range 
+     * and wilderness level where they can attack and be attacked.
+     *
+     * @return A list of players within the combat range and attackable wilderness levels.
+     */
+    public static List<Player> getPlayersInCombatLevelRange() {
+        int localCombatLevel = getCombatLevel();
+        int localWildernessLevel = Rs2Pvp.getWildernessLevelFrom(Rs2Player.getWorldLocation());
+        
+        if (localWildernessLevel == 0) return Collections.emptyList();
+        
+        int localMinCombatLevel = Math.max(3, localCombatLevel - localWildernessLevel);
+        int localMaxCombatLevel = Math.min(126, localCombatLevel + localWildernessLevel);
+
+        // Filter players based on both combat level and wilderness level constraints
+        return getPlayers().stream()
+                .filter(player -> {
+                    int playerCombatLevel = player.getCombatLevel();
+                    int playerWildernessLevel = Rs2Pvp.getWildernessLevelFrom(player.getWorldLocation());
+                    
+                    if (playerWildernessLevel == 0) return false;
+                    
+                    int playerMinCombatLevel = Math.max(3, playerCombatLevel - playerWildernessLevel);
+                    int playerMaxCombatLevel = Math.min(126, playerCombatLevel + playerWildernessLevel);
+                    
+                    boolean localCanAttackPlayer = playerCombatLevel >= localMinCombatLevel && playerCombatLevel <= localMaxCombatLevel;
+                    boolean playerCanAttackLocal = localCombatLevel >= playerMinCombatLevel && localCombatLevel <= playerMaxCombatLevel;
+
+                    return localCanAttackPlayer && playerCanAttackLocal;
+                })
+                .collect(Collectors.toList());
+    }
 
     /**
      * Gets the players current world location
@@ -638,21 +812,45 @@ public class Rs2Player {
      * @return
      */
     public static boolean drinkPrayerPotionAt(int prayerPoints) {
-        if (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) <= prayerPoints) {
-            // Check and use prayer potion first
-            if (Rs2Inventory.contains(ItemID.PRAYER_POTION1, ItemID.PRAYER_POTION2, ItemID.PRAYER_POTION3, ItemID.PRAYER_POTION4)) {
-                return Rs2Inventory.interact("prayer potion", "drink");
-            }
-            // If no prayer potion, try to use super restore
-            if (Rs2Inventory.contains(ItemID.SUPER_RESTORE1, ItemID.SUPER_RESTORE2, ItemID.SUPER_RESTORE3, ItemID.SUPER_RESTORE4)) {
-                return Rs2Inventory.interact("super restore", "drink");
-            }
-            if (Rs2Inventory.contains(ItemID.BLIGHTED_SUPER_RESTORE1, ItemID.BLIGHTED_SUPER_RESTORE2, ItemID.BLIGHTED_SUPER_RESTORE3, ItemID.BLIGHTED_SUPER_RESTORE4) && Microbot.getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
-                return Rs2Inventory.interact("super restore", "drink");
+        // Check if current prayer level is below or equal to the threshold
+        if (Microbot.getClient().getBoostedSkillLevel(Skill.PRAYER) > prayerPoints) {
+            return false;
+        }
+
+        // Attempt to drink a prayer potion
+        if (usePotion(ItemID.PRAYER_POTION1, ItemID.PRAYER_POTION2, ItemID.PRAYER_POTION3, ItemID.PRAYER_POTION4)) {
+            return true;
+        }
+
+        // Attempt to drink a super restore potion
+        if (usePotion(ItemID.SUPER_RESTORE1, ItemID.SUPER_RESTORE2, ItemID.SUPER_RESTORE3, ItemID.SUPER_RESTORE4)) {
+            return true;
+        }
+
+        // If in wilderness, attempt to drink a blighted super restore potion
+        if (Microbot.getVarbitValue(Varbits.IN_WILDERNESS) == 1) {
+            return usePotion(ItemID.BLIGHTED_SUPER_RESTORE1, ItemID.BLIGHTED_SUPER_RESTORE2, ItemID.BLIGHTED_SUPER_RESTORE3, ItemID.BLIGHTED_SUPER_RESTORE4);
+        }
+
+        return false;
+    }
+
+    /**
+     * Helper method to check for the presence of any item in the provided IDs and interact with it.
+     *
+     * @param itemIds Array of item IDs to check in the inventory.
+     * @return true if an item was found and interacted with; false otherwise.
+     */
+    private static boolean usePotion(Integer ...itemIds) {
+        if (Rs2Inventory.contains(itemIds)) {
+            Rs2Item potion = Rs2Inventory.get(itemIds);
+            if (potion != null) {
+                return Rs2Inventory.interact(potion, "drink");
             }
         }
         return false;
     }
+
 
     /**
      * Checks if the player has prayer points remaining
@@ -802,24 +1000,13 @@ public class Rs2Player {
     /**
      * Checks whether a player is about to logout
      *
-     * @return
-     */
-    public static boolean checkIdleLogout() {
-        int idleClientTicks = Microbot.getClient().getKeyboardIdleTicks();
-
-        return (long) idleClientTicks >= Random.randomDelay();
-    }
-
-    /**
-     * Checks whether a player is about to logout
-     *
      * @param randomDelay
      * @return
      */
     public static boolean checkIdleLogout(long randomDelay) {
-        int idleClientTicks = Microbot.getClient().getKeyboardIdleTicks();
+        int idleClientTicks = Math.min(Microbot.getClient().getKeyboardIdleTicks(), Microbot.getClient().getMouseIdleTicks());
 
-        return (long) idleClientTicks >= randomDelay;
+        return (long) idleClientTicks >= Microbot.getClient().getIdleTimeout() - randomDelay;
     }
 
     /**
