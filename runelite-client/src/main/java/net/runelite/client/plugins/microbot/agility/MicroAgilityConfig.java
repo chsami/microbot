@@ -78,4 +78,16 @@ public interface MicroAgilityConfig extends Config {
     {
         return "";
     }
+
+    @ConfigItem(
+            keyName = "useSimpleWalker",
+            name = "Use Simple Walker (Beta)",
+            description = "Use an alternative walker for moving back to the course's start.",
+            position = 4, // Adjust the position based on where you want this to appear in the UI
+            section = generalSection
+    )
+    default boolean useSimpleWalker() {
+        return false;
+    }
+
 }
