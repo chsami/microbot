@@ -138,13 +138,6 @@ public class Rs2Walker {
             Microbot.log("Please do not call the walker from the main thread");
             return WalkerState.EXIT;
         }
-        /**
-         * When running the walkTo method from scripts
-         * the code will run on the script thread
-         * If you really like to run this on a seperate thread because you want to do
-         * other actions while walking you can wrap the walkTo from within the script
-         * on a seperate thread
-         */
         return processShortWalk(target, distance);
     }
 
