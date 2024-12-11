@@ -9,11 +9,41 @@ public interface DiscordConfig extends Config {
     @ConfigItem(
             keyName = "enableNotifications",
             name = "Enable Notifications",
-            description = "Enable sending notifications to Discord",
-            hidden = true
+            description = "Enable Discord notifications",
+            position = 0
     )
     default boolean enableNotifications() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "proximityRadius",
+            name = "Proximity Alert Radius",
+            description = "Send alert when players are within this many tiles",
+            position = 1
+    )
+    default int proximityRadius() {
+        return 5;
+    }
+
+    @ConfigItem(
+            keyName = "enableProximityAlerts",
+            name = "Enable Proximity Alerts",
+            description = "Send Discord alerts when players are nearby",
+            position = 2
+    )
+    default boolean enableProximityAlerts() {
         return false;
+    }
+
+    @ConfigItem(
+            keyName = "onlyTrackNewPlayers",
+            name = "Only Track New Players",
+            description = "Only send alerts for players entering radius for the first time",
+            position = 3
+    )
+    default boolean onlyTrackNewPlayers() {
+        return true;
     }
 
     @ConfigItem(
