@@ -9,11 +9,8 @@ import net.runelite.client.plugins.microbot.crafting.CraftingConfig;
 import net.runelite.client.plugins.microbot.crafting.enums.Glass;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
-import net.runelite.client.plugins.microbot.util.antiban.enums.Activity;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.math.Random;
-import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -36,8 +33,7 @@ public class GlassblowingScript extends Script {
 
     public void run(CraftingConfig config) {
 
-        if (config.glassType() == Glass.PROGRESSIVE)
-            calculateItemToCraft();
+        if (config.glassType() == Glass.PROGRESSIVE) calculateItemToCraft();
 
         Rs2Antiban.resetAntibanSettings();
         Rs2Antiban.antibanSetupTemplates.applyCraftingSetup();
@@ -46,7 +42,7 @@ public class GlassblowingScript extends Script {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
 
-                if (Rs2Player.isAnimating() || Rs2Antiban.getCategory().isBusy() || Microbot.pauseAllScripts) return;
+                if (Rs2Player.isAnimating(2400) || Rs2Antiban.getCategory().isBusy() || Microbot.pauseAllScripts) return;
                 if (Rs2AntibanSettings.actionCooldownActive) return;
 
                 if (config.glassType() == Glass.PROGRESSIVE) {
@@ -57,6 +53,7 @@ public class GlassblowingScript extends Script {
 
                 if (Rs2Inventory.hasItem(moltenGlass) && Rs2Inventory.hasItem(glassblowingPipe)) {
                     craft(config);
+                    return;
                 }
                 if (!Rs2Inventory.hasItem(moltenGlass) || !Rs2Inventory.hasItem(glassblowingPipe)) {
                     bank(config);
@@ -82,7 +79,7 @@ public class GlassblowingScript extends Script {
 
         Rs2Bank.withdrawAll(true, moltenGlass);
         sleepUntil(() -> Rs2Inventory.hasItem(moltenGlass));
-        
+
         Rs2Bank.closeBank();
     }
 
