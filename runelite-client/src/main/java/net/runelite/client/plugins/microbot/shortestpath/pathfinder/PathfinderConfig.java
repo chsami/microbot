@@ -354,6 +354,8 @@ public class PathfinderConfig {
     private boolean useTransport(Transport transport) {
         // Check if the feature flag is disabled
         if (!isFeatureEnabled(transport)) return false;
+        // If the transport requires you to be in a members world (used for more granular member requirements)
+        if (transport.isMembers() && !client.getWorldType().contains(WorldType.MEMBERS)) return false;
         // If you don't meet level requirements
         if (!hasRequiredLevels(transport)) return false;
         // If the transport has quest requirements & the quest haven't been completed
@@ -407,13 +409,13 @@ public class PathfinderConfig {
                 case AGILITY_SHORTCUT:
                 case GRAPPLE_SHORTCUT:
                 case BOAT:
-                case CANOE:
                 case CHARTER_SHIP:
                 case FAIRY_RING:
                 case GNOME_GLIDER:
                 case MINECART:
                 case QUETZAL:
                 case WILDERNESS_OBELISK:
+                case TELEPORTATION_LEVER:
                 case SPIRIT_TREE:
                     return false;
             }
@@ -449,10 +451,6 @@ public class PathfinderConfig {
             case TELEPORTATION_LEVER:
                 return useTeleportationLevers;
             case TELEPORTATION_PORTAL:
-                if (transport.getDisplayInfo() != null) {
-                    if (transport.getDisplayInfo().toLowerCase().contains("soul wars") 
-                            && !client.getWorldType().contains(WorldType.MEMBERS)) return false;
-                }
                 return useTeleportationPortals;
             case TELEPORTATION_SPELL:
                 return useTeleportationSpells;

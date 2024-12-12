@@ -103,6 +103,12 @@ public class Transport {
     private String itemRequired = "";
 
     /**
+     * Transport requires player to be in a members world
+     */
+    @Getter
+    private boolean isMembers = false;
+
+    /**
      * Creates a new transport from an origin-only transport
      * and a destination-only transport, and merges requirements
      */
@@ -146,6 +152,7 @@ public class Transport {
         this.action = origin.getAction();
         this.amtItemRequired = origin.getAmtItemRequired();
         this.itemRequired = origin.getItemRequired();
+        this.isMembers = origin.isMembers;
         //END microbot variables
     }
 
@@ -268,6 +275,10 @@ public class Transport {
 
         if ((value = fieldMap.get("Wilderness level")) != null && !value.trim().isEmpty()) {
             this.maxWildernessLevel = Integer.parseInt(value);
+        }
+        
+        if ((value = fieldMap.get("isMembers")) != null && !value.trim().isEmpty()) {
+            this.isMembers = "Y".equals(value.trim()) || "yes".equals(value.trim().toLowerCase());
         }
 
         if ((value = fieldMap.get("Varbits")) != null && !value.trim().isEmpty()) {
