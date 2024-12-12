@@ -19,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -418,6 +419,7 @@ public class Rs2Npc {
     public static List<NPC> getNpcsInLineOfSight(String name) {
         return getNpcs().filter(npc -> hasLineOfSight(npc) && npc.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
     }
+
 
     /**
      * gets the npc within line of sight for a player by name

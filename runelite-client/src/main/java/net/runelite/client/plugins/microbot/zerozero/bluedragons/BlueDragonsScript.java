@@ -17,6 +17,8 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class BlueDragonsScript extends Script {
@@ -24,7 +26,6 @@ public class BlueDragonsScript extends Script {
     public static BlueDragonState currentState;
 
     private static final WorldPoint SAFE_SPOT = new WorldPoint(2918, 9781, 0);
-    private final int[] dragonIds = {265, 266};
     private Integer currentTargetId = null;
 
     public boolean run(BlueDragonsConfig config) {
@@ -149,6 +150,11 @@ public class BlueDragonsScript extends Script {
         Microbot.log("Traveling to dragons...");
         Rs2Walker.walkTo(SAFE_SPOT);
         sleepUntil(this::isPlayerAtSafeSpot);
+
+        if (hopIfPlayerAtSafeSpot()) {
+            return;
+        }
+
         currentState = BlueDragonState.FIGHTING;
     }
 
@@ -225,13 +231,12 @@ public class BlueDragonsScript extends Script {
         }
     }
 
-
     private NPC getAvailableDragon() {
-        NPC dragon = Rs2Npc.getNpc("Blue dragon");
-        if (dragon != null && (dragon.getId() == 265 || dragon.getId() == 266)) {
-            return dragon;
-        }
-        return null;
+        List<Integer> dragonIds = Arrays.asList(265, 266, 267);
+        return Rs2Npc.getNpcs()
+                .filter(npc -> dragonIds.contains(npc.getId()))
+                .findFirst()
+                .orElse(null);
     }
 
 
@@ -252,8 +257,26 @@ public class BlueDragonsScript extends Script {
         Microbot.pauseAllScripts = true;
         Rs2Walker.walkFastCanvas(SAFE_SPOT);
         sleepUntil(this::isPlayerAtSafeSpot);
+
+        if (hopIfPlayerAtSafeSpot()) {
+            return;
+        }
+
         Microbot.pauseAllScripts = false;
     }
+
+    private boolean hopIfPlayerAtSafeSpot() {
+        if (Rs2Player.hopIfPlayerDetected(1, 5000, 3)) {
+            Microbot.log("Player detected at safe spot. Pausing script and hopping worlds.");
+            Microbot.pauseAllScripts = true;
+            sleep(1000);
+            Microbot.pauseAllScripts = false;
+            return true;
+        }
+        return false;
+    }
+
+
 
     public void updateConfig(BlueDragonsConfig config) {
         Microbot.log("Applying new configuration to Blue Dragons script.");
