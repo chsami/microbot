@@ -26,7 +26,6 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
-import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
@@ -479,6 +478,32 @@ public class Rs2Walker {
 
     public static boolean walkFastCanvas(WorldPoint worldPoint) {
         return walkFastCanvas(worldPoint, true);
+    }
+
+    /**
+     * walk until location is reached for 5000 milliseconds long
+     * @param location
+     */
+    public static void walkToLocationUntilArrived(WorldPoint location) {
+        sleepUntil(() -> {
+            Rs2Walker.walkFastCanvas(location);
+            sleepGaussian(400, 150);
+            return Rs2Player.getWorldLocation().equals(location);
+        });
+    }
+
+
+    /**
+     * walk until location is reached for sleep milliseconds long
+     * @param location
+     * @param sleep
+     */
+    public static void walkToLocationUntilArrived(WorldPoint location, int sleep) {
+        sleepUntil(() -> {
+            Rs2Walker.walkFastCanvas(location);
+            sleepGaussian(400, 150);
+            return Rs2Player.getWorldLocation().equals(location);
+        }, sleep);
     }
 
     public static boolean walkFastCanvas(WorldPoint worldPoint, boolean toggleRun) {

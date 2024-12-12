@@ -32,32 +32,32 @@ public class PLooter extends Script {
     }
 
     private void lootItemByName(PVirewatchKillerConfig config, String name) {
-        LootingParameters runeParams = new LootingParameters(
-                config.radius(),
-                1,
-                5,
-                1,
-                config.toggleDelayedLooting(),
-                config.toggleOnlyLootMyItems(),
-                name
-        );
-        if (Rs2GroundItem.lootItemsBasedOnNames(runeParams)) {
+        LootingParameters parameters = new LootingParameters.Builder()
+                .setMinValue(1)
+                .setMaxValue(1)
+                .setRange(config.radius())
+                .setMinItems(5)
+                .setMinInvSlots(2)
+                .setDelayedLooting(config.toggleDelayedLooting())
+                .setLootOwnItems(config.toggleOnlyLootMyItems())
+                .setNames(name)
+                .build();
+        if (Rs2GroundItem.lootItemsBasedOnNames(parameters)) {
             Microbot.pauseAllScripts = false;
         }
-
     }
 
     private void lootItemsByValue(PVirewatchKillerConfig config) {
-        LootingParameters valueParams = new LootingParameters(
-                config.minPriceOfItemsToLoot(),
-                config.maxPriceOfItemsToLoot(),
-                config.radius(),
-                1,
-                1,
-                config.toggleDelayedLooting(),
-                config.toggleOnlyLootMyItems()
-        );
-        if (Rs2GroundItem.lootItemBasedOnValue(valueParams)) {
+        LootingParameters parameters = new LootingParameters.Builder()
+                .setMinValue(config.minPriceOfItemsToLoot())
+                .setMaxValue(config.maxPriceOfItemsToLoot())
+                .setRange(config.radius())
+                .setMinItems(1)
+                .setMinInvSlots(1)
+                .setDelayedLooting(config.toggleDelayedLooting())
+                .setLootOwnItems(config.toggleOnlyLootMyItems())
+                .build();
+        if (Rs2GroundItem.lootItemBasedOnValue(parameters)) {
             Microbot.pauseAllScripts = false;
         }
     }

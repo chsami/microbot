@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public abstract class Rs2Tile implements Tile{
@@ -92,19 +93,6 @@ public abstract class Rs2Tile implements Tile{
         if (safeTiles.isEmpty()) return null;
 
         return safeTiles.get(0);
-    }
-
-    public static boolean isWalkable(Tile tile) {
-        Client client = Microbot.getClient();
-        if (client.getCollisionMaps() != null) {
-            int[][] flags = client.getCollisionMaps()[client.getPlane()].getFlags();
-            int data = flags[tile.getSceneLocation().getX()][tile.getSceneLocation().getY()];
-
-            Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
-
-            return movementFlags.isEmpty();
-        }
-        return true;
     }
 
     public static boolean isWalkable(WorldPoint worldPoint) {
@@ -993,5 +981,100 @@ public abstract class Rs2Tile implements Tile{
             checkpointTileNumber++;
         }
         return checkpointTiles;
+    }
+
+    /**
+     * Retrieves a list of walkable tiles centered around a specified starting location.
+     * The method checks a grid of the given width and height, ensuring all tiles are valid and unoccupied.
+     * If any tile in the grid is invalid or occupied, an empty list is returned.
+     *
+     * @param startingLocation The central point from which to calculate the grid.
+     * @param width The width of the grid to check.
+     * @param height The height of the grid to check.
+     * @return A list of walkable tiles if all tiles in the grid are valid; otherwise, an empty list.
+     */
+    public  static List<WorldPoint> getWalkableTilesAroundStartingLocation(WorldPoint startingLocation, int width, int height, Predicate<WorldPoint> additionalCheck) {
+        List<WorldPoint> walkableTiles = new ArrayList<>();
+        int halfWidth = (width - 1) / 2;
+        int halfHeight = (height - 1) / 2;
+
+        // Iterate through the grid centered around startingLocation
+        for (int dx = -halfWidth; dx <= halfWidth; dx++) {
+            for (int dy = -halfHeight; dy <= halfHeight; dy++) {
+                WorldPoint tile = new WorldPoint(startingLocation.getX() + dx, startingLocation.getY() + dy, startingLocation.getPlane());
+
+                // Check if the tile is valid and does not contain an object
+                if (isValidTile(getTile(tile.getX(), tile.getY())) && additionalCheck.test(tile)) {
+                    walkableTiles.add(tile);
+                }
+            }
+        }
+
+        if (walkableTiles.size() < width * height)  {
+            return new ArrayList<>();
+        }
+
+        return walkableTiles;
+    }
+
+    /**
+     * Loops over an area of WorldPoints and checks if getWalkableTilesAroundStartingLocation returns walkable tiles.
+     * If a valid list of walkable tiles is found, the method breaks and returns the list.
+     *
+     * @param areaCenter The center of the area to search.
+     * @param searchRadius The radius around the center to loop through.
+     * @param width The width of the grid to check for walkable tiles.
+     * @param height The height of the grid to check for walkable tiles.
+     * @return A list of walkable tiles if found; otherwise, an empty list.
+     */
+    public static List<WorldPoint> searchForWalkableArea(WorldPoint areaCenter, int searchRadius, int width, int height, Predicate<WorldPoint> additionalCheck) {
+        for (int radius = 0; radius <= searchRadius; radius++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dy = -radius; dy <= radius; dy++) {
+                    if (Math.abs(dx) != radius && Math.abs(dy) != radius) {
+                        continue; // Skip points not on the perimeter of the current radius
+                    }
+
+                    WorldPoint currentPoint = new WorldPoint(areaCenter.getX() + dx, areaCenter.getY() + dy, areaCenter.getPlane());
+                    List<WorldPoint> walkableTiles = getWalkableTilesAroundStartingLocation(currentPoint, width, height, additionalCheck);
+                    if (!walkableTiles.isEmpty()) {
+                        return walkableTiles;
+                    }
+                }
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * Determine the minimum and maximum x and y values from the points in the hunterArea.
+     * @param area
+     * @return
+     */
+    public static WorldPoint getCenter(List<WorldPoint> area) {
+        // Ensure the list is not empty
+        if (area.isEmpty()) {
+            Microbot.log("The hunter area is empty.");
+            return null;
+        }
+
+        // Initialize boundaries
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+
+        // Find min/max coordinates
+        for (WorldPoint point : area) {
+            minX = Math.min(minX, point.getX());
+            minY = Math.min(minY, point.getY());
+            maxX = Math.max(maxX, point.getX());
+            maxY = Math.max(maxY, point.getY());
+        }
+
+        // Calculate the center
+        int centerX = (minX + maxX) / 2;
+        int centerY = (minY + maxY) / 2;
+        int plane = area.get(0).getPlane(); // Assume all points are on the same plane
+
+        return new WorldPoint(centerX, centerY, plane);
     }
 }

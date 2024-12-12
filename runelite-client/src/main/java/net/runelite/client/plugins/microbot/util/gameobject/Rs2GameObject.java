@@ -111,7 +111,12 @@ public class Rs2GameObject {
         }
         return false;
     }
-
+    public static boolean interact(int[] objectIds, String action, int distance) {
+        for (int objectId : objectIds) {
+            if (interact(objectId, action, distance)) return true;
+        }
+        return false;
+    }
     public static boolean interact(String name) {
         GameObject object = get(name, true);
         return clickObject(object);
