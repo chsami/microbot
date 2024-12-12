@@ -1,7 +1,9 @@
 package net.runelite.client.plugins.microbot.util.dialogues;
 
+import net.runelite.api.Varbits;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -495,5 +497,18 @@ public class Rs2Dialogue {
      */
     public static boolean sleepUntilHasCombinationOption(String text) {
         return sleepUntilHasCombinationOption(text, false);
+    }
+    
+    /**
+     * Determines whether the game is currently in a cutscene.
+     * <p>
+     * This method checks the value of a specific game state variable (varbit 542)
+     * to determine if a cutscene is active. If the value of varbit 542 is 1, the
+     * game is considered to be in a cutscene; otherwise, it is not.
+     *
+     * @return {@code true} if the game is currently in a cutscene; {@code false} otherwise.
+     */
+    public static boolean isInCutScene() {
+        return Microbot.getVarbitValue(542) == 1;
     }
 }
