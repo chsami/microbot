@@ -21,6 +21,7 @@ public class PlayerDetectionScript extends Script {
             ItemID.STAFF_OF_AIR,
             ItemID.AIR_BATTLESTAFF,
             ItemID.MYSTIC_AIR_STAFF,
+            ItemID.DUST_BATTLESTAFF,
     };
 
     private final List<Player> detectedDangerousPlayers = new CopyOnWriteArrayList<>();

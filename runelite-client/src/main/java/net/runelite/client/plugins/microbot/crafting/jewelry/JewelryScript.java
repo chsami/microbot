@@ -78,7 +78,7 @@ public class JewelryScript extends Script {
                         
                         if (!isBankOpen || !Rs2Bank.isOpen()) return;
                         
-                        boolean shouldCutGems = plugin.getJewelry().getGem() != null 
+                        boolean shouldCutGems = plugin.getJewelry().getGem() != Gem.NONE 
                                 && Rs2Bank.hasItem(plugin.getJewelry().getGem().getUncutItemID());
                         
                         if (shouldCutGems) {
@@ -96,9 +96,9 @@ public class JewelryScript extends Script {
                             return;
                         }
 
-                        int withdrawAmount = plugin.getJewelry().getGem() != null ? 13 : 27;
+                        int withdrawAmount = plugin.getJewelry().getGem() != Gem.NONE ? 13 : 27;
                         
-                        boolean shouldCraftJewelry = plugin.getJewelry().getGem() != null 
+                        boolean shouldCraftJewelry = plugin.getJewelry().getGem() != Gem.NONE 
                                 ? Rs2Bank.hasBankItem(plugin.getJewelry().getGem().getCutItemID(), withdrawAmount) && Rs2Bank.hasBankItem(plugin.getJewelry().getJewelryType().getItemID(), withdrawAmount)
                                 : Rs2Bank.hasBankItem(plugin.getJewelry().getJewelryType().getItemID(), withdrawAmount);
                         
@@ -394,7 +394,7 @@ public class JewelryScript extends Script {
     }
     
     private boolean hasFinishedCutting() {
-        if (plugin.getJewelry().getGem() == null) return false;
+        if (plugin.getJewelry().getGem() == Gem.NONE) return false;
         if(!Rs2Inventory.hasItem(ItemID.CHISEL)) return false;
         return Rs2Inventory.hasItem(plugin.getJewelry().getGem().getCutItemID()) && !Rs2Inventory.hasItem(plugin.getJewelry().getGem().getUncutItemID());
     }
@@ -403,7 +403,7 @@ public class JewelryScript extends Script {
         if (!Rs2Inventory.hasItem(plugin.getJewelry().getToolItemID())) return false;
 
         boolean hasCraftingItem = Rs2Inventory.hasItem(plugin.getJewelry().getJewelryType().getItemID());
-        boolean hasNoGem = plugin.getJewelry().getGem() == null;
+        boolean hasNoGem = plugin.getJewelry().getGem() == Gem.NONE;
         boolean hasCutGem = Rs2Inventory.hasItem(plugin.getJewelry().getGem().getCutItemID());
 
         return Rs2Inventory.hasItem(plugin.getJewelry().getItemID()) 
@@ -415,7 +415,7 @@ public class JewelryScript extends Script {
     }
     
     private boolean isCutting() {
-        if (plugin.getJewelry().getGem() == null) return false;
+        if (plugin.getJewelry().getGem() == Gem.NONE) return false;
         if (!Rs2Inventory.hasItem(ItemID.CHISEL)) return false;
         return Rs2Inventory.hasItem(plugin.getJewelry().getGem().getUncutItemID());
     }
@@ -424,7 +424,7 @@ public class JewelryScript extends Script {
         if(!Rs2Inventory.hasItem(plugin.getJewelry().getToolItemID())) return false;
         
         boolean hasCraftingItem = Rs2Inventory.hasItem(plugin.getJewelry().getJewelryType().getItemID());
-        boolean hasNoGem = plugin.getJewelry().getGem() == null;
+        boolean hasNoGem = plugin.getJewelry().getGem() == Gem.NONE;
         boolean hasCutGem = Rs2Inventory.hasItem(plugin.getJewelry().getGem().getCutItemID());
         
         return hasNoGem ? hasCraftingItem : hasCraftingItem && hasCutGem;
