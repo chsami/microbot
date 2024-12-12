@@ -4439,7 +4439,7 @@
 2591 3092 1	2590 3088 0	Climb-down;Staircase;15648						
 2590 3092 1	2590 3088 0	Climb-down;Staircase;15648						
 # Asgarnian ice dungeon								
-3008 9550 0	3007 3150 0	Climb-up;Ladder;17385						
+3009 9550 0	3007 3150 0	Climb-up;Ladder;17385						
 3008 3150 0	3009 9550 0	Climb-down;Trapdoor;1738						
 # Sawmill								
 3310 3508 1	3310 3508 0	Climb-down;Ladder;11795						
