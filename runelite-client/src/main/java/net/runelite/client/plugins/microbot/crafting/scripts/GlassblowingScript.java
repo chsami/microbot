@@ -7,9 +7,11 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.crafting.CraftingConfig;
 import net.runelite.client.plugins.microbot.crafting.enums.Glass;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.concurrent.TimeUnit;
@@ -31,27 +33,29 @@ public class GlassblowingScript extends Script {
 
     public void run(CraftingConfig config) {
 
-        if (config.glassType() == Glass.PROGRESSIVE)
-            calculateItemToCraft();
+        if (config.glassType() == Glass.PROGRESSIVE) calculateItemToCraft();
 
+        Rs2Antiban.resetAntibanSettings();
+        Rs2Antiban.antibanSetupTemplates.applyCraftingSetup();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
-                if (config.Afk() && Random.random(1, 100) == 2)
-                    sleep(1000, 60000);
+
+                if (Rs2Player.isAnimating(2400) || Rs2Antiban.getCategory().isBusy() || Microbot.pauseAllScripts) return;
+                if (Rs2AntibanSettings.actionCooldownActive) return;
+
                 if (config.glassType() == Glass.PROGRESSIVE) {
                     itemToCraft = model.getItemToCraft();
                 } else {
                     itemToCraft = config.glassType();
                 }
 
-                if (Rs2Inventory.hasItem(moltenGlass)
-                        && Rs2Inventory.hasItem(glassblowingPipe)) {
+                if (Rs2Inventory.hasItem(moltenGlass) && Rs2Inventory.hasItem(glassblowingPipe)) {
                     craft(config);
+                    return;
                 }
-                if (!Rs2Inventory.hasItem(moltenGlass)
-                        || !Rs2Inventory.hasItem(glassblowingPipe)) {
+                if (!Rs2Inventory.hasItem(moltenGlass) || !Rs2Inventory.hasItem(glassblowingPipe)) {
                     bank(config);
                 }
 
@@ -63,20 +67,19 @@ public class GlassblowingScript extends Script {
 
     private void bank(CraftingConfig config) {
         Rs2Bank.openBank();
-        sleepUntilOnClientThread(() -> Rs2Bank.isOpen());
+        sleepUntil(Rs2Bank::isOpen);
 
         Rs2Bank.depositAll(itemToCraft.getItemName());
-        sleepUntilOnClientThread(() -> !Rs2Inventory.hasItem(itemToCraft.getItemName()));
+        sleepUntil(() -> !Rs2Inventory.hasItem(itemToCraft.getItemName()));
 
         Rs2Bank.withdrawItem(true, glassblowingPipe);
-        sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(glassblowingPipe));
+        sleepUntil(() -> Rs2Inventory.hasItem(glassblowingPipe));
 
         verifyItemInBank(moltenGlass);
 
         Rs2Bank.withdrawAll(true, moltenGlass);
-        sleepUntilOnClientThread(() -> Rs2Inventory.hasItem(moltenGlass));
+        sleepUntil(() -> Rs2Inventory.hasItem(moltenGlass));
 
-        sleep(600, 3000);
         Rs2Bank.closeBank();
     }
 
@@ -92,13 +95,14 @@ public class GlassblowingScript extends Script {
     private void craft(CraftingConfig config) {
         Rs2Inventory.combine(glassblowingPipe, moltenGlass);
 
-        sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694736) != null);
+        Rs2Widget.sleepUntilHasWidgetText("How many do you wish to make?", 270, 5, false, 5000);
 
         keyPress(itemToCraft.getMenuEntry());
 
-        sleepUntilOnClientThread(() -> Rs2Widget.getWidget(17694736) == null);
+        Rs2Widget.sleepUntilHasNotWidgetText("How many do you wish to make?", 270, 5, false, 5000);
+        Rs2Antiban.actionCooldown();
 
-        sleepUntilOnClientThread(() -> !Rs2Inventory.hasItem(moltenGlass), 60000);
+        sleepUntil(() -> !Rs2Inventory.hasItem(moltenGlass), 60000);
     }
 
     public ProgressiveGlassblowingModel calculateItemToCraft() {
@@ -125,6 +129,7 @@ public class GlassblowingScript extends Script {
 
     @Override
     public void shutdown() {
+        Rs2Antiban.resetAntibanSettings();
         super.shutdown();
     }
 }

@@ -11,7 +11,9 @@ import net.runelite.client.plugins.microbot.runecrafting.gotr.data.CellType;
 import net.runelite.client.plugins.microbot.runecrafting.gotr.data.GuardianPortalInfo;
 import net.runelite.client.plugins.microbot.runecrafting.gotr.data.Mode;
 import net.runelite.client.plugins.microbot.runecrafting.gotr.data.RuneType;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -37,7 +39,7 @@ import static net.runelite.client.plugins.microbot.util.Global.sleepGaussian;
 
 public class GotrScript extends Script {
 
-    public static String version = "1.1.4";
+    public static String version = "1.1.5";
     public static long totalTime = 0;
     public static boolean shouldMineGuardianRemains = true;
     public static final String rewardPointRegex = "Total elemental energy:[^>]+>([\\d,]+).*Total catalytic energy:[^>]+>([\\d,]+).";
@@ -530,12 +532,35 @@ public class GotrScript extends Script {
 
     private static boolean repairPouches() {
         if (!useNpcContact) {
+            repairWithCordelia();
             return true;
         }
         if (Rs2Inventory.hasDegradedPouch()) {
             return Rs2Magic.repairPouchesWithLunar();
         }
         return false;
+    }
+
+    /**
+     * Repair pouch by talking to cordelia
+     * make sure to have the repair unlocked for 25 pearls
+     */
+    private static void repairWithCordelia() {
+        if (!Rs2Inventory.hasDegradedPouch()) return;
+        if (!Rs2Inventory.hasItem(ItemID.ABYSSAL_PEARLS)) return;
+        NPC pouchRepairNpc = Rs2Npc.getNpc(NpcID.APPRENTICE_CORDELIA_12180);
+        if (pouchRepairNpc == null) return;
+        if (!Rs2Npc.hasAction(pouchRepairNpc.getId(), "Repair")) return;
+        if (!Rs2Npc.canWalkTo(pouchRepairNpc, 10)) return;
+        if (!Rs2Npc.interact(pouchRepairNpc, "Repair")) return;
+
+        Microbot.log("Repairing pouches...");
+
+        Global.sleepUntil(() -> {
+            Rs2Dialogue.clickContinue();
+            return !Rs2Inventory.hasDegradedPouch();
+        }, 10000);
+
     }
 
     @Override

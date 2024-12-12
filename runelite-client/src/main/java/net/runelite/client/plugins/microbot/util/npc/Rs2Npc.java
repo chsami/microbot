@@ -214,6 +214,18 @@ public class Rs2Npc {
                 .orElse(null);
     }
 
+    /**
+     * Checks if a npc has a given action
+     * @param id of the npc
+     * @param action
+     * @return
+     */
+    public static boolean hasAction(int id, String action) {
+        NPCComposition npcComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcDefinition(id));
+
+        return Arrays.stream(npcComposition.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase(action));
+    }
+
     public static boolean interact(NPC npc, String action) {
         if (npc == null) return false;
         Microbot.status = action + " " + npc.getName();

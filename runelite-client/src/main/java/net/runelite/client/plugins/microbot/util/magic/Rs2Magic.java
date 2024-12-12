@@ -102,8 +102,12 @@ public class Rs2Magic {
         if (magicAction == null) return false;
         return quickCanCast(magicAction);
     }
-
+    
     public static boolean cast(MagicAction magicSpell) {
+        return cast(magicSpell, "cast", 1);
+    }
+
+    public static boolean cast(MagicAction magicSpell, String option, int identifier) {
         MenuAction menuAction;
         Rs2Tab.switchToMagicTab();
         Microbot.status = "Casting " + magicSpell.getName();
@@ -112,7 +116,6 @@ public class Rs2Magic {
             log("Unable to cast " + magicSpell.getName());
             return false;
         }
-        int identifier = magicSpell.getName().toLowerCase().contains("teleport to house") ? 2 : 1;
         if (magicSpell.getName().toLowerCase().contains("teleport") || magicSpell.getName().toLowerCase().contains("Bones to") || Arrays.stream(magicSpell.getActions()).anyMatch(x -> x != null && x.equalsIgnoreCase("cast"))) {
             menuAction = MenuAction.CC_OP;
         } else {
@@ -122,7 +125,7 @@ public class Rs2Magic {
         if (magicSpell.getWidgetId() == -1)
             throw new NotImplementedException("This spell has not been configured yet in the MagicAction.java class");
 
-        Microbot.doInvoke(new NewMenuEntry("cast", -1, magicSpell.getWidgetId(), menuAction.getId(), identifier, -1, magicSpell.getName()), new Rectangle(Rs2Widget.getWidget(magicSpell.getWidgetId()).getBounds()));
+        Microbot.doInvoke(new NewMenuEntry(option, -1, magicSpell.getWidgetId(), menuAction.getId(), identifier, -1, magicSpell.getName()), new Rectangle(Rs2Widget.getWidget(magicSpell.getWidgetId()).getBounds()));
         //Rs2Reflection.invokeMenu(-1, magicSpell.getWidgetId(), menuAction.getId(), 1, -1, "Cast", "<col=00ff00>" + magicSpell.getName() + "</col>", -1, -1);
         return true;
     }
