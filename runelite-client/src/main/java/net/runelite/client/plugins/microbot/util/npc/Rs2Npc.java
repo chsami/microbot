@@ -422,26 +422,6 @@ public class Rs2Npc {
 
 
     /**
-     * Finds the closest NPC to the player based on a given condition.
-     *
-     * @param condition a {@link Predicate} specifying the condition the NPC must meet
-     * @return the closest NPC that satisfies the condition, or {@code null} if none match
-     * <p> Example Usage:
-     * NPC closestBanker = getClosestNpc(npc -> Arrays.asList(npc.getComposition().getActions()).contains("Bank"));
-     * NPC closestGoblin = getClosestNpc(npc -> "Goblin".equalsIgnoreCase(npc.getName()));
-     * NPC closestAttackable = getClosestNpc(npc -> npc.getCombatLevel() > 0 && !npc.isDead());
-     */
-
-    public static NPC getClosestNpc(Predicate<NPC> condition) {
-        Rs2WorldPoint playerLocation = new Rs2WorldPoint(Microbot.getClient().getLocalPlayer().getWorldLocation());
-        return getNpcs()
-                .filter(condition)
-                .min(Comparator.comparingInt(npc -> playerLocation.distanceToPath(npc.getWorldLocation())))
-                .orElse(null);
-    }
-
-
-    /**
      * gets the npc within line of sight for a player by name
      *
      * @param name of the npc

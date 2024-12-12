@@ -233,8 +233,12 @@ public class BlueDragonsScript extends Script {
 
     private NPC getAvailableDragon() {
         List<Integer> dragonIds = Arrays.asList(265, 266, 267);
-        return Rs2Npc.getClosestNpc(npc -> dragonIds.contains(npc.getId()));
+        return Rs2Npc.getNpcs()
+                .filter(npc -> dragonIds.contains(npc.getId()))
+                .findFirst()
+                .orElse(null);
     }
+
 
     private boolean attackDragon(NPC dragon) {
         final int dragonId = dragon.getId();
