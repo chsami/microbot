@@ -487,7 +487,13 @@ public class PathfinderConfig {
         }
         
         // Handle teleportation spells
-        if (TransportType.TELEPORTATION_SPELL.equals(transport.getType())) return Rs2Magic.quickCanCast(transport.getDisplayInfo());
+        if (TransportType.TELEPORTATION_SPELL.equals(transport.getType())) {
+            boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
+            String displayInfo = hasMultipleDestination
+                    ? transport.getDisplayInfo().split(":")[0].trim().toLowerCase()
+                    : transport.getDisplayInfo();
+            return Rs2Magic.quickCanCast(displayInfo);
+        }
 
         // Check membership restrictions
         if (!client.getWorldType().contains(WorldType.MEMBERS)) return false;

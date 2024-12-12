@@ -1057,9 +1057,23 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
 
     private static boolean handleTeleportSpell(Transport transport) {
         if (Rs2Pvp.isInWilderness() && (Rs2Pvp.getWildernessLevelFrom(Rs2Player.getWorldLocation()) > (transport.getMaxWildernessLevel() + 1))) return false;
-        MagicAction magicSpell = Arrays.stream(MagicAction.values()).filter(x -> x.getName().toLowerCase().contains(transport.getDisplayInfo().toLowerCase())).findFirst().orElse(null);
+        boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
+        
+        String spellName = hasMultipleDestination
+                ? transport.getDisplayInfo().split(":")[0].trim().toLowerCase()
+                : transport.getDisplayInfo().toLowerCase();
+        
+        String option = hasMultipleDestination
+                ? transport.getDisplayInfo().split(":")[1].trim().toLowerCase()
+                : "cast";
+        
+        int identifier = hasMultipleDestination
+                ? 2
+                : 1;
+
+        MagicAction magicSpell = Arrays.stream(MagicAction.values()).filter(x -> x.getName().toLowerCase().contains(spellName)).findFirst().orElse(null);
         if (magicSpell != null) {
-            return Rs2Magic.cast(magicSpell);
+            return Rs2Magic.cast(magicSpell, option, identifier);
         }
         return false;
     }
@@ -1090,7 +1104,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
 
         List<String> locationKeyWords = Arrays.asList("farm", "monastery", "lletya", "prifddinas", "rellekka", "waterbirth island", "neitiznot", "jatiszo",
                 "ver sinhaza", "darkmeyer", "slepe", "troll stronghold", "weiss", "ecto", "burgh", "duradel", "gem mine", "nardah", "kalphite cave",
-                "kourend woodland", "mount karuulm", "grand exchange");
+                "kourend woodland", "mount karuulm", "grand exchange", "outside");
         List<String> genericKeyWords = Arrays.asList("invoke", "empty", "consume", "rub", "break", "teleport", "reminisce", "signal", "play");
 
         boolean hasMultipleDestination = transport.getDisplayInfo().contains(":");
@@ -1109,11 +1123,6 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                 .filter(action -> action != null && locationKeyWords.stream().anyMatch(keyword -> action.toLowerCase().contains(keyword.toLowerCase())))
                 .findFirst()
                 .orElse(null);
-
-        //House portal by default outside
-        if (itemId == 8013) {
-            itemAction = "Outside";
-        }
 
         // If no location-based action found, try generic actions
         if (itemAction == null) {
