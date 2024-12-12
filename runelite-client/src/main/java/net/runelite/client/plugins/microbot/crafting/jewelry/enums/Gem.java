@@ -7,6 +7,7 @@ import net.runelite.api.ItemID;
 @Getter
 @RequiredArgsConstructor
 public enum Gem {
+    NONE("", "", 0, 0, 0),
     OPAL("uncut opal", "opal",ItemID.UNCUT_OPAL, ItemID.OPAL, 1),
     JADE("uncut jade", "jade", ItemID.UNCUT_JADE, ItemID.JADE, 13),
     RED_TOPAZ("uncut red topaz", "red topaz",ItemID.UNCUT_RED_TOPAZ, ItemID.RED_TOPAZ, 16),

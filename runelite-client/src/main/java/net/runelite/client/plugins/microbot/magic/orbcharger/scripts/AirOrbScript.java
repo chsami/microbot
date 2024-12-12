@@ -58,6 +58,7 @@ public class AirOrbScript extends Script {
             ItemID.STAFF_OF_AIR,
             ItemID.AIR_BATTLESTAFF,
             ItemID.MYSTIC_AIR_STAFF,
+            ItemID.DUST_BATTLESTAFF,
     };
 
     public boolean run() {

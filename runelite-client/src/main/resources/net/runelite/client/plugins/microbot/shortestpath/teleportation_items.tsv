@@ -39,9 +39,9 @@
 1631 3940 0		3853;3855;3857;3859;3861;3863;3865;3867		4	Games necklace: Wintertodt Camp	T	19	
 								
 # Ring of Dueling (1-8)								
-3315 3235 0		2566;2564;2562;2560;2558;2556;2554;2552		4	Ring of dueling: Emir's Arena	T	19	
-2440 3090 0		2566;2564;2562;2560;2558;2556;2554;2552		4	Ring of dueling: Castle Wars	T	19	
-3151 3635 0		2566;2564;2562;2560;2558;2556;2554;2552		4	Ring of dueling: Ferox Enclave	T	19	
+3315 3235 0		2566;2564;2562;2560;2558;2556;2554;2552		6	Ring of dueling: Emir's Arena	T	19	
+2440 3090 0		2566;2564;2562;2560;2558;2556;2554;2552		6	Ring of dueling: Castle Wars	T	19	
+3151 3635 0		2566;2564;2562;2560;2558;2556;2554;2552		6	Ring of dueling: Ferox Enclave	T	19	
 								
 # Combat Bracelet (1-6) (uncharged is 11126)								
 2882 3547 0		11118;11120;11122;11124;11972;11974		4	Combat bracelet: Warriors' Guild	T	29	
@@ -114,7 +114,7 @@
 #  Teleport tablets								
 3213 3424 0		8007		4	Varrock tablet	T	19	
 # Varbit 4480 is DIARY_VARROCK_MEDIUM								
-3164 3478 0		8007		4	Varrock tablet: GE	T	19	4480=1
+3164 3478 0		8007		4	Varrock tablet: Grand Exchange	T	19	4480=1
 2965 3378 0		8009		4	Falador tablet	T	19	
 3221 3218 0		8008		4	Lumbridge tablet	T	19	
 2757 3478 0		8010		4	Camelot tablet	T	19	

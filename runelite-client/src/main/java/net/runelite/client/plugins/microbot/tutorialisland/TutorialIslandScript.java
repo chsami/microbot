@@ -407,7 +407,8 @@ public class TutorialIslandScript extends Script {
                 sleepUntil(Rs2Dialogue::isInDialogue);
             }
         } else if (Microbot.getVarbitPlayerValue(281) == 650) {
-            Rs2Magic.castOn(MagicAction.WIND_STRIKE, Rs2Npc.getNpc(NpcID.CHICKEN_3316));
+            NPC chicken = Rs2Npc.getNpcs("chicken").findFirst().orElse(null);
+            Rs2Magic.castOn(MagicAction.WIND_STRIKE, chicken);
         } else if (Microbot.getVarbitPlayerValue(281) == 670) {
             if (isInDialogue()) {
                 if (Rs2Widget.hasWidget("Do you want to go to the mainland?")) {
