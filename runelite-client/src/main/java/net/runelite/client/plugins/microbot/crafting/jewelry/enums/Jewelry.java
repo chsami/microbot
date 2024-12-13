@@ -37,7 +37,7 @@ public enum Jewelry {
     DIAMOND_BRACELET("diamond bracelet", ItemID.DIAMOND_BRACELET, Gem.DIAMOND, ItemID.BRACELET_MOULD, JewelryType.GOLD, EnchantSpell.LEVEL_4, 58),
     DRAGONSTONE_RING("dragonstone ring", ItemID.DRAGONSTONE_RING, Gem.DRAGONSTONE, ItemID.RING_MOULD, JewelryType.GOLD, EnchantSpell.LEVEL_5, 55),
     DRAGON_NECKLACE("dragon necklace", ItemID.DRAGON_NECKLACE, Gem.DRAGONSTONE, ItemID.NECKLACE_MOULD, JewelryType.GOLD, EnchantSpell.LEVEL_5, 72),
-    DRAGONSTONE_BRACELET("dragonstone bracelet", ItemID.DRAGONSTONE_BRACELET, Gem.DRAGONSTONE, ItemID.BRACELET_MOULD, JewelryType.GOLD, EnchantSpell.LEVEL_5, 74),
+    DRAGONSTONE_BRACELET("dragon bracelet", ItemID.DRAGONSTONE_BRACELET, Gem.DRAGONSTONE, ItemID.BRACELET_MOULD, JewelryType.GOLD, EnchantSpell.LEVEL_5, 74),
     ONYX_RING("onyx ring", ItemID.ONYX_RING, Gem.ONYX, ItemID.RING_MOULD, JewelryType.GOLD, EnchantSpell.LEVEL_6, 67),
     ONYX_NECKLACE("onyx necklace", ItemID.ONYX_NECKLACE, Gem.ONYX, ItemID.NECKLACE_MOULD, JewelryType.GOLD, EnchantSpell.LEVEL_6, 82),
     ONYX_BRACELET("onyx bracelet", ItemID.ONYX_BRACELET, Gem.ONYX, ItemID.BRACELET_MOULD, JewelryType.GOLD, EnchantSpell.LEVEL_6, 84),
