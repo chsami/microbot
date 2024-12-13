@@ -34,8 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.runelite.client.plugins.microbot.Microbot.log;
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class Rs2Inventory {
 
@@ -2151,20 +2150,20 @@ public class Rs2Inventory {
     public static boolean waitForInventoryChanges(int time) {
         final int currentInventorySize = size();
         final int currentInventoryStackableSize = stackableSize();
-        sleepUntil(() ->  {
-            sleepUntil(() -> currentInventorySize != size() || currentInventoryStackableSize != stackableSize(), time);
-            return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
-        });
+        sleepUntil(() -> currentInventorySize != size() || currentInventoryStackableSize != stackableSize(), time);
         return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
     }
 
     public static boolean waitForInventoryChanges(Runnable actionWhileWaiting) {
+        return waitForInventoryChanges(actionWhileWaiting, Rs2Random.between(300, 600), Rs2Random.between(600, 2400));
+    }
+
+    public static boolean waitForInventoryChanges(Runnable actionWhileWaiting, int time, int timeout) {
         final int currentInventorySize = size();
         final int currentInventoryStackableSize = stackableSize();
         sleepUntil(() ->  {
             actionWhileWaiting.run();
-            sleepUntil(() -> currentInventorySize != size() || currentInventoryStackableSize != stackableSize(), Rs2Random.between(600, 2100));
-            return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
+            return sleepUntilTrue(() -> currentInventorySize != size() || currentInventoryStackableSize != stackableSize(), time, timeout);
         });
         return currentInventorySize != size() || currentInventoryStackableSize != stackableSize();
     }
