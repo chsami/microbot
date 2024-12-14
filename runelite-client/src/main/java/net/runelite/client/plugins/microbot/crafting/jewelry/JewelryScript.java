@@ -84,13 +84,16 @@ public class JewelryScript extends Script {
                         if (shouldCutGems) {
                             if (!Rs2Inventory.isEmpty()) {
                                 Rs2Bank.depositAllExcept(ItemID.CHISEL);
+                                Rs2Inventory.waitForInventoryChanges(1200);
                             }
                             
                             if (!Rs2Inventory.hasItem(ItemID.CHISEL)) {
                                 Rs2Bank.withdrawOne(ItemID.CHISEL);
+                                Rs2Inventory.waitForInventoryChanges(1200);
                             }
                             
                             Rs2Bank.withdrawAll(plugin.getJewelry().getGem().getUncutItemID());
+                            Rs2Inventory.waitForInventoryChanges(1200);
                             Rs2Bank.closeBank();
                             sleepUntil(() -> !Rs2Bank.isOpen());
                             return;
@@ -105,6 +108,7 @@ public class JewelryScript extends Script {
                         if (shouldCraftJewelry) {
                             if (!Rs2Inventory.isEmpty()){
                                 Rs2Bank.depositAllExcept(plugin.getJewelry().getToolItemID());
+                                Rs2Inventory.waitForInventoryChanges(1200);
                             }
                             
                             if (!Rs2Inventory.hasItem(plugin.getJewelry().getToolItemID())) {
@@ -114,13 +118,16 @@ public class JewelryScript extends Script {
                                     return;
                                 }
                                 Rs2Bank.withdrawOne(plugin.getJewelry().getToolItemID());
+                                Rs2Inventory.waitForInventoryChanges(1200);
                             }
                             
                             if (plugin.getJewelry().getGem() != null) {
                                 Rs2Bank.withdrawX(plugin.getJewelry().getGem().getCutItemID(), withdrawAmount);
+                                Rs2Inventory.waitForInventoryChanges(1200);
                             }
                             
                             Rs2Bank.withdrawX(plugin.getJewelry().getJewelryType().getItemID(), withdrawAmount);
+                            Rs2Inventory.waitForInventoryChanges(1200);
                             Rs2Bank.closeBank();
                             sleepUntil(() -> !Rs2Bank.isOpen());
                             return;
@@ -234,11 +241,12 @@ public class JewelryScript extends Script {
                                 
                                 if (Rs2Inventory.hasItem(plugin.getJewelry().getItemID())) {
                                     Rs2Bank.depositAll(plugin.getJewelry().getItemID());
+                                    Rs2Inventory.waitForInventoryChanges(1200);
                                 }
                                 
                                 if (!Rs2Inventory.isEmpty()) {
                                     Rs2Bank.depositAllExcept(false,"coins", "rune", plugin.getJewelry().getItemName());
-                                    Rs2Random.waitEx(900, 100);
+                                    Rs2Inventory.waitForInventoryChanges(1200);
                                 }
 
                                 // Withdraw and equip the staff if needed
@@ -253,6 +261,7 @@ public class JewelryScript extends Script {
                                 if (totalAlchJewelry > 0) {
                                     Rs2Bank.setWithdrawAsNote();
                                     Rs2Bank.withdrawAll(plugin.getJewelry().getItemID());
+                                    Rs2Inventory.waitForInventoryChanges(1200);
                                     Rs2Bank.setWithdrawAsItem();
                                 }
 
@@ -267,13 +276,16 @@ public class JewelryScript extends Script {
                                         }
                                         
                                         Rs2Bank.withdrawRunePouch();
+                                        Rs2Inventory.waitForInventoryChanges(1200);
                                     }
                                 } else {
                                     // Otherwise, withdraw nature runes based on the needed amount
                                     if (natureRunesInInventory == 0 && natureRunesToWithdraw > 0) {
                                         Rs2Bank.withdrawAll(ItemID.NATURE_RUNE);
+                                        Rs2Inventory.waitForInventoryChanges(1200);
                                     } else if (natureRunesToWithdraw > 0) {
                                         Rs2Bank.withdrawX(ItemID.NATURE_RUNE, natureRunesToWithdraw);
+                                        Rs2Inventory.waitForInventoryChanges(1200);
                                     }
                                 }
 
