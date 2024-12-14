@@ -23,7 +23,7 @@ public class HolidayOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Holiday Event V1.0.0")
+                    .text("Holiday Event - Christmas 2024")
                     .color(Color.GREEN)
                     .build());
 
