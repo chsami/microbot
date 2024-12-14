@@ -36,6 +36,17 @@ public interface AmethystMiningConfig extends Config {
         return false;
     }
 
+    // boolean for gem bag
+    @ConfigItem(
+            keyName = "gemBag",
+            name = "Gem Bag",
+            description = "If enabled, the player will use the gem bag.",
+            position = 2
+    )
+    default boolean gemBag() {
+        return false;
+    }
+
     @ConfigItem(
             keyName = "chiselAmethysts",
             name = "Chisel Amethysts",
