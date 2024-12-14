@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.mining.motherloadmine.enums.MLMMiningSpot;
 import net.runelite.client.plugins.microbot.mining.motherloadmine.enums.MLMStatus;
+import net.runelite.client.plugins.microbot.util.antiban.AntibanPlugin;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.antiban.enums.ActivityIntensity;
@@ -18,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -27,12 +29,10 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import static net.runelite.client.plugins.microbot.util.math.Random.random;
-
 @Slf4j
 public class MotherloadMineScript extends Script
 {
-    public static final String VERSION = "1.7.0";
+    public static final String VERSION = "1.7.1";
 
     private static final WorldArea WEST_UPPER_AREA = new WorldArea(3748, 5676, 7, 9, 0);
     private static final WorldArea EAST_UPPER_AREA = new WorldArea(3756, 5667, 8, 8, 0);
@@ -193,7 +193,7 @@ public class MotherloadMineScript extends Script
 
     private void handleMining()
     {
-        if (oreVein != null) return;
+        if (oreVein != null && AntibanPlugin.isMining()) return;
 
         if (miningSpot == MLMMiningSpot.IDLE)
         {
@@ -258,9 +258,13 @@ public class MotherloadMineScript extends Script
 
     private void depositHopper()
     {
-        WorldPoint hopperDeposit = isUpperFloor() ? HOPPER_DEPOSIT_UP : HOPPER_DEPOSIT_DOWN;
+        WorldPoint hopperDeposit = (isUpperFloor() && config.upstairsHopperUnlocked()) ? HOPPER_DEPOSIT_UP : HOPPER_DEPOSIT_DOWN;
         Optional<GameObject> hopper = Optional.ofNullable(Rs2GameObject.findObject(ObjectID.HOPPER_26674, hopperDeposit));
 
+        if(isUpperFloor() && !config.upstairsHopperUnlocked())
+        {
+            ensureLowerFloor();
+        }
         if (hopper.isPresent() && Rs2GameObject.interact(hopper.get()))
         {
             sleepUntil(() -> !Rs2Inventory.isFull());
@@ -307,7 +311,7 @@ public class MotherloadMineScript extends Script
     {
         // Randomly decide which spot to go to
         // More variety can be added if needed
-        miningSpot = (random(1, 5) == 2)
+        miningSpot = (Rs2Random.between(1, 5) == 2)
                 ? (config.mineUpstairs() ? MLMMiningSpot.WEST_UPPER : MLMMiningSpot.SOUTH)
                 : (config.mineUpstairs() ? MLMMiningSpot.EAST_UPPER : MLMMiningSpot.WEST_LOWER);
         Collections.shuffle(miningSpot.getWorldPoint());
