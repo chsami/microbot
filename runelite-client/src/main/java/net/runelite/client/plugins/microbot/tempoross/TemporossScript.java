@@ -7,8 +7,11 @@ import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.breakhandler.BreakHandlerScript;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.tempoross.enums.HarpoonType;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.coords.Rs2WorldArea;
 import net.runelite.client.plugins.microbot.util.coords.Rs2WorldPoint;
@@ -31,7 +34,7 @@ import static net.runelite.client.plugins.microbot.Microbot.log;
 public class TemporossScript extends Script {
 
     // Version string
-    public static final String VERSION = "1.0.1";
+    public static final String VERSION = "1.1.0";
     public static final Pattern DIGIT_PATTERN = Pattern.compile("(\\d+)");
     public static final int TEMPOROSS_REGION = 12078;
 
@@ -66,6 +69,11 @@ public class TemporossScript extends Script {
         TemporossPlugin.fireClouds = 0;
         TemporossPlugin.waves = 0;
         state = State.INITIAL_CATCH;
+        Rs2Antiban.resetAntibanSettings();
+        Rs2AntibanSettings.naturalMouse = true;
+        Rs2AntibanSettings.simulateMistakes = true;
+        Rs2AntibanSettings.takeMicroBreaks = true;
+        Rs2AntibanSettings.microBreakChance = 0.2;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() ->{
             try {
                 if (!Microbot.isLoggedIn()) return;
@@ -145,8 +153,8 @@ public class TemporossScript extends Script {
             }
             reset();
             if (Rs2Npc.interact(exitNpc, "Leave")) {
+                Rs2Antiban.takeMicroBreakByChance();
                 sleepUntil(() -> !isInMinigame(), 15000);
-
             }
         }
     }
@@ -163,6 +171,7 @@ public class TemporossScript extends Script {
         TemporossPlugin.fireClouds = 0;
         TemporossPlugin.waves = 0;
         state = State.INITIAL_CATCH;
+        BreakHandlerScript.setLockState(false);
     }
 
     public void handleForfeit() {
@@ -263,6 +272,7 @@ public class TemporossScript extends Script {
         // If we are east of the ladder, interact with it to get on the boat
         if (Rs2Player.getWorldLocation().getX() > startingLadder.getWorldLocation().getX()) {
             if (Rs2GameObject.interact(startingLadder, ((emptyBucketCount > 0 && temporossConfig.solo()) || !temporossConfig.solo()) ? "Climb" : "Solo-start")) {
+                BreakHandlerScript.setLockState(true);
                 Rs2Player.waitForWalking();
                 return;
             }
