@@ -35,6 +35,7 @@ public class HolidayScript extends Script {
 
                 switch (currentStep) {
                     case 0:
+                        Microbot.log("Current Step: 0 - talk to cecilia and start the event");
                         Rs2Walker.walkTo(2990, 3379, 0);
                         Rs2Npc.interact("Cecilia", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
@@ -60,6 +61,7 @@ public class HolidayScript extends Script {
                         currentStep++;
                         break;
                     case 1:
+                        Microbot.log("Current Step: 1 - talk to party pete");
                         Rs2Walker.walkTo(3050, 3376, 0);
                         Rs2Npc.interact("Party Pete", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
@@ -78,6 +80,7 @@ public class HolidayScript extends Script {
                         currentStep++;
                         break;
                     case 2:
+                        Microbot.log("Current Step: 2 - Get invitations from Cecilia");
                         Rs2Walker.walkTo(2990, 3379, 0);
                         Rs2Npc.interact("Cecilia", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
@@ -94,6 +97,12 @@ public class HolidayScript extends Script {
                         currentStep++;
                         break;
                     case 3:
+                        Microbot.log("Current Step: 3 - talk to sir amik varz");
+                        if (!Rs2Inventory.contains("Invitations")) {
+                            Microbot.log("Invitations missing in Step 3. Resetting to Step 0.");
+                            currentStep = 0;
+                            return;
+                        }
                         // Walk and interact with Sir Amik
                         interactWithSirAmik();
 
@@ -110,6 +119,12 @@ public class HolidayScript extends Script {
                         break;
 
                     case 4:
+                        Microbot.log("Current Step: 4 - talk to hairdresser");
+                        if (!Rs2Inventory.contains("Invitations")) {
+                            Microbot.log("Invitations missing in Step 4. Resetting to Step 0.");
+                            currentStep = 0;
+                            return;
+                        }
                         // Walk and interact with Hairdresser
                         interactWithHairdresser();
 
@@ -125,6 +140,13 @@ public class HolidayScript extends Script {
                         currentStep++;
                         break;
                     case 5:
+                        Microbot.log("Current Step: 5 - talk to Sarah");
+                        if (!Rs2Inventory.contains("Invitations")) {
+                            Microbot.log("Invitations missing in Step 5. Resetting to Step 0.");
+                            currentStep = 0;
+                            return;
+                        }
+
                         // Walk and interact with Sarah
                         interactWithSarah();
 
@@ -140,6 +162,13 @@ public class HolidayScript extends Script {
                         currentStep++;
                         break;
                     case 6:
+                        Microbot.log("Current Step: 6 - talk to Gertrude");
+                        if (!Rs2Inventory.contains("Invitations")) {
+                            Microbot.log("Invitations missing in Step 6. Resetting to Step 0.");
+                            currentStep = 0;
+                            return;
+                        }
+
                         // Walk and interact with Gertrude
                         interactWithGertrude();
 
@@ -155,6 +184,12 @@ public class HolidayScript extends Script {
                         currentStep++;
                         break;
                     case 7:
+                        Microbot.log("Current Step: 7 - talk to charlie");
+                        if (!Rs2Inventory.contains("Invitations")) {
+                            Microbot.log("Invitations missing in Step 7. Resetting to Step 0.");
+                            currentStep = 0;
+                            return;
+                        }
                         Rs2Walker.walkTo(3211, 3392, 0);
                         Rs2Npc.interact("Charlie the tramp", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
@@ -226,6 +261,7 @@ public class HolidayScript extends Script {
                         currentStep++;
                         break;
                     case 8:
+                        Microbot.log("Current Step: 8 - hairdresser dog");
                         Rs2Npc.interact("Hairdresser", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
                         sleep(1200, 2400);
@@ -244,6 +280,7 @@ public class HolidayScript extends Script {
                         currentStep++;
                         break;
                     case 9:
+                        Microbot.log("Current Step: 9 - amik dog");
                         Rs2Npc.interact("Sir Amik Varze", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
                         sleep(1200, 1800);
@@ -262,6 +299,7 @@ public class HolidayScript extends Script {
                         currentStep++;
                         break;
                     case 10:
+                        Microbot.log("Current Step: 10 - Sarah dog");
                         Rs2Npc.interact("Sarah", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
                         sleep(1200, 2400);
@@ -280,6 +318,7 @@ public class HolidayScript extends Script {
                         currentStep++;
                         break;
                     case 11:
+                        Microbot.log("Current Step: 11 - Gertrude dog");
                         Rs2Npc.interact("Gertrude", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
                         sleep(1200, 1800);
@@ -313,6 +352,7 @@ public class HolidayScript extends Script {
                         currentStep++;
                         break;
                     case 12:
+                        Microbot.log("Current Step: 12 - Charlie's dog and finish");
                         checkAndTalkToCecilia();
                         sleepUntil(Rs2Dialogue::isInDialogue, 30000);
                         sleep(600, 1200);
@@ -509,19 +549,6 @@ public class HolidayScript extends Script {
         }
 
         sleepUntil(() -> !Rs2Dialogue.isInDialogue(), 30000);
-    }
-
-    private boolean waitForChatMessage(long timeout) {
-        long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < timeout) {
-            if (plugin.isMessageReceived()) {
-                System.out.println("Message received within timeout.");
-                return true;
-            }
-            sleep(100); // Small delay to reduce CPU usage
-        }
-        System.out.println("Timeout reached without receiving the message.");
-        return false;
     }
 
 
