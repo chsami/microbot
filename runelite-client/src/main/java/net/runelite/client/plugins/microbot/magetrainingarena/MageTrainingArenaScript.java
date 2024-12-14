@@ -69,7 +69,7 @@ public class MageTrainingArenaScript extends Script {
         Microbot.enableAutoRunOn = true;
         bought = 0;
         buyable = 0;
-
+        Rs2Walker.disableTeleports = true;
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn()) return;
