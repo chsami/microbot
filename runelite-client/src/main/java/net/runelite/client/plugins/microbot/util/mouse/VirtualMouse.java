@@ -191,11 +191,14 @@ public class VirtualMouse extends Mouse {
     public Mouse scrollUp(Point point) {
         long time = System.currentTimeMillis();
 
-        MouseEvent mouseScroll = new MouseWheelEvent(getCanvas(), MouseEvent.MOUSE_WHEEL, time, 0, point.getX(), point.getY(), 0, false,
-                0, -10, -2);
+        move(point);
 
-        getCanvas().dispatchEvent(mouseScroll);
-
+        scheduledExecutorService.schedule(() -> {
+            MouseEvent mouseScroll = new MouseWheelEvent(getCanvas(), MouseEvent.MOUSE_WHEEL, time, 0, point.getX(), point.getY(), 0, false,
+                    0, -10, -2);
+            mouseScroll.setSource("Microbot");
+            getCanvas().dispatchEvent(mouseScroll);
+        }, Rs2Random.between(40,100), TimeUnit.MILLISECONDS);
         return this;
     }
 
