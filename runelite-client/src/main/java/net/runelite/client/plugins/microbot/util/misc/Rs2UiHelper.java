@@ -33,6 +33,10 @@ public class Rs2UiHelper {
                 rectangle.getY() + rectangle.getHeight() <= (double) canvasHeight;
     }
 
+    public static boolean isRectangleWithinRectangle(Rectangle main, Rectangle sub) {
+        return main.contains(sub);
+    }
+
     public static Point getClickingPoint(Rectangle rectangle, boolean randomize) {
         if (rectangle == null) return new Point(1, 1);
         if (rectangle.getX() == 1 && rectangle.getY() == 1) return new Point(1, 1);
