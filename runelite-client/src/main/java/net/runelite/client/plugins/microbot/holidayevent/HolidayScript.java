@@ -8,12 +8,12 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
+import javax.swing.*;
 import java.util.concurrent.TimeUnit;
 
 public class HolidayScript extends Script {
 
     private int currentStep = 0;
-
     public static boolean test = false;
     public boolean run(HolidayConfig config) {
         Microbot.enableAutoRunOn = false;
@@ -55,6 +55,11 @@ public class HolidayScript extends Script {
                         Rs2Npc.interact("Party Pete", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
                         Rs2Dialogue.keyPressForDialogueOption(1);
+                        sleep(600, 1200);
+                        while (Rs2Dialogue.hasContinue() && isRunning()) {
+                            Rs2Dialogue.clickContinue();
+                            sleep(300,600);
+                        }
                         sleep(600, 1200);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
@@ -124,7 +129,7 @@ public class HolidayScript extends Script {
                         Rs2Npc.interact("Sir Amik Varze", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
                         Rs2Dialogue.keyPressForDialogueOption(1);
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
@@ -137,7 +142,7 @@ public class HolidayScript extends Script {
                         Rs2Npc.interact("Hairdresser", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
                         Rs2Dialogue.keyPressForDialogueOption(1);
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
@@ -150,7 +155,7 @@ public class HolidayScript extends Script {
                         Rs2Npc.interact("Sarah", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
                         Rs2Dialogue.keyPressForDialogueOption(1);
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
@@ -163,7 +168,7 @@ public class HolidayScript extends Script {
                         Rs2Npc.interact("Gertrude", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
                         Rs2Dialogue.keyPressForDialogueOption(1);
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
@@ -176,12 +181,38 @@ public class HolidayScript extends Script {
                         Rs2Npc.interact("Charlie the tramp", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
                         Rs2Dialogue.keyPressForDialogueOption(1);
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
                         }
-                        sleepUntil(() -> Rs2Dialogue.hasDialogueOption("Yes"));
+
+                        int result = JOptionPane.showConfirmDialog(
+                                null,
+                                "This part of the Event can cause Crashes. Press OK to shut down the plugin here and finish the event on another client, or press Cancel to continue running.",
+                                "Client Update Required",
+                                JOptionPane.OK_CANCEL_OPTION,
+                                JOptionPane.WARNING_MESSAGE
+                        );
+
+                        if (result == JOptionPane.OK_OPTION) {
+                            shutdown(); // Shut down the plugin if OK is pressed
+                        } else {
+                            // Continue running if Cancel is pressed
+                            Microbot.log("Plugin will continue running despite potential crashes.");
+                        }
+
+                        sleep(1200, 2400);
+                        while (Rs2Dialogue.hasContinue() && isRunning()) {
+                            Rs2Dialogue.clickContinue();
+                            sleep(300,600);
+                        }
+                        sleep(1200, 2400);
+                        while (Rs2Dialogue.hasContinue() && isRunning()) {
+                            Rs2Dialogue.clickContinue();
+                            sleep(300,600);
+                        }
+                        sleepUntil(() -> Rs2Dialogue.hasDialogueOption("Yes"),60000);
                         Rs2Dialogue.keyPressForDialogueOption(1);
                         sleep(3600,4400);
                         sleepUntil(() -> !Rs2Dialogue.isInCutScene() || Rs2Dialogue.hasContinue(), 30000);
@@ -215,14 +246,14 @@ public class HolidayScript extends Script {
                     case 8:
                         Rs2Npc.interact("Hairdresser", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
                         }
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         Rs2Dialogue.keyPressForDialogueOption(2);
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
@@ -233,14 +264,14 @@ public class HolidayScript extends Script {
                     case 9:
                         Rs2Npc.interact("Sir Amik Varze", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
-                        sleep(600, 1200);
+                        sleep(1200, 1800);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
                         }
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         Rs2Dialogue.keyPressForDialogueOption(1);
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
@@ -251,14 +282,14 @@ public class HolidayScript extends Script {
                     case 10:
                         Rs2Npc.interact("Sarah", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
                         }
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         Rs2Dialogue.keyPressForDialogueOption(3);
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
@@ -269,14 +300,14 @@ public class HolidayScript extends Script {
                     case 11:
                         Rs2Npc.interact("Gertrude", "Talk-to");
                         sleepUntil(() -> Rs2Dialogue.isInDialogue() && !Rs2Player.isMoving(), 30000);
-                        sleep(600, 1200);
+                        sleep(1200, 1800);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
                         }
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         Rs2Dialogue.keyPressForDialogueOption(4);
-                        sleep(600, 1200);
+                        sleep(1200, 2400);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
@@ -314,7 +345,7 @@ public class HolidayScript extends Script {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
                         }
-                        sleep(4900, 6200);
+                        sleep(3600, 6200);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
@@ -326,7 +357,7 @@ public class HolidayScript extends Script {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
                         }
-                        sleep(4200, 4800);
+                        sleep(2800, 4800);
                         while (Rs2Dialogue.hasContinue() && isRunning()) {
                             Rs2Dialogue.clickContinue();
                             sleep(300,600);
@@ -404,6 +435,7 @@ public class HolidayScript extends Script {
 
     @Override
     public void shutdown() {
+        currentStep = 0;
         super.shutdown();
     }
 }
