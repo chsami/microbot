@@ -1296,6 +1296,38 @@ public class Rs2Bank {
         }
         return nearest;
     }
+    /**
+     * Get the nearest bank to world point
+     *
+     * @return BankLocation
+     */
+
+    public static BankLocation getNearestBank(WorldPoint worldPoint) {
+        Microbot.log("Calculating nearest bank path...");
+        BankLocation nearest = null;
+        double dist = Double.MAX_VALUE;
+        double currDist;
+        for (BankLocation bankLocation : BankLocation.values()) {
+            if (!bankLocation.hasRequirements()) continue;
+
+            currDist = worldPoint.distanceTo2D(bankLocation.getWorldPoint());
+
+
+            if (nearest == null || currDist < dist) {
+                if (Rs2Walker.canReach(bankLocation.getWorldPoint())) {
+                    dist = currDist;
+                    nearest = bankLocation;
+                }
+            }
+        }
+        if (nearest != null) {
+            Microbot.log("Found nearest bank: " + nearest.name());
+        } else {
+            Microbot.log("Unable to find a bank");
+        }
+        return nearest;
+    }
+
 
     /**
      * Walk to the closest bank
@@ -1565,6 +1597,19 @@ public class Rs2Bank {
         return Arrays.stream(RunePouchType.values())
                 .anyMatch(pouch -> Rs2Bank.hasItem(pouch.getItemId()));
     }
+
+    /**
+     * Empty gem bag
+     *
+     * @return true if gem bag was emptied
+     */
+
+    public static boolean emptyGemBag() {
+        Rs2Item gemBag = Rs2Inventory.get(ItemID.GEM_BAG_12020,ItemID.OPEN_GEM_BAG);
+        if (gemBag == null) return false;
+        return Rs2Inventory.interact(gemBag, "Empty");
+    }
+
 
     /**
      * Withdraw items from the lootTrackerPlugin
