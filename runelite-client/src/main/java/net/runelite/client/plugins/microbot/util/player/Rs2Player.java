@@ -1004,9 +1004,9 @@ public class Rs2Player {
      * @return
      */
     public static boolean checkIdleLogout(long randomDelay) {
-        int idleClientTicks = Math.min(Microbot.getClient().getKeyboardIdleTicks(), Microbot.getClient().getMouseIdleTicks());
+        long idleClientTicks = Long.min(Microbot.getClient().getMouseIdleTicks(), Microbot.getClient().getKeyboardIdleTicks());
 
-        return (long) idleClientTicks >= Microbot.getClient().getIdleTimeout() - randomDelay;
+        return  idleClientTicks >= Microbot.getClient().getIdleTimeout() - randomDelay;
     }
 
     /**
