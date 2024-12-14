@@ -2,7 +2,6 @@ package net.runelite.client.plugins.microbot.sticktothescript.varrockanvil;
 
 import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
-import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -19,7 +18,6 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
-import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +31,7 @@ enum State {
 
 public class VarrockAnvilScript extends Script {
 
-    public static String version = "1.0.0";
+    public static String version = "1.0.1";
     public State state = State.BANKING;
     public String debug = "";
     private boolean expectingXPDrop = false;
@@ -106,7 +104,7 @@ public class VarrockAnvilScript extends Script {
                         debug("Using anvil");
 
                         // Wait until anvil screen is open
-                        sleepUntil(() -> Rs2Widget.getWidget(AnvilContainerWidgetID, 1) != null, 5000);
+                        sleepUntil(() -> Rs2Widget.getWidget(AnvilContainerWidgetID, 1) != null, 10000);
                         sleep(186, 480);
 
                         if (Rs2Widget.getWidget(AnvilContainerWidgetID, 1) != null) {
