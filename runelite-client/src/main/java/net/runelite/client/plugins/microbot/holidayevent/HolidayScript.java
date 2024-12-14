@@ -119,7 +119,7 @@ public class HolidayScript extends Script {
                             plugin.setMessageReceived(false); // Reset for the next case
                         } else {
                             Microbot.log("Message not received, retrying interaction with hairdresser.");
-                            interactWithSirAmik(); // Retry if message not received
+                            interactWithHairdresser(); // Retry if message not received
                         }
 
                         currentStep++;
@@ -134,7 +134,7 @@ public class HolidayScript extends Script {
                             plugin.setMessageReceived(false); // Reset for the next case
                         } else {
                             Microbot.log("Message not received, retrying interaction with Sarah.");
-                            interactWithSirAmik(); // Retry if message not received
+                            interactWithSarah(); // Retry if message not received
                         }
 
                         currentStep++;
@@ -149,7 +149,7 @@ public class HolidayScript extends Script {
                             plugin.setMessageReceived(false); // Reset for the next case
                         } else {
                             Microbot.log("Message not received, retrying interaction with gertrude.");
-                            interactWithSirAmik(); // Retry if message not received
+                            interactWithGertrude(); // Retry if message not received
                         }
 
                         currentStep++;
