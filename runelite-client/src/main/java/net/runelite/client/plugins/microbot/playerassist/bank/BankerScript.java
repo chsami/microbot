@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.playerassist.bank;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -22,24 +23,21 @@ enum ItemToKeep {
     TELEPORT(Constants.TELEPORT_IDS, PlayerAssistConfig::ignoreTeleport, PlayerAssistConfig::staminaValue),
     STAMINA(Constants.STAMINA_POTION_IDS, PlayerAssistConfig::useStamina, PlayerAssistConfig::staminaValue),
     PRAYER(Constants.PRAYER_RESTORE_POTION_IDS, PlayerAssistConfig::usePrayer, PlayerAssistConfig::prayerValue),
-    FOOD(Constants.FOOD_ITEM_IDS, PlayerAssistConfig::useFood, PlayerAssistConfig::foodValue),
+    FOOD(Rs2Food.getIds(), PlayerAssistConfig::useFood, PlayerAssistConfig::foodValue),
     ANTIPOISON(Constants.ANTI_POISON_POTION_IDS, PlayerAssistConfig::useAntipoison, PlayerAssistConfig::antipoisonValue),
     ANTIFIRE(Constants.ANTI_FIRE_POTION_IDS, PlayerAssistConfig::useAntifire, PlayerAssistConfig::antifireValue),
     COMBAT(Constants.STRENGTH_POTION_IDS, PlayerAssistConfig::useCombat, PlayerAssistConfig::combatValue),
     RESTORE(Constants.RESTORE_POTION_IDS, PlayerAssistConfig::useRestore, PlayerAssistConfig::restoreValue);
 
+    @Getter
     private final List<Integer> ids;
     private final Function<PlayerAssistConfig, Boolean> useConfig;
     private final Function<PlayerAssistConfig, Integer> valueConfig;
 
     ItemToKeep(Set<Integer> ids, Function<PlayerAssistConfig, Boolean> useConfig, Function<PlayerAssistConfig, Integer> valueConfig) {
-        this.ids = ids.stream().collect(Collectors.toList());
+        this.ids = new ArrayList<>(ids);
         this.useConfig = useConfig;
         this.valueConfig = valueConfig;
-    }
-
-    public List<Integer> getIds() {
-        return ids;
     }
 
     public boolean isEnabled(PlayerAssistConfig config) {
@@ -142,7 +140,7 @@ public class BankerScript extends Script {
     public boolean handleBanking() {
         Microbot.pauseAllScripts = true;
         Rs2Prayer.disableAllPrayers();
-        if (goToBank() && Rs2Bank.openBank()) {
+        if (Rs2Bank.walkToBankAndUseBank()) {
             depositAllExcept(config);
             withdrawUpkeepItems(config);
         }

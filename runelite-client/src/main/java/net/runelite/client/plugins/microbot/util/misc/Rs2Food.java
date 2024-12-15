@@ -3,6 +3,10 @@ package net.runelite.client.plugins.microbot.util.misc;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Getter
 @RequiredArgsConstructor
 public enum Rs2Food {
@@ -84,6 +88,11 @@ public enum Rs2Food {
 
     public String getName() {
         return name;
+    }
+
+    // get all ids as a set
+    public static Set<Integer> getIds() {
+        return Arrays.stream(values()).map(Rs2Food::getId).collect(Collectors.toSet());
     }
 
 }
