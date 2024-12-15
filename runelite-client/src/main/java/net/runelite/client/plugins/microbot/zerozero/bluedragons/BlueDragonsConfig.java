@@ -27,8 +27,7 @@ public interface BlueDragonsConfig extends Config {
     @ConfigSection(
             name = "Loot Options",
             description = "Settings related to item looting",
-            position = 1,
-            closedByDefault = false
+            position = 1
     )
     String lootSection = "lootSection";
 
@@ -56,8 +55,7 @@ public interface BlueDragonsConfig extends Config {
     @ConfigSection(
             name = "Food Options",
             description = "Settings for selecting food and health threshold",
-            position = 2,
-            closedByDefault = false
+            position = 2
     )
     String foodSection = "foodSection";
 
@@ -89,5 +87,24 @@ public interface BlueDragonsConfig extends Config {
     )
     default int eatAtHealthPercent() {
         return 50;
+    }
+
+    @ConfigSection(
+            name = "Debug",
+            description = "Debugging",
+            position = 3,
+            closedByDefault = true
+    )
+    String debugSection = "debugSection";
+
+    @ConfigItem(
+            keyName = "debugLogs",
+            name = "Enable Debug Logs",
+            description = "Enable detailed debug logging for this script",
+            section = debugSection
+
+    )
+    default boolean debugLogs() {
+        return false;
     }
 }
