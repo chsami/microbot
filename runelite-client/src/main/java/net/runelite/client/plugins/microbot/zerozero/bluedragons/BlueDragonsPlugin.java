@@ -4,7 +4,6 @@ import com.google.inject.Provides;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.eventbus.Subscribe;
 
@@ -34,7 +33,7 @@ public class BlueDragonsPlugin extends Plugin {
 
     @Override
     protected void shutDown() {
-        Microbot.log("Stopping Blue Dragons plugin...");
+        script.logOnceToChat("Stopping Blue Dragons plugin...", false, config);
         script.stop();
     }
 
@@ -45,10 +44,10 @@ public class BlueDragonsPlugin extends Plugin {
             switch (event.getKey()) {
                 case "startPlugin":
                     if (config.startPlugin()) {
-                        Microbot.log("Starting Blue Dragon plugin...");
+                        script.logOnceToChat("Starting Blue Dragon plugin...", false, config);
                         script.run(config);
                     } else {
-                        Microbot.log("Stopping Blue Dragon plugin!");
+                        script.logOnceToChat("Stopping Blue Dragon plugin!", false, config);
                         script.stop();
                     }
                     break;
@@ -58,7 +57,7 @@ public class BlueDragonsPlugin extends Plugin {
                 case "foodAmount":
                 case "eatAtHealthPercent":
                 case "lootEnsouledHead":
-                    Microbot.log("Configuration changed. Updating script settings.");
+                    script.logOnceToChat("Configuration changed. Updating script settings.", true, config);
                     if (config.startPlugin()) {
                         script.updateConfig(config);
                     }
