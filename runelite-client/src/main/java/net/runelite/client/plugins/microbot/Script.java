@@ -152,6 +152,7 @@ public abstract class Script implements IScript {
             Microbot.getSpecialAttackConfigs().reset();
             Rs2Walker.setTarget(null);
         }
+        startTime = null;
     }
 
     public boolean run() {
