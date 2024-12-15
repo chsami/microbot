@@ -133,7 +133,7 @@ public class AmethystMiningScript extends Script {
             sleepUntil(Rs2Bank::isOpen);
 
             Rs2Bank.depositAllExcept(itemsToKeep);
-            if (config.gemBag() && inventoryCountSinceLastGemBagCheck >= 1) {
+            if (config.gemBag() && inventoryCountSinceLastGemBagCheck >= 5) {
                 Rs2Bank.emptyGemBag();
                 inventoryCountSinceLastGemBagCheck = 0;
             }
@@ -170,7 +170,7 @@ public class AmethystMiningScript extends Script {
             Rs2Antiban.actionCooldown();
             Rs2Antiban.takeMicroBreakByChance();
             inventoryCountSinceLastGemBagCheck++;
-            if(inventoryCountSinceLastGemBagCheck >= 1) {
+            if(inventoryCountSinceLastGemBagCheck >= 5) {
                 status = Status.BANKING;
                 lockedStatus = true;
             }
