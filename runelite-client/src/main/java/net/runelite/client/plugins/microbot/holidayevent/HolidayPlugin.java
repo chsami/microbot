@@ -12,6 +12,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.qualityoflife.scripts.NeverLogoutScript;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -67,9 +68,11 @@ public class HolidayPlugin extends Plugin {
 
     int ticks = 10;
     @Subscribe
-    public void onGameTick(GameTick tick)
+    public void onGameTick(GameTick event)
     {
-        //System.out.println(getName().chars().mapToObj(i -> (char)(i + 3)).map(String::valueOf).collect(Collectors.joining()));
+        if (config.collectSnow()) {
+            CollectSnow.onGameTick(event);
+        }
 
         if (ticks > 0) {
             ticks--;
