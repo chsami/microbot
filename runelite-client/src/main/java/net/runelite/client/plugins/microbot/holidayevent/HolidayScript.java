@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.holidayevent;
 
 import com.google.inject.Inject;
+import net.runelite.api.TileObject;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
@@ -12,6 +13,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import javax.swing.*;
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 public class HolidayScript extends Script {
@@ -22,6 +24,15 @@ public class HolidayScript extends Script {
     public HolidayScript(HolidayPlugin plugin) {
         this.plugin = plugin;
     }
+
+
+    private int lastAnimationId = -1;
+    private long animationStartTime = System.currentTimeMillis();
+    private boolean isConfirmed = false; // Tracks if the condition is met for at least 1 second
+    private long idleGracePeriod = 500; // Grace period for idle states (-1) in milliseconds
+
+    private static final long COOLDOWN_MILLIS = 5000; // 5 seconds cooldown
+    private long lastSnowTakenTime = 0;
 
     private int currentStep = 0;
     public static boolean test = false;
@@ -426,8 +437,9 @@ public class HolidayScript extends Script {
                         default:
                             shutdown();
                     }
-                } else {
-                    if (notTakingTheSnow() && nearTheSnow()) {
+                } else if(config.collectSnow()) {
+                    System.out.println("Entering snow collection");
+                    if (!takingTheSnow() && nearTheSnow()) {
                         takeTheSnow();
                     }
                 }
@@ -443,16 +455,73 @@ public class HolidayScript extends Script {
         return true;
     }
 
-    public boolean notTakingTheSnow() {
-        return Rs2Player.getLastAnimationID() != 5067;
+    public boolean takingTheSnow() {
+        int currentAnimationId = Rs2Player.getAnimation();
+        long currentTime = System.currentTimeMillis();
+
+        // Handle animation change
+        if (currentAnimationId != lastAnimationId) {
+            // If transitioning to idle (-1), allow a grace period
+            if (currentAnimationId == -1 && (currentTime - animationStartTime) < idleGracePeriod) {
+                // Do not reset on transient idle states
+                System.out.println("DEBUG: Transient idle state detected. No reset.");
+            } else {
+                // Full animation change, reset tracking
+                System.out.println("DEBUG: Animation changed from " + lastAnimationId + " to " + currentAnimationId);
+                lastAnimationId = currentAnimationId;
+                animationStartTime = currentTime;
+                isConfirmed = false; // Reset the confirmation flag
+            }
+        }
+
+        // Time spent in current animation
+        long timeInCurrentAnimation = currentTime - animationStartTime;
+
+        // Confirm any animation after 1 second
+        if (timeInCurrentAnimation > 1000) {
+            isConfirmed = true;
+        }
+
+        // Debug logs
+        System.out.println("DEBUG: Current animation ID: " + currentAnimationId);
+        System.out.println("DEBUG: Last animation ID: " + lastAnimationId);
+        System.out.println("DEBUG: Time in current animation: " + timeInCurrentAnimation + " ms");
+        System.out.println("DEBUG: Is confirmed: " + isConfirmed);
+
+        // Final result: Only true if confirmed and in animation 5067
+        boolean result = (isConfirmed && currentAnimationId == 5067);
+        System.out.println("DEBUG: Is taking the snow? " + result);
+
+        return result;
     }
 
+
+
+
     public void takeTheSnow() {
-        Rs2GameObject.interact(19035, "Take");
+        long now = Instant.now().toEpochMilli();
+
+        if (now - lastSnowTakenTime < COOLDOWN_MILLIS) {
+            System.out.println("DEBUG: Cooldown active, skipping snow collection.");
+            return;
+        }
+
+        System.out.println("DEBUG: Attempting to take the snow.");
+        boolean success = Rs2GameObject.interact(19035, "Take");
+
+        if (success) {
+            System.out.println("DEBUG: Successfully took the snow.");
+            lastSnowTakenTime = now;
+        } else {
+            System.out.println("DEBUG: Take the snow interaction failed.");
+        }
     }
     public boolean nearTheSnow() {
-        return Rs2GameObject.findObjectByIdAndDistance(5067, 1) != null;
+        TileObject snowObject = Rs2GameObject.findObjectByIdAndDistance(19035, 1);
+        System.out.println("DEBUG: Found snow object near? " + (snowObject != null));
+        return snowObject != null;
     }
+
 
     public void dialogueCycle() {
         while (Rs2Dialogue.hasContinue() && isRunning()) {

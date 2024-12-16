@@ -6,13 +6,11 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
-import java.awt.event.KeyEvent;
-
 public class CollectSnow {
     private static long randomDelay;
 
     public static boolean nearTheSnow() {
-        return Rs2GameObject.findObjectByIdAndDistance(5067, 1) != null;
+        return Rs2GameObject.findObjectByIdAndDistance(19035, 1) != null;
     }
 
     public static void onGameTick(GameTick event) {
@@ -21,6 +19,7 @@ public class CollectSnow {
             if (Rs2GameObject.getGameObjects(19035) != null
                     && nearTheSnow()) {
                 Rs2GameObject.interact(19035, "Take");
+                Microbot.log("Done tooken snow cus about to log");
             } else {
                 Microbot.log("Restart plugin 1 tile to snow");}
             }
