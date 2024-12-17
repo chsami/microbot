@@ -25,11 +25,7 @@ public class HolidayScript extends Script {
         this.plugin = plugin;
     }
 
-
-    private int lastAnimationId = -1;
-    private long animationStartTime = System.currentTimeMillis();
-    private boolean isConfirmed = false; // Tracks if the condition is met for at least 1 second
-    private long idleGracePeriod = 500; // Grace period for idle states (-1) in milliseconds
+    private long idleStartTime = -1; // Tracks when the player started idling
 
     private static final long COOLDOWN_MILLIS = 5000; // 5 seconds cooldown
     private long lastSnowTakenTime = 0;
@@ -439,7 +435,7 @@ public class HolidayScript extends Script {
                     }
                 } else if(config.collectSnow()) {
                     System.out.println("Entering snow collection");
-                    if (!takingTheSnow() && nearTheSnow()) {
+                    if (!takingTheSnow() & isIdle() & nearTheSnow()) {
                         takeTheSnow();
                     }
                 }
@@ -457,45 +453,23 @@ public class HolidayScript extends Script {
 
     public boolean takingTheSnow() {
         int currentAnimationId = Rs2Player.getAnimation();
-        long currentTime = System.currentTimeMillis();
 
-        // Handle animation change
-        if (currentAnimationId != lastAnimationId) {
-            // If transitioning to idle (-1), allow a grace period
-            if (currentAnimationId == -1 && (currentTime - animationStartTime) < idleGracePeriod) {
-                // Do not reset on transient idle states
-                System.out.println("DEBUG: Transient idle state detected. No reset.");
-            } else {
-                // Full animation change, reset tracking
-                System.out.println("DEBUG: Animation changed from " + lastAnimationId + " to " + currentAnimationId);
-                lastAnimationId = currentAnimationId;
-                animationStartTime = currentTime;
-                isConfirmed = false; // Reset the confirmation flag
-            }
-        }
-
-        // Time spent in current animation
-        long timeInCurrentAnimation = currentTime - animationStartTime;
-
-        // Confirm any animation after 1 second
-        if (timeInCurrentAnimation > 1000) {
-            isConfirmed = true;
-        }
-
-        // Debug logs
-        System.out.println("DEBUG: Current animation ID: " + currentAnimationId);
-        System.out.println("DEBUG: Last animation ID: " + lastAnimationId);
-        System.out.println("DEBUG: Time in current animation: " + timeInCurrentAnimation + " ms");
-        System.out.println("DEBUG: Is confirmed: " + isConfirmed);
-
-        // Final result: Only true if confirmed and in animation 5067
-        boolean result = (isConfirmed && currentAnimationId == 5067);
-        System.out.println("DEBUG: Is taking the snow? " + result);
-
-        return result;
+        return (currentAnimationId == 5067);
     }
 
-
+    private boolean isIdle() {
+        int currentAnimation = Rs2Player.getAnimation(); // Assuming Rs2Player.getAnimation() returns the current animation
+        if (currentAnimation == -1) { // Idle animation
+            if (idleStartTime == -1) {
+                idleStartTime = System.currentTimeMillis();
+            }
+            long idleDuration = System.currentTimeMillis() - idleStartTime;
+            return idleDuration >= 4000; // 4 seconds in milliseconds
+        } else {
+            idleStartTime = -1; // Reset idle timer if no longer idle
+            return false;
+        }
+    }
 
 
     public void takeTheSnow() {
