@@ -1,12 +1,14 @@
 package net.runelite.client.plugins.microbot.smelting;
 
 import net.runelite.api.GameObject;
+import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.smelting.enums.Ores;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -20,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AutoSmeltingScript extends Script {
 
-    public static String version = "1.0.1";
+    public static String version = "1.0.2";
     private boolean expectingXPDrop = false;
 
     public boolean run(AutoSmeltingConfig config) {
@@ -50,6 +52,10 @@ public class AutoSmeltingScript extends Script {
                         return;
                     }
                     Rs2Bank.depositAll();
+                    if (config.SELECTED_BAR_TYPE().getId() == ItemID.IRON_BAR && Rs2Bank.hasItem(ItemID.RING_OF_FORGING) && !Rs2Equipment.isWearing(ItemID.RING_OF_FORGING)) {
+                        Rs2Bank.withdrawAndEquip(ItemID.RING_OF_FORGING);
+                        return;
+                    }
                     withdrawRightAmountOfMaterials(config);
                     return;
                 }
