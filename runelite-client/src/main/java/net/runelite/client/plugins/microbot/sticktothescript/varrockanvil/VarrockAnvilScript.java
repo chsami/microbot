@@ -106,7 +106,7 @@ public class VarrockAnvilScript extends Script {
                         debug("Using anvil");
 
                         // Wait until anvil screen is open
-                        sleepUntil(() -> Rs2Widget.getWidget(AnvilContainerWidgetID, 1) != null, 5000);
+                        sleepUntil(() -> Rs2Widget.getWidget(AnvilContainerWidgetID, 1) != null, 10000);
                         sleep(186, 480);
 
                         if (Rs2Widget.getWidget(AnvilContainerWidgetID, 1) != null) {
