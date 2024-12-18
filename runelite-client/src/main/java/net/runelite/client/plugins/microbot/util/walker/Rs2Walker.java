@@ -1181,6 +1181,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
     public static boolean handleTrapdoor(Transport transport) {
         Map<Integer, Integer> trapdoors = new HashMap<>();
         trapdoors.put(1579, 1581); // closed trapdoor -> open trapdoor
+        trapdoors.put(881, 882); // closed manhole -> open manhole (used for varrock sewers)
 
         for (Map.Entry<Integer, Integer> entry : trapdoors.entrySet()) {
             int closedTrapdoorId = entry.getKey();
