@@ -209,11 +209,11 @@ public class ScurriusScript extends Script {
                         break;
 
                     case TELEPORT_AWAY:
-                        if (Rs2Inventory.getInventoryFood().isEmpty()) {
-                            Rs2Inventory.interact("Varrock teleport", "break");
-                            sleepUntil(() -> !isInFightRoom());
-                            state = State.BANKING;
-                        }
+                        Rs2Inventory.interact("Varrock teleport", "break");
+                        sleepUntil(() -> !isInFightRoom());
+                        sleep(600 * 2);
+                        disableAllPrayers();
+                        state = State.BANKING;
                         break;
 
                     case WALK_TO_BOSS:
