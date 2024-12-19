@@ -63,6 +63,28 @@ public interface ScurriusConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "teleportAmount",
+            name = "Teleport Item Amount",
+            description = "Amount of Teleports to withdraw",
+            position = 2,
+            section = generalSettings
+    )
+    default int teleportAmount() {
+        return 5;
+    }
+
+    @ConfigItem(
+            keyName = "shutdownAfterDeath",
+            name = "Shutdown after death",
+            description = "If enabled, script will stop after dying",
+            position = 2,
+            section = generalSettings
+    )
+    default boolean shutdownAfterDeath() {
+        return false;
+    }
+    
+    @ConfigItem(
             keyName = "foodSelection",
             name = "Select Food",
             description = "Select the type of food you want to use",

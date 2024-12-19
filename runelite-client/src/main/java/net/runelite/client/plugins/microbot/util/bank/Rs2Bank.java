@@ -812,6 +812,40 @@ public class Rs2Bank {
     }
 
     /**
+     * Withdraws the deficit of an item from the bank to meet the required amount.
+     *
+     * @param id             The ID of the item to withdraw.
+     * @param requiredAmount The required total amount of the item.
+     * @return True if any items were withdrawn, false otherwise.
+     */
+    public static boolean withdrawDeficit(int id, int requiredAmount) {
+        int currentAmount = Rs2Inventory.itemQuantity(id);
+        int deficit = requiredAmount - currentAmount;
+
+        if (deficit <= 0) return true;
+        if (!hasBankItem(id, deficit)) return false;
+
+        return withdrawX(id, deficit);
+    }
+
+    /**
+     * Withdraws the deficit of an item from the bank to meet the required amount.
+     *
+     * @param name           The name of the item to withdraw.
+     * @param requiredAmount The required total amount of the item.
+     * @return True if any items were withdrawn, false otherwise.
+     */
+    public static boolean withdrawDeficit(String name, int requiredAmount) {
+        int currentAmount = Rs2Inventory.itemQuantity(name);
+        int deficit = requiredAmount - currentAmount;
+
+        if (deficit <= 0) return true;
+        if (!hasBankItem(name, deficit)) return false;
+
+        return withdrawX(name, deficit);
+    }
+
+    /**
      * Checks inventory before withdrawing item
      *
      * @param checkInv check inventory before withdrawing item
@@ -853,8 +887,8 @@ public class Rs2Bank {
      * @param id     item id to search
      * @param amount amount to withdraw
      */
-    public static void withdrawX(int id, int amount) {
-        withdrawXItem(findBankItem(id), amount);
+    public static boolean withdrawX(int id, int amount) {
+        return withdrawXItem(findBankItem(id), amount);
     }
 
     /**
@@ -875,8 +909,8 @@ public class Rs2Bank {
      * @param name   item name to search
      * @param amount amount to withdraw
      */
-    public static void withdrawX(String name, int amount) {
-        withdrawXItem(findBankItem(name, false), amount);
+    public static boolean withdrawX(String name, int amount) {
+        return withdrawXItem(findBankItem(name, false), amount);
     }
 
     /**
