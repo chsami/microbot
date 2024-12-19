@@ -3,9 +3,12 @@ package net.runelite.client.plugins.microbot.qualityoflife;
 import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.ChatMessageType;
+import net.runelite.api.GameState;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.events.ProfileChanged;
@@ -13,7 +16,8 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.config.ConfigPlugin;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.qualityoflife.enums.*;
+import net.runelite.client.plugins.microbot.qualityoflife.enums.WintertodtActions;
+import net.runelite.client.plugins.microbot.qualityoflife.managers.FletchingManager;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.*;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.pvp.PvpScript;
 import net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtOverlay;
@@ -21,9 +25,6 @@ import net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.Win
 import net.runelite.client.plugins.microbot.util.antiban.FieldUtil;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
-import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.ColorScheme;
@@ -35,17 +36,17 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.*;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static net.runelite.client.plugins.microbot.qualityoflife.scripts.wintertodt.WintertodtScript.isInWintertodtRegion;
 import static net.runelite.client.plugins.microbot.util.Global.awaitExecutionUntil;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 @PluginDescriptor(
         name = PluginDescriptor.See1Duck + "QoL",
@@ -93,6 +94,8 @@ public class QoLPlugin extends Plugin {
     @Inject
     private SpecialAttackScript specialAttackScript;
     @Inject
+    private AutoItemDropperScript autoItemDropperScript;
+    @Inject
     private OverlayManager overlayManager;
     @Inject
     private QoLOverlay qoLOverlay;
@@ -103,6 +106,10 @@ public class QoLPlugin extends Plugin {
     @Inject
     @Getter
     private PvpScript pvpScript;
+    @Inject
+    FletchingManager fletchingManager;
+    @Inject
+    EventBus eventBus;
 
     @Provides
     QoLConfig provideConfig(ConfigManager configManager) {
@@ -154,6 +161,8 @@ public class QoLPlugin extends Plugin {
         qoLScript.run(config);
         wintertodtScript.run(config);
         cannonScript.run(config);
+        autoItemDropperScript.run(config);
+        eventBus.register(fletchingManager);
         // pvpScript.run(config);
         awaitExecutionUntil(() ->Microbot.getClientThread().invokeLater(this::updateUiElements), () -> !SplashScreen.isOpen(), 600);
     }
@@ -164,8 +173,10 @@ public class QoLPlugin extends Plugin {
         autoRunScript.shutdown();
         specialAttackScript.shutdown();
         cannonScript.shutdown();
+        autoItemDropperScript.shutdown();
         overlayManager.remove(qoLOverlay);
         overlayManager.remove(wintertodtOverlay);
+        eventBus.unregister(fletchingManager);
     }
 
     @Subscribe(
@@ -332,45 +343,6 @@ public class QoLPlugin extends Plugin {
         MenuEntry menuEntry = event.getMenuEntry();
         boolean bankChestCheck = "Bank".equals(option) || ("Use".equals(option) && target.contains("Bank chest"));
 
-        if (config.quickFletchKindling() && isInWintertodtRegion() && event.getItemId() == ItemID.KNIFE && "Use".equals(option)) {
-            menuEntry.setOption("<col=FFA500>Fletch Kindle</col>");
-            menuEntry.setTarget("");
-            menuEntry.onClick(this::fletchBrumaRootsOnClicked);
-
-        }
-
-        if (config.quickFletchItems() && !isInWintertodtRegion() && event.getItemId() == ItemID.KNIFE && "Use".equals(option)) {
-            menuEntry.setOption("<col=FFA500>Quick fletch: </col>");
-            menuEntry.setTarget(config.fletchingItem().getName());
-            menuEntry.onClick(this::quickFletchOnClicked);
-        }
-
-        if (config.quickFletchHeadlessArrows() && event.getItemId() == ItemID.ARROW_SHAFT && "Use".equals(option)) {
-            menuEntry.setOption("<col=FFA500>Quick fletch: </col>");
-            menuEntry.setTarget("Headless arrow");
-            menuEntry.onClick(this::quickFletchHeadlessArrowOnClicked);
-        }
-
-        if (config.quickFletchDarts() && Arrays.stream(FletchingDarts.values()).anyMatch(dart -> dart.getDartTipId() == event.getItemId() && dart.meetsLevelRequirement()) && "Use".equals(option)) {
-            menuEntry.setOption("<col=FFA500>Quick fletch: </col>");
-            menuEntry.setTarget(Objects.requireNonNull(FletchingDarts.getDartByDartTipId(event.getItemId())).getDart());
-            menuEntry.onClick(this::quickFletchDartsOnClicked);
-
-
-        }
-
-        if (config.quickFletchArrows() && Arrays.stream(FletchingArrow.values()).anyMatch(arrow -> arrow.getArrowTipId() == event.getItemId() && arrow.meetsLevelRequirement()) && "Use".equals(option)) {
-            menuEntry.setOption("<col=FFA500>Quick fletch: </col>");
-            menuEntry.setTarget(Objects.requireNonNull(FletchingArrow.getArrowByArrowTipId(event.getItemId())).getArrow());
-            menuEntry.onClick(this::quickFletchArrowOnClicked);
-        }
-
-        if( config.quickFletchBolts() && Arrays.stream(FletchingBolt.values()).anyMatch(bolt -> bolt.getBoltTipId() == event.getItemId() && bolt.meetsLevelRequirement()) && "Use".equals(option)) {
-            menuEntry.setOption("<col=FFA500>Quick fletch: </col>");
-            menuEntry.setTarget(Objects.requireNonNull(FletchingBolt.getBoltByBoltTipId(event.getItemId())).getBolt());
-            menuEntry.onClick(this::quickFletchBoltsOnClicked);
-        }
-
         if (config.rightClickCameraTracking() && menuEntry.getNpc() != null && menuEntry.getNpc().getId() > 0) {
             addMenuEntry(event, "Track", target, this::customTrackOnClicked);
         }
@@ -526,123 +498,6 @@ public class QoLPlugin extends Plugin {
         Microbot.log("<col=245C2D>Recording actions for: </col>" + option);
     }
 
-    private void fletchBrumaRootsOnClicked(MenuEntry event) {
-        int brumaRootSlot = Rs2Inventory.slot(ItemID.BRUMA_ROOT);
-        if (brumaRootSlot == -1) {
-            Microbot.log("<col=5F1515>Bruma root not found in inventory</col>");
-            return;
-        }
-        Microbot.log("<col=245C2D>Fletching Kindling</col>");
-        NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", "Bruma root", 0, MenuAction.WIDGET_TARGET_ON_WIDGET, brumaRootSlot, event.getParam1(), false);
-        combinedMenuEntry.setItemId(ItemID.BRUMA_ROOT);
-        Microbot.doInvoke(combinedMenuEntry, new Rectangle(1, 1));
-    }
-
-    private void quickFletchOnClicked(MenuEntry event) {
-        List<Rs2Item> fletchableLogs = FletchingLogs.getFletchableLogs(config.fletchingItem());
-        if (fletchableLogs.isEmpty()) {
-            Microbot.log("<col=5F1515>No fletchable logs found in inventory</col>");
-            return;
-        }
-        int logSlot = fletchableLogs.get(0).getSlot();
-        if (logSlot == -1) {
-            Microbot.log("<col=5F1515>Couldn't get item slot</col>");
-            return;
-        }
-        Microbot.log("<col=245C2D>Fletching: "+ fletchableLogs.get(0).getName() +" To: "+config.fletchingItem().getName() +"</col>");
-        NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", fletchableLogs.get(0).getName(), 0, MenuAction.WIDGET_TARGET_ON_WIDGET, logSlot, event.getParam1(), false);
-        combinedMenuEntry.setItemId(fletchableLogs.get(0).getId());
-        Microbot.doInvoke(combinedMenuEntry, new Rectangle(1, 1));
-        Microbot.getClientThread().runOnSeperateThread(() -> {
-        sleepUntil(Rs2Widget::isProductionWidgetOpen, 1000);
-        if (Rs2Widget.isProductionWidgetOpen()) {
-            Rs2Widget.clickWidget(config.fletchingItem().getContainsInventoryName(), Optional.of(270),13,false);
-        }
-            return null;
-        });
-    }
-
-    private void quickFletchDartsOnClicked(MenuEntry event) {
-        int featherSlot = Rs2Inventory.slot(ItemID.FEATHER);
-        if (featherSlot == -1) {
-            Microbot.log("<col=5F1515>Feather not found in inventory</col>");
-            return;
-        }
-        FletchingDarts dart = FletchingDarts.getDartByDartTipId(event.getItemId());
-        if (dart == null) {
-            Microbot.log("<col=5F1515>Couldn't get dart type</col>");
-            return;
-        }
-        Microbot.log("<col=245C2D>Fletching: "+ dart.getDartTip() +" To: "+ dart.getDart() +"</col>");
-        NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", "Feather", 0, MenuAction.WIDGET_TARGET_ON_WIDGET, featherSlot, event.getParam1(), false);
-        combinedMenuEntry.setItemId(ItemID.FEATHER);
-        Microbot.getMouse().click(Microbot.getClient().getMouseCanvasPosition(),combinedMenuEntry);
-    }
-
-    private void quickFletchBoltsOnClicked(MenuEntry event) {
-        int featherSlot = Rs2Inventory.slot(ItemID.FEATHER);
-        if (featherSlot == -1) {
-            Microbot.log("<col=5F1515>Feather not found in inventory</col>");
-            return;
-        }
-        FletchingBolt bolt = FletchingBolt.getBoltByBoltTipId(event.getItemId());
-        if (bolt == null) {
-            Microbot.log("<col=5F1515>Couldn't get bolt type</col>");
-            return;
-        }
-        Microbot.log("<col=245C2D>Fletching: "+ bolt.getBoltTip() +" To: "+ bolt.getBolt() +"</col>");
-        NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", "Feather", 0, MenuAction.WIDGET_TARGET_ON_WIDGET, featherSlot, event.getParam1(), false);
-        combinedMenuEntry.setItemId(ItemID.FEATHER);
-        Microbot.getMouse().click(Microbot.getClient().getMouseCanvasPosition(),combinedMenuEntry);
-    }
-
-    private void quickFletchHeadlessArrowOnClicked(MenuEntry event) {
-        int featherSlot = Rs2Inventory.slot(ItemID.FEATHER);
-        if (featherSlot == -1) {
-            Microbot.log("<col=5F1515>Feather not found in inventory</col>");
-            return;
-        }
-
-        Microbot.log("<col=245C2D>Fletching: Headless Arrow</col>");
-        NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", "Feather", 0, MenuAction.WIDGET_TARGET_ON_WIDGET, featherSlot, event.getParam1(), false);
-        combinedMenuEntry.setItemId(ItemID.FEATHER);
-        Microbot.getMouse().click(Microbot.getClient().getMouseCanvasPosition(),combinedMenuEntry);
-        Microbot.getClientThread().runOnSeperateThread(() -> {
-            sleepUntil(Rs2Widget::isProductionWidgetOpen, 1000);
-            if (Rs2Widget.isProductionWidgetOpen()) {
-                Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-            }
-            return null;
-        });
-    }
-
-    private void quickFletchArrowOnClicked(MenuEntry event) {
-        int headlessSlot = Rs2Inventory.slot(ItemID.HEADLESS_ARROW);
-        if (headlessSlot == -1) {
-            Microbot.log("<col=5F1515>Headless Arrow not found in inventory</col>");
-            return;
-        }
-
-        FletchingArrow arrow = FletchingArrow.getArrowByArrowTipId(event.getItemId());
-        if (arrow == null) {
-            Microbot.log("<col=5F1515>Couldn't get arrow type</col>");
-            return;
-        }
-
-        Microbot.log("<col=245C2D>Fletching: "+arrow.getArrow() +"</col>");
-        NewMenuEntry combinedMenuEntry = new NewMenuEntry("Fletch", "Feather", 0, MenuAction.WIDGET_TARGET_ON_WIDGET, headlessSlot, event.getParam1(), false);
-        combinedMenuEntry.setItemId(ItemID.HEADLESS_ARROW);
-        Microbot.getMouse().click(Microbot.getClient().getMouseCanvasPosition(),combinedMenuEntry);
-        Microbot.getClientThread().runOnSeperateThread(() -> {
-            sleepUntil(Rs2Widget::isProductionWidgetOpen, 1000);
-            if (Rs2Widget.isProductionWidgetOpen()) {
-                Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-                //Microbot.getMouse().handleMove(Microbot.getMouse().getLastClick2());
-            }
-            return null;
-        });
-        //Microbot.doInvoke(combinedMenuEntry,event.getWidget() != null ? event.getWidget().getBounds() : new Rectangle(1, 1));
-    }
 
     private void applySmoothingToAngle(int index) {
         int currentAngle = index == YAW_INDEX ? Microbot.getClient().getMapAngle() : 0;

@@ -37,4 +37,15 @@ public interface MotherloadMineConfig extends Config {
     default boolean mineUpstairs() {
         return false;
     }
+
+    // Upstairs hopper unlocked
+    @ConfigItem(
+            keyName = "UpstairsHopperUnlocked",
+            name = "Upstairs Hopper Unlocked?",
+            description = "Upstairs hopper unlocked?",
+            position = 3
+    )
+    default boolean upstairsHopperUnlocked() {
+        return false;
+    }
 }

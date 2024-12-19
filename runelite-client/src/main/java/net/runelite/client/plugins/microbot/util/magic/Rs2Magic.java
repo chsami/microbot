@@ -7,12 +7,14 @@ import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
-import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.settings.Rs2SpellBookSettings;
@@ -312,6 +314,19 @@ public class Rs2Magic {
         if (!didCast) return false;
         boolean result = sleepUntilTrue(() -> Rs2Widget.getWidget(chooseCharacterWidgetId) != null && !Rs2Widget.isHidden(chooseCharacterWidgetId), 100, 5000);
         if (!result) return false;
+        Widget chooseCharacterWidget = Rs2Widget.getWidget(chooseCharacterWidgetId);
+        Widget npcWidget = Rs2Widget.findWidget(npcName);
+        // check if npc widget is fully visible inside the choose character widget
+        Rectangle npcBounds = npcWidget.getBounds();
+        Rectangle chooseCharacterBounds = chooseCharacterWidget.getBounds();
+        if (!Rs2UiHelper.isRectangleWithinRectangle(chooseCharacterBounds, npcBounds)) {
+            Microbot.log("NPC widget is not fully visible inside the choose character widget, scrolling...");
+            Global.sleepUntil(() -> Rs2UiHelper.isRectangleWithinRectangle(chooseCharacterBounds, Rs2Widget.findWidget(npcName).getBounds()), () -> {
+                boolean isBelow = npcBounds.y > chooseCharacterBounds.y;
+                if (isBelow) Microbot.getMouse().scrollDown(Rs2UiHelper.getClickingPoint(chooseCharacterWidget.getBounds(),true));
+                else Microbot.getMouse().scrollUp(Rs2UiHelper.getClickingPoint(chooseCharacterWidget.getBounds(),true));
+            }, 5000, 300);
+        }
         boolean clickResult = Rs2Widget.clickWidget(npcName, Optional.of(75), 0, false);
         if (!clickResult) return false;
         Rs2Player.waitForAnimation();
@@ -321,15 +336,15 @@ public class Rs2Magic {
     public static boolean repairPouchesWithLunar() {
         log("Repairing pouches...");
         if (npcContact("dark mage")) {
-            sleep(Random.randomGaussian(Random.random(600, 1200), 300));
+            sleep(Rs2Random.randomGaussian(900, 300));
             Rs2Dialogue.clickContinue();
-            sleep(Random.randomGaussian(Random.random(1000, 2200), 300));
+            sleep(Rs2Random.randomGaussian(900, 500));
             Rs2Widget.sleepUntilHasWidget("Can you repair my pouches?");
-            sleep(Random.randomGaussian(Random.random(600, 1200), 300));
+            sleep(Rs2Random.randomGaussian(900, 300));
             Rs2Widget.clickWidget("Can you repair my pouches?", Optional.of(162), 0, true);
-            sleep(Random.randomGaussian(Random.random(1000, 2200), 300));
+            sleep(Rs2Random.randomGaussian(900, 500));
             Rs2Dialogue.clickContinue();
-            sleep(Random.randomGaussian(1500, 300));
+            sleep(Rs2Random.randomGaussian(1500, 300));
             Rs2Tab.switchToInventoryTab();
         }
         return !Rs2Inventory.hasDegradedPouch();

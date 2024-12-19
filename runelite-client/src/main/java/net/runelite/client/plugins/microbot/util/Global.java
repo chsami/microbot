@@ -79,6 +79,32 @@ public class Global {
         return done;
     }
 
+    /**
+     * Sleeps until a specified condition is met, running an action periodically, or until a timeout is reached.
+     *
+     * @param awaitedCondition The condition to wait for.
+     * @param action           The action to run periodically while waiting.
+     * @param timeoutMillis    The maximum time to wait in milliseconds.
+     * @param sleepMillis      The time to sleep between action executions in milliseconds.
+     * @return true if the condition was met within the timeout, false otherwise.
+     */
+    public static boolean sleepUntil(BooleanSupplier awaitedCondition, Runnable action, long timeoutMillis, int sleepMillis) {
+        long startTime = System.nanoTime();
+        long timeoutNanos = TimeUnit.MILLISECONDS.toNanos(timeoutMillis);
+        try {
+            while (System.nanoTime() - startTime < timeoutNanos) {
+                action.run();
+                if (awaitedCondition.getAsBoolean()) {
+                    return true;
+                }
+                sleep(sleepMillis);
+            }
+        } catch (Exception e) {
+            Thread.currentThread().interrupt(); // Restore the interrupt status
+        }
+        return false; // Timeout reached without satisfying the condition
+    }
+
     public static boolean sleepUntilTrue(BooleanSupplier awaitedCondition) {
         if (Microbot.getClient().isClientThread()) return false;
         long startTime = System.currentTimeMillis();

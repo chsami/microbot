@@ -5,7 +5,7 @@ import lombok.Setter;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
-import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.math.Rs2Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.ui.ClientUI;
@@ -44,7 +44,7 @@ public class BreakHandlerScript extends Script {
 
         Microbot.enableAutoRunOn = false;
         title = ClientUI.getFrame().getTitle();
-        breakIn = Random.random(config.timeUntilBreakStart() * 60, config.timeUntilBreakEnd() * 60);
+        breakIn = Rs2Random.between(config.timeUntilBreakStart() * 60, config.timeUntilBreakEnd() * 60);
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
 
@@ -55,7 +55,9 @@ public class BreakHandlerScript extends Script {
                 }
 
                 if (breakIn > 0 && breakDuration <= 0) {
-                    breakIn--;
+                    if(!(Rs2AntibanSettings.takeMicroBreaks && config.onlyMicroBreaks()))
+                        breakIn--;
+
                     duration = Duration.between(LocalDateTime.now(), LocalDateTime.now().plusSeconds(breakIn));
                     breakInDuration = duration;
                 }
@@ -80,7 +82,7 @@ public class BreakHandlerScript extends Script {
                         return;
                     Microbot.pauseAllScripts = false;
                     if (breakIn <= 0)
-                        breakIn = Random.random(config.timeUntilBreakStart() * 60, config.timeUntilBreakEnd() * 60);
+                        breakIn = Rs2Random.between(config.timeUntilBreakStart() * 60, config.timeUntilBreakEnd() * 60);
 
                     if (config.useRandomWorld()) {
                         new Login(Login.getRandomWorld(Login.activeProfile.isMember()));
@@ -106,7 +108,7 @@ public class BreakHandlerScript extends Script {
                     }
 
 
-                    breakDuration = Random.random(config.breakDurationStart() * 60, config.breakDurationEnd() * 60);
+                    breakDuration = Rs2Random.between(config.breakDurationStart() * 60, config.breakDurationEnd() * 60);
 
                     if (config.logoutAfterBreak()) {
                         Rs2Player.logout();

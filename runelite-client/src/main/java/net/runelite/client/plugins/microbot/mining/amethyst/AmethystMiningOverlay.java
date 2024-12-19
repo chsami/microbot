@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.mining.amethyst;
 
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -30,8 +31,15 @@ public class AmethystMiningOverlay extends OverlayPanel {
 
             addEmptyLine();
 
-            Rs2Antiban.renderAntibanOverlayComponents(panelComponent);
-
+            if(Rs2AntibanSettings.devDebug)
+                Rs2Antiban.renderAntibanOverlayComponents(panelComponent);
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Gem bag inv count: " + AmethystMiningScript.inventoryCountSinceLastGemBagCheck)
+                    .build());
+            addEmptyLine();
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Items to keep: " + AmethystMiningScript.itemsToKeep.toString())
+                    .build());
             addEmptyLine();
 
             panelComponent.getChildren().add(LineComponent.builder()
