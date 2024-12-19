@@ -112,7 +112,7 @@
 1740 3517 0		8013		4	Teleport to House tablet	T	19	2187=8
 								
 #  Teleport tablets								
-3213 3424 0		8007		4	Varrock tablet	T	19	
+3213 3424 0		8007		4	Varrock tablet	T	19	4070=0;4585=0
 2965 3378 0		8009		4	Falador tablet	T	19	
 3221 3218 0		8008		4	Lumbridge tablet	T	19	
 2757 3478 0		8010		4	Camelot tablet	T	19	
@@ -328,4 +328,5 @@
 1175 3424 0		28327		4	Ring of shadows: The Stranglewood	T	19	
 								
 #Quetzal Whistle								
-1585 3053 0		29271;29273;29275	Children of the Sun	4	Quetzal whistle	T	19	
+1585 3053 0		29271;29273;29275	Children of the Sun	4	Quetzal whistle	T	19
+3164 3478 0		8007		4	Varrock tablet: Grand exchange	T	19	4070=0;4480=1;4585=1

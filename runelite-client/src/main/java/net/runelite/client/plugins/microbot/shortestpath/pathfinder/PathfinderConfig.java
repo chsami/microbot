@@ -65,6 +65,7 @@ public class PathfinderConfig {
             useTeleportationLevers,
             useTeleportationPortals,
             useTeleportationSpells,
+            useMagicCarpets,
             useWildernessObelisks;
     //START microbot variables
     @Getter
@@ -128,6 +129,7 @@ public class PathfinderConfig {
         useTeleportationPortals = config.useTeleportationPortals();
         useTeleportationSpells = config.useTeleportationSpells();
         useWildernessObelisks = config.useWildernessObelisks();
+        useMagicCarpets = config.useMagicCarpets();
         distanceBeforeUsingTeleport = config.distanceBeforeUsingTeleport();
 
         //START microbot variables
@@ -416,6 +418,7 @@ public class PathfinderConfig {
                 case QUETZAL:
                 case WILDERNESS_OBELISK:
                 case TELEPORTATION_LEVER:
+                case MAGIC_CARPET:
                 case SPIRIT_TREE:
                     return false;
             }
@@ -454,6 +457,8 @@ public class PathfinderConfig {
                 return useTeleportationPortals;
             case TELEPORTATION_SPELL:
                 return useTeleportationSpells;
+            case MAGIC_CARPET:
+                return useMagicCarpets;
             case WILDERNESS_OBELISK:
                 return useWildernessObelisks;
             default:

@@ -5,10 +5,7 @@ import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.TransportType;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class CollisionMap {
     // Enum.values() makes copies every time which hurts performance in the hotpath
@@ -74,6 +71,14 @@ public class CollisionMap {
     // This is only safe if pathfinding is single-threaded
     private final List<Node> neighbors = new ArrayList<>(16);
     private final boolean[] traversable = new boolean[8];
+
+    private final List<WorldPoint> ignoreCollision = Arrays.asList(
+            new WorldPoint(3142, 3457, 0),
+            new WorldPoint(3141, 3457, 0),
+            new WorldPoint(3142, 3457, 0),
+            new WorldPoint(3141, 3458, 0),
+            new WorldPoint(3141, 3456, 0),
+            new WorldPoint(3142, 3456, 0));
 
     public List<Node> getNeighbors(Node node, VisitedTiles visited, PathfinderConfig config, WorldPoint target) {
         final int x = WorldPointUtil.unpackWorldX(node.packedPosition);
@@ -147,6 +152,11 @@ public class CollisionMap {
             if (visited.get(neighborPacked)) continue;
             if (config.getRestrictedPointsPacked().contains(neighborPacked)) continue;
             if (config.getCustomRestrictions().contains(neighborPacked)) continue;
+
+            if (ignoreCollision.contains(new WorldPoint(x, y, z))) {
+                neighbors.add(new Node(neighborPacked, node));
+                continue;
+            }
 
             if (traversable[i]) {
                 neighbors.add(new Node(neighborPacked, node));
