@@ -954,6 +954,13 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                             break;
                         }
                     }
+                    
+                    if (transport.getType() == TransportType.MAGIC_CARPET) {
+                        if (handleMagicCarpet(transport)) {
+                            sleep(600 * 2); // wait 2 extra ticks before walking
+                            break;
+                        }
+                    }
 
                     if (transport.getType() == TransportType.GNOME_GLIDER) {
                         if (handleGlider(transport)) {
@@ -1353,7 +1360,18 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
         }
         return false;
     } 
+    
+    private static boolean handleMagicCarpet(Transport transport) {
+        final int flyingPoseAnimation = 6936;
+        NPC rugMerchant = Rs2Npc.getNpc(transport.getObjectId());
+        if (rugMerchant == null) return false;
 
+        Rs2Npc.interact(rugMerchant, transport.getAction());
+        Rs2Dialogue.sleepUntilInDialogue();
+        Rs2Dialogue.clickOption(transport.getDisplayInfo());
+        sleepUntil(() -> Rs2Player.getPoseAnimation() == flyingPoseAnimation, 10000);
+        return sleepUntilTrue(() -> Rs2Player.getPoseAnimation() != flyingPoseAnimation, 600,60000);
+    }
     /**
      * interact with interfaces like spirit tree & xeric talisman etc...
      *

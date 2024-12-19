@@ -331,6 +331,17 @@ public interface ShortestPathConfig extends Config {
         return true;
     }
 
+    @ConfigItem(
+            keyName = "useMagicCarpets",
+            name = "Use Magic Carpets",
+            description = "Whether to include magic carpets in the path.<br>",
+            position = 26,
+            section = sectionSettings
+    )
+    default boolean useMagicCarpets() {
+        return true;
+    }
+
     @ConfigSection(
             name = "Display",
             description = "Options for displaying the path on the world map, minimap and scene tiles",
