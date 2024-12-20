@@ -28,5 +28,15 @@ public interface HolidayConfig extends Config {
         return true; // Default to true
     }
 
+    @ConfigItem(
+            keyName = "collectSnow",
+            name = "Collect Snow",
+                description = "Only use if 1 tile next to snow. Will interact with snow on the client thread when near logout."
+    )
+    default boolean collectSnow() {
+        return true; // Default to true
+    }
+
+
 
 }
