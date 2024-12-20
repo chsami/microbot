@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.coords.Rs2WorldPoint;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.magic.Rs2Magic;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MahoganyHomesScript extends Script {
 
-    public static String version = "0.0.2";
+    public static String version = "0.0.3";
     @Inject
     MahoganyHomesPlugin plugin;
 
@@ -268,6 +269,12 @@ public class MahoganyHomesScript extends Script {
     // Get new contract
     private void getNewContract() {
         if (plugin.getCurrentHome() == null) {
+            if(plugin.getConfig().useNpcContact()){
+                if (Rs2Magic.npcContact("amy")) {
+                    handleContractDialogue();
+                }
+                return;
+            }
             WorldPoint contractLocation = getClosestContractLocation();
             if (contractLocation.distanceTo2D(Rs2Player.getWorldLocation()) > 10) {
                 log("Walking to contract NPC");
@@ -283,12 +290,7 @@ public class MahoganyHomesScript extends Script {
                 }
                 log("NPC found: " + npc.getComposition().transform().getName());
                 if (Rs2Npc.interact(npc, "Contract")) {
-                    sleepUntil(Rs2Dialogue::hasSelectAnOption, 5000);
-                    Rs2Dialogue.keyPressForDialogueOption(plugin.getConfig().currentTier().getPlankSelection().getChatOption());
-                    sleepUntil(Rs2Dialogue::hasContinue, 10000);
-                    sleep(400, 800);
-                    sleepUntil(() -> !Rs2Dialogue.isInDialogue(), Rs2Dialogue::clickContinue, 6000, 300);
-                    sleep(1200, 2200);
+                    handleContractDialogue();
                 }
 
             }
@@ -297,12 +299,23 @@ public class MahoganyHomesScript extends Script {
 
     }
 
+    public void handleContractDialogue() {
+        sleepUntil(Rs2Dialogue::hasSelectAnOption, Rs2Dialogue::clickContinue, 10000, 300);
+        Rs2Dialogue.keyPressForDialogueOption(plugin.getConfig().currentTier().getPlankSelection().getChatOption());
+        sleepUntil(Rs2Dialogue::hasContinue, 10000);
+        sleep(400, 800);
+        sleepUntil(() -> !Rs2Dialogue.isInDialogue(), Rs2Dialogue::clickContinue, 6000, 300);
+        sleep(1200, 2200);
+    }
+
     // Bank if we need to
     private void bank() {
-        if (plugin.getCurrentHome() != null
-                && !plugin.getCurrentHome().isInside(Rs2Player.getWorldLocation())
+        Home currentHome = plugin.getCurrentHome();
+        if (currentHome != null
+                && plugin.distanceBetween(currentHome.getArea(), Rs2Player.getWorldLocation()) > 0
                 && isMissingItems()) {
-            if (Rs2Bank.walkToBankAndUseBank()) {
+
+            if (Rs2Bank.walkToBankAndUseBank(Rs2Bank.getNearestBank(currentHome.getLocation()))) {
                 sleep(600, 1200);
                 if (Rs2Inventory.getEmptySlots() - steelBarsNeeded() > 0)
                     Rs2Bank.withdrawX(plugin.getConfig().currentTier().getPlankSelection().getPlankId(), Rs2Inventory.getEmptySlots() - steelBarsNeeded());

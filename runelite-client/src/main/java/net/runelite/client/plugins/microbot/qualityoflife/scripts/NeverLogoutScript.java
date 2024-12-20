@@ -8,7 +8,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import java.awt.event.KeyEvent;
 
 public class NeverLogoutScript {
-    private static long randomDelay;
+    private static long randomDelay = Rs2Random.between(1000,3000);
 
     public static void onGameTick(GameTick event) {
         if (Rs2Player.checkIdleLogout(randomDelay)) {

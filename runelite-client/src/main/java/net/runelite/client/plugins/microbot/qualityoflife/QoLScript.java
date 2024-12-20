@@ -28,7 +28,7 @@ public class QoLScript extends Script {
         loadNpcData();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (!Microbot.isLoggedIn() || !super.run()) {
+                if (!Microbot.isLoggedIn()) {
                     return;
                 }
 

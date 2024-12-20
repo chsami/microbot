@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.breakhandler;
 
+import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -40,7 +41,7 @@ public class BreakHandlerOverlay extends OverlayPanel {
 
             if (BreakHandlerScript.breakIn > 0) {
                 panelComponent.getChildren().add(LineComponent.builder()
-                        .left(BreakHandlerScript.formatDuration(BreakHandlerScript.breakInDuration, "Break in:"))
+                        .left((Rs2AntibanSettings.takeMicroBreaks && config.onlyMicroBreaks()) ? "Only Micro Breaks" : BreakHandlerScript.formatDuration(BreakHandlerScript.breakInDuration, "Break in:"))
                         .build());
             }
             if (BreakHandlerScript.breakDuration > 0) {
